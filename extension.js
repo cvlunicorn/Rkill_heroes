@@ -586,7 +586,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qixichicheng: ["female", "shu", 4, ["hangmucv", "qixi_cv"], ["zhu", "des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
                             wufenzhongchicheng: ["female", "shu", 4, ["hangmucv", "mingyundewufenzhong"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
                             dumuchenglinqiye: ["female", "wei", 4, ["hangmucv", "dumuchenglin"], ["des:有必中攻击，快跑"]],
-                            bisimai: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb"], ["zhu", "des:更多刮痧炮，更多炮弹，更多削弱光环，更多护甲模组，更多血量。"]],
+                            bisimai: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb", "qijianshashou"], ["zhu", "des:更多刮痧炮，更多炮弹，更多削弱光环，更多护甲模组，更多血量。"]],
                             misuli: ["female", "wei", 4, ["zhuangjiafh", "zhanliebb"], ["des:用精巧的手枪去质疑，用绝对的火力回击对手。"]],
                             weineituo: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb"], ["des:身材小，而强度惊人。"]],
                             lisailiu: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb"], ["des:幸运的象征之一，同时有着丰富的精神象征。"]],
@@ -3471,6 +3471,81 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
                             },
+                            qijianshashou: {
+                                trigger:{
+                                    player:"phaseUseBegin",
+                                },
+                                direct:true,
+                                //enable: "phaseUse",
+                                //usable: 1,
+                                //filterTarget: function (card, player, target) {
+                                //    return player.canCompare(target);
+                                //},
+                                //filter: function (event, player) {
+                                //    return player.countCards('h') > 0;
+                                //},
+                                content: function () {
+                                    'step 0'
+                                    player.chooseTarget(get.prompt2('qijianshashou'),function(card,player,target){
+                                        return player.canCompare(target);
+                                    }).set('ai',function(target){
+                                        return -get.attitude(player,target);
+                                    });
+                                    'step 1'
+                                    if(result.bool){
+                                        var target=result.targets[0];
+                                        event.target=target;
+                                        player.logSkill('qijianshashou',target);
+                                        player.chooseToCompare(target);
+                                    }
+                                    else{
+                                        event.finish();
+                                    }
+                                    'step 2'
+                                    game.log("拼点结果"+result.bool);
+                                    if (result.bool) {
+                                        player.markAuto('qijianshashou_1', [target]);
+                                        player.addTempSkill("qijianshashou_1");
+                                        game.log("拼点赢");
+                                    } else {
+                                        trigger.cancel();
+                                        player.skip('phaseUse');
+                                        player.skip('phaseDiscard');
+                                        game.log("拼点没赢");
+                                    }
+                                },
+                                ai:{
+                                    expose:0.2,
+                                },
+                            },
+                            qijianshashou_1: {
+                                mark: "character",
+                                onremove: true,
+                                intro: {
+                                    content: "到$的距离视为1",
+                                },
+                                mod: {
+                                    globalFrom: function (from, to) {
+                                        if (from.getStorage('qijianshashou_1').contains(to)) {
+                                            return -Infinity;
+                                        }
+                                    },
+                                },
+                                trigger: {
+                                    source: "damageBegin",
+                                },
+                                charlotte: true,
+                                forced: true,
+                                filter: function (event, player) {
+                                    return event.card&&(event.card.name == "sha"||event.card.name == "sheji9") && event.player.getStorage('qijianshashou_1')&&event.player != player;
+                                },
+                                content: function () {
+                                    trigger.num++;
+                                    game.log("伤害+1");
+                                },
+                                "_priority": 0,
+                            }
+
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -3569,11 +3644,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             sawohaizhan: "萨沃海战", "sawohaizhan_info": "若你拥有[火控]，你可以失去[火控]，若如此做你本回合使用雷杀无距离限制且伤害+1。昆西受到伤害时，你摸x张牌(x为此次伤害的数值)",
                             sawohaizhan_OvO: "萨沃海战_昆西", "sawohaizhan_OvO_info": "昆西受到伤害时，你摸x张牌(x为此次伤害的数值)",
                             sawohaizhan_1: "萨沃海战", "sawohaizhan_1_info": "本回合使用雷杀无距离限制且伤害+1。",
-
                             mingyundewufenzhong: "命运的五分钟", "mingyundewufenzhong_info": "你可以跳过判定和摸牌阶段，视为使用一张雷杀或火杀，你可以弃置一张装备牌并跳过出牌阶段，视为使用一张雷杀或火杀，你可以跳过弃牌阶段并翻面，视为使用一张雷杀或火杀。",
                             wufenzhong1: "命运的五分钟", "wufenzhong1_info": "你可以跳过判定和摸牌阶段，视为使用一张雷杀或火杀",
                             wufenzhong2: "命运的五分钟", "wufenzhong2_info": "你可以弃置一张装备牌并跳过出牌阶段，视为使用一张雷杀或火杀",
                             wufenzhong4: "命运的五分钟", "wufenzhong4_info": "你可以跳过弃牌阶段并翻面，视为使用一张雷杀或火杀。",
+                            qijianshashou: "旗舰杀手", "qijianshashou_info": "出牌阶段开始时，你可以与一名角色进行拼点，若你赢，本回合你与该角色距离视为1，你对该目标使用杀伤害+1，若你没赢，你跳过出牌阶段和弃牌阶段。",
+                            qijianshashou_1: "旗舰杀手", "qijianshashou_1_info": "",
+                        
                         },
                     };
                     if (lib.device || lib.node) {
