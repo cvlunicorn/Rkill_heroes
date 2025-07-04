@@ -1,3 +1,5 @@
+//目录：全局技能、武将列表、武将技能、武将和技能翻译、卡牌包与卡牌技能、卡牌翻译、配置（config）、单机武将列表、扩展简介、全局函数模块
+
 game.import("extension", function (lib, game, ui, get, ai, _status) {
     return {
         name: "舰R牌将", content: function (config, pack) {
@@ -608,8 +610,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             minsike: ["female", "qun", 3, ["huibi", "quzhudd", "manchangzhanyi", "manchangzhanyi_1"], ["des:跑得快，看得多。"]],
                             "u1405": ["female", "qun", 3, ["qianting", "baiyin_skill"], ["des:无需隐匿的偷袭大师，马上就让对手的后勤捉襟见肘。"]],
                             jingjishen: ["female", "wu", 3, ["junfu"], ["des:需要武器支援，伙计倒下了。"]],
-                            changchun: ["female", "shu", 3, ["daoqu"], ["des:尚处于正能量之时。"]],
-                            skilltest: ["male", "qun", 9, ["fangko2"], ["forbidai", "des:测试用"]],
+                            changchun: ["female", "shu", 3, ["daoqu", "rand"], ["des:尚处于正能量之时。"]],
+                            skilltest: ["male", "qun", 9, ["rand"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
                             _yuanhang: {
@@ -1413,6 +1415,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player.useCard({ name: 'jinjuzy' }, result.targets, false);
                                     }
                                 },
+                                ai:{
+                                        order:10,
+                                        useful:1,
+                                        value:5,
+                                    },
                                 intro: {
                                     content: function () {
                                         return get.translation(skill + '_info');
@@ -3043,9 +3050,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter: function (event, player) {
                                     var evtx = event.getParent('phaseUse');
                                     if (!evtx || evtx.player != player) return false;
-                                    return player.getHistory('useCard', evt => {
-                                        return (evt.card.name == 'sha' || evt.card.name == 'sheji9') & event.getParent('phaseUse') == evtx;
-                                    }).indexOf(event) == 0;
+                                    //return player.getHistory('useCard', evt => {
+                                    return _status.currentPhase == player && player.countUsed() == 1 && (event.card.name == 'sha' || event.card.name == 'sheji9') & event.getParent('phaseUse') == evtx;
+                                    //}).indexOf(event) == 0;
                                 },
                                 direct: true,
                                 content: function () {
@@ -3069,6 +3076,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 logTarget: function (event, player) {
                                     return game.players.sortBySeat(player);
                                 },
+
+
                                 content: function () {
                                     'step 0'
                                     player.awakenSkill('qixi_cv');
@@ -3077,44 +3086,63 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     event.targets = game.filterPlayer(current => current != player).sortBySeat();
                                     game.log(event.targets);
                                     'step 1'
-                                        lib.target=event.targets.shift();
-                                        if ( lib.target.countCards('he') < 1) event._result = { index: 2 };
-                                        else  lib.target.chooseControlList(
-                                            ['令' + get.translation(player) + '弃置你区域内的两张牌',
-                                                '本回合不能使用或打出手牌', '翻面'],
-                                            true).set('ai',function(event,player){
-                                                var target=_status.event.getParent().player;
-                                                var player=_status.event.player;
-                                                if(get.attitude(player,target)>0) return 1;
-                                                else if( lib.target.countCards('e')<1)return 0
-                                                return 2;
-                                            });
-                                        game.log( lib.target);
-                                        game.log("选择完成");
-                                        'step 2'
-                                        if (result.index == 0) {
-                                            game.log("弃牌");
-                                            player.discardPlayerCard( lib.target,2,'hej',true)
-                                            
-                                        } else if (result.index == 1) {
-                                            game.log("不能使用手牌");
-                                            lib.target.addTempSkill('qixi_cv_block');
-                                            
-                                        } else {
-                                            game.log("翻面");
-                                            lib.target.turnOver();
-                                            
-                                        }
-                                        
-                                        game.log("操作完成");
-                                    
+                                    lib.target = event.targets.shift();
+                                    if (lib.target.countCards('he') < 1) event._result = { index: 2 };
+                                    else lib.target.chooseControlList(
+                                        ['令' + get.translation(player) + '弃置你区域内的两张牌',
+                                            '本回合不能使用或打出手牌', '翻面'],
+                                        true).set('ai', function (event, player) {
+                                            var target = _status.event.getParent().player;
+                                            var player = _status.event.player;
+                                            const options = [
+                                                { name: "弃牌", weight: 3 },
+                                                { name: "沉默", weight: 3 },
+                                                { name: "翻面", weight: 1 },
+                                            ];
+                                            //根据条件修改权重
+                                            if (get.attitude(player, target) > 0) options[1].weight += 1;
+                                            if (!lib.target.hasEmptySlot(2)) options[0].weight -= 2;
+                                            else if (lib.target.countCards("h") > 3) options[0].weight += 1;
+                                            if (lib.target.hp <= 2) options[1].weight -= 1;
+
+                                            //加权随机
+                                            const selectedOption = weightedRandom(options);
+                                            game.log(selectedOption);
+                                            if (selectedOption == "弃牌") return 0;
+                                            else if (selectedOption == "沉默") return 1;
+                                            else if (selectedOption == "翻面") return 2;
+
+
+                                            return 2;
+                                        });
+
+
+                                    game.log(lib.target);
+                                    game.log("选择完成");
+                                    'step 2'
+                                    if (result.index == 0) {
+                                        game.log("弃牌");
+                                        player.discardPlayerCard(lib.target, 2, 'hej', true)
+
+                                    } else if (result.index == 1) {
+                                        game.log("不能使用手牌");
+                                        lib.target.addTempSkill('qixi_cv_block');
+
+                                    } else {
+                                        game.log("翻面");
+                                        lib.target.turnOver();
+
+                                    }
+
+                                    game.log("操作完成");
+
                                     'step 2'
                                     if (event.num < targets.length) event.goto(1);
                                     else game.delayx();
                                     game.log("技能结束");
                                     'step 3'
-                                    var next=game.createEvent('hangmucv');
-                                    next.player=player;
+                                    var next = game.createEvent('hangmucv');
+                                    next.player = player;
                                     next.setContent(lib.skill.hangmucv.content);
                                 },
                                 subSkill: {
@@ -3133,33 +3161,21 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         "_priority": 0,
                                     },
                                 },
-                                ai:{
-                                    order:1,
-                                    result:{
-                                        player:function(player){
-                                            if(lib.config.mode=='identity'&&game.zhu.isZhu&&player.identity=='fan'){
-                                                if(game.zhu.hp==1&&game.zhu.countCards('h')<=2) return 1;
-                                            }
-                                            var num=0;
-                                            var players=game.filterPlayer();
-                                            for(var i=0;i<players.length;i++){
-                                                var att=get.attitude(player,players[i]);
-                                                if(att>0) att=1;
-                                                if(att<0) att=-1;
-                                                if(players[i]!=player&&players[i].hp<=3){
-                                                    if(players[i].countCards('h')==0) num+=att/players[i].hp;
-                                                    else if(players[i].countCards('h')==1) num+=att/2/players[i].hp;
-                                                    else if(players[i].countCards('h')==2) num+=att/4/players[i].hp;
+                                ai: {
+                                    order: 10,
+                                    result: {
+
+                                        player: function (player) {
+                                            var damageCards = player.getCards('h', function (card) {
+                                                return get.tag(card,'damage')&&get.type(card) == 'trick';
+                                            });
+                                            if (damageCards.length>=1) { 
+                                            return game.countPlayer(function (current) {
+                                                if (current != player) {
+                                                    return get.sgn(get.damageEffect(current, player, player));
                                                 }
-                                                if(players[i].hp==1) num+=att*1.5;
-                                            }
-                                            if(player.hp==1){
-                                                return -num;
-                                            }
-                                            if(player.hp==2){
-                                                return -game.players.length/4-num;
-                                            }
-                                            return -game.players.length/3-num;
+                                            });}
+                                            return 0;
                                         },
                                     },
                                 },
@@ -3167,6 +3183,22 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     content: "limited",
                                 },
                                 "_priority": 0,
+                            },
+                            rand: {
+                                enable: "phaseUse",
+                                content: function () {
+                                    const options = [
+                                        { name: "一", weight: 1 },
+                                        { name: "二", weight: 1 },
+                                        { name: "三", weight: 1 },
+                                        { name: "四", weight: 1 },
+                                        { name: "五", weight: 1 },
+                                        { name: "六", weight: 1 },
+                                    ];
+                                    game.log(options);
+                                    const selectedOption = weightedRandom(options);
+                                    game.log("随机选择的选项是:" + selectedOption);
+                                }
                             }
                             //在这里添加新技能。
 
@@ -3260,6 +3292,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             hangkongzhanshuxianqu: "航空战术先驱", "hangkongzhanshuxianqu_info": "你使用转化的锦囊牌指定目标时，你摸x张牌(x为你指定的目标数，至多为你当前的体力上限)",
                             gaosusheji: "高速射击", "gaosusheji_info": "当你使用的杀是本回合你使用的第一张牌，你可以令此杀结算两次。",
                             qixi_cv: "奇袭", "qixi_cv_info": "限定技，出牌阶段，你可以令所有其他角色依次选择一项:1你弃置其区域内的两张牌，2本回合不能使用或打出手牌，3翻面。然后你可以发动一次【航母】。",
+                            rand: "随机数", "rand_info": "遇事不决？扔一个骰子吧。该技能可以生成1~6的随机数",
                         },
                     };
                     if (lib.device || lib.node) {
@@ -4643,3 +4676,29 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
         }, files: { "character": ["changchun.jpg"], "card": ["fasheqi3.png"], "skill": [] }
     }
 })
+//functions
+//加权随机函数，输入包含选项和选项的权重的数组，输出随机到的选项
+/*调用示例
+    const options = [
+    { name: "选项一", weight: 2 },
+    { name: "选项二", weight: 3 },
+    { name: "选项三", weight: 1 },
+  ];
+  
+  const selectedOption = weightedRandom(options);
+  console.log("随机选择的选项是:", selectedOption);*/
+function weightedRandom(options) {
+    const totalWeight = options.reduce((acc, option) => acc + option.weight, 0);
+    const randomValue = Math.random() * totalWeight;
+
+    let cumulativeWeight = 0;
+    for (const option of options) {
+        cumulativeWeight += option.weight;
+        if (randomValue <= cumulativeWeight) {
+            return option.name;
+        }
+    }
+
+    // This should not happen, but just in case.
+    return null;
+};
