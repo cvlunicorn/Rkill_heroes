@@ -3260,16 +3260,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhudaojiandui:{
                                 enable:"phaseUse",
                                 filter:function(event,player){
-                                    return player.countMark('zhudaojiandui')>1;
-                                },
-                                filterTarget:function(card,player,target){
-                                    return target!=player&&player.canUse('sha',target,false);
+                                    return player.countMark('zhudaojiandui')>2;
                                 },
                                 content:function(){
                                     'step 0'
-                                    player.removeMark('zhudaojiandui',2);
-                                    'step 1'
-                                    player.useCard({name:'sha',isCard:true},target,false);
+                                    player.removeMark('zhudaojiandui',3);
+                                    player.chooseUseTarget('sha',false);
                                 },
                                 marktext:"柱",
                                 intro:{
@@ -3281,11 +3277,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 subSkill:{
                                     add:{
                                         trigger:{
-                                            player:"useCardAfter",
+                                            player:["useCardAfter","respond"],
                                         },
                                         forced:true,
                                         filter:function(event,player){
-                                            return true;
+                                            return get.type(event.card)=='basic'&&event.card.isCard;
                                         },
                                         content:function(){
                                             player.addMark('zhudaojiandui',1);
@@ -3391,7 +3387,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qixi_cv: "奇袭", "qixi_cv_info": "限定技，出牌阶段，你可以令所有其他角色依次选择一项:1你弃置其区域内的两张牌，2本回合不能使用或打出手牌，3翻面。然后你可以视为使用【近距支援】。",
                             rand: "随机数", "rand_info": "遇事不决？扔一个骰子吧。该技能可以生成1~6的随机数",
                             duikongfangyu: "对空防御", "duikongfangyu_info": "你受到万箭齐发和近距支援伤害时，你防止此伤害。你发动[防空]后，你摸x张牌(x为本次防空无效的目标数。)",
-                            zhudaojiandui: "柱岛舰队", "zhudaojiandui_info": "锁定技，每当你使用一张牌，你获得一个[柱]标记。你可以移去两个柱标记视为使用一张不计入次数限制的杀。",
+                            zhudaojiandui: "柱岛舰队", "zhudaojiandui_info": "锁定技，每当你使用或打出一张非虚拟非转化的基本牌，你获得一个[柱]标记。你可以移去三个柱标记视为使用一张不计入次数限制的杀。",
                         },
                     };
                     if (lib.device || lib.node) {
