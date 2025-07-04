@@ -2349,6 +2349,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                                 mod: {
+                                    cardEnabled: function (card) {
+                                        if (card.name == 'tao'||card.name == 'kuaixiu9') return false;
+                                    },
                                     maxHandcardBase: function (player, num) {
                                         var damage = player.getStat().damage;
                                         if (typeof damage == 'number') return damage;
@@ -2579,7 +2582,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "junfu_info": "其他人回合开始时,你可以把至多1/2/3张手牌存于武将牌上，如手牌般使用。<br>其他角色回合开始时，你可以把存储的牌交给ta，然后你摸一张牌。<br>可以强化(目标的手牌数<8才能使用此技能)<br>拥有技能强化和远航强化即可起飞。",
                             manchangzhanyi: "漫长战役", "manchangzhanyi_info": "每轮限一次，你受到锦囊牌的伤害时，你免疫此伤害。你攻击范围内的其他角色回合结束时，你可以弃置其一张手牌。",
                             manchangzhanyi_1: "漫长战役", "manchangzhanyi_1_info": "",
-                            guzhuyizhi: "孤注一掷", "guzhuyizhi_info": "出牌阶段开始时，你可以摸两张牌并弃置所有手牌，然后摸等量的牌，如此做，你的其他技能失效直到你的下回合开始，你计算与其他角色的距离-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。",
+                            guzhuyizhi: "孤注一掷", "guzhuyizhi_info": "出牌阶段开始时，你可以摸两张牌并弃置所有手牌，然后摸等量的牌，如此做，你的其他技能失效且你不能使用桃或快修直到你的下回合开始，你计算与其他角色的距离-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。",
                             guzhuyizhi2: "孤注一掷", "guzhuyizhi2_info": "",
                             shuileizhandui_1: "水雷战队", "shuileizhandui_1_info": "你可以将一张牌交给其他角色",
                             shuileizhandui: "水雷战队", "shuileizhandui_info": "出牌阶段限一次，你可以摸一张牌并交给一名角色一张手牌，然后该角色可以交给另一名未以此法接受过牌的角色一张手牌，重复这个流程直到场上没有未接受过牌的角色或者有角色取消。这个流程重复第4次时，从牌堆将1张雷杀加入自己手牌。",
