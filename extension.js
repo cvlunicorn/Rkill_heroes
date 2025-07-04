@@ -28,7 +28,7 @@ game.import("extension",function(lib,game,ui,get,ai,_status){return {name:"舰R�
                 'step 0'
         if(player.identity=='zhu'){
  event.choiceList=[ ]; event.skills=[ ]; event.cao=cards;event.jieshao=[];
-        event.skills=['qixing','nzry_cunmu','huogong','repojun','nlianji','new_reyiji'];for(var skill of event.skills){
+        event.skills=['qixing','nzry_cunmu','huogong','repojun','gushe','new_reyiji'];for(var skill of event.skills){
  event.jieshao.push([skill,'<div class="popup text" style="width:calc(100% - 10px);display:inline-block"><div class="skill">【'+get.translation(skill)+'】</div><div>'+lib.translate[skill+'_info']+'</div></div>'],);};
    event.choiceList=(event.jieshao);    
         event.first=true;    //存了6个变量，可以导出为button，与textbutton样式，看需求
@@ -47,12 +47,12 @@ default: return 0;}});
  if(result.links.contains('qixing')){targets[i].addTempSkill('qixing','roundStart');targets[i].addTempSkill('qixing2','roundStart')};
  if(result.links.contains('reguanxing')){targets[i].addTempSkill('reguanxing','roundStart');targets[i].addTempSkill('nzry_cunmu','roundStart');targets[i].addTempSkill('gwjingtian','phaseZhunbeiBegin');if(i<targets.length/2-1){var s=targets.length-i;targets[s].useSkill('reguanxing');};};
  if(result.links.contains('repojun')){targets[i].addTempSkill('repojun','roundStart');targets[i].addTempSkill('zhongji','roundStart');targets[i].addTempSkill('tongxie','roundStart');targets[i].addTempSkill('kaikang','roundStart')};
- if(result.links.contains('nlianji')){targets[i].addTempSkill('nlianji','roundStart');targets[i].addTempSkill('songshu','roundStart');targets[i].addTempSkill('weimu','roundStart');};
- if(result.links.contains('new_reyiji')){targets[i].addTempSkill('jianxiong','roundStart');targets[i].addTempSkill('ganglie','roundStart');targets[i].addTempSkill('new_reyiji','roundStart');};
- if(result.links.contains('huogong')){targets[i].chooseUseTarget({name:'huogong'});};};
+ if(result.links.contains('gushe')){targets[i].addTempSkill('gushe','roundStart');targets[i].addTempSkill('nlianji','roundStart');targets[i].addTempSkill('songshu','roundStart');targets[i].addTempSkill('weimu','roundStart');};
+ if(result.links.contains('new_reyiji')){targets[i].addTempSkill('jianxiong','roundStart');targets[i].addTempSkill('reganglie','roundStart');targets[i].addTempSkill('new_reyiji','roundStart');};
+ if(result.links.contains('huogong')){targets[i].chooseUseTarget({name:'jiu'});targets[i].chooseUseTarget({name:'huogong'});};};
         };
     }},}};
-        if(config.yidong){
+        if (config.yidong){
         lib.skill._yidong={
         name:"移动座位",
         prompt:"与相邻的队友交换座次，适合互相攻击临近的目标。<br>事件过程为：双方交换座次，之后若你的座次靠后并处于出牌阶段，<br>翻面，目标获得额外回合。",
@@ -68,7 +68,7 @@ default: return 0;}});
         if(target==player.previous){
         var evt=_status.event.getParent('phaseUse');
         if(evt&&evt.name=='phaseUse'){//player.turnOver();
-        if(player.hasSkill('_yidong_yidong2')){target.insertPhase();palyer.addSkill('_yidong_yidong2');};event.finish();}};
+        target.insertPhase();event.finish();}};
     if(target==player.next){target.turnOver();event.finish()};
  },
                 ai:{
@@ -81,17 +81,7 @@ default: return 0;}});
                 if(!ui.selected.targets.length) return distance;
                 var distance2=Math.pow(get.distance(player,ui.selected.targets[0],'absolute'),2);   return Math.min(0,distance-distance2);},},},
                 intro:{content:function(){return get.translation('_yidong2_info');},},
-                subSkill:{yidong2:{trigger:{
-                            player:["phaseJieshuBegin"],
-                        },
-                        name:"移动",
-                        priority:3,
-                        forced:true,
-                        content:function(){
-        if(player.hasSkill('_yidong_yidong2')){ player.removeSkill('_yidong_yidong2');player.removeMark('_yidong_yidong2',player.countMark('_yidong_yidong2')); };
-    },intro:{content:function(){return ('移动过');},},
-    },},
-        };
+        }
         lib.skill._tiaozhan3={
             superCharlotte: true,
 			silent: true,
@@ -103,10 +93,10 @@ default: return 0;}});
             },
             content:function(){
 if(player.hasSkill('yuanhang')){if(!player.hasSkill('gzbuqu')&&get.mode()=='boss'){player.addSkill('gzbuqu');player.loseHp(player.hp-1);player.draw(player.hp-1);};
-if(!player.hasSkill('rendeonly2')){player.addSkill('diewulimitai');};player.addSkill('hanbing_gai');
+if(!player.hasSkill('rendeonly2')){player.addSkill('diewulimitai');};
             }},
             }
-    }
+    };
 	if(config.jianrjinji){
 		for(var i in lib.characterPack['jianrjinji']) {
 			if(lib.character[i][4].indexOf("forbidai")<0) lib.character[i][4].push("forbidai");
@@ -135,7 +125,7 @@ if(!player.hasSkill('rendeonly2')){player.addSkill('diewulimitai');};player.addS
             xuefeng:["female","wei",3,["huibi","rendeonly2","yuanhang","quzhudd","jianzaochuan","wulidebuff","qianghuazhuang"],["des:幸运的驱逐舰，多位画师、花了大款的大佬亲情奉献。"]],
             kangfusi:["female","wei",3,["huibi","rendeonly2","yuanhang","quzhudd","jianzaochuan","wulidebuff","qianghuazhuang"],["des:水手服欸,优秀的构图，不过图少改造晚。"]],
             lizhan:["female","shu",4,["huibi","rendeonly2","yuanhang","quzhudd","jianzaochuan","wulidebuff","qianghuazhuang"],["des:这是个依赖科技的舰船，有着科幻的舰装，与兼备温柔体贴与意气风发的表现。"]],
-            "u1405":["female","shu",2,["rendeonly2","qianting","baiyin_skill","yuanhang","jianzaochuan","wulidebuff","qianghuazhuang"],["des:无需隐匿的偷袭大师，马上就让对手的后勤捉襟见肘。"]],
+            "u1405":["female","shu",2,["rendeonly2","qianting","yuanhang","jianzaochuan","wulidebuff","qianghuazhuang"],["des:无需隐匿的偷袭大师，马上就让对手的后勤捉襟见肘。"]],
             jingjishen:["female","wu",3,["junfu","yuanhang","jianzaochuan","wulidebuff","qianghuazhuang"],["des:需要武器支援，伙计倒下了。"]],
             changchun:["female","wu",3,["daoqu","tianyi","huokongld","yuanhang","jianzaochuan","wulidebuff","qianghuazhuang"],["des:尚处于正能量之时。"]],
         },
@@ -297,13 +287,13 @@ intro:{marktext:"增强",content:function(player){return ('下一次造成伤害
                         forced:true,
                         filter:function(event,player){//xinfu_bijing
                 return player.getCards('h',function(card){
-                    return card.hasGaintag('kaishimopao')&&card.hasGaintag('kaishimopao');
+                    return card.hasGaintag('kaishimopao');
                 }).length>1;
             },
                         content:function(){
                  'step 0'
                 event.cards=player.getCards('h',function(card){return card.hasGaintag('kaishimopao'); });   
-                player.chooseToDiscard('he',false,event.cards.length).set('prompt2','弃置等同于于摸牌阶段获得的牌数，然后随机获得一张你指定类别的卡牌。').set('ai',function(card){
+                player.chooseToDiscard('he',false,event.cards.length).set('prompt2','弃置于摸牌阶段获得的牌数，然后随机获得一张你指定类别的卡牌。').set('ai',function(card){
           　if(ui.selected.cards.length>2) return -1;
             if(card.name=='tao') return -10;
             if(card.name=='jiu'&&_status.event.player.hp==1) return -10;
@@ -320,12 +310,14 @@ intro:{marktext:"增强",content:function(player){return ('下一次造成伤害
         var discardPile=Array.from(ui.discardPile.childNodes);
         var cardList=cardPile.concat(discardPile);
         event.cards.addArray(cardList.filter(function(card){
-            return get.type(card,a)==a;//game.log(get.type(card,a)==a);
+            return get.type(card,a)==a;game.log(get.type(card,a)==a);
         }));
         player.gain(event.cards[0],'gain2');
             }},
                         sub:true,
-"audioname2":{"key_shiki":"shiki_omusubi",},
+                        "audioname2":{
+                            "key_shiki":"shiki_omusubi",
+                        },
                     },
                     draw:{
                         priority:4,
@@ -563,13 +555,14 @@ event.targets=player.getEnemies();game.playAudio('..','extension','舰R牌将/au
    var num=2-player.countMark('jinengup');d=game.countPlayer(function(current){return current!=player&&event.targets.contains(current)&&!current.hasSkill('bagua_skill')&&!current.hasSkill('re_bagua_skill')&&!current.hasSkill('tengjia1');});event.tishi='';
    if(player.hasSkill('hangmucv')||player.countCards('e','hangkongzhan')) {event.tishi='（需满足：至少有两张手牌）'+player.countMark('jinengup')+'级技能<br>一轮游戏开始时选择发动，<br>你可以弃置2/1/0张牌，视为对非友方角色使用万箭齐发，<br>'+num+'：'+d+'的收益，<br>不必考虑队友状态的全体攻击，但用完后容易去世'};
 if(player.countCards('h')>=1){player.chooseToDiscard([num,num]).set('prompt2',event.tishi).set('ai',function(card){
-          　if(ui.selected.cards.length>2) return -1;
+          　if(ui.selected.cards.length) return -1;
             if(card.name=='tao') return -10;
             if(card.name=='jiu'&&_status.event.player.hp==1) return -10;
-            return 11-get.value(card);        });};
+            return get.unuseful(card)+2.5*(5-get.owner(card).hp);
+        });};
         "step 1"//game.log(result.cards);  
-      if(result.bool){event.targets=player.getEnemies();
-          if(!event.targets==''){player.useCard({name:'wanjian',nature:'thunder'},event.targets);}else player.gain(result.cards,player,'giveAuto');}else event.finish();
+      if(result.bool){
+          player.useCard({name:'jinjuzy',nature:'thunder'},event.targets);}else event.finish();
 //var e1=player.countCards('e','hangkongzhan'),xiaohao=Math.floor(Math.min(2,event.targets.length/2+0.5));
 //if(player.countCards('h')>=1&&(player.hasSkill('hangmucv')||e1>0)){if(player.countCards('h')>=0&&xiaohao>=2){player.discard(player.getCards('h').randomGet());};player.update();player.discard(player.getCards('h').randomGet());player.useCard({name:'jinjuzy',nature:'thunder'},event.targets)};                  //wanjian,jinjuzy                                       content:function(){          
 },
@@ -1016,7 +1009,7 @@ if(get.itemtype(_status.pileTop)!='card') return '牌堆顶无牌';var cardPile=
                 filter:function(event,player){return player.countCards('h','sha')>0||player.countCards('he',{type:'equip'})>0;
 },
                 filterCard:function(card){var player=_status.event.player;
-        return  card.name=='sheji9'||card.name=='zziqi9'||card.name=='sha'||card.name=='jiu'||get.type(card)=='equip';    },
+        return  card.name=='sha'||card.name=='jiu'||get.type(card)=='equip';    },
                 filterTarget:function(card,player,target){
       if((get.attitude(player,target)>=0||player.identity=='nei'))  return target!=player&&get.distance(player,target,'pure')<=1+player.countMark('shoupaiup');
     },
@@ -1080,18 +1073,18 @@ if(!target.hasSkill('diewulimitai_shale')){target.addSkill('diewulimitai_shale')
                 enable:"chooseToUse",
                 locked:false,
                 filter:function(event,player){
-        return player.countCards('hs',{color:'black'})>0&&player.countMark('kanpolimitai_wuxiele')<player.countMark('jinengup')+2},
+        return player.countCards('hs',{color:'black'})>0&&player.hasUsableCard('wuxie')  },
                 filterCard:function(card){
         return get.color(card)=='black';
     },
                 viewAsFilter:function(player){
-        return player.countCards('hs',{color:'black'})>0&&player.countMark('kanpolimitai_wuxiele')<player.countMark('jinengup')+2
+        return player.countCards('hs',{color:'black'})>0&&!player.countMark('kanpolimitai_wuxiele');
     },
                 viewAs:{
                     name:"wuxie",
                 },
                 position:"hejs",
-                prompt:"将一张黑色手牌当无懈可击使用；每轮你最多使用x+1次无懈可击，x为技能强化次数",
+                prompt:"将一张黑色手牌当无懈可击使用",
                 check:function(card){
         var tri=_status.event.getTrigger();
         if(tri&&tri.card&&tri.card.name=='chiling') return -1;
@@ -1106,22 +1099,19 @@ if(!target.hasSkill('diewulimitai_shale')){target.addSkill('diewulimitai_shale')
                 content:function(){
           if(!player.hasMark('kanpolimitai_wuxiele')){player.addSkill('kanpolimitai_wuxiele');};player.addMark('kanpolimitai_wuxiele');
     },
-                group:["kanpolimitai_wuxiele","kanpolimitai_canwuxie"],
+                group:[],
                 subSkill:{
                     wuxiele:{
                         trigger:{
                             golbal:"phaseJieshuBegin",
-                            player:"phaseJieshuBegin",
                         },
-                        force:true,
+                        fixed:true,
                         silent:true,
                         content:function(){//,player.countMark('diewulimitai_2_shale')player.removeSkill('kanpolimitai_wuxiele');
-    // if(player.hasMark('kanpolimitai_wuxiele')){
- player.removeMark('kanpolimitai_wuxiele',player.countMark('kanpolimitai_wuxiele'));
-// };
+     if(player.hasMark('kanpolimitai_wuxiele')){player.removeMark('kanpolimitai_wuxiele',player.countMark('kanpolimitai_wuxiele'));};
     },
                         intro:{
-                            marktext:"",
+                            marktext:"给了杀",
                             content:function(player){
             return ('使用无懈的次数');
         },
@@ -1132,17 +1122,15 @@ if(!target.hasSkill('diewulimitai_shale')){target.addSkill('diewulimitai_shale')
                     },
                     canwuxie:{
                         trigger:{
-                            player:"useCardAfter",
+                            player:"kanpolimitaiAfter",
                         },
                         filter:function(event,player){
-return event.card.name=='wuxie';
-},
+        return true//event.skill=='kanpolimitai';
+    },
                         fixed:true,
                         silent:true,
                         content:function(){//,player.countMark('diewulimitai_2_shale')player.removeSkill('kanpolimitai_wuxiele');
-  //   if(!player.hasMark('kanpolimitai_wuxiele')){
- player.addMark('kanpolimitai_wuxiele',1);
-// };
+     if(!player.hasMark('kanpolimitai_wuxiele')){player.addMark('kanpolimitai_wuxiele',1);};
     },
                         intro:{
                             marktext:"给了杀",
@@ -1282,7 +1270,6 @@ return event.card.name=='wuxie';
                 audioname:["re_ganning","re_heqi"],
                 mod:{
 attackFrom:function(from,to,distance){var a=0;if(from.hasSkill('quzhudd')&&to.hasSkill('qianting')){var a=a-1};return distance=(distance+a)},
-selectTarget:function(card,player,range){if((card.name=='huogong'||card.name=='guohe'||card.name=='zhaomingdan9'||card.name=='xiji9')&&player.countMark('jinengup')&&range[1]!=-1) range[1]+=(Math.min(player.countMark('jinengup'),game.players.length-1));}, 
 targetInRange:function(card,player,target){
 var type=get.type(card);
 if(type=='trick'||type=='delay'){if(get.distance(player,target)<=2) return true;};},
@@ -1290,7 +1277,7 @@ if(type=='trick'||type=='delay'){if(get.distance(player,target)<=2) return true;
                 enable:"chooseToUse",
                 usable:2,
                 position:"hejs",
-                prompt:"将♦/♥非锦囊牌当做顺手牵羊，♣/♠非锦囊牌当做兵粮寸断使用，<br>限两次。张辽与徐晃合体版<br>锦囊牌可以对距离你为2以内的角色使用。",
+                prompt:"将♦/♥非锦囊牌当做顺手牵羊，♣/♠非锦囊牌当做兵粮寸断使用，<br>限两次，本回合内不能再对同一目标使用此技能。张辽与徐晃合体版<br>锦囊牌可以对距离你为2以内的角色使用。",
                 filter:function(event,player){if(event.parent.name=='phaseUse')return player.countCards('hs')>0;},
                 viewAs:function(cards,player){
         var name=false;
@@ -1305,8 +1292,7 @@ if(type=='trick'||type=='delay'){if(get.distance(player,target)<=2) return true;
     },
                 filterCard:function(card,player,event){return true},
                 selectCard:function(card){return 1},
-                check:function(card){ var player=_status.event.player;return 7-get.value(card)//if(get.suit(card)=='club'&&player.countMark('jinengup')<1){return -1};，本回合内不能再对同一目标使用此技能
-                },
+                check:function(card){ var player=_status.event.player;if(get.suit(card)=='club'&&player.countMark('jinengup')<1){return -1};return 7-get.value(card)},
                 content:function(){},
                 ai:{
                     basic:{
@@ -1354,7 +1340,10 @@ if(type=='trick'||type=='delay'){if(get.distance(player,target)<=2) return true;
                         discard:1,
                     },
                 },
-                intro:{content:function(){return get.translation(skill+'_info');},
+                intro:{
+                    content:function(){
+            return get.translation(skill+'_info');
+        },
                 },
                 group:["qianting_jiezi","qianting_roundonefire"],
 subSkill:{
@@ -1379,13 +1368,12 @@ roundonefire:{
                 audio:"ext:1牌将修改:2",
                 trigger:{
                     global:"roundStart",
-                },
-                forced:true,
+                },force:true,
                 lastDo:true,
                 "prompt2":function(event,player){
     },
                 filter:function(event,player){//意外发现function应用广泛，然而解决不了自动显示隐藏标记。航母开幕，然后根据舰种判断具体出什么杀game.log();
-    return player.countCards('h')>0;},
+    return player.countCards('h')>0&&player.getEnemies();},
     content:function(){
 'step 0'
 var next=player.chooseCardTarget({
@@ -1720,7 +1708,7 @@ sub:true,}
                 ruleSkill:true,
                 firstDo:true,
                 filter:function(event,player){//||player.hasSkill('hanbing_gai')
-        return (event.nature=='ice'&&player.hasSkill('hanbing_skill'))&&event.notLink()&&event.player.getCards('he').length>0;
+        return (event.nature=='thunder')&&event.notLink()&&event.player.getCards('he').length>0;
     },
                 audio:"ext:舰R牌将:true",
                 check:function(event,player){
@@ -1800,12 +1788,12 @@ if(player.countMark('hanbing_gai')<event.num1&&player.countMark('hanbing_gai')){
                     marktext:"装备",
                     content:function(storage,player){//只有content与mark可以function吧，内容，介绍的文字与内容。
  var info=lib.skill.qianghuazhuang.getInfo(player);
-  return '<div class="text center"><span class=greentext>用一摸一:'+info[0]+'<br>技能耗牌：'+info[1]+'</span><br><span class=firetext>出杀距离：-'+info[2]+'<br>攻击次数:'+info[3]+'</span><br><span class=thundertext>被杀距离：+'+info[4]+'<br>手牌上限:'+info[5]+'<br>Exp:'+info[7]+'</span></div>'
+  return '<div class="text center"><span class=greentext>用一摸一:'+info[0]+'<br>技能耗牌：'+info[1]+'</span><br><span class=firetext>武器距离：'+info[2]+'<br>攻击次数:'+info[3]+'</span><br><span class=thundertext>机动：'+info[4]+'<br>手牌上限:'+info[5]+'</span><br><span class=yellowtext>辅助技能：'+info[6]+'<br>Exp:'+info[7]+'</span></div>'
      ;     },
                 },
                 enable:"phaseUse",
                 usable:2,
-                filter:function(event,player){//if (player.countCards('he',{type:'equip'})>0){if((a+b+c+d)>(4+k*4))return false} return player.countCards('he',{type:'equip'})>0||player.countMark('Expup')>0;type:"equip",+'</span><br><span class=yellowtext>辅助技能：'+info[6]
+                filter:function(event,player){//if (player.countCards('he',{type:'equip'})>0){if((a+b+c+d)>(4+k*4))return false} return player.countCards('he',{type:'equip'})>0||player.countMark('Expup')>0;type:"equip",
        var a=player.countMark('mopaiup'),b=player.countMark('jinengup'), c=player.countMark('wuqiup') , d=player.countMark('useshaup'),e=player.countMark('jidongup'),  f=player.countMark('shoupaiup'), g=player.countMark('songpaiup') , h=player.countMark('Expup'),k=player.countMark('jianzaochuan')+1,lv=0;if(k<3){lv=k*6};if(k>=3){lv=k+10};
        if(player.countCards('he')>0){if((a+b+c+d+e+f+g)>=(lv))return false}; return player.countCards('e')>0||player.countCards('he')>1||player.countMark('Expup')>1;
      //比较保守的设计，便于设计与更改。
@@ -1817,7 +1805,7 @@ if(player.countMark('hanbing_gai')<event.num1&&player.countMark('hanbing_gai')){
         var player=_status.event.player,num=0;num+=(player.countMark('Expup'));if(ui.selected.cards.length&&get.type(ui.selected.cards[0],'equip')=='equip'){num+=(1)};if(ui.selected.cards.length>1&&get.type(ui.selected.cards[1],'equip')=='equip'){num+=(1)};
         return [Math.max(2-num,0),Math.max(4-num,2)];
     },
-                prompt:"你可以弃置二至四张牌，选择一个永久效果升级。<br>（如用一摸一次数、武器攻击距离、手牌上限等）<br>装备等于两张牌，每回合限两次<br>强化上限为建造的次数，用一摸一最高强化至5级，其他为2级。<br>已存储的经验会降低弃牌最低牌数",
+                prompt:"你可以消耗经验，或弃置二至四张牌，选择一个永久效果升级。装备等于两张牌哦<br>（如摸牌、攻击距离、手牌上限等）每回合限两次<br>强化上限为建造的次数，摸牌最高强化至5级，其他为2级。",
                 check:function(card){//ui，参考仁德，ai执行判断，卡牌价值大于1就执行（只管卡片）当然，能把玩家设置进来就可以if玩家没桃 return-1。
         var player=_status.event.player;
         if(ui.selected.cards.length&&get.type(ui.selected.cards[0],'equip')=='equip') return 13-get.value(card);
@@ -1829,7 +1817,7 @@ if(player.countMark('hanbing_gai')<event.num1&&player.countMark('hanbing_gai')){
          'step 0'
  var a=player.countMark('mopaiup'),b=player.countMark('jinengup'), c=player.countMark('wuqiup') , d=player.countMark('useshaup'),e=player.countMark('jidongup'),  f=player.countMark('shoupaiup'), g=player.countMark('songpaiup') , h=player.countMark('Expup'),k=player.countMark('jianzaochuan')+1;
  player.storage.qianghuazhuang=[a,b,c,d,e,f,g,h,k];event.cadechangdu=event.cards.length;
-   event.choiceList=[ ]; event.list=[ ]; event.cao=cards;event.jieshao=['+'+a+'→'+(a+1)+'用一摸一标记上限，<br>手牌较少时，失去手牌会摸一张牌。<br>持续进攻的后勤保障，防守反击的必备技能。','+'+(b)+'→'+(b+1)+'升级，降低重巡、战列使用火控雷达时的耗牌数;<br>减少轻巡防空耗牌数、航母开幕攻击耗牌数<br>增加导驱用杀、潜艇用火攻与过河拆桥时可选的目标数;驱逐;<br>军辅能于更远的距离给其他角色递牌。','+'+c+'→'+(c+1)+'武器（出杀）攻击距离，<br>不能增加锦囊牌使用距离的减一马，但胜在永久','+'+d+'→'+(d+1)+'出杀次数，<br>不再依赖连弩进行多刀输出，作为临时替代。','+'+e+'→'+(e+1)+'武器（被杀）防御距离<br>不能防御锦囊牌的加一马，但仍能让对手的烦恼。','+'+f+'→'+(f+1)+'手牌上限，且能于更远距离给其他角色递装备给杀，<br>吕蒙弱化版。','+'+h+'→'+(h+1)+'经验，将没有机会用来强化的卡牌转为经验，供下次升级<br>'+(h+1)+'建造次数']//player.getEquip(1)，定义空数组，push填充它，事件变量可以自定义名字，什么都可以存。game.log('已强化:',a+b+c+d);
+   event.choiceList=[ ]; event.list=[ ]; event.cao=cards;event.jieshao=['+'+a+'→'+(a+1)+'摸牌标记上限，<br>防守反击必备。','+'+(b)+'→'+(b+1)+'升级，降低重巡、战列使用必中攻击时所需的手牌数;<br>增加导驱用杀时可选的目标数、潜艇用普通(非延时)锦囊牌时可选的目标数;轻巡能令更远距离的友军增加摸牌阶段摸牌数、军辅能于更远距离给其他角色递牌。','+'+c+'→'+(c+1)+'武器攻击距离，<br>不如减一马','+'+d+'→'+(d+1)+'出杀次数，<br>不再依赖连弩，但有连弩更好。','+'+e+'→'+(e+1)+'武器防御距离<br>不如加一马，但仍能让对手的烦恼。','+'+f+'→'+(f+1)+'手牌上限，且能于更远距离给其他角色递牌给杀，<br>一般是用来降低摸牌门槛。','+'+h+'→'+(h+1)+'经验，将没有机会用来强化的卡牌转为经验，供下次升级<br>'+(h+1)+'建造次数']//player.getEquip(1)，定义空数组，push填充它，事件变量可以自定义名字，什么都可以存。game.log('已强化:',a+b+c+d);
         var info=lib.skill.qianghuazhuang.getInfo(player);
         if(info[0]<k&&info[0]<5){event.list.push('mopaiup');
    event.choiceList.push(event.jieshao[0]);};
@@ -1849,7 +1837,7 @@ if(player.countMark('hanbing_gai')<event.num1&&player.countMark('hanbing_gai')){
    event.choiceList.push(event.jieshao[6]);};
         event.first=true;    //存了6个变量，可以导出为button，与textbutton样式，看需求
         var next=player.chooseButton([
-            '请强化以下1项；选择后卡牌将转化为点数，未使用完的会保留;如取消则返还卡牌，发动建造技能后会增加上限。',
+            '请令其中一项+1；可以取消，取消后会返还卡牌；升级后，多的卡牌会转化为经验，供下次升级使用。',
             [event.choiceList,'textbutton'],
         ]);
         var xuanze=event.cao.length;xuanze+=(player.countMark('Expup'));if(event.cao.length&&get.type(event.cao[0],'equip')=='equip'){xuanze+=(1)};if(event.cao.length>1&&get.type(event.cao[1],'equip')=='equip'){xuanze+=(1)};
@@ -2187,9 +2175,9 @@ if(player.countMark('hanbing_gai')<event.num1&&player.countMark('hanbing_gai')){
             zhuangjiafh:"装甲防护",
             "zhuangjiafh_info":"当你拥有护甲时，减少等同于你护甲数的手牌上限。<br>当你改变体力时,<br>你可以弃置至多三张红色牌，获得X点护甲。（X为弃牌数）<br>若你没有红色牌且没有用护甲承受过此次伤害，<br>你在伤害结算后获得1点护甲，而无需弃牌。",
             hangmucv:"航母",
-            "hangmucv_info":"一轮游戏开始时，你可以弃置2/1/0张手牌，<br>视为对非友方角色使用万箭齐发。<br>没有手牌会结束此技能。强化此技能可以减少消耗",
+            "hangmucv_info":"一轮游戏开始时，你可以弃置2/1/0张手牌，<br>视为对非友方角色使用万箭齐发。<br>没有手牌会结束此技能。强化技能可以减少消耗",
             yuanhang:"远航",
-            "yuanhang_info":"受伤时手牌上限+1<br>每回合限x次，当你失去手牌后，且手牌数小于手牌上限/2+1时，你摸一张牌。x为你强化的“用一摸一”值，处于自己的回合时+1。<br>当你进入濒死状态时，你摸一张牌，体力上限大于二时需减少一点体力上限，额外摸一张牌；死亡后，你可以按自己的身份，令一名角色摸-/2/1/1张牌。",
+            "yuanhang_info":"受伤时手牌上限+1<br>限x次，当你失去手牌后，且手牌数小于手牌上限/2+1时，你摸一张牌。x为你在强化提升的摸牌数，处于自己的回合时+1摸牌数。<br>当你进入濒死状态时，你摸一张牌，体力上限大于二时需减少一点体力上限，额外摸一张牌；死亡后，你可以按自己的身份，令一名角色摸-/2/1/1张牌。",
             zhanliebb:"战列",
             "zhanliebb_info":"",
             qingxuncl:"轻巡",
@@ -2224,8 +2212,8 @@ if(player.countMark('hanbing_gai')<event.num1&&player.countMark('hanbing_gai')){
             "daoqu_info":"你使用杀时可以额外指定x名目标。(x为技能强化次数)",
             huibi:"回避(八卦)",
             "huibi_info":"你需要打出闪时可以进行一次判定，为桃、闪、方块，则视为打出闪。<br>若判定未生效,且手牌数在手牌上限以下(含)，你会获得判定牌。<br>(手牌上限小于4则视为4)",
-            "hanbing_gai":"寒冰-改",
-            "hanbing_gai_info":"当你造成伤害时，若你拥有寒冰剑_技能/造成的伤害为冰属性，你可以防止此伤害并弃置目标2*X张牌，x为伤害值",
+            "hanbing_gai":"寒冰改",
+            "hanbing_gai_info":"当你造成属性伤害时，你可以防止此伤害并弃置目标2*X张牌，x为伤害值",
             qianghuazhuang:"强化装备",
             "qianghuazhuang_info":"你可以消耗经验，或弃置二至四张牌，选择一至两个永久效果升级。<br>（如摸牌、攻击距离、手牌上限等）每回合限两次。装备牌代表两张牌",
             huokongld:"火控雷达",
@@ -2249,7 +2237,7 @@ if(player.countMark('hanbing_gai')<event.num1&&player.countMark('hanbing_gai')){
 		if(!lib.config.characters.contains('jianrjinji')) lib.config.characters.push('jianrjinji');
 		lib.translate['jianrjinji_character_config']='舰R竞技';// 包名翻译
 		//卡包（手牌）
-			game.import('card',function(){
+		game.import('card',function(){
 			var jianrjinjibao={
 			name:'jianrjinjibao',//卡包命名
 			connect:true,//卡包是否可以联机
@@ -2649,7 +2637,7 @@ if(player.countMark('hanbing_gai')<event.num1&&player.countMark('hanbing_gai')){
             },
                     },
                 },
-                skills:["hangmucv_roundonefire"],
+                skills:["roundonefire"],
                 enable:true,
                 selectTarget:-1,
                 filterTarget:function(card,player,target){
@@ -3501,39 +3489,39 @@ if(player.countMark('hanbing_gai')<event.num1&&player.countMark('hanbing_gai')){
             jiakongls:"架空历史",
             "jiakongls_info":"群星璀璨，欧陆风云，该武将首次使用会有两轮1.5展示牌量的五谷丰登，再次使用仅有一轮。",
             mingzuyq:"民族乐器",
-            "mingzuyq_info":"北境之地的文化艺术。锁定技，你视为拥有技能国战“制衡”，若你已经有“制衡”，则改为取消可弃置牌数的限制。",
+            "mingzuyq_info":"北境之地的文化艺术。锁定技，你视为拥有技能“制衡”，若你已经有“制衡”，则改为取消弃置牌数的限制。",
             hangkongzhan:"航空战",
             "hangkongzhan_info":"建树丰厚，参与每轮开始时的三连杀战斗吗，每轮最多弃置三张牌。",
             paohuozb:"炮火准备",
-            "paohuozb_info":"试试就逝世，扣一血得属性杀增强效果，然而现在所有舰船都有这个，可以图加一杀次数。",
+            "paohuozb_info":"试试就逝世，扣一血得属性杀增伤一次，然而现在所有舰船都有这个，可以图加一杀次数。",
             xingyun:"强力规避",
             "xingyun_info":"可以进行一次判定，为桃、闪则视为打出闪。<br>若判定未生效,会获得判定牌。<br>若武将为驱逐且没有判定成功，可以额外触发一次。",
             sansheyl:"攻击",
             "sansheyl_info":"其实就是杀，但此杀能连打两次。。",
             "sushepao3":"速射炮",
-            "sushepao3_info":"射速与精度很吓人，当然消耗也很惊人（没有特殊效果）",
+            "sushepao3_info":"没有特殊效果",
             "quzhupao3":"速射炮",
-            "quzhupao3_info":"可以连续使用水弹击退敌人（没有特殊效果）",
+            "quzhupao3_info":"",
             "qingxunpao3":"两用炮",
-            "qingxunpao3_info":"对地对空的好帮手（没有特殊效果）",
+            "qingxunpao3_info":"",
             "zhongxunpao3":"中型主炮",
-            "zhongxunpao3_info":"对付轻巡很给力，对付大船则充满了不幸（没有特殊效果）",
+            "zhongxunpao3_info":"",
             "zhanliepao3":"大型主炮",
-            "zhanliepao3_info":"能击穿才是传奇，有严重损害更好（没有特殊效果）",
+            "zhanliepao3_info":"",
             "zhandouji3":"战斗机",
-            "zhandouji3_info":"适合满速轻型航母的战斗机，启航，编队，狗斗，加速降落（没有特殊效果）",
+            "zhandouji3_info":"",
             huokongld:"火控雷达",
             "huokongld_info":"强大的雷达，可以精准的命中对手。（没有技能的装备）",
             "yuleiqianting3":"鱼雷(潜艇用)",
-            "yuleiqianting3_info":"来偷袭，我一个英姿闭月双刀的老头子，这合理吗（没有特殊效果）",
+            "yuleiqianting3_info":"",
             "jianzaidaodan3":"反舰导弹",
-            "jianzaidaodan3_info":"融合卫星定位，（没有特殊效果）",
+            "jianzaidaodan3_info":"",
             "yuleiji3":"鱼雷机",
-            "yuleiji3_info":"可以反潜，较小的起飞距离则能支援主力作战，。（没有特殊效果）",
+            "yuleiji3_info":"",
             "tansheqi3":"弹射器",
-            "tansheqi3_info":"加速飞机起飞，缩短航母甲板或者增加飞机承载量（没有特殊效果）",
+            "tansheqi3_info":"",
             "fasheqi3":"发射器",
-            "fasheqi3_info":"发射导弹的同时要牺牲一个火控雷达槽位（没有特殊效果）",
+            "fasheqi3_info":"",
         },
 				list:[["heart","1","hangkongzhan"],["heart","1","paohuozb"],["heart","1","xingyun"],["heart","1","sansheyl"],["heart","1","jinjuzy"],["heart","1","jiakongls"],["heart","1","mingzuyq"]],//牌堆添加
 			}
@@ -3541,10 +3529,9 @@ if(player.countMark('hanbing_gai')<event.num1&&player.countMark('hanbing_gai')){
 		});
 		lib.translate['jianrjinjibao_card_config']='舰R竞技卡包';
 		lib.config.all.cards.push('jianrjinjibao');
-		if(!lib.config.cards.contains('jianrjinjibao')) lib.config.cards.push('jianrjinjibao');//包名翻译，失败了：,"jianrjinjibao":{"name":"禁用舰R竞技内卡包","intro":"联机卡组在游戏内运行时才添加至游戏内，禁用添加这些卡组的技能，才能真正禁用这些卡组","init":true},
-		
+		if(!lib.config.cards.contains('jianrjinjibao')) lib.config.cards.push('jianrjinjibao');//包名翻译
 	};
-},help:{},config:{"jianrjinji":{"name":"将舰R竞技内武将设为禁用","intro":"联机武将在游戏内运行时才添加至游戏内，禁用添加这些武将的技能，才能真正禁用这些武将","init":false},"qyzhugeliang":{"name":"第一轮添加额外技能","intro":"开启后，主公可以在回合开始时，选择一组技能，令所有角色获得这些技能的使用权，直到下一回合开始；还有火攻一类的卡组可以选择","init":false},"yidong":{"name":"战术移动","intro":"开启后，角色包内的角色获得以下技能：<br>1.可以在局内移动自己角色的座位 ，限制为相邻座位与队友。<br>2.可以给队友递装备、杀，队友得到牌就能立即使用，但杀只能出一次。<br>与挑战技能：<br>全员一血开局，根据流失的体力数多摸牌；<br>全员不屈，让阴间的力量站起来。","init":true},"kaishimopao":{"name":"改良型摸牌阶段","intro":"开启后，卡牌包内的武将获得技能【优质摸牌】，<br>能减少摸牌阶段摸牌量，<br>获得获取所需卡牌的能力，<br>与应对延时锦囊牌的方案。","init":true},},package:{
+},help:{},config:{"jianrjinji":{"name":"将舰R竞技内武将设为禁用","init":false},"qyzhugeliang":{"name":"第一轮添加额外技能","intro":"开启后，主公可以在回合开始时，选择一组技能，令所有角色获得这些技能的使用权，直到下一回合开始；还有火攻一类的卡组可以选择","init":false},"yidong":{"name":"战术移动","intro":"开启后，角色包内的角色获得以下技能：<br>1.可以在局内移动自己角色的座位 ，限制为相邻座位与队友。<br>2.可以给队友递装备、杀，队友得到牌就能立即使用，但杀只能出一次。<br>与挑战技能：<br>全员一血开局，根据流失的体力数多摸牌；<br>全员不屈，让阴间的力量站起来。","init":true},"kaishimopao":{"name":"改良型摸牌阶段","intro":"开启后，卡牌包内的武将获得技能【优质摸牌】，<br>能减少摸牌阶段摸牌量，<br>获得获取所需卡牌的能力，<br>与应对延时锦囊牌的方案。","init":true}},package:{
     character:{
         character:{
           addskilltest:["male","wei",9,["yuanhang","fangko2"],["forbidai","des:测试用"]],
