@@ -592,7 +592,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             lisailiu: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb"], ["des:幸运的象征之一，同时有着丰富的精神象征。"]],
                             changmen: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb", "zhudaojiandui"], ["des:。"]],
                             kunxi: ["female", "wei", 4, ["huokongld", "zhongxunca", "gaosusheji"], ["des:画师优秀的功底让这名角色美而可爱，这是出色的角色塑造。"]],
-                            ougengqi: ["female", "qun", 4, ["huokongld", "zhongxunca"], ["des:励志偶像，与标志性舰装，给人以强大的保护。"]],
+                            ougengqi: ["female", "qun", 4, ["huokongld", "zhongxunca", "zhanxianfangyu", "zhanxianfangyu1"], ["des:励志偶像，与标志性舰装，给人以强大的保护。"]],
                             qingye: ["female", "shu", 4, ["huokongld", "zhongxunca", "sawohaizhan"], ["des:励志偶像，与一首动人的歌，与一段坎坷旅途。"]],
                             beianpudun: ["female", "wei", 4, ["huokongld", "zhongxunca"], ["des:励志青年，在旅途中成长，与恋人坚定的望向远方。"]],
                             jiujinshan: ["female", "wei", 4, ["huokongld", "zhongxunca"], ["des:航海服饰，侦查员与火炮观瞄。"]],
@@ -2832,17 +2832,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 content: function () {
                                     "step 0";
                                     player.give(cards, targets[0],);
-                                         "step 1";
-                                         if(!player.hasSkill("shuileizhandui_1")){
+                                    "step 1";
+                                    if (!player.hasSkill("shuileizhandui_1")) {
                                         var card = get.cardPile(function (card) {
                                             return card.name == 'sheji9' && card.nature == 'thunder';
                                         });
                                         if (card) {
                                             game.log("在牌堆中查找到了雷属性射击");
-                                         player.gain(card, 'gain2');
+                                            player.gain(card, 'gain2');
                                         }
                                         player.addTempSkill("shuileizhandui_1", { player: 'phaseJieshuBegin' });
-                                        }
+                                    }
                                     game.log("step end");
                                 }, ai: {
                                     expose: 0.1,
@@ -3319,11 +3319,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             sawohaizhan_1: {
                                 mod: {
-                                    cardUsable:function(card){
-                                        if(card.name=='sha'&&card.nature=='thunder') return Infinity;
+                                    cardUsable: function (card) {
+                                        if (card.name == 'sha' && card.nature == 'thunder') return Infinity;
                                     },
                                     targetInRange: function (card) {
-                                        if (card.name == 'sha'&&card.nature=='thunder') return true;
+                                        if (card.name == 'sha' && card.nature == 'thunder') return true;
                                     },
                                 },
                                 trigger: {
@@ -3468,10 +3468,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             qijianshashou: {
-                                trigger:{
-                                    player:"phaseUseBegin",
+                                trigger: {
+                                    player: "phaseUseBegin",
                                 },
-                                direct:true,
+                                direct: true,
                                 //enable: "phaseUse",
                                 //usable: 1,
                                 //filterTarget: function (card, player, target) {
@@ -3482,23 +3482,23 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 //},
                                 content: function () {
                                     'step 0'
-                                    player.chooseTarget(get.prompt2('qijianshashou'),function(card,player,target){
+                                    player.chooseTarget(get.prompt2('qijianshashou'), function (card, player, target) {
                                         return player.canCompare(target);
-                                    }).set('ai',function(target){
-                                        return -get.attitude(player,target);
+                                    }).set('ai', function (target) {
+                                        return -get.attitude(player, target);
                                     });
                                     'step 1'
-                                    if(result.bool){
-                                        var target=result.targets[0];
-                                        event.target=target;
-                                        player.logSkill('qijianshashou',target);
+                                    if (result.bool) {
+                                        var target = result.targets[0];
+                                        event.target = target;
+                                        player.logSkill('qijianshashou', target);
                                         player.chooseToCompare(target);
                                     }
-                                    else{
+                                    else {
                                         event.finish();
                                     }
                                     'step 2'
-                                    game.log("拼点结果"+result.bool);
+                                    game.log("拼点结果" + result.bool);
                                     if (result.bool) {
                                         player.markAuto('qijianshashou_1', [target]);
                                         player.addTempSkill("qijianshashou_1");
@@ -3509,8 +3509,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         game.log("拼点没赢");
                                     }
                                 },
-                                ai:{
-                                    expose:0.2,
+                                ai: {
+                                    expose: 0.2,
                                 },
                             },
                             qijianshashou_1: {
@@ -3532,13 +3532,74 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 charlotte: true,
                                 forced: true,
                                 filter: function (event, player) {
-                                    return event.card&&(event.card.name == "sha"||event.card.name == "sheji9") && event.player.getStorage('qijianshashou_1')&&event.player != player;
+                                    return event.card && (event.card.name == "sha" || event.card.name == "sheji9") && event.player.getStorage('qijianshashou_1') && event.player != player;
                                 },
                                 content: function () {
                                     trigger.num++;
                                     game.log("伤害+1");
                                 },
                                 "_priority": 0,
+                            },
+                            zhanxianfangyu: {
+                                usable: 1,
+                                trigger: {
+                                    global: "useCardToTarget",
+                                },
+                                //direct:true,//自动发动
+                                priority: 5,
+                                filter: function (event, player) {
+                                    if (player == event.target || player == event.player) return false;
+                                    return (event.card.name == 'sha' || event.card.name == 'sheji9')&&get.distance(player, event.target, 'pure') <= 1;
+                                },
+                                check: function (event, player) {
+                                    if (get.attitude(player, event.target) > 2) {
+                                        if (player.countCards('h', 'shan') || player.getEquip(2) ||
+                                            trigger.target.hp == 1 || player.hp > trigger.target.hp + 1) {
+                                            if (!trigger.target.countCards('h', 'shan') || trigger.target.countCards('h') < player.countCards('h')) {
+                                                return true;
+                                            }
+                                        }
+                                    }
+                                    return false;
+                                },
+                                content: function () {
+
+                                    game.log('zhanxianfangyu', trigger.target);
+
+                                    player.draw();
+                                    trigger.getParent().targets.remove(trigger.target);
+                                    trigger.getParent().triggeredTargets2.remove(trigger.target);
+                                    trigger.getParent().targets.push(player);
+                                    trigger.untrigger();
+                                    trigger.player.line(player);
+                                    game.delayx();
+                                },
+                                ai: {
+                                    effect: {
+                                        target: function (card) {
+                                            if (card.name == 'sha') return 1.3;
+                                        },
+                                    },
+                                },
+                                "_priority": 500,
+                            },
+                            zhanxianfangyu1: {
+                                usable: 1,
+                                trigger: {
+                                    target: "shaBefore",
+                                },
+                                popup: false,
+                                direct: true,
+                                filter: function (event, player) {
+                                    return (event.card.name == 'sha' || event.card.name == 'sheji9') && get.color(event.card) == 'black';
+                                },
+                                content: function () {
+                                    player.logSkill('zhanxianfangyu1');
+                                    trigger.cancel();
+
+                                },
+                                "_priority": 0,
+
                             }
 
                             //在这里添加新技能。
@@ -3645,7 +3706,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             wufenzhong4: "命运的五分钟", "wufenzhong4_info": "你可以跳过弃牌阶段并翻面，视为使用一张雷杀或火杀。",
                             qijianshashou: "旗舰杀手", "qijianshashou_info": "出牌阶段开始时，你可以与一名角色进行拼点，若你赢，本回合你与该角色距离视为1，你对该目标使用杀伤害+1，若你没赢，你跳过出牌阶段和弃牌阶段。",
                             qijianshashou_1: "旗舰杀手", "qijianshashou_1_info": "",
-                        
+                            zhanxianfangyu: "战线防御", "zhanxianfangyu_info": "每回合限一次，你成为黑色杀的目标时，你取消之。每回合限一次，距你为1的角色成为杀的目标时，你可以摸一张牌并代替该名角色成为此杀的目标。",
+                            zhanxianfangyu1: "战线防御", "zhanxianfangyu1_info": "每回合限一次，你成为黑色杀的目标时，你取消之。",
+
                         },
                     };
                     if (lib.device || lib.node) {
