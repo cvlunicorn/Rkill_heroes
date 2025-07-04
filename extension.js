@@ -590,17 +590,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             misuli: ["female", "wei", 4, ["zhuangjiafh", "zhanliebb"], ["des:用精巧的手枪去质疑，用绝对的火力回击对手。"]],
                             weineituo: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb"], ["des:身材小，而强度惊人。"]],
                             lisailiu: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb"], ["des:幸运的象征之一，同时有着丰富的精神象征。"]],
-                            changmen: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb","zhudaojiandui"], ["des:。"]],
+                            changmen: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb", "zhudaojiandui"], ["des:。"]],
                             kunxi: ["female", "wei", 4, ["huokongld", "zhongxunca", "gaosusheji"], ["des:画师优秀的功底让这名角色美而可爱，这是出色的角色塑造。"]],
                             ougengqi: ["female", "qun", 4, ["huokongld", "zhongxunca"], ["des:励志偶像，与标志性舰装，给人以强大的保护。"]],
-                            qingye: ["female", "shu", 4, ["huokongld", "zhongxunca"], ["des:励志偶像，与一首动人的歌，与一段坎坷旅途。"]],
+                            qingye: ["female", "shu", 4, ["huokongld", "zhongxunca", "sawohaizhan"], ["des:励志偶像，与一首动人的歌，与一段坎坷旅途。"]],
                             beianpudun: ["female", "wei", 4, ["huokongld", "zhongxunca"], ["des:励志青年，在旅途中成长，与恋人坚定的望向远方。"]],
                             jiujinshan: ["female", "wei", 4, ["huokongld", "zhongxunca"], ["des:航海服饰，侦查员与火炮观瞄。"]],
                             yixian: ["female", "shu", 3, ["fangkong2", "qingxuncl"], ["des:经典美术设计的款式，意气风发，威猛先生"]],
                             tianlangxing: ["female", "wu", 3, ["fangkong2", "qingxuncl"], ["des:阻敌计谋表现优秀，这是先发制敌的优势所在，"]],
                             dading: ["female", "shu", 3, ["fangkong2", "qingxuncl"], ["des:手持竹伞的轻巡，辅助队友，防御攻击。"]],
                             degelasi: ["female", "qun", 3, ["fangkong2", "qingxuncl"], ["des:现代文职服饰，一看就很会办公。"]],
-                            yatelanda: ["female", "wei", 3, ["fangkong2", "qingxuncl","duikongfangyu"], ["des:双枪射手点形象，其双枪能以极快的射速打出爆炸弹匣，清空一小片区域。"]],
+                            yatelanda: ["female", "wei", 3, ["fangkong2", "qingxuncl", "duikongfangyu"], ["des:双枪射手点形象，其双枪能以极快的射速打出爆炸弹匣，清空一小片区域。"]],
                             "z31": ["female", "qun", 3, ["huibi", "quzhudd"], ["des:婚纱与轻纱是多数人的美梦,与绿草平原，与绿水青山"]],
                             xuefeng: ["female", "shu", 3, ["huibi", "quzhudd", "xiangrui", "yumian"], ["des:幸运的驱逐舰，多位画师、花了大款的大佬亲情奉献。"]],
                             kangfusi: ["female", "wei", 3, ["huibi", "quzhudd"], ["des:水手服欸,优秀的构图，不过图少改造晚。"]],
@@ -2675,7 +2675,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         event.target = result.targets;//前面有目标target，可以返回target。
                                         if (event.target != undefined) { for (var i = 0; i < trigger.targets.length; i += (1)) { if (event.target.contains(trigger.targets[i])) { trigger.getParent().excluded.add(trigger.targets[i]); trigger.targets[i].addSkill('fangkong_aibiexuan'); game.log('取消卡牌目标', trigger.targets[i], '编号', i) } } };//三级选择，集合target是否包含trigger.target。同时测试是否选到了目标。
                                         player.logSkill('fangkong2', event.target);
-                                        if(player.hasSkill('duikongfangyu'))player.draw(event.target.length);//对空防御的技能效果。若玩家拥有对空防御，则发动防空后可以摸牌。
+                                        if (player.hasSkill('duikongfangyu')) player.draw(event.target.length);//对空防御的技能效果。若玩家拥有对空防御，则发动防空后可以摸牌。
                                     }//让技能发语音，发历史记录。
                                 },
                                 subSkill: {
@@ -3151,12 +3151,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (event.num < targets.length) event.goto(1);
                                     else game.delayx();
                                     game.log("技能结束");
-                                    'step 3' 
-                                        player.chooseTarget("请选择目标，视为使用【万箭齐发】", [1, Infinity], function (card, player, target) {
-                                            return player != target;
-                                        }).set("ai", function (target) {
-                                            return -get.attitude(player, target);
-                                        });
+                                    'step 3'
+                                    player.chooseTarget("请选择目标，视为使用【万箭齐发】", [1, Infinity], function (card, player, target) {
+                                        return player != target;
+                                    }).set("ai", function (target) {
+                                        return -get.attitude(player, target);
+                                    });
                                     "step 4"
                                     if (result.targets && result.targets.length > 0) {
                                         player.useCard({ name: 'jinjuzy' }, result.targets, false);
@@ -3221,78 +3221,256 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     game.log("随机选择的选项是:" + selectedOption);
                                 }
                             },
-                            duikongfangyu:{//对空防御的免伤部分。对空防御的摸牌部分写在防空
-                                    trigger:{
-                                        player:"damageBegin4",
-                                    },
-                                    forced:true,
-                                    check:function(event,player){
-                                        if(player==event.player) return true;
-                                        return false;
-                                    },
-                                    filter:function(event,player){
-                                        return event.card&&(event.card.name=='wanjian'||event.card.name=='jinjuzy');
-                                    },
-                                    content:function(){
-                                        trigger.cancel();
-                                    },
-                                    
-                                    ai:{
-                                        notrick:true,
-                                        notricksource:true,
-                                        effect:{
-                                            target:function(card,player,target,current){
-                                                if(get.type(card)=='trick'&&get.tag(card,'damage')){
-                                                    return 'zeroplayertarget';
-                                                }
-                                            },
-                                            player:function(card,player,target,current){
-                                                if(get.type(card)=='trick'&&get.tag(card,'damage')){
-                                                    return 'zeroplayertarget';
-                                                }
-                                            },
-                                        },
-                                    },
-                                    
-                                    "_priority":0,
-                                
-                            },
-                            zhudaojiandui:{
-                                enable:"phaseUse",
-                                filter:function(event,player){
-                                    return player.countMark('zhudaojiandui')>2;
+                            duikongfangyu: {//对空防御的免伤部分。对空防御的摸牌部分写在防空
+                                trigger: {
+                                    player: "damageBegin4",
                                 },
-                                content:function(){
-                                    'step 0'
-                                    player.removeMark('zhudaojiandui',3);
-                                    player.chooseUseTarget('sha',false);
+                                forced: true,
+                                check: function (event, player) {
+                                    if (player == event.player) return true;
+                                    return false;
                                 },
-                                marktext:"柱",
-                                intro:{
-                                    name:"柱岛舰队",
-                                    "name2":"柱",
-                                    content:"mark",
+                                filter: function (event, player) {
+                                    return event.card && (event.card.name == 'wanjian' || event.card.name == 'jinjuzy');
                                 },
-                                group:"zhudaojiandui_add",
-                                subSkill:{
-                                    add:{
-                                        trigger:{
-                                            player:["useCardAfter","respond"],
+                                content: function () {
+                                    trigger.cancel();
+                                },
+
+                                ai: {
+                                    notrick: true,
+                                    notricksource: true,
+                                    effect: {
+                                        target: function (card, player, target, current) {
+                                            if (get.type(card) == 'trick' && get.tag(card, 'damage')) {
+                                                return 'zeroplayertarget';
+                                            }
                                         },
-                                        forced:true,
-                                        filter:function(event,player){
-                                            return get.type(event.card)=='basic'&&event.card.isCard;
+                                        player: function (card, player, target, current) {
+                                            if (get.type(card) == 'trick' && get.tag(card, 'damage')) {
+                                                return 'zeroplayertarget';
+                                            }
                                         },
-                                        content:function(){
-                                            player.addMark('zhudaojiandui',1);
-                                        },
-                                        sub:true,
-                                        "_priority":0,
                                     },
                                 },
 
-                            }
-                            
+                                "_priority": 0,
+
+                            },
+                            zhudaojiandui: {
+                                enable: "phaseUse",
+                                filter: function (event, player) {
+                                    return player.countMark('zhudaojiandui') > 2;
+                                },
+                                content: function () {
+                                    'step 0'
+                                    player.removeMark('zhudaojiandui', 3);
+                                    player.chooseUseTarget('sha', false);
+                                },
+                                marktext: "柱",
+                                intro: {
+                                    name: "柱岛舰队",
+                                    "name2": "柱",
+                                    content: "mark",
+                                },
+                                ai: {
+                                    order: 1,
+                                    result: {
+                                        player: 1,
+                                    },
+                                    threaten: 1.5,
+                                },
+                                group: "zhudaojiandui_add",
+                                subSkill: {
+                                    add: {
+                                        trigger: {
+                                            player: ["useCardAfter", "respond"],
+                                        },
+                                        forced: true,
+                                        filter: function (event, player) {
+                                            return get.type(event.card) == 'basic' && event.card.isCard && event.cards.length == 1;
+                                        },
+                                        content: function () {
+                                            player.addMark('zhudaojiandui', 1);
+                                        },
+                                        sub: true,
+                                        "_priority": 0,
+                                    },
+                                },
+
+                            },
+                            sawohaizhan: {
+                                enable: "phaseUse",
+                                filter: function (event, player) {
+                                    return player.hasSkill('huokongld');
+                                },
+                                content: function () {
+                                    player.removeSkill('huokongld');
+                                    player.addTempSkill('sawohaizhan_1');
+                                },
+                                group: "sawohaizhan_OvO",
+                                subSkill: {
+                                    OvO: {
+                                        trigger: {
+                                            global: "damageEnd",
+                                        },
+                                        forced: true,
+                                        filter: function (event, player) {
+                                            return event.player.name == "kunxi";
+                                        },
+                                        content: function () {
+                                            player.draw(event.count);
+                                        },
+                                    },
+                                },
+                            },
+                            sawohaizhan_1: {
+                                mod: {
+                                    targetInRange: function (card) {
+                                        if (card.name == 'sha') return true;
+                                    },
+                                },
+                                trigger: {
+                                    player: "useCard",
+                                },
+                                forced: true,
+                                filter: function (event, player) {
+                                    return event.card && (event.card.name == 'sha' && event.card.nature == 'thunder');
+                                },
+                                content: function () {
+                                    trigger.baseDamage++;
+                                },
+
+
+                                filter: function (event, player) {
+                                    return get.type(event.card) == 'basic' && event.card.isCard && event.cards.length == 1;
+                                },
+                                content: function () {
+                                    player.addMark('zhudaojiandui', 1);
+                                },
+                                sub: true,
+                                "_priority": 0,
+                            },
+                            mingyundewufenzhong: {
+                                group: ["wufenzhong1", "wufenzhong2", "wufenzhong4"],
+                                "_priority": 0,
+                            },
+                            wufenzhong1: {
+                                trigger: {
+                                    player: "phaseJudgeBefore",
+                                },
+                                direct: true,
+                                content: function () {
+                                    "step 0"
+                                    var check = player.countCards('h') > 2;
+                                    player.chooseTarget(get.prompt("mingyundewufenzhong"), "跳过判定阶段和摸牌阶段，视为对一名其他角色使用一张【杀】", function (card, player, target) {
+                                        if (player == target) return false;
+                                        return player.canUse({ name: 'sha' }, target, false);
+                                    }).set('check', check).set('ai', function (target) {
+                                        if (!_status.event.check) return 0;
+                                        return get.effect(target, { name: 'sha' }, _status.event.player);
+                                    }).setHiddenSkill('wufenzhong1');
+                                    "step 1"
+                                    if (result.bool) {
+                                        player.logSkill('wufenzhong1', result.targets);
+                                        player.storage.AttTarget = result.targets[0]
+                                        var list = ["thunder", "fire"];
+                                        game.log(JSON.stringify(list));
+                                        player.chooseControl(list).set('prompt', get.prompt('mingyundewufenzhong')).set('prompt2', '视为使用一张属性杀');
+                                        "step 2"
+                                        player.popup(get.translation(result.control) + '杀', result.control);
+                                        game.log(result.control);
+                                        player.useCard({ name: 'sha', nature: result.control, isCard: true }, player.storage.AttTarget, false);
+                                        trigger.cancel();
+                                        player.skip('phaseDraw');
+                                    }
+                                },
+                                "_priority": 0,
+                            },
+                            wufenzhong2: {
+                                trigger: {
+                                    player: "phaseUseBefore",
+                                },
+                                direct: true,
+                                filter: function (event, player) {
+                                    return player.countCards('he', function (card) {
+                                        if (_status.connectMode) return true;
+                                        return get.type(card) == 'equip';
+                                    }) > 0;
+                                },
+                                content: function () {
+                                    "step 0"
+                                    var check = player.needsToDiscard();
+                                    player.chooseCardTarget({
+                                        prompt: get.prompt('mingyundewufenzhong'),
+                                        prompt2: "弃置一张装备牌并跳过出牌阶段，视为对一名其他角色使用一张【杀】",
+                                        filterCard: function (card, player) {
+                                            return get.type(card) == 'equip' && lib.filter.cardDiscardable(card, player)
+                                        },
+                                        position: 'he',
+                                        filterTarget: function (card, player, target) {
+                                            if (player == target) return false;
+                                            return player.canUse({ name: 'sha' }, target, false);
+                                        },
+                                        ai1: function (card) {
+                                            if (_status.event.check) return 0;
+                                            return 6 - get.value(card);
+                                        },
+                                        ai2: function (target) {
+                                            if (_status.event.check) return 0;
+                                            return get.effect(target, { name: 'sha' }, _status.event.player);
+                                        },
+                                        check: check
+                                    }).setHiddenSkill('wufenzhong2');
+                                    "step 1"
+                                    if (result.bool) {
+                                        player.logSkill('wufenzhong2', result.targets);
+                                        player.storage.AttTarget = result.targets[0]
+                                        var list = ["thunder", "fire"];
+                                        game.log(JSON.stringify(list));
+                                        player.chooseControl(list).set('prompt', get.prompt('mingyundewufenzhong')).set('prompt2', '视为使用一张属性杀');
+                                        "step 2"
+                                        player.popup(get.translation(result.control) + '杀', result.control);
+                                        game.log(result.control);
+                                        player.useCard({ name: 'sha', nature: result.control, isCard: true }, player.storage.AttTarget, false);
+                                        trigger.cancel();
+                                    }
+                                },
+                                "_priority": 0,
+                            },
+                            wufenzhong4: {
+                                trigger: {
+                                    player: "phaseDiscardBefore",
+                                },
+                                direct: true,
+                                content: function () {
+                                    "step 0"
+                                    var check = player.needsToDiscard() || player.isTurnedOver() || (player.hasSkill('shebian') && player.canMoveCard(true, true));
+                                    player.chooseTarget(get.prompt('mingyundewufenzhong'), "跳过弃牌阶段并将武将牌翻面，视为对一名其他角色使用一张【杀】", function (card, player, target) {
+                                        if (player == target) return false;
+                                        return player.canUse({ name: 'sha' }, target, false);
+                                    }).set('check', check).set('ai', function (target) {
+                                        if (!_status.event.check) return 0;
+                                        return get.effect(target, { name: 'sha' }, _status.event.player, _status.event.player);
+                                    });
+                                    "step 1"
+                                    if (result.bool) {
+                                        player.logSkill('wufenzhong4', result.targets);
+                                        player.storage.AttTarget = result.targets[0]
+                                        player.turnOver();
+                                        var list = ["thunder", "fire"];
+                                        game.log(JSON.stringify(list));
+                                        player.chooseControl(list).set('prompt', get.prompt('mingyundewufenzhong')).set('prompt2', '视为使用一张属性杀');
+                                        "step 2"
+                                        player.popup(get.translation(result.control) + '杀', result.control);
+                                        game.log(result.control);
+                                        player.useCard({ name: 'sha', nature: result.control, isCard: true }, player.storage.AttTarget, false);
+
+                                        trigger.cancel();
+                                    }
+                                },
+                                "_priority": 0,
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -3388,6 +3566,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             rand: "随机数", "rand_info": "遇事不决？扔一个骰子吧。该技能可以生成1~6的随机数",
                             duikongfangyu: "对空防御", "duikongfangyu_info": "你受到万箭齐发和近距支援伤害时，你防止此伤害。你发动[防空]后，你摸x张牌(x为本次防空无效的目标数。)",
                             zhudaojiandui: "柱岛舰队", "zhudaojiandui_info": "锁定技，每当你使用或打出一张非虚拟非转化的基本牌，你获得一个[柱]标记。你可以移去三个柱标记视为使用一张不计入次数限制的杀。",
+                            sawohaizhan: "萨沃海战", "sawohaizhan_info": "若你拥有[火控]，你可以失去[火控]，若如此做你本回合使用雷杀无距离限制且伤害+1。昆西受到伤害时，你摸x张牌(x为此次伤害的数值)",
+                            sawohaizhan_OvO: "萨沃海战_昆西", "sawohaizhan_OvO_info": "昆西受到伤害时，你摸x张牌(x为此次伤害的数值)",
+                            sawohaizhan_1: "萨沃海战", "sawohaizhan_1_info": "本回合使用雷杀无距离限制且伤害+1。",
+
+                            mingyundewufenzhong: "命运的五分钟", "mingyundewufenzhong_info": "你可以跳过判定和摸牌阶段，视为使用一张雷杀或火杀，你可以弃置一张装备牌并跳过出牌阶段，视为使用一张雷杀或火杀，你可以跳过弃牌阶段并翻面，视为使用一张雷杀或火杀。",
+                            wufenzhong1: "命运的五分钟", "wufenzhong1_info": "你可以跳过判定和摸牌阶段，视为使用一张雷杀或火杀",
+                            wufenzhong2: "命运的五分钟", "wufenzhong2_info": "你可以弃置一张装备牌并跳过出牌阶段，视为使用一张雷杀或火杀",
+                            wufenzhong4: "命运的五分钟", "wufenzhong4_info": "你可以跳过弃牌阶段并翻面，视为使用一张雷杀或火杀。",
                         },
                     };
                     if (lib.device || lib.node) {
@@ -4727,7 +4913,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     changmen: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["des:。"]],
                     kunxi: ["female", "shu", 4, ["huokongld", "zhongxunca", "gaosusheji"], ["des:画师优秀的功底让这名角色美而可爱，这是出色的角色塑造。"]],
                     ougengqi: ["female", "shu", 4, ["huokongld", "zhongxunca"], ["des:励志偶像，与标志性舰装，给人以强大的保护。"]],
-                    qingye: ["female", "shu", 4, ["huokongld", "zhongxunca"], ["des:励志偶像，与一首动人的歌，与一段坎坷旅途。"]],
+                    qingye: ["female", "shu", 4, ["huokongld", "zhongxunca", "sawohaizhan"], ["des:励志偶像，与一首动人的歌，与一段坎坷旅途。"]],
                     beianpudun: ["female", "shu", 4, ["huokongld", "zhongxunca"], ["des:励志青年，在旅途中成长，与恋人坚定的望向远方。"]],
                     jiujinshan: ["female", "shu", 4, ["huokongld", "zhongxunca"], ["des:航海服饰，侦查员与火炮观瞄。"]],
                     yixian: ["female", "wei", 3, ["fangkong2", "qingxuncl"], ["des:经典美术设计的款式，意气风发，威猛先生"]],
