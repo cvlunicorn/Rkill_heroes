@@ -599,7 +599,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             degelasi: ["female", "qun", 3, ["fangkong2", "qingxuncl"], ["des:现代文职服饰，一看就很会办公。"]],
                             yatelanda: ["female", "wei", 3, ["fangkong2", "qingxuncl"], ["des:双枪射手点形象，其双枪能以极快的射速打出爆炸弹匣，清空一小片区域。"]],
                             "z31": ["female", "qun", 3, ["huibi", "quzhudd"], ["des:婚纱与轻纱是多数人的美梦,与绿草平原，与绿水青山"]],
-                            xuefeng: ["female", "shu", 3, ["huibi", "quzhudd"], ["des:幸运的驱逐舰，多位画师、花了大款的大佬亲情奉献。"]],
+                            xuefeng: ["female", "shu", 3, ["huibi", "quzhudd","xiangrui","yumian"], ["des:幸运的驱逐舰，多位画师、花了大款的大佬亲情奉献。"]],
                             kangfusi: ["female", "wei", 3, ["huibi", "quzhudd"], ["des:水手服欸,优秀的构图，不过图少改造晚。"]],
                             "47project": ["female", "qun", 3, ["huibi", "quzhudd"], ["des:这是个依赖科技的舰船，有着科幻的舰装，与兼备温柔体贴与意气风发的表现。"]],
                             guzhuyizhichuixue: ["female", "shu", 3, ["huibi", "quzhudd", "guzhuyizhi"], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
@@ -2969,6 +2969,54 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         game.log("计算后" + trigger.num);
                                     }
                                 }
+                            },
+                            xiangrui:{
+                                trigger:{ player:"damageBegin4",},
+                                usable:1,
+                                mark:true,
+                                content:function(){
+                                    "step 0"
+                                    player.judge(function(card){
+                                            if(get.color(card)=='black') {
+                                                trigger.cancel();
+                                                player.addMark('xiangrui',2);
+                                            }
+                                    });
+                                },
+                                marktext:"祥瑞",
+                                intro:{
+                                    name:"祥瑞",
+                                    content:"幸运值$",
+                                },
+                            },
+                            yumian:{
+                                trigger:{
+                                    player:"phaseJieshuBegin",
+                                },
+                                forced:true,
+                                preHidden:true,
+                                content:function(){
+                                    "step 0"
+                                    player.addMark('xiangrui',1);
+                                        var i=player.countMark('xiangrui');
+                                        player.removeMark('xiangrui',i);
+                                    "step 1"
+                                    if(i<2){
+                                        event.finish();
+                                        return;
+                                    }
+                                    player.chooseTarget(get.prompt2('yumian'),function(card,player,target){return get.distance(player,target)<=1;}).set('ai',function(target){
+                                        if(get.attitude(_status.event.player,target)<0){
+                                            return 1/Math.sqrt(target.hp+1);
+                                        }
+                                        return 0;
+                                    }).animate=false;
+                                    "step 2"
+                                    if(result.bool&&result.targets.length){
+                                        result.targets[0].loseHp(1);
+                                        result.targets[0].draw(2);
+                                    }
+                                },
                             }
                             //在这里添加新技能。
 
@@ -3055,6 +3103,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             shuileizhandui: "水雷战队", "shuileizhandui_info": "出牌阶段限一次，你可以摸一张牌并交给一名角色一张手牌，然后该角色可以交给另一名未以此法接受过牌的角色一张手牌，重复这个流程直到场上没有未接受过牌的角色或者有角色取消。这个流程重复第4次时，从牌堆将1张雷杀加入自己手牌。",
                             dumuchenglin: "独木成林", "dumuchenglin_info": "你获得【规避】。当场上没有其他航母时，杀使用次数+1，你于你的回合造成的第一次伤害+1。",
                             dumuchenglin_2: "独木成林2", "dumuchenglin_2_info": "杀使用次数+1，你于你的回合造成的第一次伤害+1。",
+                            xiangrui: "祥瑞", "xiangrui_info": "每名玩家的回合限一次，当你受到伤害前，你可以进行判定，判定结果为梅花/黑桃，免疫此次伤害，然后获得[祥瑞]标记。",
+                            yumian: "御免", "yumian_info": "锁定技，结束阶段，你移除所有[祥瑞]标记。若你失去了一个或以上的祥瑞标记，你可以选择距你为1的目标，让其失去一点体力并摸两张牌。",
                         },
                     };
                     if (lib.device || lib.node) {
@@ -4401,7 +4451,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     degelasi: ["female", "wei", 3, ["fangkong2", "qingxuncl"], ["des:现代文职服饰，一看就很会办公。"]],
                     yatelanda: ["female", "wei", 3, ["fangkong2", "qingxuncl"], ["des:双枪射手点形象，其双枪能以极快的射速打出爆炸弹匣，清空一小片区域。"]],
                     "z31": ["female", "wei", 3, ["huibi", "quzhudd"], ["des:婚纱与轻纱是多数人的美梦,与绿草平原，与绿水青山"]],
-                    xuefeng: ["female", "wei", 3, ["huibi", "quzhudd"], ["des:幸运的驱逐舰，多位画师、花了大款的大佬亲情奉献。"]],
+                    xuefeng: ["female", "shu", 3, ["huibi", "quzhudd","xiangrui","yumian"], ["des:幸运的驱逐舰，多位画师、花了大款的大佬亲情奉献。"]],
                     kangfusi: ["female", "wei", 3, ["huibi", "quzhudd"], ["des:水手服欸,优秀的构图，不过图少改造晚。"]],
                     "47project": ["female", "wei", 3, ["huibi", "quzhudd"], ["des:这是个依赖科技的舰船，有着科幻的舰装，与兼备温柔体贴与意气风发的表现。"]],
                     guzhuyizhichuixue: ["female", "shu", 3, ["huibi", "quzhudd", "guzhuyizhi"], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
