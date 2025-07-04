@@ -580,7 +580,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         connect: true,//该武将包是否可以联机（必填）,"xianjinld""zhiyangai","baiyin_skill",
                         //全局技能"_yuanhang","_jianzaochuan","_qianghuazhuang",
                         character: {
-                            liekexingdun: ["female", "wei", 4, ["hangmucv"], ["zhu", "des:血量中等的航母，温柔，体贴，过渡期追着大船打的航母。"]],
+                            liekexingdun: ["female", "wei", 4, ["hangmucv","hangkongzhanshuxianqu"], ["zhu", "des:血量中等的航母，温柔，体贴，过渡期追着大船打的航母。"]],
                             chicheng: ["female", "shu", 4, ["hangmucv"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
                             dumuchenglinqiye: ["female", "wei", 4, ["hangmucv", "dumuchenglin"], ["des:有必中攻击，快跑"]],
                             bisimai: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb"], ["zhu", "des:更多刮痧炮，更多炮弹，更多削弱光环，更多护甲模组，更多血量。"]],
@@ -588,7 +588,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             weineituo: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb"], ["des:身材小，而强度惊人。"]],
                             lisailiu: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb"], ["des:幸运的象征之一，同时有着丰富的精神象征。"]],
                             changmen: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["des:。"]],
-                            kunxi: ["female", "wei", 4, ["huokongld", "zhongxunca"], ["des:画师优秀的功底让这名角色美而可爱，这是出色的角色塑造。"]],
+                            kunxi: ["female", "wei", 4, ["huokongld", "zhongxunca","gaosusheji"], ["des:画师优秀的功底让这名角色美而可爱，这是出色的角色塑造。"]],
                             ougengqi: ["female", "qun", 4, ["huokongld", "zhongxunca"], ["des:励志偶像，与标志性舰装，给人以强大的保护。"]],
                             qingye: ["female", "shu", 4, ["huokongld", "zhongxunca"], ["des:励志偶像，与一首动人的歌，与一段坎坷旅途。"]],
                             beianpudun: ["female", "wei", 4, ["huokongld", "zhongxunca"], ["des:励志青年，在旅途中成长，与恋人坚定的望向远方。"]],
@@ -2685,7 +2685,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter: function (event, player) {
                                     return player.inRange(event.player); // 在你的攻击范围内
                                 },
-                                content: function () {
+    check:function(event,player){
+        return get.attitude(player,event.player)<=0;
+    },                            content: function () {
                                     "step 0"
                                     player.discardPlayerCard('h', trigger.player, 1, true);
                                 },
@@ -3019,6 +3021,35 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         result.targets[0].draw(2);
                                     }
                                 },
+                            },
+                            hangkongzhanshuxianqu:{
+                                trigger:{
+                                    player:"useCardToPlayered",
+                                },
+                                frequent:true,
+                                filter:function (event,player){
+                                    if(event.getParent().triggeredTargets3.length>1) return false;
+                                    return event.targets.length>0&&(get.type(event.card)=='trick'&&!event.card.isCard);
+                                },
+                                content:function(){
+                                    player.draw(Math.min(trigger.targets.length,player.maxHp));
+                                },
+                            },
+                            gaosusheji:{
+                                    trigger:{
+                                        player:"useCard",
+                                    },
+                                    filter:function(event,player){
+                                        var evtx=event.getParent('phaseUse');
+                                        if(!evtx||evtx.player!=player) return false;
+                                        return player.getHistory('useCard',evt=>{
+                                            return (evt.card.name=='sha'||evt.card.name=='sheji9')&event.getParent('phaseUse')==evtx;
+                                        }).indexOf(event)==0;
+                                    },
+                                    direct:true,
+                                    content:function(){
+                                        trigger.effectCount++;
+                                    },
                             }
                             //在这里添加新技能。
 
@@ -3107,6 +3138,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             dumuchenglin_2: "独木成林2", "dumuchenglin_2_info": "杀使用次数+1，你于你的回合造成的第一次伤害+1。",
                             xiangrui: "祥瑞", "xiangrui_info": "每名玩家的回合限一次，当你受到伤害前，你可以进行判定，判定结果为梅花/黑桃，免疫此次伤害，然后获得[祥瑞]标记。",
                             yumian: "御免", "yumian_info": "锁定技，结束阶段，你移除所有[祥瑞]标记。若你失去了一个或以上的祥瑞标记，你可以选择距你为1的目标，让其失去一点体力并摸两张牌。",
+                            hangkongzhanshuxianqu: "航空战术先驱", "hangkongzhanshuxianqu_info": "你使用转化的锦囊牌指定目标时，你摸x张牌(x为你指定的目标数，至多为你当前的体力上限)",
+                            gaosusheji: "高速射击", "gaosusheji_info": "当你使用的杀是本回合你使用的第一张牌，你可以令此杀结算两次。",
                         },
                     };
                     if (lib.device || lib.node) {
@@ -4434,7 +4467,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
         }, package: {
             character: {
                 character: {//单机部分，在联机框架开启时，联机武将会覆盖同名武将应该不生效。
-                    liekexingdun: ["female", "wu", 4, ["hangmucv"], ["zhu", "des:血量中等的航母，温柔，体贴，过渡期追着大船打的航母。"]],
+                    liekexingdun: ["female", "wu", 4, ["hangmucv","hangkongzhanshuxianqu"], ["zhu", "des:血量中等的航母，温柔，体贴，过渡期追着大船打的航母。"]],
                     chicheng: ["female", "wu", 4, ["hangmucv"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
                     dumuchenglinqiye: ["female", "wei", 4, ["hangmucv", "dumuchenglin"], ["des:有必中攻击，快跑"]],
                     bisimai: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["zhu", "des:更多刮痧炮，更多炮弹，更多削弱光环，更多护甲模组，更多血量。"]],
@@ -4442,7 +4475,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     weineituo: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["des:身材小，而强度惊人。"]],
                     lisailiu: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["des:幸运的象征之一，同时有着丰富的精神象征。"]],
                     changmen: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["des:。"]],
-                    kunxi: ["female", "shu", 4, ["huokongld", "zhongxunca"], ["des:画师优秀的功底让这名角色美而可爱，这是出色的角色塑造。"]],
+                    kunxi: ["female", "shu", 4, ["huokongld", "zhongxunca","gaosusheji"], ["des:画师优秀的功底让这名角色美而可爱，这是出色的角色塑造。"]],
                     ougengqi: ["female", "shu", 4, ["huokongld", "zhongxunca"], ["des:励志偶像，与标志性舰装，给人以强大的保护。"]],
                     qingye: ["female", "shu", 4, ["huokongld", "zhongxunca"], ["des:励志偶像，与一首动人的歌，与一段坎坷旅途。"]],
                     beianpudun: ["female", "shu", 4, ["huokongld", "zhongxunca"], ["des:励志青年，在旅途中成长，与恋人坚定的望向远方。"]],
