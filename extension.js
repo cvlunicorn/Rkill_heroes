@@ -2814,7 +2814,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                             shuileizhandui: {
                                 enable: "phaseUse",
-                                usable: 1,
                                 filterCard: true,
                                 position: 'hejs',
                                 discard: false,
@@ -2832,24 +2831,18 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 prompt: function () { return ('选择一名角色并交给其任意张牌') },
                                 content: function () {
                                     "step 0";
-                                    player.draw(1);
-                                    targets[0].addTempSkill('shuileizhandui_1', { player: 'phaseJieshuBegin' });
                                     player.give(cards, targets[0],);
-                                    targets[0].addMark("shuileizhandui_1");
-                                    targets[0].useSkill('shuileizhandui_1');
-                                    "step 1";
-                                    var num = game.countPlayer(function (current) {
-                                        return current.hasSkill('shuileizhandui_1');
-                                    });
-                                    if (num >= 4) {
+                                         "step 1";
+                                         if(!player.hasSkill("shuileizhandui_1")){
                                         var card = get.cardPile(function (card) {
                                             return card.name == 'sheji9' && card.nature == 'thunder';
                                         });
                                         if (card) {
                                             game.log("在牌堆中查找到了雷属性射击");
-                                            player.gain(card, 'gain2');
+                                         player.gain(card, 'gain2');
                                         }
-                                    }
+                                        player.addTempSkill("shuileizhandui_1", { player: 'phaseJieshuBegin' });
+                                        }
                                     game.log("step end");
                                 }, ai: {
                                     expose: 0.1,
@@ -2872,7 +2865,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
 
                             shuileizhandui_1: {
-                                trigger: { player: "gainEnd" }, // 当你获得牌时触发
+                                /*trigger: { player: "gainEnd" }, // 当你获得牌时触发
                                 direct: true,
                                 filter: function (event, player) {
                                     return !player.hasMark('shuileizhandui_1');
@@ -2949,7 +2942,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                     },
                                 },
-
+*/
                             },
                             dumuchenglin: {
                                 trigger: {
@@ -3326,8 +3319,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             sawohaizhan_1: {
                                 mod: {
+                                    cardUsable:function(card){
+                                        if(card.name=='sha'&&card.nature=='thunder') return Infinity;
+                                    },
                                     targetInRange: function (card) {
-                                        if (card.name == 'sha') return true;
+                                        if (card.name == 'sha'&&card.nature=='thunder') return true;
                                     },
                                 },
                                 trigger: {
@@ -3509,7 +3505,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         game.log("拼点赢");
                                     } else {
                                         trigger.cancel();
-                                        player.skip('phaseUse');
                                         player.skip('phaseDiscard');
                                         game.log("拼点没赢");
                                     }
@@ -3629,8 +3624,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             manchangzhanyi_1: "漫长战役", "manchangzhanyi_1_info": "",
                             guzhuyizhi: "孤注一掷", "guzhuyizhi_info": "出牌阶段开始时，你可以摸两张牌并弃置所有手牌，然后摸等量的牌，如此做，你的其他技能失效且你不能使用桃或快修直到你的下回合开始，你计算与其他角色的距离-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。",
                             guzhuyizhi2: "孤注一掷", "guzhuyizhi2_info": "",
-                            shuileizhandui_1: "水雷战队", "shuileizhandui_1_info": "你可以将一张牌交给其他角色",
-                            shuileizhandui: "水雷战队", "shuileizhandui_info": "出牌阶段限一次，你可以摸一张牌并交给一名角色任意张牌，然后该角色可以交给另一名未以此法接受过牌的角色一张牌，重复这个流程直到场上没有未接受过牌的角色或者有角色取消。这个流程重复第4次时，从牌堆将1张雷杀加入自己手牌。",
+                            shuileizhandui_1: "水雷战队", "shuileizhandui_1_info": "",
+                            shuileizhandui: "水雷战队", "shuileizhandui_info": "你可以交给一名角色任意张牌。若你是本回合第一次发动本技能，你可以从牌堆和弃牌堆获得一张雷杀。",
                             dumuchenglin: "独木成林", "dumuchenglin_info": "你获得【规避】。当场上没有其他航母时，杀使用次数+1，你于你的回合造成的第一次伤害+1。",
                             dumuchenglin_2: "独木成林2", "dumuchenglin_2_info": "杀使用次数+1，你于你的回合造成的第一次伤害+1。",
                             xiangrui: "祥瑞", "xiangrui_info": "每名玩家的回合限一次，当你受到伤害前，你可以进行判定，判定结果为梅花/黑桃，免疫此次伤害，然后获得[祥瑞]标记。",
@@ -3641,9 +3636,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             rand: "随机数", "rand_info": "遇事不决？扔一个骰子吧。该技能可以生成1~6的随机数",
                             duikongfangyu: "对空防御", "duikongfangyu_info": "你受到万箭齐发和近距支援伤害时，你防止此伤害。你发动[防空]后，你摸x张牌(x为本次防空无效的目标数。)",
                             zhudaojiandui: "柱岛舰队", "zhudaojiandui_info": "锁定技，每当你使用或打出一张非虚拟非转化的基本牌，你获得一个[柱]标记。你可以移去三个柱标记视为使用一张不计入次数限制的杀。",
-                            sawohaizhan: "萨沃海战", "sawohaizhan_info": "若你拥有[火控]，你可以失去[火控]，若如此做你本回合使用雷杀无距离限制且伤害+1。昆西受到伤害时，你摸x张牌(x为此次伤害的数值)",
+                            sawohaizhan: "萨沃海战", "sawohaizhan_info": "当西受到伤害时，你摸x张牌(x为此次伤害的数值)。出牌阶段，若你拥有[火控]，你可以失去[火控]，若如此做你本回合使用雷杀无距离次数限制且伤害+1。",
                             sawohaizhan_OvO: "萨沃海战_昆西", "sawohaizhan_OvO_info": "昆西受到伤害时，你摸x张牌(x为此次伤害的数值)",
-                            sawohaizhan_1: "萨沃海战", "sawohaizhan_1_info": "本回合使用雷杀无距离限制且伤害+1。",
+                            sawohaizhan_1: "萨沃海战", "sawohaizhan_1_info": "本回合使用雷杀无距离次数限制且伤害+1。",
                             mingyundewufenzhong: "命运的五分钟", "mingyundewufenzhong_info": "你可以跳过判定和摸牌阶段，视为使用一张雷杀或火杀，你可以弃置一张装备牌并跳过出牌阶段，视为使用一张雷杀或火杀，你可以跳过弃牌阶段并翻面，视为使用一张雷杀或火杀。",
                             wufenzhong1: "命运的五分钟", "wufenzhong1_info": "你可以跳过判定和摸牌阶段，视为使用一张雷杀或火杀",
                             wufenzhong2: "命运的五分钟", "wufenzhong2_info": "你可以弃置一张装备牌并跳过出牌阶段，视为使用一张雷杀或火杀",
