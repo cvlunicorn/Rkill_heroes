@@ -583,7 +583,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         //全局技能"_yuanhang","_jianzaochuan","_qianghuazhuang",
                         character: {
                             liekexingdun: ["female", "wei", 4, ["hangmucv", "hangkongzhanshuxianqu"], ["zhu", "des:血量中等的航母，温柔，体贴，过渡期追着大船打的航母。"]],
-                            qixichicheng: ["female", "shu", 4, ["hangmucv", "qixi_cv"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
+                            qixichicheng: ["female", "shu", 4, ["hangmucv", "qixi_cv"], ["zhu", "des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
                             wufenzhongchicheng: ["female", "shu", 4, ["hangmucv", "mingyundewufenzhong"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
                             dumuchenglinqiye: ["female", "wei", 4, ["hangmucv", "dumuchenglin"], ["des:有必中攻击，快跑"]],
                             bisimai: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb"], ["zhu", "des:更多刮痧炮，更多炮弹，更多削弱光环，更多护甲模组，更多血量。"]],
@@ -1415,11 +1415,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player.useCard({ name: 'jinjuzy' }, result.targets, false);
                                     }
                                 },
-                                ai:{
-                                        order:10,
-                                        useful:1,
-                                        value:5,
-                                    },
+                                ai: {
+                                    order: 10,
+                                    useful: 1,
+                                    value: 5,
+                                },
                                 intro: {
                                     content: function () {
                                         return get.translation(skill + '_info');
@@ -2791,9 +2791,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         if (card.name == 'tao' || card.name == 'kuaixiu9') return false;
                                     },
                                     maxHandcardBase: function (player, num) {
-                                        var damage = player.getStat().damage;
-                                        if (typeof damage == 'number') return damage;
-                                        return 0;
+                                        if (player.hp == player.maxHp) {
+                                            var damage = player.getStat().damage;
+                                            if (typeof damage == 'number') return damage - player.countMark('shoupaiup');
+                                            return 0 - player.countMark('shoupaiup');
+                                        } else {
+                                            var damage = player.getStat().damage;
+                                            if (typeof damage == 'number') return damage - player.countMark('shoupaiup') - 1;
+                                            return 0 - player.countMark('shoupaiup') - 1;
+                                        }
                                     },
                                     cardUsable: function (card, player, num) {
                                         if (card.name == 'sha') return num + 1;
@@ -2808,8 +2814,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 enable: "phaseUse",
                                 usable: 1,
                                 filterCard: true,
-                                position: 'h',
+                                position: 'hejs',
                                 discard: false,
+                                selectCard: [1, Infinity],
                                 lose: false, check: function (card) {
                                     var player = _status.event.player;
                                     var val = 5;
@@ -2820,12 +2827,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return player != target;
                                 },
                                 //使用give必须要以上这三条属性
-                                prompt: function () { return ('选择一名角色并交给其一张牌') },
+                                prompt: function () { return ('选择一名角色并交给其任意张牌') },
                                 content: function () {
                                     "step 0";
                                     player.draw(1);
                                     targets[0].addTempSkill('shuileizhandui_1', { player: 'phaseJieshuBegin' });
-                                    player.give(cards, targets[0], 'gain');
+                                    player.give(cards, targets[0],);
                                     targets[0].addMark("shuileizhandui_1");
                                     targets[0].useSkill('shuileizhandui_1');
                                     "step 1";
@@ -2907,7 +2914,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 }
                                             }
                                         }
-                                        player.give(result.cards[0], result.targets[0]); result.targets[0].addMark("shuileizhandui_1"); result.targets[0].useSkill('shuileizhandui_1');
+                                        player.give(result.cards[0], result.targets[0]);
+                                        result.targets[0].addMark("shuileizhandui_1");
+                                        result.targets[0].useSkill('shuileizhandui_1');
                                     };
                                 },
                                 onremove: function (player) { player.removeGaintag('shuileizhandui_1'); },
@@ -3140,10 +3149,19 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (event.num < targets.length) event.goto(1);
                                     else game.delayx();
                                     game.log("技能结束");
-                                    'step 3'
-                                    var next = game.createEvent('hangmucv');
+                                    'step 3' 
+                                        player.chooseTarget("请选择目标，视为使用【万箭齐发】", [1, Infinity], function (card, player, target) {
+                                            return player != target;
+                                        }).set("ai", function (target) {
+                                            return -get.attitude(player, target);
+                                        });
+                                    "step 4"
+                                    if (result.targets && result.targets.length > 0) {
+                                        player.useCard({ name: 'jinjuzy' }, result.targets, false);
+                                    }
+                                    /*var next = game.createEvent('hangmucv');
                                     next.player = player;
-                                    next.setContent(lib.skill.hangmucv.content);
+                                    next.setContent(lib.skill.hangmucv.content);*/
                                 },
                                 subSkill: {
                                     block: {
@@ -3167,14 +3185,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                         player: function (player) {
                                             var damageCards = player.getCards('h', function (card) {
-                                                return get.tag(card,'damage')&&get.type(card) == 'trick';
+                                                return get.tag(card, 'damage') && get.type(card) == 'trick';
                                             });
-                                            if (damageCards.length>=1) { 
-                                            return game.countPlayer(function (current) {
-                                                if (current != player) {
-                                                    return get.sgn(get.damageEffect(current, player, player));
-                                                }
-                                            });}
+                                            if (damageCards.length >= 1) {
+                                                return game.countPlayer(function (current) {
+                                                    if (current != player) {
+                                                        return get.sgn(get.damageEffect(current, player, player));
+                                                    }
+                                                });
+                                            }
                                             return 0;
                                         },
                                     },
@@ -3284,14 +3303,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             guzhuyizhi: "孤注一掷", "guzhuyizhi_info": "出牌阶段开始时，你可以摸两张牌并弃置所有手牌，然后摸等量的牌，如此做，你的其他技能失效且你不能使用桃或快修直到你的下回合开始，你计算与其他角色的距离-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。",
                             guzhuyizhi2: "孤注一掷", "guzhuyizhi2_info": "",
                             shuileizhandui_1: "水雷战队", "shuileizhandui_1_info": "你可以将一张牌交给其他角色",
-                            shuileizhandui: "水雷战队", "shuileizhandui_info": "出牌阶段限一次，你可以摸一张牌并交给一名角色一张手牌，然后该角色可以交给另一名未以此法接受过牌的角色一张手牌，重复这个流程直到场上没有未接受过牌的角色或者有角色取消。这个流程重复第4次时，从牌堆将1张雷杀加入自己手牌。",
+                            shuileizhandui: "水雷战队", "shuileizhandui_info": "出牌阶段限一次，你可以摸一张牌并交给一名角色任意张牌，然后该角色可以交给另一名未以此法接受过牌的角色一张牌，重复这个流程直到场上没有未接受过牌的角色或者有角色取消。这个流程重复第4次时，从牌堆将1张雷杀加入自己手牌。",
                             dumuchenglin: "独木成林", "dumuchenglin_info": "你获得【规避】。当场上没有其他航母时，杀使用次数+1，你于你的回合造成的第一次伤害+1。",
                             dumuchenglin_2: "独木成林2", "dumuchenglin_2_info": "杀使用次数+1，你于你的回合造成的第一次伤害+1。",
                             xiangrui: "祥瑞", "xiangrui_info": "每名玩家的回合限一次，当你受到伤害前，你可以进行判定，判定结果为梅花/黑桃，免疫此次伤害，然后获得[祥瑞]标记。",
                             yumian: "御免", "yumian_info": "锁定技，结束阶段，你移除所有[祥瑞]标记。若你失去了一个或以上的祥瑞标记，你可以选择距你为1的目标，让其失去一点体力并摸两张牌。",
                             hangkongzhanshuxianqu: "航空战术先驱", "hangkongzhanshuxianqu_info": "你使用转化的锦囊牌指定目标时，你摸x张牌(x为你指定的目标数，至多为你当前的体力上限)",
                             gaosusheji: "高速射击", "gaosusheji_info": "当你使用的杀是本回合你使用的第一张牌，你可以令此杀结算两次。",
-                            qixi_cv: "奇袭", "qixi_cv_info": "限定技，出牌阶段，你可以令所有其他角色依次选择一项:1你弃置其区域内的两张牌，2本回合不能使用或打出手牌，3翻面。然后你可以发动一次【航母】。",
+                            qixi_cv: "奇袭", "qixi_cv_info": "限定技，出牌阶段，你可以令所有其他角色依次选择一项:1你弃置其区域内的两张牌，2本回合不能使用或打出手牌，3翻面。然后你可以视为使用【近距支援】。",
                             rand: "随机数", "rand_info": "遇事不决？扔一个骰子吧。该技能可以生成1~6的随机数",
                         },
                     };
@@ -4668,11 +4687,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                 },
             },
-            intro: "制作组群，730255133，#(滑稽)。<br>建议：1.使用懒人包，开启扩展-十周年UI，技能标记卡顿时，可以关闭获得技能提示，提高体验感。<br>2.点击透明时钟-选项-武将>将其他武将包设为点将才能用，体验丰富而简单的卡牌对战。<br>3.选项-降低字体缩放，提升视野，玩16人扩展也好操作。<br>角色分类：为适配原版主公技而做如下分类，魏国闪避，蜀国输出，吴国辅助。<br>玩法：本扩展增加了与队友互给关键牌、用装备强化自己的玩法，间接让牌的质量有所提高，可以在下方做限制。 <br>特殊规则：雷杀对有护甲或者有失血反击技能的目标流失体力（穿甲），冰杀对有护甲的目标加1伤，火杀会让对手于其自己的出牌阶段结束后扣一血。<br>卡牌里也有作者尝试的身影，可以编辑牌堆尝试哦。<br>扩展设置：附带增强原版体验的全局技能，可根据需要开关。长按或右键全局技能的简介可以查看详情",
+            intro: "制作组群，730255133，#(滑稽)。<br>建议：1.使用懒人包，开启扩展-十周年UI，技能标记卡顿时，可以关闭获得技能提示，提高体验感。<br>2.点击透明时钟-选项-武将>将其他武将包设为点将才能用，体验丰富而简单的卡牌对战。<br>3.选项-降低字体缩放，提升视野，玩16人扩展也好操作。<br>玩法：本扩展增加了与队友互给关键牌、用装备强化自己的玩法，间接让牌的质量有所提高，可以在下方做限制。 <br>特殊规则：雷杀对有护甲或者有失血反击技能的目标流失体力（穿甲），冰杀对有护甲的目标加1伤，火杀会让对手于其自己的出牌阶段结束后扣一血。<br>卡牌里也有作者尝试的身影，可以编辑牌堆尝试哦。<br>扩展设置：附带增强原版体验的全局技能，可根据需要开关。长按或右键全局技能的简介可以查看详情",
             author: "※人杰地灵游戏中",
             diskURL: "https://pan.baidu.com/s/1JTv8QGtFu90UED_ZVYm5-A 提取码：5iox",
             forumURL: "",
-            version: "1.14",
+            version: "1.81",
         }, files: { "character": ["changchun.jpg"], "card": ["fasheqi3.png"], "skill": [] }
     }
 })
