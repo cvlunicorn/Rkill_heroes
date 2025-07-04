@@ -580,15 +580,16 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         connect: true,//该武将包是否可以联机（必填）,"xianjinld""zhiyangai","baiyin_skill",
                         //全局技能"_yuanhang","_jianzaochuan","_qianghuazhuang",
                         character: {
-                            liekexingdun: ["female", "wei", 4, ["hangmucv","hangkongzhanshuxianqu"], ["zhu", "des:血量中等的航母，温柔，体贴，过渡期追着大船打的航母。"]],
-                            chicheng: ["female", "shu", 4, ["hangmucv"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
+                            liekexingdun: ["female", "wei", 4, ["hangmucv", "hangkongzhanshuxianqu"], ["zhu", "des:血量中等的航母，温柔，体贴，过渡期追着大船打的航母。"]],
+                            qixichicheng: ["female", "shu", 4, ["hangmucv", "qixi_cv"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
+                            wufenzhongchicheng: ["female", "shu", 4, ["hangmucv", "mingyundewufenzhong"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
                             dumuchenglinqiye: ["female", "wei", 4, ["hangmucv", "dumuchenglin"], ["des:有必中攻击，快跑"]],
                             bisimai: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb"], ["zhu", "des:更多刮痧炮，更多炮弹，更多削弱光环，更多护甲模组，更多血量。"]],
                             misuli: ["female", "wei", 4, ["zhuangjiafh", "zhanliebb"], ["des:用精巧的手枪去质疑，用绝对的火力回击对手。"]],
                             weineituo: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb"], ["des:身材小，而强度惊人。"]],
                             lisailiu: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb"], ["des:幸运的象征之一，同时有着丰富的精神象征。"]],
                             changmen: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["des:。"]],
-                            kunxi: ["female", "wei", 4, ["huokongld", "zhongxunca","gaosusheji"], ["des:画师优秀的功底让这名角色美而可爱，这是出色的角色塑造。"]],
+                            kunxi: ["female", "wei", 4, ["huokongld", "zhongxunca", "gaosusheji"], ["des:画师优秀的功底让这名角色美而可爱，这是出色的角色塑造。"]],
                             ougengqi: ["female", "qun", 4, ["huokongld", "zhongxunca"], ["des:励志偶像，与标志性舰装，给人以强大的保护。"]],
                             qingye: ["female", "shu", 4, ["huokongld", "zhongxunca"], ["des:励志偶像，与一首动人的歌，与一段坎坷旅途。"]],
                             beianpudun: ["female", "wei", 4, ["huokongld", "zhongxunca"], ["des:励志青年，在旅途中成长，与恋人坚定的望向远方。"]],
@@ -2685,9 +2686,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter: function (event, player) {
                                     return player.inRange(event.player); // 在你的攻击范围内
                                 },
-    check:function(event,player){
-        return get.attitude(player,event.player)<=0;
-    },                            content: function () {
+                                check: function (event, player) {
+                                    return get.attitude(player, event.player) <= 0;
+                                }, content: function () {
                                     "step 0"
                                     player.discardPlayerCard('h', trigger.player, 1, true);
                                 },
@@ -3003,7 +3004,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     var i = player.countMark('xiangrui');
                                     player.removeMark('xiangrui', i);
                                     game.log(i);
-                                    var s=(i<=0);
+                                    var s = (i <= 0);
                                     game.log(s);
                                     if (s) {
                                         game.log("finish");
@@ -3022,34 +3023,150 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                 },
                             },
-                            hangkongzhanshuxianqu:{
-                                trigger:{
-                                    player:"useCardToPlayered",
+                            hangkongzhanshuxianqu: {
+                                trigger: {
+                                    player: "useCardToPlayered",
                                 },
-                                frequent:true,
-                                filter:function (event,player){
-                                    if(event.getParent().triggeredTargets3.length>1) return false;
-                                    return event.targets.length>0&&(get.type(event.card)=='trick'&&!event.card.isCard);
+                                frequent: true,
+                                filter: function (event, player) {
+                                    if (event.getParent().triggeredTargets3.length > 1) return false;
+                                    return event.targets.length > 0 && (get.type(event.card) == 'trick' && !event.card.isCard);
                                 },
-                                content:function(){
-                                    player.draw(Math.min(trigger.targets.length,player.maxHp));
+                                content: function () {
+                                    player.draw(Math.min(trigger.targets.length, player.maxHp));
                                 },
                             },
-                            gaosusheji:{
-                                    trigger:{
-                                        player:"useCard",
+                            gaosusheji: {
+                                trigger: {
+                                    player: "useCard",
+                                },
+                                filter: function (event, player) {
+                                    var evtx = event.getParent('phaseUse');
+                                    if (!evtx || evtx.player != player) return false;
+                                    return player.getHistory('useCard', evt => {
+                                        return (evt.card.name == 'sha' || evt.card.name == 'sheji9') & event.getParent('phaseUse') == evtx;
+                                    }).indexOf(event) == 0;
+                                },
+                                direct: true,
+                                content: function () {
+                                    trigger.effectCount++;
+                                },
+                            },
+                            qixi_cv: {
+                                unique: true,
+                                enable: "phaseUse",
+                                mark: true,
+                                skillAnimation: true,
+                                limited: true,
+                                animationColor: "wood",
+                                init: function (player) {
+                                    player.storage.qixi_cv = false;
+                                },
+                                filter: function (event, player) {
+                                    if (player.storage.qixi_cv) return false;
+                                    return true;
+                                },
+                                logTarget: function (event, player) {
+                                    return game.players.sortBySeat(player);
+                                },
+                                content: function () {
+                                    'step 0'
+                                    player.awakenSkill('qixi_cv');
+                                    player.storage.qixi_cv = true;
+                                    event.num = 0;
+                                    event.targets = game.filterPlayer(current => current != player).sortBySeat();
+                                    game.log(event.targets);
+                                    'step 1'
+                                        lib.target=event.targets.shift();
+                                        if ( lib.target.countCards('he') < 1) event._result = { index: 2 };
+                                        else  lib.target.chooseControlList(
+                                            ['令' + get.translation(player) + '弃置你区域内的两张牌',
+                                                '本回合不能使用或打出手牌', '翻面'],
+                                            true).set('ai',function(event,player){
+                                                var target=_status.event.getParent().player;
+                                                var player=_status.event.player;
+                                                if(get.attitude(player,target)>0) return 1;
+                                                else if( lib.target.countCards('e')<1)return 0
+                                                return 2;
+                                            });
+                                        game.log( lib.target);
+                                        game.log("选择完成");
+                                        'step 2'
+                                        if (result.index == 0) {
+                                            game.log("弃牌");
+                                            player.discardPlayerCard( lib.target,2,'hej',true)
+                                            
+                                        } else if (result.index == 1) {
+                                            game.log("不能使用手牌");
+                                            lib.target.addTempSkill('qixi_cv_block');
+                                            
+                                        } else {
+                                            game.log("翻面");
+                                            lib.target.turnOver();
+                                            
+                                        }
+                                        
+                                        game.log("操作完成");
+                                    
+                                    'step 2'
+                                    if (event.num < targets.length) event.goto(1);
+                                    else game.delayx();
+                                    game.log("技能结束");
+                                    'step 3'
+                                    var next=game.createEvent('hangmucv');
+                                    next.player=player;
+                                    next.setContent(lib.skill.hangmucv.content);
+                                },
+                                subSkill: {
+                                    block: {
+                                        mark: true,
+                                        intro: {
+                                            content: "不能使用或打出手牌",
+                                        },
+                                        charlotte: true,
+                                        mod: {
+                                            "cardEnabled2": function (card) {
+                                                if (get.position(card) == 'h') return false;
+                                            },
+                                        },
+                                        sub: true,
+                                        "_priority": 0,
                                     },
-                                    filter:function(event,player){
-                                        var evtx=event.getParent('phaseUse');
-                                        if(!evtx||evtx.player!=player) return false;
-                                        return player.getHistory('useCard',evt=>{
-                                            return (evt.card.name=='sha'||evt.card.name=='sheji9')&event.getParent('phaseUse')==evtx;
-                                        }).indexOf(event)==0;
+                                },
+                                ai:{
+                                    order:1,
+                                    result:{
+                                        player:function(player){
+                                            if(lib.config.mode=='identity'&&game.zhu.isZhu&&player.identity=='fan'){
+                                                if(game.zhu.hp==1&&game.zhu.countCards('h')<=2) return 1;
+                                            }
+                                            var num=0;
+                                            var players=game.filterPlayer();
+                                            for(var i=0;i<players.length;i++){
+                                                var att=get.attitude(player,players[i]);
+                                                if(att>0) att=1;
+                                                if(att<0) att=-1;
+                                                if(players[i]!=player&&players[i].hp<=3){
+                                                    if(players[i].countCards('h')==0) num+=att/players[i].hp;
+                                                    else if(players[i].countCards('h')==1) num+=att/2/players[i].hp;
+                                                    else if(players[i].countCards('h')==2) num+=att/4/players[i].hp;
+                                                }
+                                                if(players[i].hp==1) num+=att*1.5;
+                                            }
+                                            if(player.hp==1){
+                                                return -num;
+                                            }
+                                            if(player.hp==2){
+                                                return -game.players.length/4-num;
+                                            }
+                                            return -game.players.length/3-num;
+                                        },
                                     },
-                                    direct:true,
-                                    content:function(){
-                                        trigger.effectCount++;
-                                    },
+                                },
+                                intro: {
+                                    content: "limited",
+                                },
+                                "_priority": 0,
                             }
                             //在这里添加新技能。
 
@@ -3059,7 +3176,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         },
                         translate: {
                             addskilltest: "addskilltest",
-                            liekexingdun: "列克星敦", chicheng: "赤城",
+                            liekexingdun: "列克星敦",
+                            qixichicheng: "奇袭赤城",
+                            wufenzhongchicheng: "五分钟赤城",
                             dumuchenglinqiye: "独木成林企业",
                             bisimai: "俾斯麦&北宅", misuli: "密苏里",
                             changmen: "长门", weineituo: "维内托",
@@ -3140,6 +3259,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             yumian: "御免", "yumian_info": "锁定技，结束阶段，你移除所有[祥瑞]标记。若你失去了一个或以上的祥瑞标记，你可以选择距你为1的目标，让其失去一点体力并摸两张牌。",
                             hangkongzhanshuxianqu: "航空战术先驱", "hangkongzhanshuxianqu_info": "你使用转化的锦囊牌指定目标时，你摸x张牌(x为你指定的目标数，至多为你当前的体力上限)",
                             gaosusheji: "高速射击", "gaosusheji_info": "当你使用的杀是本回合你使用的第一张牌，你可以令此杀结算两次。",
+                            qixi_cv: "奇袭", "qixi_cv_info": "限定技，出牌阶段，你可以令所有其他角色依次选择一项:1你弃置其区域内的两张牌，2本回合不能使用或打出手牌，3翻面。然后你可以发动一次【航母】。",
                         },
                     };
                     if (lib.device || lib.node) {
@@ -4467,15 +4587,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
         }, package: {
             character: {
                 character: {//单机部分，在联机框架开启时，联机武将会覆盖同名武将应该不生效。
-                    liekexingdun: ["female", "wu", 4, ["hangmucv","hangkongzhanshuxianqu"], ["zhu", "des:血量中等的航母，温柔，体贴，过渡期追着大船打的航母。"]],
-                    chicheng: ["female", "wu", 4, ["hangmucv"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
+                    liekexingdun: ["female", "wu", 4, ["hangmucv", "hangkongzhanshuxianqu"], ["zhu", "des:血量中等的航母，温柔，体贴，过渡期追着大船打的航母。"]],
+                    qixichicheng: ["female", "shu", 4, ["hangmucv", "qixi_cv"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
+                    wufenzhongchicheng: ["female", "shu", 4, ["hangmucv", "mingyundewufenzhong"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
+
                     dumuchenglinqiye: ["female", "wei", 4, ["hangmucv", "dumuchenglin"], ["des:有必中攻击，快跑"]],
                     bisimai: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["zhu", "des:更多刮痧炮，更多炮弹，更多削弱光环，更多护甲模组，更多血量。"]],
                     misuli: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["des:用精巧的手枪去质疑，用绝对的火力回击对手。"]],
                     weineituo: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["des:身材小，而强度惊人。"]],
                     lisailiu: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["des:幸运的象征之一，同时有着丰富的精神象征。"]],
                     changmen: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["des:。"]],
-                    kunxi: ["female", "shu", 4, ["huokongld", "zhongxunca","gaosusheji"], ["des:画师优秀的功底让这名角色美而可爱，这是出色的角色塑造。"]],
+                    kunxi: ["female", "shu", 4, ["huokongld", "zhongxunca", "gaosusheji"], ["des:画师优秀的功底让这名角色美而可爱，这是出色的角色塑造。"]],
                     ougengqi: ["female", "shu", 4, ["huokongld", "zhongxunca"], ["des:励志偶像，与标志性舰装，给人以强大的保护。"]],
                     qingye: ["female", "shu", 4, ["huokongld", "zhongxunca"], ["des:励志偶像，与一首动人的歌，与一段坎坷旅途。"]],
                     beianpudun: ["female", "shu", 4, ["huokongld", "zhongxunca"], ["des:励志青年，在旅途中成长，与恋人坚定的望向远方。"]],
