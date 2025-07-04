@@ -125,7 +125,7 @@ if(!player.hasSkill('rendeonly2')){player.addSkill('diewulimitai');};
             xuefeng:["female","wei",3,["huibi","rendeonly2","yuanhang","quzhudd","jianzaochuan","wulidebuff","qianghuazhuang"],["des:幸运的驱逐舰，多位画师、花了大款的大佬亲情奉献。"]],
             kangfusi:["female","wei",3,["huibi","rendeonly2","yuanhang","quzhudd","jianzaochuan","wulidebuff","qianghuazhuang"],["des:水手服欸,优秀的构图，不过图少改造晚。"]],
             lizhan:["female","shu",4,["huibi","rendeonly2","yuanhang","quzhudd","jianzaochuan","wulidebuff","qianghuazhuang"],["des:这是个依赖科技的舰船，有着科幻的舰装，与兼备温柔体贴与意气风发的表现。"]],
-            "u1405":["female","shu",2,["touxichuan","rendeonly2","roundonefire","yuanhang","qianting","jianzaochuan","wulidebuff","qianghuazhuang"],["des:无需隐匿的偷袭大师，马上就让对手的后勤捉襟见肘。"]],
+            "u1405":["female","shu",2,["rendeonly2","roundonefire","qianting","yuanhang","jianzaochuan","wulidebuff","qianghuazhuang"],["des:无需隐匿的偷袭大师，马上就让对手的后勤捉襟见肘。"]],
             jingjishen:["female","wu",3,["junfu","yuanhang","jianzaochuan","wulidebuff","qianghuazhuang"],["des:需要武器支援，伙计倒下了。"]],
             changchun:["female","wu",3,["daoqu","tianyi","huokongld","yuanhang","jianzaochuan","wulidebuff","qianghuazhuang"],["des:尚处于正能量之时。"]],
         },
@@ -378,7 +378,7 @@ for(var i=0;i<trigger.num;i+=(1)){if(trigger.num>0&&player.countMark('kaishimopa
    if(event.type=='dying'){if(player!=event.dying) return false; return player.countCards('hejs')>=3;}
 else if(event.parent.name=='phaseUse'&&(a)>0){return (player.countCards('hejs')>=2)&&a;    }return false;
      },
-                selectCard:function(event,player){var event=_status.event;if(event.type=='dying')return [3,4];return [2,3];},
+                selectCard:function(event,player){var event=_status.event;if(event.type=='dying')return [4,4];return [3,3];},
                 position:"hejs",
                 filterCard:function (card){
         var suit=get.suit(card);
@@ -392,10 +392,10 @@ else if(event.parent.name=='phaseUse'&&(a)>0){return (player.countCards('hejs')>
        if(player!=event.dying&&(player.hp<player.maxHp)&&(player.countCards('h')>4||!player.hasMark('jianzaochuan'))) return 11-get.value(card);
         if(player.hp<=0&&(huifu<(-player.hp+1)||!player.hasMark('jianzaochuan')))  return 15-get.value(card);
     },
-                prompt:function(event,player){
-   if(event.parent.name=='phaseUse') {return '出牌阶段，<br>你可以弃置2张不同同花色的牌，提升一点血量上限,<br>或弃置三张牌，回复一点血量。'}; if(event.type=='dying') {return "当你濒死时，你可以弃置3张不同花色的牌，回复一点体力。或弃置四张牌，回复两点体力"};},
+                prompt:function(event,player){//<br>或弃置三张牌，回复一点血量。或弃置四张牌，回复两点体力
+   if(event.parent.name=='phaseUse') {return '1.出牌阶段<br>你可以弃置3张不同花色的牌，提升一点血量上限。'}; if(event.type=='dying') {return "2.当你濒死时，<br>你可以弃置4张不同花色的牌，回复一点体力。"};},
                 content:function(){player.addMark('jianzaochuan');game.log(event.parent.name,event.cards);
-if(event.cards.length<3){player.gainMaxHp(1);};if(event.cards.length>2){player.recover();};if(event.cards.length>3){player.recover();};
+if(event.cards.length<3){player.gainMaxHp(1);};if(event.cards.length>2){player.gainMaxHp(1);};if(event.cards.length>3){player.recover();};
 },
                 ai:{
                     save:true,
@@ -1281,6 +1281,12 @@ if(!target.hasSkill('diewulimitai_shale')){target.addSkill('diewulimitai_shale')
             qianting:{
                 audio:"ext:舰R牌将:2",
                 audioname:["re_ganning","re_heqi"],
+                mod:{
+attackFrom:function(from,to,distance){var a=0;if(from.hasSkill('quzhudd')&&to.hasSkill('qianting')){var a=a-1};return distance=(distance+a)},
+targetInRange:function(card,player,target){
+var type=get.type(card);
+if(type=='trick'||type=='delay'){if(get.distance(player,target)<=2) return true;};},
+    },
                 enable:"chooseToUse",
                 usable:2,
                 position:"hejs",
@@ -1301,12 +1307,6 @@ if(!target.hasSkill('diewulimitai_shale')){target.addSkill('diewulimitai_shale')
                 selectCard:function(card){return 1},
                 check:function(card){ var player=_status.event.player;if(get.suit(card)=='club'&&player.countMark('jinengup')<1){return -1};return 7-get.value(card)},
                 content:function(){},
-mod:{
-attackFrom:function(from,to,distance){var a=0;if(from.hasSkill('quzhudd')&&to.hasSkill('qianting')){var a=a-1};return distance=(distance+a)},
-        targetInRange:function(card,player,target){
-var type=get.type(card);
-if(type=='trick'||type=='delay'){if(get.distance(player,target)<=2) return true;};},
-    },
                 ai:{
                     basic:{
                         order:1,
@@ -1358,7 +1358,7 @@ if(type=='trick'||type=='delay'){if(get.distance(player,target)<=2) return true;
             return get.translation(skill+'_info');
         },
                 },
-                group:["touxichuan_jiezi"],
+                group:["qianting_jiezi"],
 subSkill:{
 jiezi:{
     trigger:{
@@ -2114,31 +2114,30 @@ if(player.countMark('hanbing_gai')<event.num1&&player.countMark('hanbing_gai')){
             },
         },
         translate:{
-            "u1405":"u1405潜艇",
-            haiwangxing:"海王星轻巡",
+            addskilltest:"addskilltest",
             liekexingdun:"列克星敦",
             chicheng:"赤城航母",
             bisimai:"俾斯麦&北宅",
-            lizhan:"历战重巡",
-            xuefeng:"雪风驱逐",
-            addskilltest:"addskilltest",
-            kunxi:"昆西重巡",
             misuli:"密苏里战列",
-            yixian:"逸仙轻巡",
-            "z31":"z31驱逐",
+            kunxi:"昆西重巡",
             ougengqi:"欧根重巡",
-            kangfusi:"康弗斯驱逐",
+            haiwangxing:"海王星轻巡",
+            yixian:"逸仙轻巡",
             rending:"仁淀轻巡",
+            kangfusi:"康弗斯驱逐","z31":"z31驱逐",
+            lizhan:"历战驱逐",
+            xuefeng:"雪风驱逐",
             jingjishen:"竞技神军辅",
+            "u1405":"u1405潜艇",
             changchun:"长春导驱",
-            tiaozhanzhuanbei:"手枪",
+            tiaozhanzhuanbei:"挑战装备",
             "tiaozhanzhuanbei_info":"挑战锁定技，游戏开始时，你将一张【回避】【专属武器】和一张【望远镜】置入你的装备区。你装备区内的武器牌和宝物牌不能被其他角色弃置。",
             danzong:"增强杀",
             "danzong_info":"每使用六张杀，你便可以在造成无属性伤害附加属性：<br>潜艇、驱逐：获得雷属性的效果，<br>战列、航母：获得雷属性与改进型冰杀的效果。<br>其他舰种时：获得火属性,点燃目标。<br>效果持续到伤害结算完成时（打不穿藤甲的高爆弹与暴击藤甲的决斗）",
             kaishimopao:"开始摸牌",
             "kaishimopao_info":"<br>，判定阶段你可以减少一次摸牌阶段的摸牌，然后在回合结束时摸一张牌。",
             jianzaochuan:"建造",
-            "jianzaochuan_info":"当你进行了至少一次强化后，你可以弃置三张同花色的牌，回复一点体力,受伤时额外回复一点体力，同时提升一点体力上限。（处于濒死状态时，+1要弃置的牌；重复改建造只会回复一点体力。）",
+            "jianzaochuan_info":"当你进行了至少一次强化后1.出牌阶段<br>你可以弃置3张不同花色的牌，提升一点血量上限。<br>2.当你濒死时，<br>你可以弃置4张不同花色的牌，回复一点体力。",
             "paohuozb_skill":"炮火准备1",
             "paohuozb_skill_info":"装备技能",
             fupaozu:"副炮",
