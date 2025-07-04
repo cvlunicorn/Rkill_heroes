@@ -599,7 +599,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             degelasi: ["female", "qun", 3, ["fangkong2", "qingxuncl"], ["des:现代文职服饰，一看就很会办公。"]],
                             yatelanda: ["female", "wei", 3, ["fangkong2", "qingxuncl"], ["des:双枪射手点形象，其双枪能以极快的射速打出爆炸弹匣，清空一小片区域。"]],
                             "z31": ["female", "qun", 3, ["huibi", "quzhudd"], ["des:婚纱与轻纱是多数人的美梦,与绿草平原，与绿水青山"]],
-                            xuefeng: ["female", "shu", 3, ["huibi", "quzhudd","xiangrui","yumian"], ["des:幸运的驱逐舰，多位画师、花了大款的大佬亲情奉献。"]],
+                            xuefeng: ["female", "shu", 3, ["huibi", "quzhudd", "xiangrui", "yumian"], ["des:幸运的驱逐舰，多位画师、花了大款的大佬亲情奉献。"]],
                             kangfusi: ["female", "wei", 3, ["huibi", "quzhudd"], ["des:水手服欸,优秀的构图，不过图少改造晚。"]],
                             "47project": ["female", "qun", 3, ["huibi", "quzhudd"], ["des:这是个依赖科技的舰船，有着科幻的舰装，与兼备温柔体贴与意气风发的表现。"]],
                             guzhuyizhichuixue: ["female", "shu", 3, ["huibi", "quzhudd", "guzhuyizhi"], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
@@ -733,7 +733,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     player.addMark('_jianzaochuan'); game.log(event.parent.name, event.cards);
-                                    if (event.cards.length < 3) { player.gainMaxHp(1); }; if (event.cards.length > 2) { player.gainMaxHp(1); }; if (event.cards.length > 3) { player.recover(); };
+                                    if (event.cards.length <= 3) { player.gainMaxHp(1); }; if (event.cards.length > 3) { player.recover(); };
                                 },
                                 ai: {
                                     save: true, expose: 0, threaten: 0, order: 2,
@@ -2970,49 +2970,51 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                 }
                             },
-                            xiangrui:{
-                                trigger:{ player:"damageBegin4",},
-                                usable:1,
-                                mark:true,
-                                content:function(){
+                            xiangrui: {
+                                trigger: { player: "damageBegin4", },
+                                usable: 1,
+                                mark: true,
+                                content: function () {
                                     "step 0"
-                                    player.judge(function(card){
-                                            if(get.color(card)=='black') {
-                                                trigger.cancel();
-                                                player.addMark('xiangrui',2);
-                                            }
+                                    player.judge(function (card) {
+                                        if (get.color(card) == 'black') {
+                                            trigger.cancel();
+                                            player.addMark('xiangrui', 1);
+                                        }
                                     });
                                 },
-                                marktext:"祥瑞",
-                                intro:{
-                                    name:"祥瑞",
-                                    content:"幸运值$",
+                                marktext: "祥瑞",
+                                intro: {
+                                    name: "祥瑞",
+                                    content: "幸运值$",
                                 },
                             },
-                            yumian:{
-                                trigger:{
-                                    player:"phaseJieshuBegin",
+                            yumian: {
+                                trigger: {
+                                    player: "phaseJieshuBegin",
                                 },
-                                forced:true,
-                                preHidden:true,
-                                content:function(){
+                                forced: true,
+                                preHidden: true,
+                                content: function () {
                                     "step 0"
-                                    player.addMark('xiangrui',1);
-                                        var i=player.countMark('xiangrui');
-                                        player.removeMark('xiangrui',i);
-                                    "step 1"
-                                    if(i<2){
-                                        event.finish();
-                                        return;
+                                    //player.addMark('xiangrui', 1);
+                                    var i = player.countMark('xiangrui');
+                                    player.removeMark('xiangrui', i);
+                                    game.log(i);
+                                    var s=(i<=0);
+                                    game.log(s);
+                                    if (s) {
+                                        game.log("finish");
+                                        event.finish;
+                                    } else {
+                                        player.chooseTarget(get.prompt2('yumian'), function (card, player, target) { return get.distance(player, target) <= 1; }).set('ai', function (target) {
+                                            if (get.attitude(_status.event.player, target) < 0) {
+                                                return 1 / Math.sqrt(target.hp + 1);
+                                            }
+                                            return 0;
+                                        }).animate = false;
                                     }
-                                    player.chooseTarget(get.prompt2('yumian'),function(card,player,target){return get.distance(player,target)<=1;}).set('ai',function(target){
-                                        if(get.attitude(_status.event.player,target)<0){
-                                            return 1/Math.sqrt(target.hp+1);
-                                        }
-                                        return 0;
-                                    }).animate=false;
-                                    "step 2"
-                                    if(result.bool&&result.targets.length){
+                                    if (result.bool && result.targets.length) {
                                         result.targets[0].loseHp(1);
                                         result.targets[0].draw(2);
                                     }
@@ -4451,7 +4453,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     degelasi: ["female", "wei", 3, ["fangkong2", "qingxuncl"], ["des:现代文职服饰，一看就很会办公。"]],
                     yatelanda: ["female", "wei", 3, ["fangkong2", "qingxuncl"], ["des:双枪射手点形象，其双枪能以极快的射速打出爆炸弹匣，清空一小片区域。"]],
                     "z31": ["female", "wei", 3, ["huibi", "quzhudd"], ["des:婚纱与轻纱是多数人的美梦,与绿草平原，与绿水青山"]],
-                    xuefeng: ["female", "shu", 3, ["huibi", "quzhudd","xiangrui","yumian"], ["des:幸运的驱逐舰，多位画师、花了大款的大佬亲情奉献。"]],
+                    xuefeng: ["female", "shu", 3, ["huibi", "quzhudd", "xiangrui", "yumian"], ["des:幸运的驱逐舰，多位画师、花了大款的大佬亲情奉献。"]],
                     kangfusi: ["female", "wei", 3, ["huibi", "quzhudd"], ["des:水手服欸,优秀的构图，不过图少改造晚。"]],
                     "47project": ["female", "wei", 3, ["huibi", "quzhudd"], ["des:这是个依赖科技的舰船，有着科幻的舰装，与兼备温柔体贴与意气风发的表现。"]],
                     guzhuyizhichuixue: ["female", "shu", 3, ["huibi", "quzhudd", "guzhuyizhi"], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
