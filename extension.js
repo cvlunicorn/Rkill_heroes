@@ -3116,7 +3116,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return event.targets.length > 0 && (get.type(event.card) == 'trick' && !event.card.isCard);
                                 },
                                 content: function () {
-                                    player.draw(Math.min(trigger.targets.length, player.maxHp));
+                                    player.draw(Math.min(trigger.targets.length, 4));
                                 },
                                 ai: {
                                     threaten: 8,
@@ -3810,7 +3810,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     global: "useCardToTargeted",
                                 },
                                 filter: function (event, player) {
-                                    return (event.card.name == 'sha' || event.card.name == 'sheji9') && get.distance(player, event.target) <= 1 && event.target.isIn();
+                                    return (event.card.name == 'sha' || event.card.name == 'sheji9') && get.distance(player, event.target) <= 1 && event.target.isIn()&&player!=event.target;
                                 },
                                 check: function (event, player) {
                                     return get.attitude(player, event.target) >= 0;
@@ -4350,20 +4350,52 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             duomianshou: {
                                 enable: "phaseUse",
                                 usable: 1,
+                      init:function(player){
+        player.storage.duomianshou=[];
+  
+    },
                                 filterCard(card, player) {
-                                    return true;
+                                var player = _status.event.player;
+                                //var event = _status.event;
+                                game.log("选择卡牌过滤器"+JSON.stringify(player.storage.duomianshou));
+                              var numbers=[];
+                              
+        if(player.storage.duomianshou.length){
+        game.log("进入了if");
+        for(var i=0;i<player.storage.duomianshou.length;i++){
+            numbers.add(get.number(player.storage.duomianshou[i]));
+        }
+       }
+        
+            if(!numbers.includes(get.number(card))){
+                return true;
+            }
+        
+        return false;
+       // return true;
                                 },
+                                
                                 position: "hs",
                                 discard: false,
                                 lose: false,
                                 check: function (card) {
-
-                                    return 7.5 - get.value(card);
-
+                                /*var event = _status.event;
+                                var numbers=[];
+        for(var i=0;i<player.storage.duomianshou.length;i++){
+            numbers.add(get.number(event.player.storage.duomianshou[i],'trick'));
+        }
+       
+            if(!numbers.includes(get.number(cards,'trick'))){
+                return 7.5 - get.value(card);
+    
+        }
+        return false;*/
+return 7.5 - get.value(card);
                                 },
 
                                 content: function () {
                                     'step 0'
+                                    game.log("记录的卡牌"+JSON.stringify(player.storage.duomianshou));
                                     var card = cards[0];
                                     //var cardtype=get.type(card);
                                     game.log("卡牌价值" + get.value(card));
@@ -4385,6 +4417,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                     if (list == "") {
                                         game.log('牌堆中没有符合要求的牌');
+                                        delete player.getStat('skill').duomianshou;
+                                        player.storage.duomianshou.push(card);
                                         event.finish();
                                     }
                                     var dialog = ui.create.dialog('多面手', [list, 'card']);
@@ -4423,6 +4457,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player.addTempSkill("duomianshou_1", "useCardToTargeted");
                                         player.chooseUseTarget(true, get.name(result.links[0]));
                                         //player.removeSkill("duomianshou_1");
+                                        player.storage.duomianshou=[];
                                     }
                                 },
                                 ai: {
@@ -4558,7 +4593,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             dumuchenglin_2: "独木成林2", "dumuchenglin_2_info": "杀使用次数+1，你于你的回合造成的第一次伤害+1。",
                             xiangrui: "祥瑞", "xiangrui_info": "每名玩家的回合限一次，当你受到伤害前，你可以进行判定，判定结果为梅花/黑桃，免疫此次伤害，然后获得[祥瑞]标记。",
                             yumian: "御免", "yumian_info": "锁定技，结束阶段，你移除所有[祥瑞]标记。你可以选择距你为1的目标，让其失去一点体力并摸两张牌。若你失去了一个或以上的祥瑞标记，你可以选择的目标不受距离限制",
-                            hangkongzhanshuxianqu: "航空战术先驱", "hangkongzhanshuxianqu_info": "你使用转化的锦囊牌指定目标时，你摸x张牌(x为你指定的目标数，至多为你当前的体力上限)",
+                            hangkongzhanshuxianqu: "航空战术先驱", "hangkongzhanshuxianqu_info": "你使用转化的锦囊牌指定目标时，你摸x张牌(x为你指定的目标数，至多为4)",
                             gaosusheji: "高速射击", "gaosusheji_info": "当你使用的杀是本回合你使用的第一张牌，你可以令此杀结算两次。",
                             qixi_cv: "奇袭", "qixi_cv_info": "限定技，出牌阶段，你可以令所有其他角色依次选择一项:1你弃置其区域内的两张牌，2本回合不能使用或打出手牌，3翻面。然后你可以视为使用【近距支援】。",
                             rand: "随机数", "rand_info": "遇事不决？扔一个骰子吧。该技能可以生成1~6的随机数",
@@ -4575,7 +4610,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhanxianfangyu: "战线防御", "zhanxianfangyu_info": "每回合限一次，你成为黑色杀的目标时，你取消之。每回合限一次，距你为1的角色成为杀的目标时，你可以弃置一张牌并代替该名角色成为此杀的目标。",
                             zhanxianfangyu1: "战线防御", "zhanxianfangyu1_info": "",
                             Zqujingying: "Z驱菁英", "Zqujingying_info": "回合开始时，根据场上势力数，你可以选择获得以下技能中的一项:大于等于一，英姿;大于等于二，观星;大于等于三，反馈;大于等于四，谋识。直到你的下回合开始。",
-                            huhangyuanhu: "护航援护", "huhangyuanhu_info": "当一名角色成为杀的目标后，若你至该角色的距离为一，你可以摸一张牌，若如此做，你交给其一张牌并展示之。若为装备牌，该角色可以使用此牌。",
+                            huhangyuanhu: "护航援护", "huhangyuanhu_info": "当一名其他角色成为杀的目标后，若你至该角色的距离为一，你可以摸一张牌，若如此做，你交给其一张牌并展示之。若为装备牌，该角色可以使用此牌。",
                             shizhibuyu: "矢志不渝", "shizhibuyu_info": "当你受到伤害时，你可以弃置两张颜色相同的牌令此伤害-1，然后进行判定，若结果为红色，你摸一张牌。 当你的判定牌生效后，你可以获得之。然后你可以令一名角色使用杀次数+1和手牌上限+1直到你的下回合开始。",
                             shizhibuyu1: "矢志不渝", "shizhibuyu1_info": "",
                             shizhibuyu1_eff: "矢志不渝", "shizhibuyu1_eff_info": "直到回合结束，手牌上限+1，出杀次数+1",
@@ -4588,7 +4623,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             wuweizhuangji: "无畏撞击", "wuweizhuangji_info": "限定技，你可以废除自己的全部装备栏，然后对一名角色造成x点伤害（x为你此前装备区内牌的数量）",
                             zhongzhuangcike: "重装刺客", "zhongzhuangcike_info": "你装备区内有牌时，你使用的杀无视防具；你造成伤害后可以获得目标角色的一张装备牌；你可以将装备牌当作杀使用或打出。",
                             zhongzhuangcike_3: "重装刺客", "zhongzhuangcike_3_info": "你可以将装备牌当作杀使用或打出。",
-                            duomianshou: "多面手", "duomianshou_info": "出牌阶段限一次，你可以弃置将一张手牌视为使用一张牌堆中同点数的其他类型的牌(不受次数限制）；对其他中小型船使用此法转化后的牌时其选择一项：1.你摸一张牌；2.其弃置一张牌。",
+                            duomianshou: "多面手", "duomianshou_info": "出牌阶段限一次，你可以弃置将一张手牌视为使用一张牌堆中同点数的其他类型的牌(不受次数限制），如列表里没牌，技能使用次数+1，且本回合不能使用该点数发动技能；对其他中小型船使用此法转化后的牌时其选择一项：1.你摸一张牌；2.其弃置一张牌。",
                             duomianshou_1: "多面手", "duomianshou_1_info": "对其他中小型船使用转化后的牌时其选择一项：1.你摸一张牌；2.其弃置一张牌。",
 
                         },
