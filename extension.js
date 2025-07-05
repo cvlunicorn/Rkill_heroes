@@ -298,7 +298,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
             if (config._qianghuazhuang) {//优化摸牌时牌的质量的技能
                 lib.skill._qianghuazhuang = {
-                    name: "强化装备", prompt: "每回合限两次，你可以弃置二至四张牌，将手牌转化为强化点数，<br>每2点强化点数换一个永久的效果升级。<br>（可选择如减少技能消耗、增加武器攻击距离、提高手牌上限等）<br>强化上限为建造的次数，最高强化至2级。<br>已存储的经验会降低弃牌最低牌数", mark: true, intro: {
+                    name: "强化装备", prompt: "每回合限一次，你可以弃置二至四张牌，将手牌转化为强化点数，<br>每2点强化点数换一个永久的效果升级。<br>（可选择如减少技能消耗、增加武器攻击距离、提高手牌上限等）<br>强化上限为建造的次数，最高强化至2级。<br>已存储的经验会降低弃牌最低牌数", mark: true, intro: {
                         marktext: "装备", content: function (storage, player) {//只有content与mark可以function吧，内容，介绍的文字与内容。
                             var info = lib.skill._qianghuazhuang.getInfo(player);
                             return '<div class="text center"><span class=greentext>用一摸一:' + info[0] + '<br>技能耗牌：' + info[1] + '</span><br><span class=firetext>出杀距离：-' + info[2] + '<br>攻击次数:' + info[3] + '</span><br><span class=thundertext>被杀距离：+' + info[4] + '<br>手牌上限:' + info[5] + '<br>Exp:' + info[7] + '</span></div>';
@@ -318,7 +318,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             var a = 0; if (player.countMark('shoupaiup')) { var a = a + player.countMark('shoupaiup') }; return num = (num + a);
                         },
                     },
-                    direct: true, enable: "phaseUse", usable: 2,
+                    direct: true, enable: "phaseUse", usable: 1,
                     init: function (player) {//初始化数组，也可以运行事件再加if后面的内容
                         if (!player.storage._qianghuazhuang) player.storage._qianghuazhuang = [0, 0, 0, 0, 0, 0, 0, 0, 0];
                     },
@@ -904,7 +904,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 mark: false, intro: { content: function () { return get.translation('建造的次数，用于提升升级上限。'); }, },
                             },
                             _qianghuazhuang: {
-                                name: "强化装备", prompt: "每回合限两次，你可以弃置二至四张牌，将手牌转化为强化点数，<br>每2点强化点数换一个永久的效果升级。<br>（可选择如减少技能消耗、增加武器攻击距离、提高手牌上限等）<br>强化上限为建造的次数，最高强化至2级。<br>已存储的经验会降低弃牌最低牌数", mark: true, intro: {
+                                name: "强化装备", prompt: "每回合限一次，你可以弃置二至四张牌，将手牌转化为强化点数，<br>每2点强化点数换一个永久的效果升级。<br>（可选择如减少技能消耗、增加武器攻击距离、提高手牌上限等）<br>强化上限为建造的次数，最高强化至2级。<br>已存储的经验会降低弃牌最低牌数", mark: true, intro: {
                                     marktext: "装备", content: function (storage, player) {//只有content与mark可以function吧，内容，介绍的文字与内容。
                                         var info = lib.skill._qianghuazhuang.getInfo(player);
                                         return '<div class="text center"><span class=greentext>用一摸一:' + info[0] + '<br>技能耗牌：' + info[1] + '</span><br><span class=firetext>出杀距离：-' + info[2] + '<br>攻击次数:' + info[3] + '</span><br><span class=thundertext>被杀距离：+' + info[4] + '<br>手牌上限:' + info[5] + '<br>Exp:' + info[7] + '</span></div>';
@@ -924,7 +924,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         var a = 0; if (player.countMark('shoupaiup')) { var a = a + player.countMark('shoupaiup') }; return num = (num + a);
                                     },
                                 },
-                                direct: true, enable: "phaseUse", usable: 2,
+                                direct: true, enable: "phaseUse", usable: 1,
                                 init: function (player) {//初始化数组，也可以运行事件再加if后面的内容
                                     if (!player.storage._qianghuazhuang) player.storage._qianghuazhuang = [0, 0, 0, 0, 0, 0, 0, 0, 0];
                                 },
@@ -5060,7 +5060,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 image: 'ext:舰R牌将/jinjuzy.jpg',
                                 type: "trick",
                                 enable: true,
-                                selectTarget: -1,
+                                //selectTarget: -1,
+                                selectTarget:[1,Infinity],
                                 reverseOrder: true,
                                 "yingbian_prompt": "当你使用此牌选择目标后，你可为此牌减少一个目标",
                                 "yingbian_tags": ["remove"],
@@ -5068,7 +5069,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     event.yingbian_removeTarget = true;
                                 },
                                 filterTarget: function (card, player, target) {
-                                    return get.attitude(player, target) < 0;
+                                    return player!=target;
                                 },
                                 content: function () {
                                     "step 0"
@@ -5094,6 +5095,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                 },
                                 ai: {
+                                    
                                     wuxie: function (target, card, player, viewer) {
                                         if (get.attitude(viewer, target) > 0 && target.countCards('h', 'shan')) {
                                             if (!target.countCards('h') || target.hp == 1 || Math.random() < 0.7) return 0;
@@ -5105,6 +5107,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         value: 7,
                                     },
                                     result: {
+                                        player(player,target){
+                                            var att=get.attitude(player,target);
+                                            if(att>0) return 0;
+                                            return 1;
+                                        },
                                         "target_use": function (player, target) {
                                             if (player.hasUnknown(2) && get.mode() != 'guozhan') return 0;
                                             var nh = target.countCards('h');
