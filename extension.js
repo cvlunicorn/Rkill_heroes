@@ -597,7 +597,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             ougengqi: ["female", "qun", 4, ["huokongld", "zhongxunca", "zhanxianfangyu", "zhanxianfangyu1"], ["des:励志偶像，与标志性舰装，给人以强大的保护。"]],
                             qingye: ["female", "shu", 4, ["huokongld", "zhongxunca", "sawohaizhan"], ["des:励志偶像，与一首动人的歌，与一段坎坷旅途。"]],
                             beianpudun: ["female", "wei", 4, ["huokongld", "zhongxunca", "huhangyuanhu"], ["des:励志青年，在旅途中成长，与恋人坚定的望向远方。"]],
-                            jiujinshan: ["female", "wei", 4, ["huokongld", "zhongxunca","jiujingzhanzhen"], ["des:航海服饰，侦查员与火炮观瞄。"]],
+                            jiujinshan: ["female", "wei", 4, ["huokongld", "zhongxunca", "jiujingzhanzhen"], ["des:航海服饰，侦查员与火炮观瞄。"]],
                             yixian: ["female", "shu", 3, ["fangkong2", "qingxuncl", "shizhibuyu", "shizhibuyu1"], ["des:经典美术设计的款式，意气风发，威猛先生"]],
                             tianlangxing: ["female", "wu", 3, ["fangkong2", "qingxuncl"], ["des:阻敌计谋表现优秀，这是先发制敌的优势所在，"]],
                             dadianrendian: ["female", "shu", 3, ["fangkong2", "qingxuncl"], ["des:手持竹伞的轻巡，辅助队友，防御攻击。"]],
@@ -610,9 +610,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             guzhuyizhichuixue: ["female", "shu", 3, ["huibi", "quzhudd", "guzhuyizhi"], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
                             shuileizhanduichuixue: ["female", "shu", 3, ["huibi", "quzhudd", "shuileizhandui",], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
                             minsike: ["female", "qun", 3, ["huibi", "quzhudd", "manchangzhanyi", "manchangzhanyi_1"], ["des:跑得快，看得多。"]],
+                            yinghuochong: ["female", "wu", 3, ["huibi", "quzhudd", "zhongzhuangcike", "wuweizhuangji"], ["des:为你施加勇气的魔法!"]],
                             "u1405": ["female", "qun", 3, ["qianting", "baiyin_skill", "qianxingtuxi"], ["des:无需隐匿的偷袭大师，马上就让对手的后勤捉襟见肘。"]],
                             jingjishen: ["female", "wu", 3, ["junfu"], ["des:需要武器支援，伙计倒下了。"]],
                             changchun: ["female", "shu", 3, ["daoqu", "rand", "sidajingang"], ["des:尚处于正能量之时。"]],
+
                             skilltest: ["male", "qun", 9, ["zhanlie"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
@@ -4214,9 +4216,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             jiujingzhanzhen: {
                                 direct: true,
-                                filter:function(event,player){
-                                    return player.hasHistory('lose',function(evt){
-                                        return evt.hs&&evt.hs.length>0;
+                                filter: function (event, player) {
+                                    return player.hasHistory('lose', function (evt) {
+                                        return evt.hs && evt.hs.length > 0;
                                     });
                                 },
                                 trigger: {
@@ -4225,9 +4227,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                 content: function () {
                                     'step 0'
-                                    var num=0;
-                                    player.getHistory('lose',function(evt){
-                                        if(evt.hs) num+=evt.hs.length;
+                                    var num = 0;
+                                    player.getHistory('lose', function (evt) {
+                                        if (evt.hs) num += evt.hs.length;
                                     });
                                     player.chooseTarget([1, num], get.prompt2('jiujingzhanzhen')).ai = function (target) {
                                         return get.attitude(_status.event.player, target);
@@ -4243,7 +4245,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     else event.finish();
                                     'step 2'
                                     event.current = targets.shift();
-                                    if (player.hujia>=1) event._result = { index: 0 };
+                                    if (player.hujia >= 1) event._result = { index: 0 };
                                     else event.current.chooseControl().set('choiceList', [
                                         '摸一张牌',
                                         '令' + get.translation(player) + '获得一点护甲',
@@ -4254,7 +4256,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     'step 3'
                                     if (result.index == 1) {
                                         event.current.line(player);
-                                        player.changeHujia(1,null,true);
+                                        player.changeHujia(1, null, true);
                                     }
                                     else event.current.draw();
                                     game.delay();
@@ -4262,6 +4264,87 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
 
+                            },
+                            wuweizhuangji: {
+                                unique: true,
+                                enable: "phaseUse",
+                                skillAnimation: true,
+                                animationColor: "gray",
+                                mark: true,
+
+                                limited: true,
+                                filter: function (event, player) {
+                                    return player.hasEnabledSlot();
+                                },
+                                filterTarget: function (card, player, target) {
+                                    return target != player;
+                                },
+                                content: function () {
+                                    player.awakenSkill('wuweizhuangji');
+                                    var num = player.countCards('e');
+                                    var disables = [];
+                                    for (var i = 1; i <= 5; i++) {
+                                        for (var j = 0; j < player.countEnabledSlot(i); j++) {
+                                            disables.push(i);
+                                        }
+                                    }
+                                    if (disables.length > 0) player.disableEquip(disables);
+                                    target.damage(num);
+
+                                },
+                            },
+                            zhongzhuangcike: {
+                                group:["zhongzhuangcike_1", "zhongzhuangcike_2", "zhongzhuangcike_3"],
+                                "_priority": 0,
+                            },
+                            zhongzhuangcike_1: {
+
+                                trigger: {
+                                    player: "useCardToPlayered",
+                                },
+                                filter: function (event) {
+                                    return (event.card.name == 'sha' || event.card.name == 'sheji9');
+                                },
+                                forced: true,
+                                logTarget: "target",
+                                content: function () {
+                                    if (player.countCards('e')) {
+                                        trigger.target.addTempSkill('qinggang2');
+                                        trigger.target.storage.qinggang2.add(trigger.card);
+                                        trigger.target.markSkill('qinggang2');
+                                    }
+                                    event.finish;
+                                },
+                                prompt:"你装备区内有牌时，你使用的杀无视防具",
+                            },
+                            zhongzhuangcike_2:{
+                                trigger:{
+                                    source:"damageSource",
+                                },
+                                content:function(){
+                                    player.gainPlayerCard(trigger.player,'e',true,trigger.num);
+                                },
+                                prompt:"造成伤害后可以获得目标角色的一张装备牌",
+                            },
+                            zhongzhuangcike_3:{
+                                enable:["chooseToRespond","chooseToUse"],
+                                filterCard(card,player){
+                                    if(get.zhu(player,'shouyue')) return true;
+                                    return get.type(card)=='equip';
+                                },
+                                position:"hes",
+                                viewAs:{
+                                    name:"sha",
+                                },
+                                viewAsFilter(player){
+                                    if(get.zhu(player,'shouyue')){
+                                        if(!player.countCards('hes')) return false;
+                                    }
+                                    else{
+                                        if(!player.countCards('hes',{type: 'equip'})) return false;
+                                    }
+                                },
+                                prompt:"将一张装备牌当杀使用或打出",
                             }
                             //在这里添加新技能。
 
@@ -4293,6 +4376,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "u1405": "u1405",
                             changchun: "长春",
                             "1913": "1913战巡",
+                            yinghuochong: "萤火虫",
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐舰", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -4379,7 +4463,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "31jiezhongdui": "31节中队", "31jiezhongdui_info": "每名玩家每回合限一次，有角色使用杀指定目标后，若使用者的体力值小于目标的体力值，你可以选择一项:1令此杀不可响应;2令此杀伤害+1;3令此杀使用者摸两张牌然后直到你的回合开始不能发动此技能。:1令此杀不可响应;2令此杀伤害+1;3令此杀使用者摸两张牌然后本轮不能发动此技能。",
                             jujianmengxiang: "巨舰梦想", "jujianmengxiang_info": "出牌阶段，你可以失去一点体力，视为使用一张基本牌或非延时锦囊牌（每回合每种牌名限一次）。",
                             sidajingang: "四大金刚", "sidajingang_info": "你使用杀造成伤害时，你可以与目标拼点，若你赢你获得其一张牌。你发动[远航摸牌]后可以摸一张牌。",
-                            jiujingzhanzhen:"久经战阵","jiujingzhanzhen_info":"结束阶段，你可以选择X名角色，其各选择一项:1摸一张牌，2令你获得一点护甲(至多为一)。X为你本回合失去的牌数。",
+                            jiujingzhanzhen: "久经战阵", "jiujingzhanzhen_info": "结束阶段，你可以选择X名角色，其各选择一项:1摸一张牌，2令你获得一点护甲(至多为一)。X为你本回合失去的牌数。",
+                            wuweizhuangji: "无畏撞击", "wuweizhuangji_info": "限定技，你可以废除自己的全部装备栏，然后对一名角色造成x点伤害（x为你此前装备区内牌的数量）",
+                            zhongzhuangcike: "重装刺客", "zhongzhuangcike_info": "你装备区内有牌时，你使用的杀无视防具；你造成伤害后可以获得目标角色的一张装备牌；你可以将装备牌当作杀使用或打出。",
+                            zhongzhuangcike_3: "重装刺客", "zhongzhuangcike_3_info": "你可以将装备牌当作杀使用或打出。",
+                        
                         },
                     };
                     if (lib.device || lib.node) {
