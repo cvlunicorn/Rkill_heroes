@@ -589,8 +589,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             dumuchenglinqiye: ["female", "wei", 4, ["hangmucv", "dumuchenglin"], ["des:有必中攻击，快跑"]],
                             bisimai: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb", "qijianshashou"], ["zhu", "des:更多刮痧炮，更多炮弹，更多削弱光环，更多护甲模组，更多血量。"]],
                             misuli: ["female", "wei", 4, ["zhuangjiafh", "zhanliebb"], ["des:用精巧的手枪去质疑，用绝对的火力回击对手。"]],
-                            weineituo: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb"], ["des:身材小，而强度惊人。"]],
-                            lisailiu: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb","kaixuanzhige"], ["des:幸运的象征之一，同时有着丰富的精神象征。"]],
+                            weineituo: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb", "yishisheji", "yishisheji_1"], ["des:身材小，而强度惊人。"]],
+                            lisailiu: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb", "kaixuanzhige"], ["des:幸运的象征之一，同时有着丰富的精神象征。"]],
                             changmen: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb", "zhudaojiandui"], ["des:。"]],
                             "1913": ["female", "shu", 4, ["zhuangjiafh", "zhanliebb", "jujianmengxiang", "jujianmengxiang_reflash"], ["des:在大舰巨炮的黄金年代，让国人也拥有主力战舰，堪称最为奢侈的海军梦想了——而今日，妾身有幸以此姿态回应诸位之诉求。"]],
                             kunxi: ["female", "wei", 4, ["huokongld", "zhongxunca", "gaosusheji"], ["des:画师优秀的功底让这名角色美而可爱，这是出色的角色塑造。"]],
@@ -615,7 +615,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jingjishen: ["female", "wu", 3, ["junfu"], ["des:需要武器支援，伙计倒下了。"]],
                             changchun: ["female", "shu", 3, ["daoqu", "rand", "sidajingang"], ["des:尚处于正能量之时。"]],
 
-                            skilltest: ["male", "qun", 9, ["zhanlie", "kaixuanzhige"], ["forbidai", "des:测试用"]],
+                            skilltest: ["male", "qun", 9, ["zhanlie"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
                             _yuanhang: {
@@ -4520,13 +4520,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return get.attitude(player, event.target) <= 0;
                                 },
                                 filter: function (event, player) {
-                                    return player!=event.target&&event.targets.length==1&&event.card.name == 'sha';
+                                    return player != event.target && event.targets.length == 1 && event.card.name == 'sha';
                                 },
                                 logTarget: "target",
                                 content: function () {
                                     "step 0"
                                     player.judge(function () { return 0 });
-                                    
+
                                     //game.log("trigger.target1"+JSON.stringify(trigger.target[0]));
                                     "step 1"
                                     game.log("此杀伤害基数" + trigger.getParent().baseDamage);
@@ -4541,22 +4541,94 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger.target.markSkill('qinggang2');
 
                                     }
-                                    if(player.hp<3&&!trigger.target.hasSkill('qinggang2')){
+                                    if (player.hp < 3 && !trigger.target.hasSkill('qinggang2')) {
                                         trigger.target.addTempSkill('qinggang2');
                                         trigger.target.storage.qinggang2.add(trigger.card);
                                         trigger.target.markSkill('qinggang2');
                                     }
                                 },
-                                ai:{
-                                    expose:0.2,
-                                    threaten:1.3,
+                                ai: {
+                                    expose: 0.2,
+                                    threaten: 1.3,
                                 },
                                 "_priority": 0,
                             },
-                            yishisheji:{
-                                
-                            }
+                            yishisheji: {
+                                init(player) {
+                                    if (player.getHistory('useCard', evt => get.name(evt.card) == 'sha' || "sheji9").length) player.addTempSkill('yishisheji_used');
+                                },
+                                mod: {
+                                    targetInRange(card, player, target) {
+                                        if ((get.name(card) == 'sha' || get.name(card) == "sheji9") && !player.hasSkill('yishisheji_used')) return true;
+                                    },
+                                },
+                                shaRelated: true,
+                                trigger: {
+                                    player: "useCardToPlayered",
+                                },
+                                check: function (event, player) {
+                                    return get.attitude(player, event.target) <= 0;
+                                },
+                                filter: function (event, player) {
+                                    return player != event.target && event.targets.length == 1 && event.card.name == 'sha';
+                                },
+                                logTarget: "target",
+                                content: function () {
+                                    "step 0"
+                                    player.judge(function () { return 0 });
 
+                                    //game.log("trigger.target1"+JSON.stringify(trigger.target[0]));
+                                    "step 1"
+                                    game.log("此杀伤害基数" + trigger.getParent().baseDamage);
+                                    game.log(get.color(result));
+                                    game.log(trigger.target);
+                                    if (get.color(result) == "red") {
+                                        trigger.getParent().baseDamage++;
+
+                                    } else if (get.color(result) != "red") {
+                                        game.log("else");
+                                        trigger.targets.length = 0;
+                                        trigger.getParent().triggeredTargets1.length = 0;//取消所有目标，来自秦宓谏征
+                                    }
+
+                                },
+                                ai: {
+                                    expose: 0.2,
+                                    threaten: 1.3,
+                                },
+                                "_priority": 0,
+                            },
+                            yishisheji_1: {
+                                group: ["yishisheji_1_mianyi"],
+                                subSkill: {
+                                    mianyi: {
+                                        trigger:
+                                        {
+                                            player: "damageBefore",
+                                            //source: "damageSource",
+                                            filter: function (event, player) { return true },
+                                        },
+                                        forced: true,
+                                        content: function () {
+
+                                            if (!player.hasSkill('yishisheji_1_disable') && trigger.card) {
+                                                trigger.cancel();
+                                                game.log(player, "免疫了一次伤害。");
+                                                player.addTempSkill('yishisheji_1_disable', 'roundStart');
+                                            }
+                                        },
+                                        mark: false,
+                                        sub: true,
+                                    },
+                                    disable: {
+                                        mark: true,
+                                        intro: {
+                                            content: "本轮已发动",
+                                        },
+                                        sub: true,
+                                    },
+                                },
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -4681,7 +4753,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             duomianshou: "多面手", "duomianshou_info": "出牌阶段限一次，你可以弃置将一张手牌视为使用一张牌堆中同点数的其他类型的牌(不受次数限制），如列表里没牌，技能使用次数+1，且本回合不能使用该点数发动技能；对其他中小型船使用此法转化后的牌时其选择一项：1.你摸一张牌；2.其弃置一张牌。",
                             duomianshou_1: "多面手", "duomianshou_1_info": "对其他中小型船使用转化后的牌时其选择一项：1.你摸一张牌；2.其弃置一张牌。",
                             kaixuanzhige: "凯旋之歌", "kaixuanzhige_info": "当你使用【杀】指定唯一其他角色为目标后，你可以进行判定，若结果为锦囊牌，此【杀】伤害+1且无视防具。你的体力值小于3时，你使用的【杀】无视防具。",
-                        yishisheji:"意式设计","yishisheji_info":"每轮限一次，你可以免疫一次伤害。你使用杀指定目标时可以进行判定，若判定结果为红色，此杀基础伤害+1，否则此杀无效。出牌阶段你使用的第一张杀无距离限制。",
+                            yishisheji: "意式设计", "yishisheji_info": "每轮限一次，你可以免疫一次伤害。你使用杀指定唯一目标时可以进行判定，若判定结果为红色，此杀基础伤害+1，否则此杀无效。出牌阶段你使用的第一张杀无距离限制。",
+                            yishisheji_1: "意式设计", "yishisheji_1_info": "",
                         },
                     };
                     if (lib.device || lib.node) {
