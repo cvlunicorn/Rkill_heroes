@@ -2192,7 +2192,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     global: "roundStart",
                                 },
-                                forced: true,
                                 lastDo: true,
                                 "prompt2": function (event, player) {
                                 },
@@ -2201,9 +2200,33 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     'step 0'
-                                    var next = player.chooseCardTarget({
+                                    var next = player.chooseToDiscard(function (card, player) {
+                                        if (player.countMark('jinengup') <= 0) {
+                                            if (card.suit == 'heart') {
+                                                return lib.filter.cardDiscardable(card, player);
+                                            }
+                                        }
+                                        else if (player.countMark('jinengup') == 1) {
+                                            if (card.suit == 'heart' || card.suit == 'spade') {
+                                                return lib.filter.cardDiscardable(card, player);
+                                            }
+                                        }
+                                        else if (player.countMark('jinengup') >= 2) {
+                                            if (card.suit == 'heart' || card.suit == 'spade' || card.suit == 'diamond') {
+                                                return lib.filter.cardDiscardable(card, player);
+                                            }
+                                        }
+                                        return false;
+                                    }, 'h')
+                                        .set('prompt', '雷杀')
+                                        .set('prompt2', '弃置一张符合要求的牌')
+                                        .set('ai', card => {
+                                            return 5 - get.useful(card);
+                                        }).set('logSkill', '潜艇');
+
+                                    /*var next = player.chooseCardTarget({
                                         prompt: ('雷杀'),
-                                        prompt2: ('选择弃置一张符合要求的牌，同时选择一位即将被你虚拟杀的目标'),
+                                        prompt2: ('弃置一张符合要求的牌'),
                                         position: 'hejs',//hej代指牌的位置，加个j即可用木流流马的牌。
                                         selectCard: function () {
                                             var player = _status.event.player; if (ui.selected.targets) return [1, 1]; return 1;
@@ -2211,6 +2234,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         selectTarget: function () {
                                             var player = _status.event.player; if (ui.selected.cards) return [ui.selected.cards.length, ui.selected.cards.length]; return 1;
                                         },//要选择的目标，同上，目标上限跟着手牌数走，怕报错跟个判定。
+                                        
                                         filterCard: function (card, player) {
                                             if (player.countMark('jinengup') <= 0) {
                                                 if (card.suit == 'heart') {
@@ -2230,7 +2254,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return false;
                                         },
                                         filterTarget: function (card, player, target) {
-                                            return target.inRange(player);
+                                            return player.inRange(target);
                                         },//选择事件包含的目标，同trigger的目标。有其他同技能的角色时，ai不要重复选择目标。
                                         ai1: function (card) {
                                             return 5 - get.useful(card);
@@ -2242,12 +2266,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             if (target.hasSkill('bagua_skill') | target.hasSkill('re_bagua_skill')) { att *= 0.5 };
                                             return att;
                                         }, targets: trigger.targets,//这个代码不能照搬到content以外的地方。贯石斧、朱雀羽扇有类似代码。还有recover版的。
-                                    });//技能还没扩起来，括起来。
+                                    });//技能还没扩起来，括起来。*///移除选择目标这一过程，视为使用牌自带选择目标。2024.2.18
                                     'step 1'
                                     if (result.bool) {//只能判断你有没有选择，然后给你true与false，没其他文本。
                                         player.discard(result.cards);//前面有卡牌card，可以返回card，不同于仁德主动技能直接写card。
-                                        event.target = result.targets;//前面有目标target，可以返回target。player.discard(player.getCards('h').randomGet()),
-                                        if (player.countCards('h') > 0) { player.useCard({ name: 'sha', nature: 'thunder', isCard: true }, event.target); }
+                                        //event.target = result.targets;//前面有目标target，可以返回target。player.discard(player.getCards('h').randomGet()),
+                                        //if (player.countCards('h') > 0) { player.useCard({ name: 'sha', nature: 'thunder', isCard: true }, event.target); }//移除选择目标这一过程，视为使用牌自带选择目标。2024.2.18
+                                        player.chooseUseTarget({
+                                            name: 'sha',
+                                            nature: 'thunder',
+                                            isCard: true,
+                                        }, false,);
                                     } else event.finish();
                                 },
                                 //a=game.countPlayer(function(current){return get.attitude(player,current)<0&&current.inRange(player)})-1;
@@ -3913,45 +3942,39 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             qianxingtuxi: {
-                                trigger: {
-                                    player: "phaseDrawBegin2",
+                                mod: {
+                                    attackFrom: function (from, to, distance) {
+                                        return 1
+                                    },
                                 },
-                                direct: true,
-                                preHidden: true,
+                                trigger: {
+                                    source: "damageSource",
+                                },
+                                forced: true,
                                 filter: function (event, player) {
-                                    return event.num > 0 && !event.numFixed && game.hasPlayer(function (target) {
-                                        return target.countCards('h') > 0 && player != target;
-                                    });
+                                    return _status.currentPhase != player;
                                 },
                                 content: function () {
                                     "step 0"
-                                    var num = get.copy(trigger.num);
-                                    if (get.mode() == 'guozhan' && num > 2) num = 2;
-                                    player.chooseTarget(get.prompt('qianxingtuxi'), '获得至多' + get.translation(num) + '名角色的各一张手牌，然后少摸等量的牌', [1, num], function (card, player, target) {
-                                        return target.countCards('h') > 0 && player != target;
-                                    }, function (target) {
-                                        var att = get.attitude(_status.event.player, target);
-                                        if (target.hasSkill('tuntian')) return att / 10;
-                                        return 1 - att;
-                                    }).setHiddenSkill('qianxingtuxi');
-                                    "step 1"
-                                    if (result.bool) {
-                                        result.targets.sortBySeat();
-                                        player.logSkill('qianxingtuxi', result.targets);
-                                        player.gainMultiple(result.targets);
-                                        trigger.num -= result.targets.length;
-                                    }
-                                    else {
-                                        event.finish();
-                                    }
-                                    "step 2"
-                                    if (trigger.num <= 0) game.delay();
-                                },
-                                ai: {
-                                    threaten: 1.6,
-                                    expose: 0.2,
+                                    player.addTempSkill("huibi", "roundstart");
+                                    trigger.player.addTempSkill("qianxingtuxi_debuff", 'phaseEnd');
                                 },
                                 "_priority": 0,
+                            },
+                            qianxingtuxi_debuff: {
+                                usable: 1,
+                                trigger: {
+                                    source: "damageBegin1",
+                                },
+                                force: true,
+                                content: function () {
+                                    "step 0"
+                                    player.judge(function (card) {
+                                        if (get.suit(card) == 'spade') {
+                                            trigger.num--;
+                                        }
+                                    });
+                                },
                             },
                             "31jiezhongdui": {
 
@@ -4300,7 +4323,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             shizhibuyu: "矢志不渝", "shizhibuyu_info": "当你受到伤害时，你可以弃置两张颜色相同的牌令此伤害-1，然后进行判定，若结果为红色，你摸一张牌。 当你的判定牌生效后，你可以获得之。然后你可以令一名角色使用杀次数+1和手牌上限+1直到你的下回合开始。",
                             shizhibuyu1: "矢志不渝", "shizhibuyu1_info": "",
                             shizhibuyu1_eff: "矢志不渝", "shizhibuyu1_eff_info": "直到回合结束，手牌上限+1，出杀次数+1",
-                            qianxingtuxi: "潜行突袭", "qianxingtuxi_info": "摸牌阶段摸牌时，你可以少摸任意张牌，然后获得等量的角色的各一张手牌",
+                            qianxingtuxi: "潜行突袭", "qianxingtuxi_info": "你使用牌无视距离限制；若你在回合外造成伤害，你于此轮获得规避且受到伤害的角色下个回合第一次造成伤害时须进行一次判定，如果为黑桃，此次伤害-1。",
+                            qianxingtuxi_debuff: "被袭", "qianxingtuxi_debuff_info": "锁定技，你第一次造成伤害时须进行一次判定，如果为黑桃，此次伤害-1。",
                             "31jiezhongdui": "31节中队", "31jiezhongdui_info": "每名玩家每回合限一次，有角色使用杀指定目标后，若使用者的体力值小于目标的体力值，你可以选择一项:1令此杀不可响应;2令此杀伤害+1;3令此杀使用者摸两张牌然后直到你的回合开始不能发动此技能。:1令此杀不可响应;2令此杀伤害+1;3令此杀使用者摸两张牌然后本轮不能发动此技能。",
                             jujianmengxiang: "巨舰梦想", "jujianmengxiang_info": "出牌阶段，你可以失去一点体力，视为使用一张基本牌或非延时锦囊牌（每回合每种牌名限一次）。",
                             sidajingang: "四大金刚", "sidajingang_info": "你使用杀造成伤害时，你可以与目标拼点，若你赢你获得其一张牌。你发动[远航摸牌]后可以摸一张牌。",
