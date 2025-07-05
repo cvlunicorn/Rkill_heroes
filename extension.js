@@ -2281,6 +2281,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }, false,);
                                     } else event.finish();
                                 },
+                                ai:{
+                                    order:1,
+                                    result:{
+                                        player:1,
+                                    },
+                                    threaten:1.5,
+                                },
                                 //a=game.countPlayer(function(current){return get.attitude(player,current)<0&&current.inRange(player)})-1;
                                 //if(a=0)event.finish();
                                 intro: {
@@ -3040,6 +3047,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 trigger: {
                                     source: "damageBegin1",
+                                },
+                                filter:function(event,player){
+                                    if(player!=event.player)return true;
                                 },
                                 forced: true,
                                 charlotte: true,
@@ -4589,8 +4599,8 @@ return 7.5 - get.value(card);
                             guzhuyizhi2: "孤注一掷", "guzhuyizhi2_info": "",
                             shuileizhandui_1: "水雷战队", "shuileizhandui_1_info": "",
                             shuileizhandui: "水雷战队", "shuileizhandui_info": "你可以交给一名角色任意张牌。若你是本回合第一次发动本技能，你可以从牌堆和弃牌堆获得一张雷杀。",
-                            dumuchenglin: "独木成林", "dumuchenglin_info": "你获得【规避】。当场上没有其他航母时，杀使用次数+1，你于你的回合造成的第一次伤害+1。",
-                            dumuchenglin_2: "独木成林2", "dumuchenglin_2_info": "杀使用次数+1，你于你的回合造成的第一次伤害+1。",
+                            dumuchenglin: "独木成林", "dumuchenglin_info": "你获得【规避】。当场上没有其他航母时，杀使用次数+1，你于你的回合造成的第一次伤害时若受伤角色不是你此伤害+1。",
+                            dumuchenglin_2: "独木成林2", "dumuchenglin_2_info": "杀使用次数+1，你于你的回合造成的第一次伤害时若受伤角色不是你此伤害+1。",
                             xiangrui: "祥瑞", "xiangrui_info": "每名玩家的回合限一次，当你受到伤害前，你可以进行判定，判定结果为梅花/黑桃，免疫此次伤害，然后获得[祥瑞]标记。",
                             yumian: "御免", "yumian_info": "锁定技，结束阶段，你移除所有[祥瑞]标记。你可以选择距你为1的目标，让其失去一点体力并摸两张牌。若你失去了一个或以上的祥瑞标记，你可以选择的目标不受距离限制",
                             hangkongzhanshuxianqu: "航空战术先驱", "hangkongzhanshuxianqu_info": "你使用转化的锦囊牌指定目标时，你摸x张牌(x为你指定的目标数，至多为4)",
