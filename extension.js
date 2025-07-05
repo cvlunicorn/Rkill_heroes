@@ -608,7 +608,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             guzhuyizhichuixue: ["female", "shu", 3, ["huibi", "quzhudd", "guzhuyizhi"], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
                             shuileizhanduichuixue: ["female", "shu", 3, ["huibi", "quzhudd", "shuileizhandui",], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
                             minsike: ["female", "qun", 3, ["huibi", "quzhudd", "manchangzhanyi", "manchangzhanyi_1"], ["des:跑得快，看得多。"]],
-                            "u1405": ["female", "qun", 3, ["qianting", "baiyin_skill"], ["des:无需隐匿的偷袭大师，马上就让对手的后勤捉襟见肘。"]],
+                            "u1405": ["female", "qun", 3, ["qianting", "baiyin_skill","qianxingtuxi"], ["des:无需隐匿的偷袭大师，马上就让对手的后勤捉襟见肘。"]],
                             jingjishen: ["female", "wu", 3, ["junfu"], ["des:需要武器支援，伙计倒下了。"]],
                             changchun: ["female", "shu", 3, ["daoqu", "rand"], ["des:尚处于正能量之时。"]],
                             skilltest: ["male", "qun", 9, ["rand"], ["forbidai", "des:测试用"]],
@@ -3909,7 +3909,48 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                                 "_priority":0,
-                            }
+                            },
+                            qianxingtuxi:{
+                                trigger:{
+                                    player:"phaseDrawBegin2",
+                                },
+                                direct:true,
+                                preHidden:true,
+                                filter:function(event,player){
+                                    return event.num>0&&!event.numFixed&&game.hasPlayer(function(target){
+                                        return target.countCards('h')>0&&player!=target;
+                                    });
+                                },
+                                content:function (){
+                                    "step 0"
+                                    var num=get.copy(trigger.num);
+                                    if(get.mode()=='guozhan'&&num>2) num=2;
+                                    player.chooseTarget(get.prompt('qianxingtuxi'),'获得至多'+get.translation(num)+'名角色的各一张手牌，然后少摸等量的牌',[1,num],function(card,player,target){
+                                        return target.countCards('h')>0&&player!=target;
+                                    },function(target){
+                                        var att=get.attitude(_status.event.player,target);
+                                        if(target.hasSkill('tuntian')) return att/10;
+                                        return 1-att;
+                                    }).setHiddenSkill('qianxingtuxi');
+                                    "step 1"
+                                    if(result.bool){
+                                        result.targets.sortBySeat();
+                                        player.logSkill('qianxingtuxi',result.targets);
+                                        player.gainMultiple(result.targets);
+                                        trigger.num-=result.targets.length;
+                                    }
+                                    else{
+                                        event.finish();
+                                    }
+                                    "step 2"
+                                    if(trigger.num<=0) game.delay();
+                                },
+                                ai:{
+                                    threaten:1.6,
+                                    expose:0.2,
+                                },
+                                "_priority":0,
+                            },
 
                             //在这里添加新技能。
 
@@ -4022,6 +4063,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             shizhibuyu: "矢志不渝", "shizhibuyu_info": "当你受到伤害时，你可以弃置两张颜色相同的牌令此伤害-1，然后进行判定，若结果为红色，你摸一张牌。 当你的判定牌生效后，你可以获得之。然后你可以令一名角色使用杀次数+1和手牌上限+1直到你的下回合开始。",
                             shizhibuyu1: "矢志不渝", "shizhibuyu1_info": "",
                             shizhibuyu1_eff: "矢志不渝", "shizhibuyu1_eff_info": "直到回合结束，手牌上限+1，出杀次数+1",
+                            qianxingtuxi: "潜行突袭", "qianxingtuxi_info": "摸牌阶段摸牌时，你可以少摸任意张牌，然后获得等量的角色的各一张手牌",
                         
                         },
                     };
