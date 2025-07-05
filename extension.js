@@ -4,6 +4,154 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
     return {
         name: "舰R牌将", content: function (config, pack) {
+            /*lib.group.push('RN');
+            lib.translate.RN = '<span style="color:#FFCD7F32">英</span>';
+            lib.group.push('USN');
+            lib.translate.USN = '<span style="color:#FF000000">美</span>';
+            lib.group.push('IJN');
+            lib.translate.IJN = '<span style="color:#FFCCCCCC">日</span>';*///添加势力，但是由于未知原因显示的字体相当模糊，解决问题之前不采用
+
+            lib.groupnature.PLAN = 'PLAN';
+            //将势力添加到势力库中 并指定势力的中文名称
+            lib.group.push('PLAN');
+            lib.translate['PLAN'] = 'C';
+
+            lib.groupnature.KMS = 'KMS';
+            lib.group.push('KMS');
+            lib.translate['KMS'] = 'G';
+
+            lib.groupnature.USN = 'USN';
+            lib.group.push('USN');
+            lib.translate['USN'] = 'U';
+
+            lib.groupnature.ΒΜΦCCCP = 'ΒΜΦCCCP';
+            lib.group.push('ΒΜΦCCCP');
+            lib.translate['ΒΜΦCCCP'] = 'S';
+
+            lib.groupnature.IJN = 'IJN';
+            lib.group.push('IJN');
+            lib.translate['IJN'] = 'J';
+
+            lib.groupnature.MN = 'MN';
+            lib.group.push('MN');
+            lib.translate['MN'] = 'F';
+
+            lib.groupnature.RN = 'RN';
+            lib.group.push('RN');
+            lib.translate['RN'] = 'E';
+
+            lib.groupnature.RM = 'RM';
+            lib.group.push('RM');
+            lib.translate['RM'] = 'I';
+
+            lib.groupnature.ROCN = 'ROCN';
+            lib.group.push('ROCN');
+            lib.translate['ROCN'] = 'C';
+
+            lib.groupnature.OTHER = 'OTHER';
+            lib.group.push('OTHER');
+            lib.translate['OTHER'] = 'OTHER';
+
+            var style2 = document.createElement('style');
+            style2.innerHTML = ".player.identity[data-color='PLAN'],";
+            style2.innerHTML += "div[data-nature='PLAN'],";
+            style2.innerHTML += "span[data-nature='PLAN'] {text-shadow: black 0 0 1px,rgba(255, 0, 0,1) 0 0 2px,rgba(255, 0, 0,1) 0 0 5px,rgba(255, 0, 0,1) 0 0 10px,rgba(255, 0, 0,1) 0 0 10px}";
+            style2.innerHTML += "div[data-nature='PLANm'],";
+            style2.innerHTML += "span[data-nature='PLANm'] {text-shadow: black 0 0 1px,rgba(255, 0, 0,1) 0 0 2px,rgba(255, 0, 0,1) 0 0 5px,rgba(255, 0, 0,1) 0 0 5px,rgba(255, 0, 0,1) 0 0 5px,black 0 0 1px;}";
+            style2.innerHTML += "div[data-nature='PLANmm'],";
+            style2.innerHTML += "span[data-nature='PLANmm'] {text-shadow: black 0 0 1px,rgba(255, 0, 0,1) 0 0 2px,rgba(255, 0, 0,1) 0 0 2px,rgba(255, 0, 0,1) 0 0 2px,rgba(255, 0, 0,1) 0 0 2px,black 0 0 1px;}";
+            document.head.appendChild(style2);
+
+            var style2 = document.createElement('style');
+            style2.innerHTML = ".player.identity[data-color='KMS'],";
+            style2.innerHTML += "div[data-nature='KMS'],";
+            style2.innerHTML += "span[data-nature='KMS'] {text-shadow: black 0 0 1px,rgba(128, 0, 0,1) 0 0 2px,rgba(128, 0, 0,1) 0 0 5px,rgba(128, 0, 0,1) 0 0 10px,rgba(128, 0, 0,1) 0 0 10px}";
+            style2.innerHTML += "div[data-nature='KMSm'],";
+            style2.innerHTML += "span[data-nature='KMSm'] {text-shadow: black 0 0 1px,rgba(128, 0, 0,1) 0 0 2px,rgba(128, 0, 0,1) 0 0 5px,rgba(128, 0, 0,1) 0 0 5px,rgba(128, 0, 0,1) 0 0 5px,black 0 0 1px;}";
+            style2.innerHTML += "div[data-nature='KMSmm'],";
+            style2.innerHTML += "span[data-nature='KMSmm'] {text-shadow: black 0 0 1px,rgba(128, 0, 0,1) 0 0 2px,rgba(128, 0, 0,1) 0 0 2px,rgba(128, 0, 0,1) 0 0 2px,rgba(128, 0, 0,1) 0 0 2px,black 0 0 1px;}";
+            document.head.appendChild(style2);
+
+            var style2 = document.createElement('style');
+            style2.innerHTML = ".player.identity[data-color='USN'],";
+            style2.innerHTML += "div[data-nature='USN'],";
+            style2.innerHTML += "span[data-nature='USN'] {text-shadow: black 0 0 1px,rgba(0, 0, 160,1) 0 0 2px,rgba(0, 0, 160,1) 0 0 5px,rgba(0, 0, 160,1) 0 0 10px,rgba(0, 0, 160,1) 0 0 10px}";
+            style2.innerHTML += "div[data-nature='USNm'],";
+            style2.innerHTML += "span[data-nature='USNm'] {text-shadow: black 0 0 1px,rgba(0, 0, 160,1) 0 0 2px,rgba(0, 0, 160,1) 0 0 5px,rgba(0, 0, 160,1) 0 0 5px,rgba(0, 0, 160,1) 0 0 5px,black 0 0 1px;}";
+            style2.innerHTML += "div[data-nature='USNmm'],";
+            style2.innerHTML += "span[data-nature='USNmm'] {text-shadow: black 0 0 1px,rgba(0, 0, 160,1) 0 0 2px,rgba(0, 0, 160,1) 0 0 2px,rgba(0, 0, 160,1) 0 0 2px,rgba(0, 0, 160,1) 0 0 2px,black 0 0 1px;}";
+            document.head.appendChild(style2);
+
+            var style2 = document.createElement('style');
+            style2.innerHTML = ".player.identity[data-color='RN'],";
+            style2.innerHTML += "div[data-nature='RN'],";
+            style2.innerHTML += "span[data-nature='RN'] {text-shadow: black 0 0 1px,rgba(0, 255, 128,1) 0 0 2px,rgba(0, 255, 128,1) 0 0 5px,rgba(0, 255, 128,1) 0 0 10px,rgba(0, 255, 128,1) 0 0 10px}";
+            style2.innerHTML += "div[data-nature='RNm'],";
+            style2.innerHTML += "span[data-nature='RNm'] {text-shadow: black 0 0 1px,rgba(0, 255, 128,1) 0 0 2px,rgba(0, 255, 128,1) 0 0 5px,rgba(0, 255, 128,1) 0 0 5px,rgba(0, 255, 128,1) 0 0 5px,black 0 0 1px;}";
+            style2.innerHTML += "div[data-nature='RNmm'],";
+            style2.innerHTML += "span[data-nature='RNmm'] {text-shadow: black 0 0 1px,rgba(0, 255, 128,1) 0 0 2px,rgba(0, 255, 128,1) 0 0 2px,rgba(0, 255, 128,1) 0 0 2px,rgba(0, 255, 128,1) 0 0 2px,black 0 0 1px;}";
+            document.head.appendChild(style2);
+
+            var style2 = document.createElement('style');
+            style2.innerHTML = ".player.identity[data-color='IJN'],";
+            style2.innerHTML += "div[data-nature='IJN'],";
+            style2.innerHTML += "span[data-nature='IJN'] {text-shadow: black 0 0 1px,rgba(255, 255, 128,1) 0 0 2px,rgba(255, 255, 128,1) 0 0 5px,rgba(255, 255, 128,1) 0 0 10px,rgba(255, 255, 128,1) 0 0 10px}";
+            style2.innerHTML += "div[data-nature='IJNm'],";
+            style2.innerHTML += "span[data-nature='IJNm'] {text-shadow: black 0 0 1px,rgba(255, 255, 128,1) 0 0 2px,rgba(255, 255, 128,1) 0 0 5px,rgba(255, 255, 128,1) 0 0 5px,rgba(255, 255, 128,1) 0 0 5px,black 0 0 1px;}";
+            style2.innerHTML += "div[data-nature='IJNmm'],";
+            style2.innerHTML += "span[data-nature='IJNmm'] {text-shadow: black 0 0 1px,rgba(255, 255, 128,1) 0 0 2px,rgba(255, 255, 128,1) 0 0 2px,rgba(255, 255, 128,1) 0 0 2px,rgba(255, 255, 128,1) 0 0 2px,black 0 0 1px;}";
+            document.head.appendChild(style2);
+
+            var style2 = document.createElement('style');
+            style2.innerHTML = ".player.identity[data-color='MN'],";
+            style2.innerHTML += "div[data-nature='MN'],";
+            style2.innerHTML += "span[data-nature='MN'] {text-shadow: black 0 0 1px,rgba(0, 128, 255,1) 0 0 2px,rgba(0, 128, 255,1) 0 0 5px,rgba(0, 128, 255,1) 0 0 10px,rgba(0, 128, 255,1) 0 0 10px}";
+            style2.innerHTML += "div[data-nature='MNm'],";
+            style2.innerHTML += "span[data-nature='MNm'] {text-shadow: black 0 0 1px,rgba(0, 128, 255,1) 0 0 2px,rgba(0, 128, 255,1) 0 0 5px,rgba(0, 128, 255,1) 0 0 5px,rgba(0, 128, 255,1) 0 0 5px,black 0 0 1px;}";
+            style2.innerHTML += "div[data-nature='MNmm'],";
+            style2.innerHTML += "span[data-nature='MNmm'] {text-shadow: black 0 0 1px,rgba(0, 128, 255,1) 0 0 2px,rgba(0, 128, 255,1) 0 0 2px,rgba(0, 128, 255,1) 0 0 2px,rgba(0, 128, 255,1) 0 0 2px,black 0 0 1px;}";
+            document.head.appendChild(style2);
+
+            var style2 = document.createElement('style');
+            style2.innerHTML = ".player.identity[data-color='RM'],";
+            style2.innerHTML += "div[data-nature='RM'],";
+            style2.innerHTML += "span[data-nature='RM'] {text-shadow: black 0 0 1px,rgba(128, 0, 128) 0 0 2px,rgba(128, 0, 128) 0 0 5px,rgba(128, 0, 128) 0 0 10px,rgba(128, 0, 128) 0 0 10px}";
+            style2.innerHTML += "div[data-nature='RMm'],";
+            style2.innerHTML += "span[data-nature='RMm'] {text-shadow: black 0 0 1px,rgba(128, 0, 128) 0 0 2px,rgba(128, 0, 128) 0 0 5px,rgba(128, 0, 128) 0 0 5px,rgba(128, 0, 128) 0 0 5px,black 0 0 1px;}";
+            style2.innerHTML += "div[data-nature='RMmm'],";
+            style2.innerHTML += "span[data-nature='RMmm'] {text-shadow: black 0 0 1px,rgba(128, 0, 128) 0 0 2px,rgba(128, 0, 128) 0 0 2px,rgba(128, 0, 128) 0 0 2px,rgba(128, 0, 128) 0 0 2px,black 0 0 1px;}";
+            document.head.appendChild(style2);
+
+            var style2 = document.createElement('style');
+            style2.innerHTML = ".player.identity[data-color='ΒΜΦCCCP'],";
+            style2.innerHTML += "div[data-nature='ΒΜΦCCCP'],";
+            style2.innerHTML += "span[data-nature='ΒΜΦCCCP'] {text-shadow: black 0 0 1px,rgba(255, 128, 0) 0 0 2px,rgba(255, 128, 0) 0 0 5px,rgba(255, 128, 0) 0 0 10px,rgba(255, 128, 0) 0 0 10px}";
+            style2.innerHTML += "div[data-nature='ΒΜΦCCCPm'],";
+            style2.innerHTML += "span[data-nature='ΒΜΦCCCPm'] {text-shadow: black 0 0 1px,rgba(255, 128, 0) 0 0 2px,rgba(255, 128, 0) 0 0 5px,rgba(255, 128, 0) 0 0 5px,rgba(255, 128, 0) 0 0 5px,black 0 0 1px;}";
+            style2.innerHTML += "div[data-nature='ΒΜΦCCCPmm'],";
+            style2.innerHTML += "span[data-nature='ΒΜΦCCCPmm'] {text-shadow: black 0 0 1px,rgba(255, 128, 0) 0 0 2px,rgba(255, 128, 0) 0 0 2px,rgba(255, 128, 0) 0 0 2px,rgba(255, 128, 0) 0 0 2px,black 0 0 1px;}";
+            document.head.appendChild(style2);
+
+            var style2 = document.createElement('style');
+            style2.innerHTML = ".player.identity[data-color='ROCN'],";
+            style2.innerHTML += "div[data-nature='ROCN'],";
+            style2.innerHTML += "span[data-nature='ROCN'] {text-shadow: black 0 0 1px,rgba(255, 128, 128) 0 0 2px,rgba(255, 128, 128) 0 0 5px,rgba(255, 128, 128) 0 0 10px,rgba(255, 128, 128) 0 0 10px}";
+            style2.innerHTML += "div[data-nature='ROCNm'],";
+            style2.innerHTML += "span[data-nature='ROCNm'] {text-shadow: black 0 0 1px,rgba(255, 128, 128)8) 0 0 2px,rgba(255, 128, 128) 0 0 5px,rgba(255, 128, 128) 0 0 5px,rgba(255, 128, 128)8)8) 0 0 5px,black 0 0 1px;}";
+            style2.innerHTML += "div[data-nature='ROCNmm'],";
+            style2.innerHTML += "span[data-nature='ROCNmm'] {text-shadow: black 0 0 1px,rgba(255, 128, 128) 0 0 2px,rgba(255, 128, 128) 0 0 2px,rgba(255, 128, 128) 0 0 2px,rgba(255, 128, 128) 0 0 2px,black 0 0 1px;}";
+            document.head.appendChild(style2);
+
+            var style2 = document.createElement('style');
+            style2.innerHTML = ".player.identity[data-color='OTHER'],";
+            style2.innerHTML += "div[data-nature='OTHER'],";
+            style2.innerHTML += "span[data-nature='OTHER'] {text-shadow: black 0 0 1px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 5px,rgba(0, 0, 0) 10px,rgba(0, 0, 0) 0 0 10px}";
+            style2.innerHTML += "div[data-nature='OTHERm'],";
+            style2.innerHTML += "span[data-nature='OTHERm'] {text-shadow: black 0 0 1px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 5px,rgba(0, 0, 0) 0 0 5px,rgba(0, 0, 0) 0 0 5px,black 0 0 1px;}";
+            style2.innerHTML += "div[data-nature='OTHERmm'],";
+            style2.innerHTML += "span[data-nature='OTHERmm'] {text-shadow: black 0 0 1px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0),rgba(0, 0, 0) 0 0 2px,black 0 0 1px;}";
+            document.head.appendChild(style2);
+
             if (config._yuanhang) {//优化摸牌时牌的质量的技能，全局技能需要下划线作为前缀，才能被无名杀识别。
                 lib.skill._yuanhang = {
                     name: "远航", "prompt2": "当你有摸牌标记时，你失去手牌后能摸1张牌，然后失去1个摸牌标记，自己回合暂时+1标记上限并回满标记，标记上限x个，可在强化中提升X值。", intro: { marktext: "摸牌", content: function (player, mark) { ; var a = game.me.countMark('_yuanhang_mopai'); return '手牌较少时，失去手牌可以摸一张牌，还可以摸' + a + '次，其他角色回合开始时会回复一个标记'; }, },
@@ -583,39 +731,39 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         connect: true,//该武将包是否可以联机（必填）,"xianjinld""zhiyangai","baiyin_skill",
                         //全局技能"_yuanhang","_jianzaochuan","_qianghuazhuang",
                         character: {
-                            liekexingdun: ["female", "美", 4, ["hangmucv", "hangkongzhanshuxianqu"], ["zhu", "des:血量中等的航母，温柔，体贴，过渡期追着大船打的航母。"]],
-                            qixichicheng: ["female", "日", 4, ["hangmucv", "qixi_cv"], ["zhu", "des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
-                            wufenzhongchicheng: ["female", "日", 4, ["hangmucv", "mingyundewufenzhong"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
-                            dumuchenglinqiye: ["female", "美", 4, ["hangmucv", "dumuchenglin"], ["des:有必中攻击，快跑"]],
-                            bisimai: ["female", "德", 4, ["zhuangjiafh", "zhanliebb", "qijianshashou"], ["zhu", "des:更多刮痧炮，更多炮弹，更多削弱光环，更多护甲模组，更多血量。"]],
-                            misuli: ["female", "美", 4, ["zhuangjiafh", "zhanliebb", "jueshengzhibing", "zhanfu"], ["des:用精巧的手枪去质疑，用绝对的火力回击对手。"]],
-                            weineituo: ["female", "意", 4, ["zhuangjiafh", "zhanliebb", "yishisheji", "yishisheji_1"], ["des:身材小，而强度惊人。"]],
-                            lisailiu: ["female", "法", 4, ["zhuangjiafh", "zhanliebb", "kaixuanzhige"], ["des:幸运的象征之一，同时有着丰富的精神象征。"]],
-                            changmen: ["female", "日", 4, ["zhuangjiafh", "zhanliebb", "zhudaojiandui"], ["des:。"]],
-                            "1913": ["female", "中", 4, ["zhuangjiafh", "zhanliebb", "jujianmengxiang", "jujianmengxiang_reflash"], ["zhu", "des:在大舰巨炮的黄金年代，让国人也拥有主力战舰，堪称最为奢侈的海军梦想了——而今日，妾身有幸以此姿态回应诸位之诉求。"]],
-                            kunxi: ["female", "美", 4, ["huokongld", "zhongxunca", "gaosusheji"], ["des:画师优秀的功底让这名角色美而可爱，这是出色的角色塑造。"]],
-                            ougengqi: ["female", "德", 4, ["huokongld", "zhongxunca", "zhanxianfangyu", "zhanxianfangyu1"], ["des:励志偶像，与标志性舰装，给人以强大的保护。"]],
-                            qingye: ["female", "日", 4, ["huokongld", "zhongxunca", "sawohaizhan"], ["des:励志偶像，与一首动人的歌，与一段坎坷旅途。"]],
-                            beianpudun: ["female", "美", 4, ["huokongld", "zhongxunca", "huhangyuanhu"], ["des:励志青年，在旅途中成长，与恋人坚定的望向远方。"]],
-                            jiujinshan: ["female", "美", 4, ["huokongld", "zhongxunca", "jiujingzhanzhen"], ["des:航海服饰，侦查员与火炮观瞄。"]],
-                            yixian: ["female", "中", 3, ["fangkong2", "qingxuncl", "shizhibuyu", "shizhibuyu1"], ["des:经典美术设计的款式，意气风发，威猛先生"]],
-                            tianlangxing: ["female", "英", 3, ["fangkong2", "qingxuncl", "duomianshou"], ["des:阻敌计谋表现优秀，这是先发制敌的优势所在，"]],
-                            dadianrendian: ["female", "日", 3, ["fangkong2", "qingxuncl"], ["des:手持竹伞的轻巡，辅助队友，防御攻击。"]],
-                            //degelasi: ["female", "法", 3, ["fangkong2", "qingxuncl"], ["des:现代文职服饰，一看就很会办公。"]],
-                            yatelanda: ["female", "美", 3, ["fangkong2", "qingxuncl", "duikongfangyu"], ["des:双枪射手点形象，其双枪能以极快的射速打出爆炸弹匣，清空一小片区域。"]],
-                            "z31": ["female", "德", 3, ["huibi", "quzhudd", "Zqujingying"], ["des:婚纱与轻纱是多数人的美梦,与绿草平原，与绿水青山"]],
-                            xuefeng: ["female", "日", 3, ["huibi", "quzhudd", "xiangrui", "yumian"], ["des:幸运的驱逐舰，多位画师、花了大款的大佬亲情奉献。"]],
-                            kangfusi: ["female", "美", 3, ["huibi", "quzhudd", "31jiezhongdui"], ["des:水手服欸,优秀的构图，不过图少改造晚。"]],
-                            "47project": ["female", "苏", 3, ["huibi", "quzhudd"], ["des:这是个依赖科技的舰船，有着科幻的舰装，与兼备温柔体贴与意气风发的表现。"]],
-                            guzhuyizhichuixue: ["female", "日", 3, ["huibi", "quzhudd", "guzhuyizhi"], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
-                            shuileizhanduichuixue: ["female", "日", 3, ["huibi", "quzhudd", "shuileizhandui",], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
-                            minsike: ["female", "苏", 3, ["huibi", "quzhudd", "manchangzhanyi", "manchangzhanyi_1"], ["des:跑得快，看得多。"]],
-                            yinghuochong: ["female", "英", 3, ["huibi", "quzhudd", "zhongzhuangcike", "wuweizhuangji"], ["des:为你施加勇气的魔法!"]],
-                            "u1405": ["female", "德", 3, ["qianting", "baiyin_skill", "qianxingtuxi"], ["des:无需隐匿的偷袭大师，马上就让对手的后勤捉襟见肘。"]],
-                            jingjishen: ["female", "英", 3, ["junfu"], ["des:需要武器支援，伙计倒下了。"]],
-                            changchun: ["female", "中", 3, ["daoqu", "rand", "sidajingang"], ["des:尚处于正能量之时。"]],
+                            liekexingdun: ["female", "USN", 4, ["hangmucv", "hangkongzhanshuxianqu"], ["zhu", "des:血量中等的航母，温柔，体贴，过渡期追着大船打的航母。"]],
+                            qixichicheng: ["female", "IJN", 4, ["hangmucv", "qixi_cv"], ["zhu", "des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
+                            wufenzhongchicheng: ["female", "IJN", 4, ["hangmucv", "mingyundewufenzhong"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
+                            dumuchenglinqiye: ["female", "USN", 4, ["hangmucv", "dumuchenglin"], ["des:有必中攻击，快跑"]],
+                            bisimai: ["female", "KMS", 4, ["zhuangjiafh", "zhanliebb", "qijianshashou"], ["zhu", "des:更多刮痧炮，更多炮弹，更多削弱光环，更多护甲模组，更多血量。"]],
+                            misuli: ["female", "USN", 4, ["zhuangjiafh", "zhanliebb", "jueshengzhibing", "zhanfu"], ["des:用精巧的手枪去质疑，用绝对的火力回击对手。"]],
+                            weineituo: ["female", "RM", 4, ["zhuangjiafh", "zhanliebb", "yishisheji", "yishisheji_1"], ["des:身材小，而强度惊人。"]],
+                            lisailiu: ["female", "MN", 4, ["zhuangjiafh", "zhanliebb", "kaixuanzhige"], ["des:幸运的象征之一，同时有着丰富的精神象征。"]],
+                            changmen: ["female", "IJN", 4, ["zhuangjiafh", "zhanliebb", "zhudaojiandui"], ["des:。"]],
+                            "1913": ["female", "ROCN", 4, ["zhuangjiafh", "zhanliebb", "jujianmengxiang", "jujianmengxiang_reflash"], ["zhu", "des:在大舰巨炮的黄金年代，让国人也拥有主力战舰，堪称最为奢侈的海军梦想了——而今日，妾身有幸以此姿态回应诸位之诉求。"]],
+                            kunxi: ["female", "USN", 4, ["huokongld", "zhongxunca", "gaosusheji"], ["des:画师优秀的功底让这名角色美而可爱，这是出色的角色塑造。"]],
+                            ougengqi: ["female", "KMS", 4, ["huokongld", "zhongxunca", "zhanxianfangyu", "zhanxianfangyu1"], ["des:励志偶像，与标志性舰装，给人以强大的保护。"]],
+                            qingye: ["female", "IJN", 4, ["huokongld", "zhongxunca", "sawohaizhan"], ["des:励志偶像，与一首动人的歌，与一段坎坷旅途。"]],
+                            beianpudun: ["female", "USN", 4, ["huokongld", "zhongxunca", "huhangyuanhu"], ["des:励志青年，在旅途中成长，与恋人坚定的望向远方。"]],
+                            jiujinshan: ["female", "USN", 4, ["huokongld", "zhongxunca", "jiujingzhanzhen"], ["des:航海服饰，侦查员与火炮观瞄。"]],
+                            yixian: ["female", "ROCN", 3, ["fangkong2", "qingxuncl", "shizhibuyu", "shizhibuyu1"], ["des:经典美术设计的款式，意气风发，威猛先生"]],
+                            tianlangxing: ["female", "RN", 3, ["fangkong2", "qingxuncl", "duomianshou"], ["des:阻敌计谋表现优秀，这是先发制敌的优势所在，"]],
+                            dadianrendian: ["female", "IJN", 3, ["fangkong2", "qingxuncl"], ["des:手持竹伞的轻巡，辅助队友，防御攻击。"]],
+                            //degelasi: ["female", "MN", 3, ["fangkong2", "qingxuncl"], ["des:现代文职服饰，一看就很会办公。"]],
+                            yatelanda: ["female", "USN", 3, ["fangkong2", "qingxuncl", "duikongfangyu"], ["des:双枪射手点形象，其双枪能以极快的射速打出爆炸弹匣，清空一小片区域。"]],
+                            "z31": ["female", "KMS", 3, ["huibi", "quzhudd", "Zqujingying"], ["des:婚纱与轻纱是多数人的美梦,与绿草平原，与绿水青山"]],
+                            xuefeng: ["female", "IJN", 3, ["huibi", "quzhudd", "xiangrui", "yumian"], ["des:幸运的驱逐舰，多位画师、花了大款的大佬亲情奉献。"]],
+                            kangfusi: ["female", "USN", 3, ["huibi", "quzhudd", "31jiezhongdui"], ["des:水手服欸,优秀的构图，不过图少改造晚。"]],
+                            "47project": ["female", "ΒΜΦCCCP", 3, ["huibi", "quzhudd"], ["des:这是个依赖科技的舰船，有着科幻的舰装，与兼备温柔体贴与意气风发的表现。"]],
+                            guzhuyizhichuixue: ["female", "IJN", 3, ["huibi", "quzhudd", "guzhuyizhi"], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
+                            shuileizhanduichuixue: ["female", "IJN", 3, ["huibi", "quzhudd", "shuileizhandui",], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
+                            minsike: ["female", "ΒΜΦCCCP", 3, ["huibi", "quzhudd", "manchangzhanyi", "manchangzhanyi_1"], ["des:跑得快，看得多。"]],
+                            yinghuochong: ["female", "RN", 3, ["huibi", "quzhudd", "zhongzhuangcike", "wuweizhuangji"], ["des:为你施加勇气的魔法!"]],
+                            "u1405": ["female", "KMS", 3, ["qianting", "baiyin_skill", "qianxingtuxi"], ["des:无需隐匿的偷袭大师，马上就让对手的后勤捉襟见肘。"]],
+                            jingjishen: ["female", "RN", 3, ["junfu"], ["des:需要武器支援，伙计倒下了。"]],
+                            changchun: ["female", "PLAN", 3, ["daoqu", "rand", "sidajingang"], ["des:尚处于正能量之时。"]],
 
-                            skilltest: ["male", "其他", 9, ["zhanlie"], ["forbidai", "des:测试用"]],
+                            skilltest: ["male", "OTHER", 9, ["zhanlie"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
                             _yuanhang: {
@@ -3632,6 +3780,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 //direct:true,//自动发动
                                 priority: 5,
+                                check:function (event, player) {
+                                    
+                                    return get.attitude(player, event.target) > 1;
+                                },
                                 filter: function (event, player) {
                                     if (player.countCards == 0) return false;
                                     if (player == event.target || player == event.player) return false;
@@ -3661,6 +3813,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     game.delayx();
                                 },
                                 ai: {
+                                   
                                     threaten: 1.1,
                                     expose: 0.25,
 
@@ -4634,20 +4787,20 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             jueshengzhibing: {
                                 trigger: {
-                                    global: ["loseAfter","loseAsyncAfter"],
+                                    global: ["loseAfter", "loseAsyncAfter"],
                                 },
                                 force: true,
-                                direct:true,
+                                direct: true,
                                 filter: function (event, player) {
-                                    if(event.type!='discard'||_status.currentPhase==player||event.getlx===false) return false;
-                                    if(event.name=='lose'&&event.player==player) return false;
+                                    if (event.type != 'discard' || _status.currentPhase == player || event.getlx === false) return false;
+                                    if (event.name == 'lose' && event.player == player) return false;
                                     //game.log("jueshengzhibing");
                                     return !player.isMaxHandcard();
                                 },
                                 content: function () {
                                     player.draw(1);
                                     game.logskill("jueshengzhibing");
-                                    
+
                                 }
                             },
                             zhanfu: {
@@ -4655,9 +4808,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     targetInRange(card, player, target) {
                                         if ((card.name == 'sha' || card.name == 'sheji9') && player.isMaxHandcard()) return true;
                                     },
-                                    
+
                                 },
-                               
+
                             },
                             //在这里添加新技能。
 
@@ -4756,7 +4909,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             rand: "随机数", "rand_info": "遇事不决？扔一个骰子吧。该技能可以生成1~6的随机数",
                             duikongfangyu: "对空防御", "duikongfangyu_info": "你受到万箭齐发和近距支援伤害时，你防止此伤害。你发动[防空]后，你摸x张牌(x为本次防空无效的目标数。)",
                             zhudaojiandui: "柱岛舰队", "zhudaojiandui_info": "锁定技，每当你使用或打出一张非虚拟非转化的基本牌，你获得一个[柱]标记。你可以移去三个柱标记视为使用一张不计入次数限制的杀。",
-                            sawohaizhan: "萨沃海战", "sawohaizhan_info": "出牌阶段，若你拥有[火控]，你可以失去[火控]，若如此做你本回合使用杀无距离次数限制且雷杀伤害+1。",
+                            sawohaizhan: "萨沃海战", "sawohaizhan_info": "出牌阶段，若你拥有[火控]，你可以失去[火控]，摸等同于体力值的牌。若如此做你本回合使用杀无距离次数限制且雷杀伤害+1。",
                             sawohaizhan_1: "萨沃海战", "sawohaizhan_1_info": "本回合使用杀无距离次数限制且雷杀伤害+1。",
                             mingyundewufenzhong: "命运的五分钟", "mingyundewufenzhong_info": "你可以跳过判定和摸牌阶段，视为使用一张雷杀或火杀，你可以弃置一张装备牌并跳过出牌阶段，视为使用一张雷杀或火杀，你可以跳过弃牌阶段并翻面，视为使用一张雷杀或火杀。",
                             wufenzhong1: "命运的五分钟", "wufenzhong1_info": "你可以跳过判定和摸牌阶段，视为使用一张雷杀或火杀",
@@ -5349,17 +5502,28 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filterTarget: function (card, player, target) { return target != player && player.canUse('sha', target); },
                                 content: function () {
                                     'step 0'
-                                    var choice = 'liutouge';
+                                    event.num=0;
+                                    'step 1'
+                                    game.log("event.num"+event.num);
+                                    event.num++;
+                                    /*var choice = 'liutouge';
                                     player.chooseVCardButton('选择一张牌视为使用之', ['sha', 'sha', 'sha']).set('ai', function (button) {
                                         if (button.link[2] == _status.event.choice) return 2;
                                         return Math.random();
                                     }).set('choice', choice).set('filterButton', function (button) {
                                         return _status.event.player.hasUseTarget(button.link[2]);
-                                    });
-                                    'step 1'
-                                    if (result.bool) {
-                                        player.chooseUseTarget(result.links[0][2]); player.chooseUseTarget(result.links[0][2]);
-                                    } else event.finish();
+                                    });*/
+                                    player.chooseUseTarget({
+                                        name:'sha',
+                                        //nature:'fire',
+                                        isCard:true,
+                                    },'请选择【杀】的目标（'+(event.num==2?'2':event.num)+'/2）',false);
+                                  
+                                    'step 2'
+                                    if(result.bool&&event.num<2) event.goto(1);
+                                    else{
+                                        event.finish();
+                                    }
                                 },
                                 ai: {
                                     order: 5,
@@ -6118,7 +6282,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     qixichicheng: ["female", "shu", 4, ["hangmucv", "qixi_cv"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
                     wufenzhongchicheng: ["female", "shu", 4, ["hangmucv", "mingyundewufenzhong"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
          
-                    dumuchenglinqiye: ["female", "美", 4, ["hangmucv", "dumuchenglin"], ["des:有必中攻击，快跑"]],
+                    dumuchenglinqiye: ["female", "USN", 4, ["hangmucv", "dumuchenglin"], ["des:有必中攻击，快跑"]],
                     bisimai: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["zhu", "des:更多刮痧炮，更多炮弹，更多削弱光环，更多护甲模组，更多血量。"]],
                     misuli: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["des:用精巧的手枪去质疑，用绝对的火力回击对手。"]],
                     weineituo: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["des:身材小，而强度惊人。"]],
@@ -6129,15 +6293,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     qingye: ["female", "shu", 4, ["huokongld", "zhongxunca", "sawohaizhan"], ["des:励志偶像，与一首动人的歌，与一段坎坷旅途。"]],
                     beianpudun: ["female", "shu", 4, ["huokongld", "zhongxunca"], ["des:励志青年，在旅途中成长，与恋人坚定的望向远方。"]],
                     jiujinshan: ["female", "shu", 4, ["huokongld", "zhongxunca"], ["des:航海服饰，侦查员与火炮观瞄。"]],
-                    yixian: ["female", "美", 3, ["fangkong2", "qingxuncl"], ["des:经典美术设计的款式，意气风发，威猛先生"]],
-                    tianlangxing: ["female", "美", 3, ["fangkong2", "qingxuncl"], ["des:阻敌计谋表现优秀，这是先发制敌的优势所在，"]],
-                    dading: ["female", "美", 3, ["fangkong2", "qingxuncl"], ["des:手持竹伞的轻巡，辅助队友，防御攻击。"]],
-                    degelasi: ["female", "美", 3, ["fangkong2", "qingxuncl"], ["des:现代文职服饰，一看就很会办公。"]],
-                    yatelanda: ["female", "美", 3, ["fangkong2", "qingxuncl"], ["des:双枪射手点形象，其双枪能以极快的射速打出爆炸弹匣，清空一小片区域。"]],
-                    "z31": ["female", "美", 3, ["huibi", "quzhudd"], ["des:婚纱与轻纱是多数人的美梦,与绿草平原，与绿水青山"]],
+                    yixian: ["female", "USN", 3, ["fangkong2", "qingxuncl"], ["des:经典美术设计的款式，意气风发，威猛先生"]],
+                    tianlangxing: ["female", "USN", 3, ["fangkong2", "qingxuncl"], ["des:阻敌计谋表现优秀，这是先发制敌的优势所在，"]],
+                    dading: ["female", "USN", 3, ["fangkong2", "qingxuncl"], ["des:手持竹伞的轻巡，辅助队友，防御攻击。"]],
+                    degelasi: ["female", "USN", 3, ["fangkong2", "qingxuncl"], ["des:现代文职服饰，一看就很会办公。"]],
+                    yatelanda: ["female", "USN", 3, ["fangkong2", "qingxuncl"], ["des:双枪射手点形象，其双枪能以极快的射速打出爆炸弹匣，清空一小片区域。"]],
+                    "z31": ["female", "USN", 3, ["huibi", "quzhudd"], ["des:婚纱与轻纱是多数人的美梦,与绿草平原，与绿水青山"]],
                     xuefeng: ["female", "shu", 3, ["huibi", "quzhudd", "xiangrui", "yumian"], ["des:幸运的驱逐舰，多位画师、花了大款的大佬亲情奉献。"]],
-                    kangfusi: ["female", "美", 3, ["huibi", "quzhudd"], ["des:水手服欸,优秀的构图，不过图少改造晚。"]],
-                    "47project": ["female", "美", 3, ["huibi", "quzhudd"], ["des:这是个依赖科技的舰船，有着科幻的舰装，与兼备温柔体贴与意气风发的表现。"]],
+                    kangfusi: ["female", "USN", 3, ["huibi", "quzhudd"], ["des:水手服欸,优秀的构图，不过图少改造晚。"]],
+                    "47project": ["female", "USN", 3, ["huibi", "quzhudd"], ["des:这是个依赖科技的舰船，有着科幻的舰装，与兼备温柔体贴与意气风发的表现。"]],
                     guzhuyizhichuixue: ["female", "shu", 3, ["huibi", "quzhudd", "guzhuyizhi"], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
                     shuileizhanduichuixue: ["female", "shu", 3, ["huibi", "quzhudd", "shuileizhandui",], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
                     minsike: ["female", "qun", 3, ["huibi", "quzhudd", "manchangzhanyi", "manchangzhanyi_1"], ["des:跑得快，看得多。"]],
