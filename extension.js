@@ -48,13 +48,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         },
                         dietogain: {
                             name: "远航死后给牌", trigger: { player: ["dieAfter"], }, direct: true, forceDie: true,
-                            filter: function (event, player) { if (event.name == 'die') return true; return player.isAlive() && (get.mode() != 'boss' || (get.mode() == 'boss' && !lib.character[player.name][4].contains('boss') && player.identity == 'cai'));; },
+                            filter: function (event, player) { if (event.name == 'die') return player.identity != 'fan'; return player.isAlive() && (get.mode() != 'boss' || (get.mode() == 'boss' && !lib.character[player.name][4].contains('boss') && player.identity == 'cai'));; },
                             content: function () {
                                 'step 0'
                                 event.count = trigger.num || 1;
                                 'step 1'
                                 event.count--;//让优势方有一轮的挑战，因为第二轮对手就因为过牌量下降而失去威胁。
-                                player.chooseTarget(get.prompt2('在离开战斗前，若你的身份：<br>是忠臣，你可令一名角色摸2张牌；<br>是反贼，令一名角色摸1张牌；<br>内奸，令一名角色获得一张闪。<br>或许会有转机出现。'), function (card, player, target) { return target.maxHp > 0; }).set('ai', function (target) {
+                                player.chooseTarget(get.prompt2('在离开战斗前，若你的身份：<br>是忠臣，你可令一名角色摸1张牌；<br>内奸，令一名角色获得一张闪。<br>或许会有转机出现。'), function (card, player, target) { return target.maxHp > 0; }).set('ai', function (target) {
                                     var att = get.attitude(_status.event.player, target); var draw = Math.max(3, player.maxHp + 1);
                                     if (target == trigger.source) att *= 0.35; if (target.hasSkill('zhanliebb')) att *= 1.05;
                                     return att
@@ -63,9 +63,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 if (result.bool) {
                                     var target = result.targets[0]; event.target = target; player.logSkill('_yuanhang_dietogain', target);
                                     //if(target==trigger.source){target.draw(Math.max(1,player.maxHp))}else
-                                    if (player.identity == 'zhong') { target.draw(2); };
+                                    if (player.identity == 'zhong') { target.draw(1); };
                                     if (player.identity == 'nei') { target.gain(game.createCard('shan'), 'gain2'); };
-                                    if (player.identity == 'fan') { target.draw(1); };
+                                    //if (player.identity == 'fan') { target.draw(1); };
                                 } else event.finish();
                             },
                             sub: true,
@@ -3641,7 +3641,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         event.finish();
                                         return;
                                     }
-                                    var prompt2 = '你可以获得下列一项技能直到回合结束';
+                                    var prompt2 = '你可以获得下列一项技能直到下回合开始';
                                     if (event.done) {
                                         prompt2 += ' (2/2)';
                                     }
@@ -4016,9 +4016,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }
                                     }
                                     var dialog = ui.create.dialog('巨舰梦想', [list, 'vcard']);
-                                    //var taoyuan=0,nanman=0;
-                                    //var players=game.filterPlayer();
-                                    /*for(var i=0;i<players.length;i++){
+                                    var taoyuan=0,nanman=0;
+                                    var players=game.filterPlayer();
+                                    for(var i=0;i<players.length;i++){
                                         var eff1=get.effect(players[i],{name:'taoyuan'},player,player);
                                         var eff2=get.effect(players[i],{name:'nanman'},player,player);
                                         if(eff1>0){
@@ -4033,17 +4033,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         else if(eff2<0){
                                             nanman--;
                                         }
-                                    }*/
+                                    }
                                     player.chooseButton(dialog).ai = function (button) {
                                         var name = button.link[2];
                                         if (Math.max(taoyuan, nanman) > 1) {
-                                            if (taoyuan > nanman) return name == 'taoyuan' ? 1 : 0;
-                                            return name == 'nanman' ? 1 : 0;
+                                            if (taoyuan > nanman) return name == 'jinjixiuli9' ? 1 : 0;
+                                            return name == 'manchangyy9' ? 1 : 0;
                                         }
                                         if (player.countCards('h') < player.hp && player.hp >= 2) {
-                                            return name == 'wuzhong' ? 1 : 0;
+                                            return name == 'buji9' ? 1 : 0;
                                         }
-                                        return name == 'zengbin' ? 1 : 0;
+                                        return name == 'jinju9' ? 1 : 0;
                                     }
                                     'step 1'
                                     if (result.bool) {
