@@ -588,11 +588,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             wufenzhongchicheng: ["female", "日", 4, ["hangmucv", "mingyundewufenzhong"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
                             dumuchenglinqiye: ["female", "美", 4, ["hangmucv", "dumuchenglin"], ["des:有必中攻击，快跑"]],
                             bisimai: ["female", "德", 4, ["zhuangjiafh", "zhanliebb", "qijianshashou"], ["zhu", "des:更多刮痧炮，更多炮弹，更多削弱光环，更多护甲模组，更多血量。"]],
-                            misuli: ["female", "美", 4, ["zhuangjiafh", "zhanliebb"], ["des:用精巧的手枪去质疑，用绝对的火力回击对手。"]],
+                            misuli: ["female", "美", 4, ["zhuangjiafh", "zhanliebb", "jueshengzhibing", "zhanfu"], ["des:用精巧的手枪去质疑，用绝对的火力回击对手。"]],
                             weineituo: ["female", "意", 4, ["zhuangjiafh", "zhanliebb", "yishisheji", "yishisheji_1"], ["des:身材小，而强度惊人。"]],
                             lisailiu: ["female", "法", 4, ["zhuangjiafh", "zhanliebb", "kaixuanzhige"], ["des:幸运的象征之一，同时有着丰富的精神象征。"]],
                             changmen: ["female", "日", 4, ["zhuangjiafh", "zhanliebb", "zhudaojiandui"], ["des:。"]],
-                            "1913": ["female", "中", 4, ["zhuangjiafh", "zhanliebb", "jujianmengxiang", "jujianmengxiang_reflash"], ["zhu","des:在大舰巨炮的黄金年代，让国人也拥有主力战舰，堪称最为奢侈的海军梦想了——而今日，妾身有幸以此姿态回应诸位之诉求。"]],
+                            "1913": ["female", "中", 4, ["zhuangjiafh", "zhanliebb", "jujianmengxiang", "jujianmengxiang_reflash"], ["zhu", "des:在大舰巨炮的黄金年代，让国人也拥有主力战舰，堪称最为奢侈的海军梦想了——而今日，妾身有幸以此姿态回应诸位之诉求。"]],
                             kunxi: ["female", "美", 4, ["huokongld", "zhongxunca", "gaosusheji"], ["des:画师优秀的功底让这名角色美而可爱，这是出色的角色塑造。"]],
                             ougengqi: ["female", "德", 4, ["huokongld", "zhongxunca", "zhanxianfangyu", "zhanxianfangyu1"], ["des:励志偶像，与标志性舰装，给人以强大的保护。"]],
                             qingye: ["female", "日", 4, ["huokongld", "zhongxunca", "sawohaizhan"], ["des:励志偶像，与一首动人的歌，与一段坎坷旅途。"]],
@@ -2216,7 +2216,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         else if (player.countMark('jinengup') >= 2) {
                                             if (card.suit == 'heart' || card.suit == 'spade' || card.suit == 'diamond') {
                                                 return lib.filter.cardDiscardable(card, player);
-                                            }   
+                                            }
                                         }
                                         return false;
                                     }, 'h')
@@ -3637,17 +3637,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (player == event.target || player == event.player) return false;
                                     return (event.card.name == 'sha' || event.card.name == 'sheji9') && get.distance(player, event.target, 'pure') <= 1;
                                 },
-                               /* check: function (event, player) {
-                                
-                                    if (get.attitude(player, event.target) > 2) {
-                                        if (player.countCards('h', 'shan') || player.getEquip(2) || trigger.target.hp == 1 || player.hp > trigger.target.hp + 1) {
-                                            if (!trigger.target.countCards('h', 'shan') || trigger.target.countCards('h') < player.countCards('h')) {
-                                                return true;
-                                            }
-                                        }
-                                    }
-                                    return false;
-                                },*/
+                                /* check: function (event, player) {
+                                 
+                                     if (get.attitude(player, event.target) > 2) {
+                                         if (player.countCards('h', 'shan') || player.getEquip(2) || trigger.target.hp == 1 || player.hp > trigger.target.hp + 1) {
+                                             if (!trigger.target.countCards('h', 'shan') || trigger.target.countCards('h') < player.countCards('h')) {
+                                                 return true;
+                                             }
+                                         }
+                                     }
+                                     return false;
+                                 },*/
                                 content: function () {
 
                                     game.log('zhanxianfangyu', trigger.target);
@@ -3660,12 +3660,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     trigger.player.line(player);
                                     game.delayx();
                                 },
-                                ai:{
-        threaten:1.1,
-        expose:0.25,
- 
-                                
-                                    
+                                ai: {
+                                    threaten: 1.1,
+                                    expose: 0.25,
+
+
+
                                 },
                                 "_priority": 500,
                             },
@@ -3680,7 +3680,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return (event.card.name == 'sha' || event.card.name == 'sheji9') && get.color(event.card) == 'black';
                                 },
                                 content: function () {
-                                
+
                                     player.logSkill('zhanxianfangyu1');
                                     trigger.cancel();
 
@@ -4632,6 +4632,33 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
+                            jueshengzhibing: {
+                                trigger: {
+                                    global: ["loseAfter","loseAsyncAfter"],
+                                },
+                                force: true,
+                                direct:true,
+                                filter: function (event, player) {
+                                    if(event.type!='discard'||_status.currentPhase==player||event.getlx===false) return false;
+                                    if(event.name=='lose'&&event.player==player) return false;
+                                    //game.log("jueshengzhibing");
+                                    return !player.isMaxHandcard();
+                                },
+                                content: function () {
+                                    player.draw(1);
+                                    game.logskill("jueshengzhibing");
+                                    
+                                }
+                            },
+                            zhanfu: {
+                                mod: {
+                                    targetInRange(card, player, target) {
+                                        if ((card.name == 'sha' || card.name == 'sheji9') && player.isMaxHandcard()) return true;
+                                    },
+                                    
+                                },
+                               
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -4758,6 +4785,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             kaixuanzhige: "凯旋之歌", "kaixuanzhige_info": "当你使用【杀】指定唯一其他角色为目标后，你可以进行判定，若结果为锦囊牌，此【杀】伤害+1且无视防具。你的体力值小于3时，你使用的【杀】无视防具。",
                             yishisheji: "意式设计", "yishisheji_info": "每轮限一次，你可以免疫一次伤害。你使用杀指定唯一目标时可以进行判定，若判定结果为红色，此杀基础伤害+1，否则此杀无效。出牌阶段你使用的第一张杀无距离限制。",
                             yishisheji_1: "意式设计", "yishisheji_1_info": "",
+                            jueshengzhibing: "决胜之兵", "juezhanzhibing_info": "锁定技，其他角色弃置牌时，若你的手牌数不为全场最多，你可以摸一张牌",
+                            zhanfu: "战斧", "zhanfu_info": "你手牌数为场上最多时，你使用杀无视距离",
                         },
                     };
                     if (lib.device || lib.node) {
