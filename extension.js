@@ -3636,7 +3636,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (player == event.target || player == event.player) return false;
                                     return (event.card.name == 'sha' || event.card.name == 'sheji9') && get.distance(player, event.target, 'pure') <= 1;
                                 },
-                                check: function (event, player) {
+                               /* check: function (event, player) {
+                                
                                     if (get.attitude(player, event.target) > 2) {
                                         if (player.countCards('h', 'shan') || player.getEquip(2) || trigger.target.hp == 1 || player.hp > trigger.target.hp + 1) {
                                             if (!trigger.target.countCards('h', 'shan') || trigger.target.countCards('h') < player.countCards('h')) {
@@ -3645,7 +3646,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }
                                     }
                                     return false;
-                                },
+                                },*/
                                 content: function () {
 
                                     game.log('zhanxianfangyu', trigger.target);
@@ -3658,12 +3659,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     trigger.player.line(player);
                                     game.delayx();
                                 },
-                                ai: {
-                                    effect: {
-                                        target: function (card) {
-                                            if (card.name == 'sha') return 1.3;
-                                        },
-                                    },
+                                ai:{
+        threaten:1.1,
+        expose:0.25,
+ 
+                                
+                                    
                                 },
                                 "_priority": 500,
                             },
@@ -3678,6 +3679,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return (event.card.name == 'sha' || event.card.name == 'sheji9') && get.color(event.card) == 'black';
                                 },
                                 content: function () {
+                                
                                     player.logSkill('zhanxianfangyu1');
                                     trigger.cancel();
 
