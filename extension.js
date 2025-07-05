@@ -1,6 +1,7 @@
 //目录：全局技能、武将列表、武将技能、武将和技能翻译、卡牌包与卡牌技能、卡牌翻译、配置（config）、单机武将列表、扩展简介、全局函数模块
 
 game.import("extension", function (lib, game, ui, get, ai, _status) {
+
     return {
         name: "舰R牌将", content: function (config, pack) {
             if (config._yuanhang) {//优化摸牌时牌的质量的技能，全局技能需要下划线作为前缀，才能被无名杀识别。
@@ -611,7 +612,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             minsike: ["female", "qun", 3, ["huibi", "quzhudd", "manchangzhanyi", "manchangzhanyi_1"], ["des:跑得快，看得多。"]],
                             "u1405": ["female", "qun", 3, ["qianting", "baiyin_skill", "qianxingtuxi"], ["des:无需隐匿的偷袭大师，马上就让对手的后勤捉襟见肘。"]],
                             jingjishen: ["female", "wu", 3, ["junfu"], ["des:需要武器支援，伙计倒下了。"]],
-                            changchun: ["female", "shu", 3, ["daoqu", "rand","sidajingang"], ["des:尚处于正能量之时。"]],
+                            changchun: ["female", "shu", 3, ["daoqu", "rand", "sidajingang"], ["des:尚处于正能量之时。"]],
                             skilltest: ["male", "qun", 9, ["zhanlie"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
@@ -2305,7 +2306,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         popup: false,
                                         firstDo: true,
                                         filter: function (event, player) {
-                                            zongshu = 1 + player.countMark('jinengup'), cunpaishu = player.getExpansions('tunchu').length + player.getCards('s', function (card) { return card.hasGaintag('tunchu') }).length;
+                                            var zongshu = 1 + player.countMark('jinengup'), cunpaishu = player.getExpansions('tunchu').length + player.getCards('s', function (card) { return card.hasGaintag('tunchu') }).length;
                                             return zongshu > cunpaishu && player.countCards('h');
                                         },
                                         charlotte: true,
@@ -2980,7 +2981,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                     },
                                 },
-*/
+                                */
                             },
                             dumuchenglin: {
                                 trigger: {
@@ -3141,7 +3142,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         true).set('ai', function (event, player) {
                                             var target = _status.event.getParent().player;
                                             var player = _status.event.player;
-                                            const options = [
+                                            var options = [
                                                 { name: "弃牌", weight: 3 },
                                                 { name: "沉默", weight: 3 },
                                                 { name: "翻面", weight: 1 },
@@ -3153,8 +3154,18 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             if (lib.target.hp <= 2) options[1].weight -= 1;
 
                                             //加权随机
-                                            const selectedOption = weightedRandom(options);
-                                            game.log(selectedOption);
+                                            var totalWeight = options.reduce((acc, option) => acc + option.weight, 0);
+                                            var randomValue = Math.random() * totalWeight;
+
+                                            let cumulativeWeight = 0;
+                                            for (var option of options) {
+                                                cumulativeWeight += option.weight;
+                                                if (randomValue <= cumulativeWeight) {
+                                                    var selectedOption = option.name;
+                                                    break;
+                                                }
+                                            }
+                                            game.log('selectedOption' + selectedOption);
                                             if (selectedOption == "弃牌") return 0;
                                             else if (selectedOption == "沉默") return 1;
                                             else if (selectedOption == "翻面") return 2;
@@ -3244,7 +3255,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             rand: {
                                 enable: "phaseUse",
                                 content: function () {
-                                    const options = [
+                                    var options = [
                                         { name: "一", weight: 1 },
                                         { name: "二", weight: 1 },
                                         { name: "三", weight: 1 },
@@ -3252,8 +3263,21 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         { name: "五", weight: 1 },
                                         { name: "六", weight: 1 },
                                     ];
+
                                     game.log(options);
-                                    const selectedOption = weightedRandom(options);
+                                    var selectedOption = 0;
+                                    const totalWeight = options.reduce((acc, option) => acc + option.weight, 0);
+                                    const randomValue = Math.random() * totalWeight;
+                                    let cumulativeWeight = 0;
+                                    for (const option of options) {
+                                        cumulativeWeight += option.weight;
+
+                                        if (randomValue <= cumulativeWeight) {
+                                            selectedOption = option.name;
+                                            break;
+                                        }
+                                    }
+
                                     game.log("随机选择的选项是:" + selectedOption);
                                 }
                             },
@@ -4016,7 +4040,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }
                                     }
                                     var dialog = ui.create.dialog('巨舰梦想', [list, 'vcard']);
-                                    var taoyuan=0,nanman=0;
+                                    /*var taoyuan=0,nanman=0;
                                     var players=game.filterPlayer();
                                     for(var i=0;i<players.length;i++){
                                         var eff1=get.effect(players[i],{name:'taoyuan'},player,player);
@@ -4033,19 +4057,53 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         else if(eff2<0){
                                             nanman--;
                                         }
-                                    }
+                                    }*/
+
+
                                     player.chooseButton(dialog).ai = function (button) {
-                                        var name = button.link[2];
-                                        if (Math.max(taoyuan, nanman) > 1) {
-                                            if (taoyuan > nanman) return name == 'jinjixiuli9' ? 1 : 0;
-                                            return name == 'manchangyy9' ? 1 : 0;
+                                        var player = _status.event.player;
+                                        var recover = 0, lose = 1, players = game.filterPlayer();
+                                        for (var i = 0; i < players.length; i++) {
+                                            if (players[i].hp == 1 && get.damageEffect(players[i], player, player) > 0 && !players[i].hasSha()) {
+                                                return (button.link[2] == 'juedouba9') ? 2 : -1;
+                                            }
+                                            if (!players[i].isOut()) {
+                                                if (players[i].hp < players[i].maxHp) {
+                                                    if (get.attitude(player, players[i]) > 0) {
+                                                        if (players[i].hp < 2) {
+                                                            lose--;
+                                                            recover += 0.5;
+                                                        }
+                                                        lose--;
+                                                        recover++;
+                                                    }
+                                                    else if (get.attitude(player, players[i]) < 0) {
+                                                        if (players[i].hp < 2) {
+                                                            lose++;
+                                                            recover -= 0.5;
+                                                        }
+                                                        lose++;
+                                                        recover--;
+                                                    }
+                                                }
+                                                else {
+                                                    if (get.attitude(player, players[i]) > 0) {
+                                                        lose--;
+                                                    }
+                                                    else if (get.attitude(player, players[i]) < 0) {
+                                                        lose++;
+                                                    }
+                                                }
+                                            }
                                         }
-                                        if (player.countCards('h') < player.hp && player.hp >= 2) {
-                                            return name == 'buji9' ? 1 : 0;
-                                        }
-                                        return name == 'jinju9' ? 1 : 0;
+                                        if (lose > recover && lose > 0) { return (button.link[2] == 'manchangyy9') ? 1 : -1; }
+                                        else if (lose < recover && recover > 0) { return (button.link[2] == 'jinjixiuli9') ? 1 : -1; }
+                                        else { return (button.link[2] == 'ewaibuji9') ? 1 : -1; }
+
                                     }
+
                                     'step 1'
+                                    game.log(result.links[0][2]);
                                     if (result.bool) {
                                         player.chooseUseTarget(true, result.links[0][2]);
                                         player.storage.jujianmengxiang.add(result.links[0][2]);
@@ -4063,6 +4121,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player: function (player) {
                                             if (player.countCards('h') >= player.hp - 1) return -1;
                                             if (player.hp < 3) return -1;
+                                            if (player.storage.jujianmengxiang.contains('ewaibuji9')) return -1;
                                             return 1;
                                         },
                                     },
@@ -4111,7 +4170,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         filter: function (event, player) {
                                             if (event._notrigger.contains(event.player)) return false;
-                                            return (event.card && (event.card.name == 'sha' ||event.card.name == 'sheji9' )&& (event.getParent().name == 'sha'||event.getParent().name == 'sheji9') &&
+                                            return (event.card && (event.card.name == 'sha' || event.card.name == 'sheji9') && (event.getParent().name == 'sha' || event.getParent().name == 'sheji9') &&
                                                 event.player.isIn() &&
                                                 player.canCompare(event.player));
                                         },
@@ -4244,7 +4303,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qianxingtuxi: "潜行突袭", "qianxingtuxi_info": "摸牌阶段摸牌时，你可以少摸任意张牌，然后获得等量的角色的各一张手牌",
                             "31jiezhongdui": "31节中队", "31jiezhongdui_info": "每名玩家每回合限一次，有角色使用杀指定目标后，若使用者的体力值小于目标的体力值，你可以选择一项:1令此杀不可响应;2令此杀伤害+1;3令此杀使用者摸两张牌然后直到你的回合开始不能发动此技能。:1令此杀不可响应;2令此杀伤害+1;3令此杀使用者摸两张牌然后本轮不能发动此技能。",
                             jujianmengxiang: "巨舰梦想", "jujianmengxiang_info": "出牌阶段，你可以失去一点体力，视为使用一张基本牌或非延时锦囊牌（每回合每种牌名限一次）。",
-                            sidajingang:"四大金刚","sidajingang_info":"你使用杀造成伤害时，你可以与目标拼点，若你赢你获得其一张牌。你发动[远航摸牌]后可以摸一张牌。",
+                            sidajingang: "四大金刚", "sidajingang_info": "你使用杀造成伤害时，你可以与目标拼点，若你赢你获得其一张牌。你发动[远航摸牌]后可以摸一张牌。",
                         },
                     };
                     if (lib.device || lib.node) {
@@ -5575,7 +5634,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     /*liekexingdun: ["female", "wu", 4, ["hangmucv", "hangkongzhanshuxianqu"], ["zhu", "des:血量中等的航母，温柔，体贴，过渡期追着大船打的航母。"]],
                     qixichicheng: ["female", "shu", 4, ["hangmucv", "qixi_cv"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
                     wufenzhongchicheng: ["female", "shu", 4, ["hangmucv", "mingyundewufenzhong"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
-        
+         
                     dumuchenglinqiye: ["female", "wei", 4, ["hangmucv", "dumuchenglin"], ["des:有必中攻击，快跑"]],
                     bisimai: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["zhu", "des:更多刮痧炮，更多炮弹，更多削弱光环，更多护甲模组，更多血量。"]],
                     misuli: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["des:用精巧的手枪去质疑，用绝对的火力回击对手。"]],
@@ -5627,24 +5686,25 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             version: "1.92+",
         }, files: { "character": ["changchun.jpg"], "card": ["fasheqi3.png"], "skill": [] }
     }
+
 })
 //functions
 //加权随机函数，输入包含选项和选项的权重的数组，输出随机到的选项
 /*调用示例
-    const options = [
+    var options = [
     { name: "选项一", weight: 2 },
     { name: "选项二", weight: 3 },
     { name: "选项三", weight: 1 },
   ];
   
-  const selectedOption = weightedRandom(options);
+  var selectedOption = weightedRandom(options);
   console.log("随机选择的选项是:", selectedOption);*/
 function weightedRandom(options) {
-    const totalWeight = options.reduce((acc, option) => acc + option.weight, 0);
-    const randomValue = Math.random() * totalWeight;
+    var totalWeight = options.reduce((acc, option) => acc + option.weight, 0);
+    var randomValue = Math.random() * totalWeight;
 
     let cumulativeWeight = 0;
-    for (const option of options) {
+    for (var option of options) {
         cumulativeWeight += option.weight;
         if (randomValue <= cumulativeWeight) {
             return option.name;
