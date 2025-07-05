@@ -2729,7 +2729,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
 
                             manchangzhanyi: {
-                                trigger: { global: "phaseEnd" }, // 触发时机：其他角色的结束阶段
+                                trigger: { global: "phaseZhunbeiBegin" }, // 触发时机：其他角色的准备阶段
                                 filter: function (event, player) {
                                     return player.inRange(event.player); // 在你的攻击范围内
                                 },
@@ -3029,7 +3029,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 content: function () {
                                     "step 0"
                                     player.judge(function (card) {
-                                        if (get.color(card) == 'black') {
+                                        if (get.suit(card) == 'spade') {
                                             trigger.cancel();
                                             player.addMark('xiangrui', 1);
                                         }
@@ -3054,18 +3054,19 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.removeMark('xiangrui', i);
                                     game.log(i);
                                     var s = (i <= 0);
-                                    game.log(s);
-                                    if (s) {
-                                        game.log("finish");
-                                        event.finish;
-                                    } else {
-                                        player.chooseTarget(get.prompt2('yumian'), function (card, player, target) { return get.distance(player, target) <= 1; }).set('ai', function (target) {
+                                    
+                                    //if (s) {
+                                        //game.log("finish");
+                                        //event.finish;
+                                    //} else {
+                                        player.chooseTarget(get.prompt2('yumian'), function (card, player, target) { if(s){return get.distance(player, target) <= 1;}else{return true} }).set('ai', function (target) {
                                             if (get.attitude(_status.event.player, target) < 0) {
                                                 return 1 / Math.sqrt(target.hp + 1);
                                             }
                                             return 0;
                                         }).animate = false;
-                                    }
+                                    //}
+                                    "step 1"
                                     if (result.bool && result.targets.length) {
                                         result.targets[0].loseHp(1);
                                         result.targets[0].draw(2);
@@ -3343,29 +3344,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.removeSkill('huokongld');
                                     player.addTempSkill('sawohaizhan_1');
                                 },
-                                group: "sawohaizhan_OvO",
-                                subSkill: {
-                                    OvO: {
-                                        trigger: {
-                                            global: "damageEnd",
-                                        },
-                                        forced: true,
-                                        filter: function (event, player) {
-                                            return event.player.name == "kunxi";
-                                        },
-                                        content: function () {
-                                            player.draw(event.count);
-                                        },
-                                    },
-                                },
                             },
                             sawohaizhan_1: {
                                 mod: {
                                     cardUsable: function (card) {
-                                        if (card.name == 'sha' && card.nature == 'thunder') return Infinity;
+                                        if ((card.name == 'sha' ||card.name == 'sheji9')/*&& card.nature == 'thunder'*/) return Infinity;
                                     },
                                     targetInRange: function (card) {
-                                        if (card.name == 'sha' && card.nature == 'thunder') return true;
+                                        if ((card.name == 'sha' ||card.name == 'sheji9')/*&& card.nature == 'thunder'*/) return true;
                                     },
                                 },
                                 trigger: {
@@ -3373,20 +3359,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 forced: true,
                                 filter: function (event, player) {
-                                    return event.card && (event.card.name == 'sha' && event.card.nature == 'thunder');
+                                    return event.card && ((event.card.name == 'sha' ||event.card.name == 'sheji9')&& event.card.nature == 'thunder');
                                 },
                                 content: function () {
                                     trigger.baseDamage++;
                                 },
-
-
-                                filter: function (event, player) {
-                                    return get.type(event.card) == 'basic' && event.card.isCard && event.cards.length == 1;
-                                },
-                                content: function () {
-                                    player.addMark('zhudaojiandui', 1);
-                                },
-                                sub: true,
                                 "_priority": 0,
                             },
                             mingyundewufenzhong: {
@@ -3590,13 +3567,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 //direct:true,//自动发动
                                 priority: 5,
                                 filter: function (event, player) {
+                                    if(player.countCards==0)return false; 
                                     if (player == event.target || player == event.player) return false;
                                     return (event.card.name == 'sha' || event.card.name == 'sheji9') && get.distance(player, event.target, 'pure') <= 1;
                                 },
                                 check: function (event, player) {
                                     if (get.attitude(player, event.target) > 2) {
-                                        if (player.countCards('h', 'shan') || player.getEquip(2) ||
-                                            trigger.target.hp == 1 || player.hp > trigger.target.hp + 1) {
+                                        if (player.countCards('h', 'shan') || player.getEquip(2) ||trigger.target.hp == 1 || player.hp > trigger.target.hp + 1) {
                                             if (!trigger.target.countCards('h', 'shan') || trigger.target.countCards('h') < player.countCards('h')) {
                                                 return true;
                                             }
@@ -3608,7 +3585,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                     game.log('zhanxianfangyu', trigger.target);
 
-                                    player.draw();
+                                    player.chooseToDiscard(1);
                                     trigger.getParent().targets.remove(trigger.target);
                                     trigger.getParent().triggeredTargets2.remove(trigger.target);
                                     trigger.getParent().targets.push(player);
@@ -4026,8 +4003,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             
                                 content:function(){
                                     "step 0"
-                                    player.loseHp(1);
-                                    "step 1"
                                      
                                     //
                                     var list=[];
@@ -4041,9 +4016,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }
                                     }
                                     var dialog=ui.create.dialog('巨舰梦想',[list,'vcard']);
-                                    var taoyuan=0,nanman=0;
-                                    var players=game.filterPlayer();
-                                    for(var i=0;i<players.length;i++){
+                                    //var taoyuan=0,nanman=0;
+                                    //var players=game.filterPlayer();
+                                    /*for(var i=0;i<players.length;i++){
                                         var eff1=get.effect(players[i],{name:'taoyuan'},player,player);
                                         var eff2=get.effect(players[i],{name:'nanman'},player,player);
                                         if(eff1>0){
@@ -4058,7 +4033,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         else if(eff2<0){
                                             nanman--;
                                         }
-                                    }
+                                    }*/
                                     player.chooseButton(dialog).ai=function(button){
                                         var name=button.link[2];
                                         if(Math.max(taoyuan,nanman)>1){
@@ -4068,21 +4043,21 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         if(player.countCards('h')<player.hp&&player.hp>=2){
                                             return name=='wuzhong'?1:0;
                                         }
-                                        if(player.hp<player.maxHp&&player.hp<3){
-                                            return name=='tao'?1:0;
-                                        }
                                         return name=='zengbin'?1:0;
                                     }
-                                    'step 2'
+                                    'step 1'
                                     if(result.bool){
                                         player.chooseUseTarget(true,result.links[0][2]);
                                         player.storage.jujianmengxiang.add(result.links[0][2]);
+                                        player.loseHp(1);
                                     }
+                                    
+                                    
                                     //
                                 },
                                 ai:{
                                     basic:{
-                                        order:1,
+                                        order:4,
                                     },
                                     result:{
                                         player:function(player){
@@ -4147,7 +4122,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhongxunca: "重巡", "zhongxunca_info": "",
                             zhanliebb: "战列", "zhanliebb_info": "",
                             daoqu: "导驱", "daoqu_info": "你的攻击范围增加2+X(x为技能强化次数)",
-                            hangmucv: "航母", "hangmucv_info": "(可强化)你的出牌阶段开始时，<br>你可以弃置2张：零级强化，黑桃手牌；一级强化，梅花手牌；二级强化，黑色手牌。视为对你选择的任意个目标使用万箭齐发",
+                            hangmucv: "航母", "hangmucv_info": "(可强化)你的出牌阶段开始时，<br>你可以弃置2张：零级强化，黑桃或梅花手牌；一级强化，黑桃或梅花或红桃手牌；二级强化，任意手牌。视为对你选择的任意个目标使用万箭齐发",
                             qianting_xiji: "袭击", "qianting_xiji_info": "每回合限两次，将♦/♥牌当做顺手牵羊，♣/♠牌当做兵粮寸断使用<br>你使用的锦囊牌可以对距离你2以内的角色使用。",
                             qianting: "潜艇", "qianting_info": "（可强化）一轮游戏开始时，你可以弃置一张红桃/红桃或黑桃/红桃或黑桃或方片牌，对一个目标使用一张雷杀。没有手牌会结束此技能。",
                             qianting_jiezi: "截辎", "qianting_jiezi_info": "其他角色跳过阶段时，你摸一张牌",
@@ -4191,7 +4166,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "huijiahuihe_info": "当你有护甲时，你可以移除所有护甲并进行一个额外的回合；额外回合的摸牌数等于护甲数。此回合没有输出时，摸一张牌。",
                             junfu: "军辅船",
                             "junfu_info": "其他人回合开始时,你可以把至多1/2/3张手牌存于武将牌上，如手牌般使用。<br>其他角色回合开始时，你可以把存储的牌交给ta，然后你摸一张牌。<br>可以强化(目标的手牌数<8才能使用此技能)<br>拥有技能强化和远航强化即可起飞。",
-                            manchangzhanyi: "漫长战役", "manchangzhanyi_info": "每轮限一次，你受到锦囊牌的伤害时，你免疫此伤害。你攻击范围内的其他角色回合结束时，你可以弃置其一张手牌。",
+                            manchangzhanyi: "漫长战役", "manchangzhanyi_info": "每轮限一次，你受到锦囊牌的伤害时，你免疫此伤害。你攻击范围内的其他角色的准备阶段，你可以弃置其一张手牌。",
                             manchangzhanyi_1: "漫长战役", "manchangzhanyi_1_info": "",
                             guzhuyizhi: "孤注一掷", "guzhuyizhi_info": "出牌阶段开始时，你可以摸两张牌并弃置所有手牌，然后摸等量的牌，如此做，你的其他技能失效且你不能使用桃或快修直到你的下回合开始，你计算与其他角色的距离-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。",
                             guzhuyizhi2: "孤注一掷", "guzhuyizhi2_info": "",
@@ -4200,24 +4175,23 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             dumuchenglin: "独木成林", "dumuchenglin_info": "你获得【规避】。当场上没有其他航母时，杀使用次数+1，你于你的回合造成的第一次伤害+1。",
                             dumuchenglin_2: "独木成林2", "dumuchenglin_2_info": "杀使用次数+1，你于你的回合造成的第一次伤害+1。",
                             xiangrui: "祥瑞", "xiangrui_info": "每名玩家的回合限一次，当你受到伤害前，你可以进行判定，判定结果为梅花/黑桃，免疫此次伤害，然后获得[祥瑞]标记。",
-                            yumian: "御免", "yumian_info": "锁定技，结束阶段，你移除所有[祥瑞]标记。若你失去了一个或以上的祥瑞标记，你可以选择距你为1的目标，让其失去一点体力并摸两张牌。",
+                            yumian: "御免", "yumian_info": "锁定技，结束阶段，你移除所有[祥瑞]标记。你可以选择距你为1的目标，让其失去一点体力并摸两张牌。若你失去了一个或以上的祥瑞标记，你可以选择的目标不受距离限制",
                             hangkongzhanshuxianqu: "航空战术先驱", "hangkongzhanshuxianqu_info": "你使用转化的锦囊牌指定目标时，你摸x张牌(x为你指定的目标数，至多为你当前的体力上限)",
                             gaosusheji: "高速射击", "gaosusheji_info": "当你使用的杀是本回合你使用的第一张牌，你可以令此杀结算两次。",
                             qixi_cv: "奇袭", "qixi_cv_info": "限定技，出牌阶段，你可以令所有其他角色依次选择一项:1你弃置其区域内的两张牌，2本回合不能使用或打出手牌，3翻面。然后你可以视为使用【近距支援】。",
                             rand: "随机数", "rand_info": "遇事不决？扔一个骰子吧。该技能可以生成1~6的随机数",
                             duikongfangyu: "对空防御", "duikongfangyu_info": "你受到万箭齐发和近距支援伤害时，你防止此伤害。你发动[防空]后，你摸x张牌(x为本次防空无效的目标数。)",
                             zhudaojiandui: "柱岛舰队", "zhudaojiandui_info": "锁定技，每当你使用或打出一张非虚拟非转化的基本牌，你获得一个[柱]标记。你可以移去三个柱标记视为使用一张不计入次数限制的杀。",
-                            sawohaizhan: "萨沃海战", "sawohaizhan_info": "当西受到伤害时，你摸x张牌(x为此次伤害的数值)。出牌阶段，若你拥有[火控]，你可以失去[火控]，若如此做你本回合使用雷杀无距离次数限制且伤害+1。",
-                            sawohaizhan_OvO: "萨沃海战_昆西", "sawohaizhan_OvO_info": "昆西受到伤害时，你摸x张牌(x为此次伤害的数值)",
-                            sawohaizhan_1: "萨沃海战", "sawohaizhan_1_info": "本回合使用雷杀无距离次数限制且伤害+1。",
+                            sawohaizhan: "萨沃海战", "sawohaizhan_info": "出牌阶段，若你拥有[火控]，你可以失去[火控]，若如此做你本回合使用杀无距离次数限制且雷杀伤害+1。",
+                            sawohaizhan_1: "萨沃海战", "sawohaizhan_1_info": "本回合使用杀无距离次数限制且雷杀伤害+1。",
                             mingyundewufenzhong: "命运的五分钟", "mingyundewufenzhong_info": "你可以跳过判定和摸牌阶段，视为使用一张雷杀或火杀，你可以弃置一张装备牌并跳过出牌阶段，视为使用一张雷杀或火杀，你可以跳过弃牌阶段并翻面，视为使用一张雷杀或火杀。",
                             wufenzhong1: "命运的五分钟", "wufenzhong1_info": "你可以跳过判定和摸牌阶段，视为使用一张雷杀或火杀",
                             wufenzhong2: "命运的五分钟", "wufenzhong2_info": "你可以弃置一张装备牌并跳过出牌阶段，视为使用一张雷杀或火杀",
                             wufenzhong4: "命运的五分钟", "wufenzhong4_info": "你可以跳过弃牌阶段并翻面，视为使用一张雷杀或火杀。",
                             qijianshashou: "旗舰杀手", "qijianshashou_info": "出牌阶段开始时，你可以与一名角色进行拼点，若你赢，本回合你与该角色距离视为1，你对该目标使用杀伤害+1，若你没赢，你跳过出牌阶段和弃牌阶段。",
                             qijianshashou_1: "旗舰杀手", "qijianshashou_1_info": "",
-                            zhanxianfangyu: "战线防御", "zhanxianfangyu_info": "每回合限一次，你成为黑色杀的目标时，你取消之。每回合限一次，距你为1的角色成为杀的目标时，你可以摸一张牌并代替该名角色成为此杀的目标。",
-                            zhanxianfangyu1: "战线防御", "zhanxianfangyu1_info": "每回合限一次，你成为黑色杀的目标时，你取消之。",
+                            zhanxianfangyu: "战线防御", "zhanxianfangyu_info": "每回合限一次，你成为黑色杀的目标时，你取消之。每回合限一次，距你为1的角色成为杀的目标时，你可以弃置一张牌并代替该名角色成为此杀的目标。",
+                            zhanxianfangyu1: "战线防御", "zhanxianfangyu1_info": "",
                             Zqujingying: "Z驱菁英", "Zqujingying_info": "回合开始时，根据场上势力数，你可以选择获得以下技能中的一项:大于等于一，英姿;大于等于二，观星;大于等于三，反馈;大于等于四，谋识。直到你的下回合开始。",
                             huhangyuanhu: "护航援护", "huhangyuanhu_info": "当一名角色成为杀的目标后，若你至该角色的距离为一，你可以摸一张牌，若如此做，你交给其一张牌并展示之。若为装备牌，该角色可以使用此牌。",
                             shizhibuyu: "矢志不渝", "shizhibuyu_info": "当你受到伤害时，你可以弃置两张颜色相同的牌令此伤害-1，然后进行判定，若结果为红色，你摸一张牌。 当你的判定牌生效后，你可以获得之。然后你可以令一名角色使用杀次数+1和手牌上限+1直到你的下回合开始。",
