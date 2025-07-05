@@ -754,7 +754,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "z31": ["female", "KMS", 3, ["huibi", "quzhudd", "Zqujingying"], ["des:婚纱与轻纱是多数人的美梦,与绿草平原，与绿水青山"]],
                             xuefeng: ["female", "IJN", 3, ["huibi", "quzhudd", "xiangrui", "yumian"], ["des:幸运的驱逐舰，多位画师、花了大款的大佬亲情奉献。"]],
                             kangfusi: ["female", "USN", 3, ["huibi", "quzhudd", "31jiezhongdui"], ["des:水手服欸,优秀的构图，不过图少改造晚。"]],
-                            "47project": ["female", "ΒΜΦCCCP", 3, ["huibi", "quzhudd"], ["des:这是个依赖科技的舰船，有着科幻的舰装，与兼备温柔体贴与意气风发的表现。"]],
+                            "47project": ["female", "ΒΜΦCCCP", 3, ["huibi", "quzhudd","xinqidian"], ["des:这是个依赖科技的舰船，有着科幻的舰装，与兼备温柔体贴与意气风发的表现。"]],
                             guzhuyizhichuixue: ["female", "IJN", 3, ["huibi", "quzhudd", "guzhuyizhi"], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
                             shuileizhanduichuixue: ["female", "IJN", 3, ["huibi", "quzhudd", "shuileizhandui",], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
                             minsike: ["female", "ΒΜΦCCCP", 3, ["huibi", "quzhudd", "manchangzhanyi", "manchangzhanyi_1"], ["des:跑得快，看得多。"]],
@@ -3780,8 +3780,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 //direct:true,//自动发动
                                 priority: 5,
-                                check:function (event, player) {
-                                    
+                                check: function (event, player) {
+
                                     return get.attitude(player, event.target) > 1;
                                 },
                                 filter: function (event, player) {
@@ -3813,7 +3813,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     game.delayx();
                                 },
                                 ai: {
-                                   
+
                                     threaten: 1.1,
                                     expose: 0.25,
 
@@ -4812,6 +4812,101 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
 
                             },
+                            xinqidian: {
+                                enable: "phaseUse",
+                                usable: 1,
+                                
+                                filterTarget: function (card, player, target) {
+                                    return player != target;
+                                },
+                                selectTarget: function () {
+                                    return [1, 3];
+                                },
+                                multiline:true,
+                                multitarget:true,
+                                async content(event,trigger,player){//这里由“浮海”（卫温诸葛直）修改而来，可能因为目标选择不同存在部分bug，需要注意。能跑就行暂不动他。2024.3.9
+                                    
+                                    const targets=event.targets.sortBySeat();
+                                    //game.log(targets);
+                                    targets.push(player);
+                                    game.log(targets);
+                                    const next=player.chooseCardOL(targets,'请展示一张手牌',true).set('ai',card=>{
+                                        return -get.value(card);
+                                    }).set('aiCard',target=>{
+                                        const hs=target.getCards('h');
+                                        return {bool:true,cards:[hs.randomGet()]};
+                                    });
+                                    //game.log(next);
+                                    next._args.remove('glow_result');
+                                    const {result}=await next;
+                                    const cards=[];
+                                    const videoId=lib.status.videoId++;
+                                    for(let i=0;i<targets.length;i++){
+                                        cards.push(result[i].cards[0]);
+                                        game.log(targets[i],'展示了',result[i].cards[0]);
+                                    }
+                                    //game.log(JSON.stringify(result));
+                                    game.broadcastAll((targets,cards,id,player)=>{
+                                        var dialog=ui.create.dialog(get.translation(player)+'发动了【新起点】',cards);
+                                        dialog.videoId=id;
+                                        const getName=(target)=>{
+                                            if(target._tempTranslate) return target._tempTranslate;
+                                            var name=target.name;
+                                            if(lib.translate[name+'_ab']) return lib.translate[name+'_ab'];
+                                            return get.translation(name);
+                                        }
+                                        for(let i=0;i<targets.length;i++){
+                                            dialog.buttons[i].querySelector('.info').innerHTML=getName(targets[i])+'|'+get.strNumber(cards[i].number);
+                                        }
+                                    },targets,cards,videoId,player);
+                                    await game.asyncDelay(4);
+                                    game.broadcastAll('closeDialog',videoId);
+
+                                    
+                                    const type=get.type(cards[0],false);
+                                    game.log("flag0"+type);
+                                    let flag=false;
+                                        for(let i=0;i<targets.length;i++){
+                                            
+                                            
+                                            if(type==get.type(cards[i],false)){
+                                                game.log("flag=true"+get.type(cards[i],false));
+                                                flag=true;
+                                            }
+                                            else{
+                                                game.log("flag=false"+get.type(cards[i],false)); 
+                                                flag=false;
+                                                break;
+                                            }
+                                           
+                                        }
+                                        game.log("种类相同？"+flag);
+                                        game.log(targets);
+                                        for(let j=0;j<targets.length;j++){
+                                            if(flag){
+                                                
+                                                game.log(targets[j]+"摸牌");
+                                                targets[j].draw();
+                                            }
+
+                                            if(!flag){
+                                                
+                                                game.log(targets[j]+"获得技能");
+                                                targets[j].addTempSkill("mashu",{player:"phaseJieshuBegin"});
+                                            }
+                                        }
+                                },
+                                ai:{
+                                    order:3.05,
+                                    result:{
+                                        player(player,target){
+                                            var att=get.attitude(player,target);
+                                            if(att<=0) return 0;
+                                            return 1;
+                                        },
+                                    },
+                                },
+                            }
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -4940,6 +5035,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             yishisheji_1: "意式设计", "yishisheji_1_info": "",
                             jueshengzhibing: "决胜之兵", "juezhanzhibing_info": "锁定技，其他角色弃置牌时，若你的手牌数不为全场最多，你可以摸一张牌",
                             zhanfu: "战斧", "zhanfu_info": "你手牌数为场上最多时，你使用杀无视距离",
+                            xinqidian: "新起点", "xinqidian_info": "出牌阶段限一次，你可以选择至多3名角色，你与这些角色各展示一张牌:若展示的牌类型均相同，每人摸1张牌;若不同，参与展示牌的角色计算与其他角色距离-1直至其的下个回合结束。",
+                            //xinqidian_1:"新起点",xinqidian_1_info:"",
                         },
                     };
                     if (lib.device || lib.node) {
@@ -5502,9 +5599,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filterTarget: function (card, player, target) { return target != player && player.canUse('sha', target); },
                                 content: function () {
                                     'step 0'
-                                    event.num=0;
+                                    event.num = 0;
                                     'step 1'
-                                    game.log("event.num"+event.num);
+                                    game.log("event.num" + event.num);
                                     event.num++;
                                     /*var choice = 'liutouge';
                                     player.chooseVCardButton('选择一张牌视为使用之', ['sha', 'sha', 'sha']).set('ai', function (button) {
@@ -5514,14 +5611,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         return _status.event.player.hasUseTarget(button.link[2]);
                                     });*/
                                     player.chooseUseTarget({
-                                        name:'sha',
+                                        name: 'sha',
                                         //nature:'fire',
-                                        isCard:true,
-                                    },'请选择【杀】的目标（'+(event.num==2?'2':event.num)+'/2）',false);
-                                  
+                                        isCard: true,
+                                    }, '请选择【杀】的目标（' + (event.num == 2 ? '2' : event.num) + '/2）', false);
+
                                     'step 2'
-                                    if(result.bool&&event.num<2) event.goto(1);
-                                    else{
+                                    if (result.bool && event.num < 2) event.goto(1);
+                                    else {
                                         event.finish();
                                     }
                                 },
