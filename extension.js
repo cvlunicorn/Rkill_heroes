@@ -590,7 +590,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             bisimai: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb", "qijianshashou"], ["zhu", "des:更多刮痧炮，更多炮弹，更多削弱光环，更多护甲模组，更多血量。"]],
                             misuli: ["female", "wei", 4, ["zhuangjiafh", "zhanliebb"], ["des:用精巧的手枪去质疑，用绝对的火力回击对手。"]],
                             weineituo: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb"], ["des:身材小，而强度惊人。"]],
-                            lisailiu: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb"], ["des:幸运的象征之一，同时有着丰富的精神象征。"]],
+                            lisailiu: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb","kaixuanzhige"], ["des:幸运的象征之一，同时有着丰富的精神象征。"]],
                             changmen: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb", "zhudaojiandui"], ["des:。"]],
                             "1913": ["female", "shu", 4, ["zhuangjiafh", "zhanliebb", "jujianmengxiang", "jujianmengxiang_reflash"], ["des:在大舰巨炮的黄金年代，让国人也拥有主力战舰，堪称最为奢侈的海军梦想了——而今日，妾身有幸以此姿态回应诸位之诉求。"]],
                             kunxi: ["female", "wei", 4, ["huokongld", "zhongxunca", "gaosusheji"], ["des:画师优秀的功底让这名角色美而可爱，这是出色的角色塑造。"]],
@@ -601,7 +601,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             yixian: ["female", "shu", 3, ["fangkong2", "qingxuncl", "shizhibuyu", "shizhibuyu1"], ["des:经典美术设计的款式，意气风发，威猛先生"]],
                             tianlangxing: ["female", "wu", 3, ["fangkong2", "qingxuncl", "duomianshou"], ["des:阻敌计谋表现优秀，这是先发制敌的优势所在，"]],
                             dadianrendian: ["female", "shu", 3, ["fangkong2", "qingxuncl"], ["des:手持竹伞的轻巡，辅助队友，防御攻击。"]],
-                            degelasi: ["female", "qun", 3, ["fangkong2", "qingxuncl"], ["des:现代文职服饰，一看就很会办公。"]],
+                            //degelasi: ["female", "qun", 3, ["fangkong2", "qingxuncl"], ["des:现代文职服饰，一看就很会办公。"]],
                             yatelanda: ["female", "wei", 3, ["fangkong2", "qingxuncl", "duikongfangyu"], ["des:双枪射手点形象，其双枪能以极快的射速打出爆炸弹匣，清空一小片区域。"]],
                             "z31": ["female", "qun", 3, ["huibi", "quzhudd", "Zqujingying"], ["des:婚纱与轻纱是多数人的美梦,与绿草平原，与绿水青山"]],
                             xuefeng: ["female", "shu", 3, ["huibi", "quzhudd", "xiangrui", "yumian"], ["des:幸运的驱逐舰，多位画师、花了大款的大佬亲情奉献。"]],
@@ -615,7 +615,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jingjishen: ["female", "wu", 3, ["junfu"], ["des:需要武器支援，伙计倒下了。"]],
                             changchun: ["female", "shu", 3, ["daoqu", "rand", "sidajingang"], ["des:尚处于正能量之时。"]],
 
-                            skilltest: ["male", "qun", 9, ["zhanlie", "duomianshou"], ["forbidai", "des:测试用"]],
+                            skilltest: ["male", "qun", 9, ["zhanlie", "kaixuanzhige"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
                             _yuanhang: {
@@ -2281,12 +2281,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }, false,);
                                     } else event.finish();
                                 },
-                                ai:{
-                                    order:1,
-                                    result:{
-                                        player:1,
+                                ai: {
+                                    order: 1,
+                                    result: {
+                                        player: 1,
                                     },
-                                    threaten:1.5,
+                                    threaten: 1.5,
                                 },
                                 //a=game.countPlayer(function(current){return get.attitude(player,current)<0&&current.inRange(player)})-1;
                                 //if(a=0)event.finish();
@@ -3048,8 +3048,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     source: "damageBegin1",
                                 },
-                                filter:function(event,player){
-                                    if(player!=event.player)return true;
+                                filter: function (event, player) {
+                                    if (player != event.player) return true;
                                 },
                                 forced: true,
                                 charlotte: true,
@@ -3820,7 +3820,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     global: "useCardToTargeted",
                                 },
                                 filter: function (event, player) {
-                                    return (event.card.name == 'sha' || event.card.name == 'sheji9') && get.distance(player, event.target) <= 1 && event.target.isIn()&&player!=event.target;
+                                    return (event.card.name == 'sha' || event.card.name == 'sheji9') && get.distance(player, event.target) <= 1 && event.target.isIn() && player != event.target;
                                 },
                                 check: function (event, player) {
                                     return get.attitude(player, event.target) >= 0;
@@ -4077,70 +4077,70 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     var dialog = ui.create.dialog('巨舰梦想', [list, 'vcard']);
 
                                     game.log("巨舰梦想列表已生成")
-                                    if(!list==""){
-                                    player.chooseButton(dialog).ai = function (button) {
-                                        var player = _status.event.player;
-                                        var recover = 0, lose = 1, players = game.filterPlayer();
-                                        for (var i = 0; i < players.length; i++) {
-                                            if (!player.storage.jujianmengxiang.contains('juedouba9') && players[i].hp == 1 && get.damageEffect(players[i], player, player) > 0 && !players[i].hasSha()) {
-                                                game.log('juedouba9' + (button.link[2] == 'juedouba9'));
-                                                return (button.link[2] == 'juedouba9') ? 2 : -1;
-                                            }
-                                            if (!players[i].isOut()) {
-                                                if (players[i].hp < players[i].maxHp) {
-                                                    if (get.attitude(player, players[i]) > 0) {
-                                                        if (players[i].hp < 2) {
+                                    if (!list == "") {
+                                        player.chooseButton(dialog).ai = function (button) {
+                                            var player = _status.event.player;
+                                            var recover = 0, lose = 1, players = game.filterPlayer();
+                                            for (var i = 0; i < players.length; i++) {
+                                                if (!player.storage.jujianmengxiang.contains('juedouba9') && players[i].hp == 1 && get.damageEffect(players[i], player, player) > 0 && !players[i].hasSha()) {
+                                                    game.log('juedouba9' + (button.link[2] == 'juedouba9'));
+                                                    return (button.link[2] == 'juedouba9') ? 2 : -1;
+                                                }
+                                                if (!players[i].isOut()) {
+                                                    if (players[i].hp < players[i].maxHp) {
+                                                        if (get.attitude(player, players[i]) > 0) {
+                                                            if (players[i].hp < 2) {
+                                                                lose--;
+                                                                recover += 0.5;
+                                                            }
                                                             lose--;
-                                                            recover += 0.5;
+                                                            recover++;
                                                         }
-                                                        lose--;
-                                                        recover++;
-                                                    }
-                                                    else if (get.attitude(player, players[i]) < 0) {
-                                                        if (players[i].hp < 2) {
+                                                        else if (get.attitude(player, players[i]) < 0) {
+                                                            if (players[i].hp < 2) {
+                                                                lose++;
+                                                                recover -= 0.5;
+                                                            }
                                                             lose++;
-                                                            recover -= 0.5;
+                                                            recover--;
                                                         }
-                                                        lose++;
-                                                        recover--;
                                                     }
-                                                }
-                                                else {
-                                                    if (get.attitude(player, players[i]) > 0) {
-                                                        lose--;
-                                                    }
-                                                    else if (get.attitude(player, players[i]) < 0) {
-                                                        lose++;
+                                                    else {
+                                                        if (get.attitude(player, players[i]) > 0) {
+                                                            lose--;
+                                                        }
+                                                        else if (get.attitude(player, players[i]) < 0) {
+                                                            lose++;
+                                                        }
                                                     }
                                                 }
                                             }
-                                        }
-                                        if (!player.storage.jujianmengxiang.contains('manchangyy9') && lose > recover && lose > 0) {
-                                            game.log('manchangyy9' + (button.link[2] == 'manchangyy9'));
-                                            return (button.link[2] == 'manchangyy9') ? 1 : -1;
-                                        }
-                                        else if (!player.storage.jujianmengxiang.contains('jinjixiuli9') && lose < recover && recover > 0) {
-                                            game.log('jinjixiuli9' + (button.link[2] == 'jinjixiuli9'));
-                                            return (button.link[2] == 'jinjixiuli9') ? 1 : -1;
-                                        }
-                                        else {
-                                            game.log('ewaibuji9' + (button.link[2] == 'ewaibuji9'));
-                                            return (button.link[2] == 'ewaibuji9') ? 1 : -1;
-                                        }
+                                            if (!player.storage.jujianmengxiang.contains('manchangyy9') && lose > recover && lose > 0) {
+                                                game.log('manchangyy9' + (button.link[2] == 'manchangyy9'));
+                                                return (button.link[2] == 'manchangyy9') ? 1 : -1;
+                                            }
+                                            else if (!player.storage.jujianmengxiang.contains('jinjixiuli9') && lose < recover && recover > 0) {
+                                                game.log('jinjixiuli9' + (button.link[2] == 'jinjixiuli9'));
+                                                return (button.link[2] == 'jinjixiuli9') ? 1 : -1;
+                                            }
+                                            else {
+                                                game.log('ewaibuji9' + (button.link[2] == 'ewaibuji9'));
+                                                return (button.link[2] == 'ewaibuji9') ? 1 : -1;
+                                            }
 
-                                    }
-                                }else{
-                                    event.finish();
-                                }
-                                    'step 1'
-                                    game.log("结果bool"+result.bool);
-
-                                    if(result.bool){
+                                        }
+                                    } else {
                                         event.finish();
                                     }
-                                    
-                                    if (result&&result.bool&&result.links[0][2]) {
-                                        game.log("选择的牌"+result.links[0][2]);
+                                    'step 1'
+                                    game.log("结果bool" + result.bool);
+
+                                    if (result.bool) {
+                                        event.finish();
+                                    }
+
+                                    if (result && result.bool && result.links[0][2]) {
+                                        game.log("选择的牌" + result.links[0][2]);
                                         player.chooseUseTarget(true, result.links[0][2]);
                                         player.storage.jujianmengxiang.add(result.links[0][2]);
                                         player.loseHp(1);
@@ -4360,56 +4360,56 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             duomianshou: {
                                 enable: "phaseUse",
                                 usable: 1,
-                      init:function(player){
-        player.storage.duomianshou=[];
-  
-    },
-                                filterCard(card, player) {
-                                var player = _status.event.player;
-                                //var event = _status.event;
-                                game.log("选择卡牌过滤器"+JSON.stringify(player.storage.duomianshou));
-                              var numbers=[];
-                              
-        if(player.storage.duomianshou.length){
-        game.log("进入了if");
-        for(var i=0;i<player.storage.duomianshou.length;i++){
-            numbers.add(get.number(player.storage.duomianshou[i]));
-        }
-       }
-        
-            if(!numbers.includes(get.number(card))){
-                return true;
-            }
-        
-        return false;
-       // return true;
+                                init: function (player) {
+                                    player.storage.duomianshou = [];
+
                                 },
-                                
+                                filterCard(card, player) {
+                                    var player = _status.event.player;
+                                    //var event = _status.event;
+                                    game.log("选择卡牌过滤器" + JSON.stringify(player.storage.duomianshou));
+                                    var numbers = [];
+
+                                    if (player.storage.duomianshou.length) {
+                                        game.log("进入了if");
+                                        for (var i = 0; i < player.storage.duomianshou.length; i++) {
+                                            numbers.add(get.number(player.storage.duomianshou[i]));
+                                        }
+                                    }
+
+                                    if (!numbers.includes(get.number(card))) {
+                                        return true;
+                                    }
+
+                                    return false;
+                                    // return true;
+                                },
+
                                 position: "hs",
                                 discard: false,
                                 lose: false,
                                 check: function (card) {
-                                /*var event = _status.event;
-                                var numbers=[];
-        for(var i=0;i<player.storage.duomianshou.length;i++){
-            numbers.add(get.number(event.player.storage.duomianshou[i],'trick'));
-        }
-       
-            if(!numbers.includes(get.number(cards,'trick'))){
-                return 7.5 - get.value(card);
-    
-        }
-        return false;*/
-return 7.5 - get.value(card);
+                                    /*var event = _status.event;
+                                    var numbers=[];
+            for(var i=0;i<player.storage.duomianshou.length;i++){
+                numbers.add(get.number(event.player.storage.duomianshou[i],'trick'));
+            }
+           
+                if(!numbers.includes(get.number(cards,'trick'))){
+                    return 7.5 - get.value(card);
+        
+            }
+            return false;*/
+                                    return 7.5 - get.value(card);
                                 },
 
                                 content: function () {
                                     'step 0'
-                                    game.log("记录的卡牌"+JSON.stringify(player.storage.duomianshou));
+                                    game.log("记录的卡牌" + JSON.stringify(player.storage.duomianshou));
                                     var card = cards[0];
                                     //var cardtype=get.type(card);
                                     game.log("卡牌价值" + get.value(card));
-                                    game.log("卡牌类型"+get.type(card));
+                                    game.log("卡牌类型" + get.type(card));
                                     var list = [];
                                     //game.log(JSON.stringify(lib.cardPile));
                                     for (var i of ui.cardPile.childNodes) {
@@ -4455,19 +4455,19 @@ return 7.5 - get.value(card);
                                         return (button.link == MostValuableCard) ? 1 : -1;
                                     }
                                     'step 1'
-                                    game.log("结果bool"+result.bool);
+                                    game.log("结果bool" + result.bool);
 
-                                    if(result.bool){
+                                    if (result.bool) {
                                         event.finish();
                                     }
-                                    
-                                    if (result&&result.bool&&result.links[0]) {
+
+                                    if (result && result.bool && result.links[0]) {
                                         game.log("选中的结果" + JSON.stringify(get.name(result.links[0])));
                                         player.discard(cards[0]);
                                         player.addTempSkill("duomianshou_1", "useCardToTargeted");
                                         player.chooseUseTarget(true, get.name(result.links[0]));
                                         //player.removeSkill("duomianshou_1");
-                                        player.storage.duomianshou=[];
+                                        player.storage.duomianshou = [];
                                     }
                                 },
                                 ai: {
@@ -4510,6 +4510,51 @@ return 7.5 - get.value(card);
                                     threaten: 8,
                                 },
                                 "_priority": 0,
+                            },
+                            kaixuanzhige: {
+                                shaRelated: true,
+                                trigger: {
+                                    player: "useCardToPlayered",
+                                },
+                                check: function (event, player) {
+                                    return get.attitude(player, event.target) <= 0;
+                                },
+                                filter: function (event, player) {
+                                    return player!=event.target&&event.targets.length==1&&event.card.name == 'sha';
+                                },
+                                logTarget: "target",
+                                content: function () {
+                                    "step 0"
+                                    player.judge(function () { return 0 });
+                                    
+                                    //game.log("trigger.target1"+JSON.stringify(trigger.target[0]));
+                                    "step 1"
+                                    game.log("此杀伤害基数" + trigger.getParent().baseDamage);
+                                    game.log(get.type(result));
+                                    game.log(trigger.target);
+                                    if (get.type(result) == "trick") {
+                                        //game.log("进入if");
+                                        trigger.getParent().baseDamage++;
+                                        //game.log("trigger.target2"+JSON.stringify(trigger.target[0]));
+                                        trigger.target.addTempSkill('qinggang2');
+                                        trigger.target.storage.qinggang2.add(trigger.card);
+                                        trigger.target.markSkill('qinggang2');
+
+                                    }
+                                    if(player.hp<3&&!trigger.target.hasSkill('qinggang2')){
+                                        trigger.target.addTempSkill('qinggang2');
+                                        trigger.target.storage.qinggang2.add(trigger.card);
+                                        trigger.target.markSkill('qinggang2');
+                                    }
+                                },
+                                ai:{
+                                    expose:0.2,
+                                    threaten:1.3,
+                                },
+                                "_priority": 0,
+                            },
+                            yishisheji:{
+                                
                             }
 
                             //在这里添加新技能。
@@ -4635,7 +4680,8 @@ return 7.5 - get.value(card);
                             zhongzhuangcike_3: "重装刺客", "zhongzhuangcike_3_info": "你可以将装备牌当作杀使用或打出。",
                             duomianshou: "多面手", "duomianshou_info": "出牌阶段限一次，你可以弃置将一张手牌视为使用一张牌堆中同点数的其他类型的牌(不受次数限制），如列表里没牌，技能使用次数+1，且本回合不能使用该点数发动技能；对其他中小型船使用此法转化后的牌时其选择一项：1.你摸一张牌；2.其弃置一张牌。",
                             duomianshou_1: "多面手", "duomianshou_1_info": "对其他中小型船使用转化后的牌时其选择一项：1.你摸一张牌；2.其弃置一张牌。",
-
+                            kaixuanzhige: "凯旋之歌", "kaixuanzhige_info": "当你使用【杀】指定唯一其他角色为目标后，你可以进行判定，若结果为锦囊牌，此【杀】伤害+1且无视防具。你的体力值小于3时，你使用的【杀】无视防具。",
+                        yishisheji:"意式设计","yishisheji_info":"每轮限一次，你可以免疫一次伤害。你使用杀指定目标时可以进行判定，若判定结果为红色，此杀基础伤害+1，否则此杀无效。出牌阶段你使用的第一张杀无距离限制。",
                         },
                     };
                     if (lib.device || lib.node) {
