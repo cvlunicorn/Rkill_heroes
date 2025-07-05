@@ -601,7 +601,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             dading: ["female", "shu", 3, ["fangkong2", "qingxuncl"], ["des:手持竹伞的轻巡，辅助队友，防御攻击。"]],
                             degelasi: ["female", "qun", 3, ["fangkong2", "qingxuncl"], ["des:现代文职服饰，一看就很会办公。"]],
                             yatelanda: ["female", "wei", 3, ["fangkong2", "qingxuncl", "duikongfangyu"], ["des:双枪射手点形象，其双枪能以极快的射速打出爆炸弹匣，清空一小片区域。"]],
-                            "z31": ["female", "qun", 3, ["huibi", "quzhudd","Zqujingying"], ["des:婚纱与轻纱是多数人的美梦,与绿草平原，与绿水青山"]],
+                            "z31": ["female", "qun", 3, ["huibi", "quzhudd", "Zqujingying"], ["des:婚纱与轻纱是多数人的美梦,与绿草平原，与绿水青山"]],
                             xuefeng: ["female", "shu", 3, ["huibi", "quzhudd", "xiangrui", "yumian"], ["des:幸运的驱逐舰，多位画师、花了大款的大佬亲情奉献。"]],
                             kangfusi: ["female", "wei", 3, ["huibi", "quzhudd"], ["des:水手服欸,优秀的构图，不过图少改造晚。"]],
                             "47project": ["female", "qun", 3, ["huibi", "quzhudd"], ["des:这是个依赖科技的舰船，有着科幻的舰装，与兼备温柔体贴与意气风发的表现。"]],
@@ -1380,8 +1380,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter: function (event, player) {
                                     return player.countCards('h') > 0;
                                 },
-                                check:function(card){
-                                    return 17-get.value(card);
+                                check: function (card) {
+                                    return 17 - get.value(card);
                                 },
                                 direct: true,
                                 content: function () {
@@ -1418,44 +1418,44 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player.useCard({ name: 'jinjuzy' }, result.targets, false);
                                     }
                                 },
-                                ai:{
-                                    basic:{
-                                        order:8.5,
-                                        useful:1,
-                                        value:5,
+                                ai: {
+                                    basic: {
+                                        order: 8.5,
+                                        useful: 1,
+                                        value: 5,
                                     },
-                                    wuxie:function(target,card,player,viewer){
-                                        if(get.attitude(viewer,target)>0&&target.countCards('h','shan')){
-                                            if(!target.countCards('h')||target.hp==1||Math.random()<0.7) return 0;
+                                    wuxie: function (target, card, player, viewer) {
+                                        if (get.attitude(viewer, target) > 0 && target.countCards('h', 'shan')) {
+                                            if (!target.countCards('h') || target.hp == 1 || Math.random() < 0.7) return 0;
                                         }
                                     },
-                                    result:{
-                                        "target_use":function(player,target){
-                                            if(player.hasUnknown(2)&&get.mode()!='guozhan') return 0;
-                                            var nh=target.countCards('h');
-                                            if(get.mode()=='identity'){
-                                                if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
+                                    result: {
+                                        "target_use": function (player, target) {
+                                            if (player.hasUnknown(2) && get.mode() != 'guozhan') return 0;
+                                            var nh = target.countCards('h');
+                                            if (get.mode() == 'identity') {
+                                                if (target.isZhu && nh <= 2 && target.hp <= 1) return -100;
                                             }
-                                            if(nh==0) return -2;
-                                            if(nh==1) return -1.7
+                                            if (nh == 0) return -2;
+                                            if (nh == 1) return -1.7
                                             return -1.5;
                                         },
-                                        target:function(player,target){
-                                            var nh=target.countCards('h');
-                                            if(get.mode()=='identity'){
-                                                if(target.isZhu&&nh<=2&&target.hp<=1) return -100;
+                                        target: function (player, target) {
+                                            var nh = target.countCards('h');
+                                            if (get.mode() == 'identity') {
+                                                if (target.isZhu && nh <= 2 && target.hp <= 1) return -100;
                                             }
-                                            if(nh==0) return -2;
-                                            if(nh==1) return -1.7
+                                            if (nh == 0) return -2;
+                                            if (nh == 1) return -1.7
                                             return -1.5;
                                         },
                                     },
-                                    tag:{
-                                        respond:1,
-                                        respondShan:1,
-                                        damage:1,
-                                        multitarget:1,
-                                        multineg:1,
+                                    tag: {
+                                        respond: 1,
+                                        respondShan: 1,
+                                        damage: 1,
+                                        multitarget: 1,
+                                        multineg: 1,
                                     },
                                 },
                                 intro: {
@@ -3085,8 +3085,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 content: function () {
                                     player.draw(Math.min(trigger.targets.length, player.maxHp));
                                 },
-                                ai:{
-                                    threaten:8,
+                                ai: {
+                                    threaten: 8,
                                 },
                             },
                             gaosusheji: {
@@ -3591,7 +3591,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 priority: 5,
                                 filter: function (event, player) {
                                     if (player == event.target || player == event.player) return false;
-                                    return (event.card.name == 'sha' || event.card.name == 'sheji9')&&get.distance(player, event.target, 'pure') <= 1;
+                                    return (event.card.name == 'sha' || event.card.name == 'sheji9') && get.distance(player, event.target, 'pure') <= 1;
                                 },
                                 check: function (event, player) {
                                     if (get.attitude(player, event.target) > 2) {
@@ -3642,78 +3642,126 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
                             },
-                            Zqujingying:{
+                            Zqujingying: {
+                                trigger: {
+                                    player: "phaseZhunbeiBegin",
+                                },
+                                direct: true,
+                                forceaudio: true,
+                                filter: function (event, player) {
+                                        return true;
+                                },
+                                content: function () {
+                                    'step 0'
+                                    event.num = game.countGroup();
+                                    'step 1'
+                                    var list = [];
+                                    if (event.num >= 1 && !player.hasSkill('reyingzi')) list.push('reyingzi');
+                                    if (event.num >= 2 && !player.hasSkill('reguanxing')) list.push('reguanxing');
+                                    if (event.num >= 3 && !player.hasSkill('reguicai')) list.push('reguicai');
+                                    if (event.num >= 4 && !player.hasSkill('mjmouzhi')) list.push('mjmouzhi');
+                                    if (!list.length) {
+                                        event.finish();
+                                        return;
+                                    }
+                                    var prompt2 = '你可以获得下列一项技能直到回合结束';
+                                    list.push('cancel2');
+                                    player.chooseControl(list).set('prompt', get.translation('Zqujingying')).
+                                        set('prompt2', prompt2).set('centerprompt2', true).set('ai', function (evt, player) {
+                                            var controls = _status.event.controls;
+                                            if (controls.contains('reguanxing')) {
+                                                return 'reguanxing';
+                                            }
+                                            if (controls.contains('reyingzi')) {
+                                                return 'reyingzi';
+                                            }
+                                            if (controls.contains('reguicai')) {
+                                                return 'reguicai';
+                                            }
+                                            if (controls.contains('mjmouzhi')) {
+                                                return 'mjmouzhi';
+                                            }
+                                            return controls.randomGet();
+                                        });
+                                    'step 2'
+                                    if (result.control != 'cancel2') {
+                                        player.addTempSkill(result.control,{player:'phaseBegin'});
+                                        if (!event.done) player.logSkill('jiahe_put');
+                                        game.log(player, '获得了技能', '【' + get.translation(skill) + '】');
+                                    }
+                                },
+                                "_priority": 0,
 
                             },
                             wuziliangjiangdao:{//军争可用的五子良将纛
-                                
-                                    trigger:{
-                                        player:["phaseZhunbeiBegin"],
-                                    },
-                                    filter:function(event,player,name){
-                                        if(name!='phaseZhunbeiBegin') return get.is.jun(player)&&player.identity=='wei';
-                                        return true;
-                                    },
-                                    direct:true,
-                                    content:function(){
-                                        'step 0'
-                                        var skills=['new_retuxi','qiaobian','gzxiaoguo','gzjieyue','new_duanliang'];
-                                        game.countPlayer(function(current){
-                                                if(current==player) return;
-                                                if(current.hasSkill('new_retuxi')) skills.remove('new_retuxi');
-                                                if(current.hasSkill('qiaobian')) skills.remove('qiaobian');
-                                                if(current.hasSkill('gzxiaoguo')) skills.remove('gzxiaoguo');
-                                                if(current.hasSkill('gzjieyue')) skills.remove('gzjieyue');
-                                                if(current.hasSkill('new_duanliang')) skills.remove('new_duanliang');
-                                        });
-                                        if(!skills.length) event.finish();
-                                        else{
-                                            event.skills=skills;
-                                            var next=player.chooseToDiscard('he');
-                                            var str='';
-                                            for(var i=0;i<skills.length;i++){
-                                                str+='、【';
-                                                str+=get.translation(skills[i]);
-                                                str+='】';
-                                            }
-                                            next.set('prompt','是否发动【五子良将纛】？')
-                                            next.set('prompt2',get.translation('弃置一张牌，获得以下技能中的一个直到下回合开始：'+str.slice(1)));
-                                            next.logSkill='g_jianan';
-                                            next.skills=skills;
-                                            next.ai=function(card){
-                                                var skills=_status.event.skills;
-                                                var player=_status.event.player;
-                                                var rank=0;
-                                                if(skills.contains('new_retuxi')&&game.countPlayer(function(current){
-                                                    return get.attitude(player,current)<0&&current.countGainableCards(player,'h')
-                                                })>1) rank=4;
-                                                if(skills.contains('gzjieyue')&&player.countCards('h',function(card){
-                                                    return get.value(card)<7;
-                                                })>1) rank=5;
-                                                if(skills.contains('qiaobian')&&player.countCards('h')>4) rank=6;
-                                                if((get.guozhanRank(player.name1,player)<rank&&!player.isUnseen(0))||(get.guozhanRank(player.name2,player)<rank&&!player.isUnseen(1))) return rank+1-get.value(card);
-                                                return -1;
-                                            };
+
+                                trigger: {
+                                    player: ["phaseZhunbeiBegin"],
+                                },
+                                filter: function (event, player, name) {
+                                    if (name != 'phaseZhunbeiBegin') return get.is.jun(player) && player.identity == 'wei';
+                                    return true;
+                                },
+                                direct: true,
+                                content: function () {
+                                    'step 0'
+                                    var skills = ['new_retuxi', 'qiaobian', 'gzxiaoguo', 'gzjieyue', 'new_duanliang'];
+                                    game.countPlayer(function (current) {
+                                        if (current == player) return;
+                                        if (current.hasSkill('new_retuxi')) skills.remove('new_retuxi');
+                                        if (current.hasSkill('qiaobian')) skills.remove('qiaobian');
+                                        if (current.hasSkill('gzxiaoguo')) skills.remove('gzxiaoguo');
+                                        if (current.hasSkill('gzjieyue')) skills.remove('gzjieyue');
+                                        if (current.hasSkill('new_duanliang')) skills.remove('new_duanliang');
+                                    });
+                                    if (!skills.length) event.finish();
+                                    else {
+                                        event.skills = skills;
+                                        var next = player.chooseToDiscard('he');
+                                        var str = '';
+                                        for (var i = 0; i < skills.length; i++) {
+                                            str += '、【';
+                                            str += get.translation(skills[i]);
+                                            str += '】';
                                         }
-                                        
-                                        'step 1'
-                                        player.chooseControl(event.skills).set('ai',function(){
-                                            var skills=event.skills;
-                                            if(skills.contains('qiaobian')&&player.countCards('h')>3) return 'qiaobian';
-                                            if(skills.contains('gzjieyue')&&player.countCards('h',function(card){
-                                                return get.value(card)<7;
-                                            })) return 'gzjieyue';
-                                            if(skills.contains('new_retuxi')) return 'new_retuxi';
-                                            return skills.randomGet();
-                                        }).set("prompt","选择获得其中的一个技能直到下回合开始");
-                                        'step 2'
-                                        var link=result.control;
-                                        player.addTempSkill(link,{player:'phaseBegin'});
-                                        //player.addTempSkill("jianan_eff","jiananUpdate");
-                                        game.log(player,"获得了技能","#g【"+get.translation(result.control)+"】");
-                                    },
-                                    "_priority":0,
-                                
+                                        next.set('prompt', '是否发动【五子良将纛】？')
+                                        next.set('prompt2', get.translation('弃置一张牌，获得以下技能中的一个直到下回合开始：' + str.slice(1)));
+                                        next.logSkill = 'g_jianan';
+                                        next.skills = skills;
+                                        next.ai = function (card) {
+                                            var skills = _status.event.skills;
+                                            var player = _status.event.player;
+                                            var rank = 0;
+                                            if (skills.contains('new_retuxi') && game.countPlayer(function (current) {
+                                                return get.attitude(player, current) < 0 && current.countGainableCards(player, 'h')
+                                            }) > 1) rank = 4;
+                                            if (skills.contains('gzjieyue') && player.countCards('h', function (card) {
+                                                return get.value(card) < 7;
+                                            }) > 1) rank = 5;
+                                            if (skills.contains('qiaobian') && player.countCards('h') > 4) rank = 6;
+                                            if ((get.guozhanRank(player.name1, player) < rank && !player.isUnseen(0)) || (get.guozhanRank(player.name2, player) < rank && !player.isUnseen(1))) return rank + 1 - get.value(card);
+                                            return -1;
+                                        };
+                                    }
+
+                                    'step 1'
+                                    player.chooseControl(event.skills).set('ai', function () {
+                                        var skills = event.skills;
+                                        if (skills.contains('qiaobian') && player.countCards('h') > 3) return 'qiaobian';
+                                        if (skills.contains('gzjieyue') && player.countCards('h', function (card) {
+                                            return get.value(card) < 7;
+                                        })) return 'gzjieyue';
+                                        if (skills.contains('new_retuxi')) return 'new_retuxi';
+                                        return skills.randomGet();
+                                    }).set("prompt", "选择获得其中的一个技能直到下回合开始");
+                                    'step 2'
+                                    var link = result.control;
+                                    player.addTempSkill(link, { player: 'phaseBegin' });
+                                    //player.addTempSkill("jianan_eff","jiananUpdate");
+                                    game.log(player, "获得了技能", "#g【" + get.translation(result.control) + "】");
+                                },
+                                "_priority": 0,
+
                             }
 
                             //在这里添加新技能。
@@ -3822,7 +3870,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qijianshashou_1: "旗舰杀手", "qijianshashou_1_info": "",
                             zhanxianfangyu: "战线防御", "zhanxianfangyu_info": "每回合限一次，你成为黑色杀的目标时，你取消之。每回合限一次，距你为1的角色成为杀的目标时，你可以摸一张牌并代替该名角色成为此杀的目标。",
                             zhanxianfangyu1: "战线防御", "zhanxianfangyu1_info": "每回合限一次，你成为黑色杀的目标时，你取消之。",
-
+                            Zqujingying: "Z驱菁英", "Zqujingying_info": "回合开始时，根据场上势力数，你可以选择获得以下技能中的一项:大于等于一，英姿;大于等于二，观星;大于等于三，鬼才;大于等于四，谋识。直到你的下回合开始。",
                         },
                     };
                     if (lib.device || lib.node) {
@@ -3854,7 +3902,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     event.yingbian_removeTarget = true;
                                 },
                                 filterTarget: function (card, player, target) {
-                                    return get.attitude(player, target) < 0 && target.getEquip(2) != 'tengjia';
+                                    return get.attitude(player, target) < 0 ;
                                 },
                                 content: function () {
                                     "step 0"
