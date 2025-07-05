@@ -599,7 +599,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             beianpudun: ["female", "wei", 4, ["huokongld", "zhongxunca", "huhangyuanhu"], ["des:励志青年，在旅途中成长，与恋人坚定的望向远方。"]],
                             jiujinshan: ["female", "wei", 4, ["huokongld", "zhongxunca", "jiujingzhanzhen"], ["des:航海服饰，侦查员与火炮观瞄。"]],
                             yixian: ["female", "shu", 3, ["fangkong2", "qingxuncl", "shizhibuyu", "shizhibuyu1"], ["des:经典美术设计的款式，意气风发，威猛先生"]],
-                            tianlangxing: ["female", "wu", 3, ["fangkong2", "qingxuncl","duomianshou"], ["des:阻敌计谋表现优秀，这是先发制敌的优势所在，"]],
+                            tianlangxing: ["female", "wu", 3, ["fangkong2", "qingxuncl", "duomianshou"], ["des:阻敌计谋表现优秀，这是先发制敌的优势所在，"]],
                             dadianrendian: ["female", "shu", 3, ["fangkong2", "qingxuncl"], ["des:手持竹伞的轻巡，辅助队友，防御攻击。"]],
                             degelasi: ["female", "qun", 3, ["fangkong2", "qingxuncl"], ["des:现代文职服饰，一看就很会办公。"]],
                             yatelanda: ["female", "wei", 3, ["fangkong2", "qingxuncl", "duikongfangyu"], ["des:双枪射手点形象，其双枪能以极快的射速打出爆炸弹匣，清空一小片区域。"]],
@@ -4338,25 +4338,27 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 prompt: "将一张装备牌当杀使用或打出",
                             },
-                            /*var number=get.number(card);
-                           var list=lib.inpile.filter(function(i){
-                               return (get.type(i)=='trick'||get.type(i)=='basic')&&get.number(i)==number&&lib.filter.filterCard({name:i});
-                           });*/
                             duomianshou: {
                                 enable: "phaseUse",
-                                usable: 3,
-                                filterCard: true,
+                                usable: 1,
+                                filterCard(card, player) {
+                                    return true;
+                                },
                                 position: "hs",
                                 discard: false,
                                 lose: false,
                                 check: function (card) {
-                                    return -get.value(card) + 7.5;
+
+                                    return 7.5 - get.value(card);
+
                                 },
+
                                 content: function () {
                                     'step 0'
                                     var card = cards[0];
                                     //var cardtype=get.type(card);
-                                    game.log(get.type(card));
+                                    game.log("卡牌价值" + get.value(card));
+                                    game.log("卡牌类型"+get.type(card));
                                     var list = [];
                                     //game.log(JSON.stringify(lib.cardPile));
                                     for (var i of ui.cardPile.childNodes) {
@@ -4368,30 +4370,48 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 game.log(type);
                                                 game.log(i);
                                                 list.push(i);
+                                                //list.push(game.createCard2(get.name(i), get.suit(card), get.number(i), get.nature(i)));
                                             }
                                         }
                                     }
-                                    if (!list) {
+                                    if (list == "") {
                                         game.log('牌堆中没有符合要求的牌');
                                         event.finish();
                                     }
                                     var dialog = ui.create.dialog('多面手', [list, 'card']);
-
                                     game.log("多面手列表已生成");
+
+
                                     player.chooseButton(dialog).ai = function (button) {
-                                        return 0;
+                                        var MostValue = 0;
+                                        var MostValuableCard = card;
+
+                                        for (var j of list) {
+                                            game.log("目标卡牌价值" + get.value(j));
+                                            game.log("最大卡牌价值" + MostValue);
+
+                                            if (get.value(j) > MostValue) {
+                                                MostValuableCard = j;
+                                                MostValue = get.value(j);
+                                                game.log("最有价值的卡牌变更为" + get.name(MostValuableCard));
+                                            }
+
+                                        }
+                                        //game.log("button.link[0]"+JSON.stringify(button.link));
+                                        //game.log("MostValuableCard"+JSON.stringify(MostValuableCard));
+                                        return (button.link == MostValuableCard) ? 1 : -1;
                                     }
                                     'step 1'
                                     game.log("选中的结果" + JSON.stringify(get.name(result.links[0])));
                                     if (result.bool) {
                                         player.discard(cards[0]);
-                                        player.addTempSkill("duomianshou_1","useCardToTargeted");
-                                        player.chooseUseTarget(true,get.name(result.links[0]));
+                                        player.addTempSkill("duomianshou_1", "useCardToTargeted");
+                                        player.chooseUseTarget(true, get.name(result.links[0]));
                                         //player.removeSkill("duomianshou_1");
                                     }
                                 },
                                 ai: {
-                                    order: 9,
+                                    order: 10,
                                     result: {
                                         player: 1,
                                     },
@@ -4413,7 +4433,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 filter: function (event, player) {
                                     if (event.target.hasSkill('quzhudd') || event.target.hasSkill('qingxuncl') || event.target.hasSkill('qianting') || event.target.hasSkill('zhongxunca'))
-                                        return event.target!=player;
+                                        return event.target != player;
                                 },
                                 content: function () {
                                     "step 0"
@@ -4553,7 +4573,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             wuweizhuangji: "无畏撞击", "wuweizhuangji_info": "限定技，你可以废除自己的全部装备栏，然后对一名角色造成x点伤害（x为你此前装备区内牌的数量）",
                             zhongzhuangcike: "重装刺客", "zhongzhuangcike_info": "你装备区内有牌时，你使用的杀无视防具；你造成伤害后可以获得目标角色的一张装备牌；你可以将装备牌当作杀使用或打出。",
                             zhongzhuangcike_3: "重装刺客", "zhongzhuangcike_3_info": "你可以将装备牌当作杀使用或打出。",
-                            duomianshou: "多面手", "duomianshou_info": "出牌阶段限三次，你可以弃置将一张手牌视为使用一张牌堆中同点数的其他类型的牌(不计入次数限制）；对其他中小型船使用此法转化后的牌时其选择一项：1.你摸一张牌；2.其弃置一张牌。",
+                            duomianshou: "多面手", "duomianshou_info": "出牌阶段限一次，你可以弃置将一张手牌视为使用一张牌堆中同点数的其他类型的牌(不受次数限制）；对其他中小型船使用此法转化后的牌时其选择一项：1.你摸一张牌；2.其弃置一张牌。",
                             duomianshou_1: "多面手", "duomianshou_1_info": "对其他中小型船使用转化后的牌时其选择一项：1.你摸一张牌；2.其弃置一张牌。",
 
                         },
