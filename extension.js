@@ -2257,7 +2257,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             junfu: {
-                                audio: "ext:舰R牌将:2",
                                 trigger: {
                                     global: ["phaseBegin"],
                                 },
@@ -3658,13 +3657,19 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     var list = [];
                                     if (event.num >= 1 && !player.hasSkill('reyingzi')) list.push('reyingzi');
                                     if (event.num >= 2 && !player.hasSkill('reguanxing')) list.push('reguanxing');
-                                    if (event.num >= 3 && !player.hasSkill('reguicai')) list.push('reguicai');
+                                    if (event.num >= 3 && !player.hasSkill('refankui')) list.push('refankui');
                                     if (event.num >= 4 && !player.hasSkill('mjmouzhi')) list.push('mjmouzhi');
                                     if (!list.length) {
                                         event.finish();
                                         return;
                                     }
                                     var prompt2 = '你可以获得下列一项技能直到回合结束';
+                                    if(event.done){
+                                        prompt2+=' (2/2)';
+                                    }
+                                    else{
+                                        prompt2+=' (1/2)';
+                                    }
                                     list.push('cancel2');
                                     player.chooseControl(list).set('prompt', get.translation('Zqujingying')).
                                         set('prompt2', prompt2).set('centerprompt2', true).set('ai', function (evt, player) {
@@ -3675,8 +3680,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             if (controls.contains('reyingzi')) {
                                                 return 'reyingzi';
                                             }
-                                            if (controls.contains('reguicai')) {
-                                                return 'reguicai';
+                                            if (controls.contains('refankui')) {
+                                                return 'refankui';
                                             }
                                             if (controls.contains('mjmouzhi')) {
                                                 return 'mjmouzhi';
@@ -3688,6 +3693,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player.addTempSkill(result.control,{player:'phaseBegin'});
                                         if (!event.done) player.logSkill('jiahe_put');
                                         game.log(player, '获得了技能', '【' + get.translation(skill) + '】');
+                                        if(!event.done){
+                                            event.done=true;
+                                            event.goto(1);
+                                        }
                                     }
                                 },
                                 "_priority": 0,
@@ -3870,7 +3879,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qijianshashou_1: "旗舰杀手", "qijianshashou_1_info": "",
                             zhanxianfangyu: "战线防御", "zhanxianfangyu_info": "每回合限一次，你成为黑色杀的目标时，你取消之。每回合限一次，距你为1的角色成为杀的目标时，你可以摸一张牌并代替该名角色成为此杀的目标。",
                             zhanxianfangyu1: "战线防御", "zhanxianfangyu1_info": "每回合限一次，你成为黑色杀的目标时，你取消之。",
-                            Zqujingying: "Z驱菁英", "Zqujingying_info": "回合开始时，根据场上势力数，你可以选择获得以下技能中的一项:大于等于一，英姿;大于等于二，观星;大于等于三，鬼才;大于等于四，谋识。直到你的下回合开始。",
+                            Zqujingying: "Z驱菁英", "Zqujingying_info": "回合开始时，根据场上势力数，你可以选择获得以下技能中的一项:大于等于一，英姿;大于等于二，观星;大于等于三，反馈;大于等于四，谋识。直到你的下回合开始。",
                         },
                     };
                     if (lib.device || lib.node) {
@@ -5178,9 +5187,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     }
                     return jianrjinjibao
                 });
-                lib.translate['jianrjinjibao_card_config'] = '舰R卡包测试';
+                lib.translate['jianrjinjibao_card_config'] = '舰R卡牌';
                 lib.config.all.cards.push('jianrjinjibao');
-                if (!lib.config.cards.contains('jianrjinjibao')) lib.config.cards.push('jianrjinjibao');//包名翻译，失败了：,"jianrjinjibao":{"name":"禁用舰R测试内卡包","intro":"联机卡组在游戏内运行时才添加至游戏内，禁用添加这些卡组的技能，才能真正禁用这些卡组","init":true},
+                //if (!lib.config.cards.contains('jianrjinjibao')) lib.config.cards.push('jianrjinjibao');//包名翻译，失败了：,"jianrjinjibao":{"name":"禁用舰R测试内卡包","intro":"联机卡组在游戏内运行时才添加至游戏内，禁用添加这些卡组的技能，才能真正禁用这些卡组","init":true},
                 //闪避（响应）对面的攻击，通过攻击减少对手手牌数，config.diewulimitaiconfig.hanbing_gaiconfig.tiaozhanbiaojiang
             };
         }, help: {}, config: {//config就是配置文件，类似于minecraft的模组设置文本。无名将其可视化了....。当你进行了至少一次强化后<br>1.出牌阶段<br>你可以弃置3张不同花色的牌，提升一点血量上限。<br>2.当你濒死时，<br>你可以弃置4张不同花色的牌，回复一点体力。<br>（未开启强化，则无需强化即可使用建造。未开启建造，则强化上限仅为1级。）火杀：令目标回合结束后，受到一点火焰伤害，摸两张牌。</br>冰杀：护甲加1伤；减少对手1点防御距离。</br>雷杀：自动判断是否流失对手体力；减少对手1点手牌上限；。</br>此角色回合结束后移除所有的进水、减速、燃烧。
@@ -5198,7 +5207,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
         }, package: {
             character: {
                 character: {//单机部分，在联机框架开启时，联机武将会覆盖同名武将应该不生效。
-                    liekexingdun: ["female", "wu", 4, ["hangmucv", "hangkongzhanshuxianqu"], ["zhu", "des:血量中等的航母，温柔，体贴，过渡期追着大船打的航母。"]],
+                    /*liekexingdun: ["female", "wu", 4, ["hangmucv", "hangkongzhanshuxianqu"], ["zhu", "des:血量中等的航母，温柔，体贴，过渡期追着大船打的航母。"]],
                     qixichicheng: ["female", "shu", 4, ["hangmucv", "qixi_cv"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
                     wufenzhongchicheng: ["female", "shu", 4, ["hangmucv", "mingyundewufenzhong"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
 
@@ -5227,7 +5236,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     minsike: ["female", "qun", 3, ["huibi", "quzhudd", "manchangzhanyi", "manchangzhanyi_1"], ["des:跑得快，看得多。"]],
                     "u1405": ["female", "wu", 2, ["qianting", "baiyin_skill"], ["des:无需隐匿的偷袭大师，马上就让对手的后勤捉襟见肘。"]],
                     jingjishen: ["female", "wu", 3, ["junfu"], ["des:需要武器支援，伙计倒下了。"]],
-                    changchun: ["female", "wu", 3, ["daoqu", "tianyi"], ["des:尚处于正能量之时。"]],
+                    changchun: ["female", "wu", 3, ["daoqu", "tianyi"], ["des:尚处于正能量之时。"]],*/
                 },
                 translate: {
 
@@ -5248,9 +5257,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             },
             intro: "制作组群，730255133，#(滑稽)。<br>建议：1.使用懒人包，开启扩展-十周年UI，技能标记卡顿时，可以关闭获得技能提示，提高体验感。<br>2.点击透明时钟-选项-武将>将其他武将包设为点将才能用，体验丰富而简单的卡牌对战。<br>3.选项-降低字体缩放，提升视野，玩16人扩展也好操作。<br>玩法：本扩展增加了与队友互给关键牌、用装备强化自己的玩法，间接让牌的质量有所提高，可以在下方做限制。 <br>特殊规则：雷杀对有护甲或者有失血反击技能的目标流失体力（穿甲），冰杀对有护甲的目标加1伤，火杀会让对手于其自己的出牌阶段结束后扣一血。<br>卡牌里也有作者尝试的身影，可以编辑牌堆尝试哦。<br>扩展设置：附带增强原版体验的全局技能，可根据需要开关。长按或右键全局技能的简介可以查看详情",
             author: "※人杰地灵游戏中",
-            diskURL: "https://pan.baidu.com/s/1JTv8QGtFu90UED_ZVYm5-A 提取码：5iox",
+            diskURL: "https://pan.baidu.com/s/1VPMQuAUgucpRRbef9Dmy3g?pwd=gfmv",
             forumURL: "",
-            version: "1.81",
+            version: "1.92+",
         }, files: { "character": ["changchun.jpg"], "card": ["fasheqi3.png"], "skill": [] }
     }
 })
