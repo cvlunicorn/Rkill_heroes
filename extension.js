@@ -4052,7 +4052,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                 content: function () {
                                     "step 0"
-
+                                    
                                     //
                                     var list = [];
                                     for (var i = 0; i < lib.inpile.length; i++) {
@@ -4084,12 +4084,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }
                                     }*/
 
-
+                                    game.log("巨舰梦想列表已生成")
                                     player.chooseButton(dialog).ai = function (button) {
                                         var player = _status.event.player;
                                         var recover = 0, lose = 1, players = game.filterPlayer();
                                         for (var i = 0; i < players.length; i++) {
-                                            if (players[i].hp == 1 && get.damageEffect(players[i], player, player) > 0 && !players[i].hasSha()) {
+                                            if (!player.storage.jujianmengxiang.contains('juedouba9')&&players[i].hp == 1 && get.damageEffect(players[i], player, player) > 0 && !players[i].hasSha()) {
+                                                game.log('juedouba9'+(button.link[2] == 'juedouba9'));
                                                 return (button.link[2] == 'juedouba9') ? 2 : -1;
                                             }
                                             if (!players[i].isOut()) {
@@ -4121,9 +4122,18 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 }
                                             }
                                         }
-                                        if (lose > recover && lose > 0) { return (button.link[2] == 'manchangyy9') ? 1 : -1; }
-                                        else if (lose < recover && recover > 0) { return (button.link[2] == 'jinjixiuli9') ? 1 : -1; }
-                                        else { return (button.link[2] == 'ewaibuji9') ? 1 : -1; }
+                                        if (!player.storage.jujianmengxiang.contains('manchangyy9')&&lose > recover && lose > 0) { 
+                                            game.log('manchangyy9'+(button.link[2] == 'manchangyy9'));
+                                        return (button.link[2] == 'manchangyy9') ? 1 : -1; 
+                                    }
+                                        else if (!player.storage.jujianmengxiang.contains('jinjixiuli9')&&lose < recover && recover > 0) { 
+                                            game.log('jinjixiuli9'+(button.link[2] == 'jinjixiuli9'));
+                                            return (button.link[2] == 'jinjixiuli9') ? 1 : -1; 
+                                        }
+                                        else { 
+                                            game.log('ewaibuji9'+(button.link[2] == 'ewaibuji9'));
+                                        return ( button.link[2] == 'ewaibuji9') ? 1 : -1;
+                                         }
 
                                     }
 
