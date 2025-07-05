@@ -596,7 +596,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qingye: ["female", "shu", 4, ["huokongld", "zhongxunca", "sawohaizhan"], ["des:励志偶像，与一首动人的歌，与一段坎坷旅途。"]],
                             beianpudun: ["female", "wei", 4, ["huokongld", "zhongxunca","huhangyuanhu"], ["des:励志青年，在旅途中成长，与恋人坚定的望向远方。"]],
                             jiujinshan: ["female", "wei", 4, ["huokongld", "zhongxunca"], ["des:航海服饰，侦查员与火炮观瞄。"]],
-                            yixian: ["female", "shu", 3, ["fangkong2", "qingxuncl"], ["des:经典美术设计的款式，意气风发，威猛先生"]],
+                            yixian: ["female", "shu", 3, ["fangkong2", "qingxuncl","shizhibuyu","shizhibuyu1"], ["des:经典美术设计的款式，意气风发，威猛先生"]],
                             tianlangxing: ["female", "wu", 3, ["fangkong2", "qingxuncl"], ["des:阻敌计谋表现优秀，这是先发制敌的优势所在，"]],
                             dading: ["female", "shu", 3, ["fangkong2", "qingxuncl"], ["des:手持竹伞的轻巡，辅助队友，防御攻击。"]],
                             degelasi: ["female", "qun", 3, ["fangkong2", "qingxuncl"], ["des:现代文职服饰，一看就很会办公。"]],
@@ -3810,6 +3810,105 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     threaten:1.1,
                                 },
                                 "_priority":0,
+                            },
+                            shizhibuyu:{
+                                trigger:{
+                                    player:"damageBegin3",
+                                },
+                                filter:function(event,player){
+                                    return event.num>0;
+                                },
+                                direct:true,
+                                preHidden:true,
+                                content:function(){
+                                    'step 0'
+                                    var check=(player.countCards('h',{color:'red'})>1||player.countCards('h',{color:'black'})>1);
+                                    player.chooseCard(get.prompt('shizhibuyu'),'弃置两张颜色相同的牌，令即将受到的伤害-1','he',2,function(card){
+                                        if(ui.selected.cards.length) return get.color(card)==get.color(ui.selected.cards[0]);
+                                        return true;
+                                    }).set('complexCard',true).set('ai',function(card){
+                                        if(!_status.event.check) return 0;
+                                        var player=_status.event.player;
+                                        if(player.hp==1){
+                                            if(!player.countCards('h',function(card){return get.tag(card,'save')})&&!player.hasSkillTag('save',true)) return 10-get.value(card);
+                                            return 7-get.value(card);
+                                        }
+                                        return 6-get.value(card);
+                                    }).set('check',check).setHiddenSkill(event.name);
+                                    'step 1'
+                                    var logged=false;
+                                    if(result.cards){
+                                        logged=true;
+                                        player.logSkill('shizhibuyu');
+                                        player.discard(result.cards);
+                                        trigger.num--;
+                                    }
+                                    if(!player.isUnseen()&&!game.hasPlayer(function(current){
+                                        return current!=player&&current.isFriendOf(player);
+                                    })){
+                                        if(!logged) player.logSkill('shizhibuyu');
+                                        player.judge(function(card){
+                                            if(get.color(card)=='red') return 1;
+                                            return 0;
+                                        });
+                                    }
+                                    else event.finish();
+                                    'step 2'
+                                    if(result.judge>0) player.draw();
+                                },
+                                "_priority":0,
+                            },
+                            shizhibuyu1:{
+                                audio:2,
+                                trigger:{
+                                    player:"judgeEnd",
+                                },
+                                filter:function(event){
+                                    if(get.owner(event.result.card)) return false;
+                                    if(event.nogain&&event.nogain(event.result.card)) return false;
+                                    return true;
+                                    //return event.result.card.name=='sha'||event.result.card.name=='juedou';
+                                },
+                                frequent:true,
+                                preHidden:true,
+                                content:function(){
+                                    'step 0'
+                                    player.gain(trigger.result.card,'gain2');
+                                    player.chooseTarget(get.prompt2('选择一名角色本回合的手牌上限和使用【杀】的次数上限+1')).ai=function(target){
+                                        return get.attitude(player,target)>0;
+                                    }
+                                    'step 1'
+                                    if(result.bool){
+                                        game.log(result.targets[0]+"矢志不渝");
+                                        if(!result.targets[0].hasSkill('shizhibuyu1_eff')){
+                                            result.targets[0].addTempSkill('shizhibuyu1_eff',{ player: 'phaseEnd' });
+                                            result.targets[0].storage.shizhibuyu1_eff=1;
+                                        }
+                                        else result.targets[0].storage.shizhibuyu1_eff++;
+                                        result.targets[0].updateMarks();
+                                        //target.addTempSkill('mingjian2',{player:'phaseAfter'});
+                                        //target.storage.mingjian2++;
+                                        //target.updateMarks('mingjian2');
+                                    }
+                                },
+                                subSkill:{
+                                    eff:{
+                                        sub:true,
+                                        mod:{
+                                            cardUsable:function(card,player,num){
+                                                if(card.name=='sha'||card.name=='sha') return num+player.storage.shizhibuyu1_eff;
+                                            },
+                                            maxHandcard:function(player,num){return num+player.storage.shizhibuyu1_eff},
+                                        },
+                                        mark:true,
+                                        charlotte:true,
+                                        intro:{
+                                            content:function(storage){if(storage) return '使用【杀】的次数上限+'+storage+'，手牌上限+'+storage},
+                                        },
+                                        "_priority":0,
+                                    },
+                                },
+                                "_priority":0,
                             }
 
                             //在这里添加新技能。
@@ -3920,6 +4019,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhanxianfangyu1: "战线防御", "zhanxianfangyu1_info": "每回合限一次，你成为黑色杀的目标时，你取消之。",
                             Zqujingying: "Z驱菁英", "Zqujingying_info": "回合开始时，根据场上势力数，你可以选择获得以下技能中的一项:大于等于一，英姿;大于等于二，观星;大于等于三，反馈;大于等于四，谋识。直到你的下回合开始。",
                             huhangyuanhu: "护航援护", "huhangyuanhu_info": "当一名角色成为杀的目标后，若你至该角色的距离为一，你可以摸一张牌，若如此做，你交给其一张牌并展示之。若为装备牌，该角色可以使用此牌。",
+                            shizhibuyu: "矢志不渝", "shizhibuyu_info": "当你受到伤害时，你可以弃置两张颜色相同的牌令此伤害-1，然后进行判定，若结果为红色，你摸一张牌。 当你的判定牌生效后，你可以获得之。然后你可以令一名角色使用杀次数+1和手牌上限+1直到你的下回合开始。",
+                            shizhibuyu1: "矢志不渝", "shizhibuyu1_info": "",
+                            shizhibuyu1_eff: "矢志不渝", "shizhibuyu1_eff_info": "直到回合结束，手牌上限+1，出杀次数+1",
+                        
                         },
                     };
                     if (lib.device || lib.node) {
