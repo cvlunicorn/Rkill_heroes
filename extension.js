@@ -4067,6 +4067,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     var dialog = ui.create.dialog('巨舰梦想', [list, 'vcard']);
 
                                     game.log("巨舰梦想列表已生成")
+                                    if(!list==""){
                                     player.chooseButton(dialog).ai = function (button) {
                                         var player = _status.event.player;
                                         var recover = 0, lose = 1, players = game.filterPlayer();
@@ -4118,10 +4119,18 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }
 
                                     }
-
+                                }else{
+                                    event.finish();
+                                }
                                     'step 1'
-                                    game.log(result.links[0][2]);
-                                    if (result.bool) {
+                                    game.log("结果bool"+result.bool);
+
+                                    if(result.bool){
+                                        event.finish();
+                                    }
+                                    
+                                    if (result&&result.bool&&result.links[0][2]) {
+                                        game.log("选择的牌"+result.links[0][2]);
                                         player.chooseUseTarget(true, result.links[0][2]);
                                         player.storage.jujianmengxiang.add(result.links[0][2]);
                                         player.loseHp(1);
@@ -4402,8 +4411,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         return (button.link == MostValuableCard) ? 1 : -1;
                                     }
                                     'step 1'
-                                    game.log("选中的结果" + JSON.stringify(get.name(result.links[0])));
-                                    if (result.bool) {
+                                    game.log("结果bool"+result.bool);
+
+                                    if(result.bool){
+                                        event.finish();
+                                    }
+                                    
+                                    if (result&&result.bool&&result.links[0]) {
+                                        game.log("选中的结果" + JSON.stringify(get.name(result.links[0])));
                                         player.discard(cards[0]);
                                         player.addTempSkill("duomianshou_1", "useCardToTargeted");
                                         player.chooseUseTarget(true, get.name(result.links[0]));
