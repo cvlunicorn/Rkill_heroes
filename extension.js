@@ -594,7 +594,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             kunxi: ["female", "wei", 4, ["huokongld", "zhongxunca", "gaosusheji"], ["des:画师优秀的功底让这名角色美而可爱，这是出色的角色塑造。"]],
                             ougengqi: ["female", "qun", 4, ["huokongld", "zhongxunca", "zhanxianfangyu", "zhanxianfangyu1"], ["des:励志偶像，与标志性舰装，给人以强大的保护。"]],
                             qingye: ["female", "shu", 4, ["huokongld", "zhongxunca", "sawohaizhan"], ["des:励志偶像，与一首动人的歌，与一段坎坷旅途。"]],
-                            beianpudun: ["female", "wei", 4, ["huokongld", "zhongxunca"], ["des:励志青年，在旅途中成长，与恋人坚定的望向远方。"]],
+                            beianpudun: ["female", "wei", 4, ["huokongld", "zhongxunca","huhangyuanhu"], ["des:励志青年，在旅途中成长，与恋人坚定的望向远方。"]],
                             jiujinshan: ["female", "wei", 4, ["huokongld", "zhongxunca"], ["des:航海服饰，侦查员与火炮观瞄。"]],
                             yixian: ["female", "shu", 3, ["fangkong2", "qingxuncl"], ["des:经典美术设计的款式，意气风发，威猛先生"]],
                             tianlangxing: ["female", "wu", 3, ["fangkong2", "qingxuncl"], ["des:阻敌计谋表现优秀，这是先发制敌的优势所在，"]],
@@ -3771,6 +3771,45 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
 
+                            },
+                            huhangyuanhu:{
+                                trigger:{
+                                    global:"useCardToTargeted",
+                                },
+                                filter:function(event,player){
+                                    return (event.card.name=='sha'||event.card.name=='sheji9')&&get.distance(player,event.target)<=1&&event.target.isIn();
+                                },
+                                check:function(event,player){
+                                    return get.attitude(player,event.target)>=0;
+                                },
+                                logTarget:"target",
+                                content:function(){
+                                    "step 0"
+                                    player.draw();
+                                    if(trigger.target!=player){
+                                        player.chooseCard(true,'he','交给'+get.translation(trigger.target)+'一张牌').set('ai',function(card){
+                                            if(get.position(card)=='e') return -1;
+                                            if(card.name=='shan'||card.name=='huibi9') return 1;
+                                            if(get.type(card)=='equip') return 0.5;
+                                            return 0;
+                                        });
+                                    }
+                                    else{
+                                        event.finish();
+                                    }
+                                    "step 1"
+                                    player.give(result.cards,trigger.target,'give');
+                                    game.delay();
+                                    event.card=result.cards[0];
+                                    "step 2"
+                                    if(trigger.target.getCards('h').contains(card)&&get.type(card)=='equip'){
+                                        trigger.target.chooseUseTarget(card);
+                                    }
+                                },
+                                ai:{
+                                    threaten:1.1,
+                                },
+                                "_priority":0,
                             }
 
                             //在这里添加新技能。
@@ -3880,6 +3919,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhanxianfangyu: "战线防御", "zhanxianfangyu_info": "每回合限一次，你成为黑色杀的目标时，你取消之。每回合限一次，距你为1的角色成为杀的目标时，你可以摸一张牌并代替该名角色成为此杀的目标。",
                             zhanxianfangyu1: "战线防御", "zhanxianfangyu1_info": "每回合限一次，你成为黑色杀的目标时，你取消之。",
                             Zqujingying: "Z驱菁英", "Zqujingying_info": "回合开始时，根据场上势力数，你可以选择获得以下技能中的一项:大于等于一，英姿;大于等于二，观星;大于等于三，反馈;大于等于四，谋识。直到你的下回合开始。",
+                            huhangyuanhu: "护航援护", "huhangyuanhu_info": "当一名角色成为杀的目标后，若你至该角色的距离为一，你可以摸一张牌，若如此做，你交给其一张牌并展示之。若为装备牌，该角色可以使用此牌。",
                         },
                     };
                     if (lib.device || lib.node) {
