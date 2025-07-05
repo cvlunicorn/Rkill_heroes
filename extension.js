@@ -2,7 +2,7 @@
 
 game.import("extension", function (lib, game, ui, get, ai, _status) {
     return {
-        name: "舰R牌将", content: function (config, pack) {
+        name: "舰R牌将", content: function (config, pack) { 
             if (config._yuanhang) {//优化摸牌时牌的质量的技能，全局技能需要下划线作为前缀，才能被无名杀识别。
                 lib.skill._yuanhang = {
                     name: "远航", "prompt2": "当你有摸牌标记时，你失去手牌后能摸1张牌，然后失去1个摸牌标记，自己回合暂时+1标记上限并回满标记，标记上限x个，可在强化中提升X值。", intro: { marktext: "摸牌", content: function (player, mark) { ; var a = game.me.countMark('_yuanhang_mopai'); return '手牌较少时，失去手牌可以摸一张牌，还可以摸' + a + '次，其他角色回合开始时会回复一个标记'; }, },
@@ -591,6 +591,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             weineituo: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb"], ["des:身材小，而强度惊人。"]],
                             lisailiu: ["female", "qun", 4, ["zhuangjiafh", "zhanliebb"], ["des:幸运的象征之一，同时有着丰富的精神象征。"]],
                             changmen: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb", "zhudaojiandui"], ["des:。"]],
+                            "1913": ["female", "shu", 4, ["zhuangjiafh", "zhanliebb", "jujianmengxiang","jujianmengxiang_reflash"], ["des:在大舰巨炮的黄金年代，让国人也拥有主力战舰，堪称最为奢侈的海军梦想了——而今日，妾身有幸以此姿态回应诸位之诉求。"]],
                             kunxi: ["female", "wei", 4, ["huokongld", "zhongxunca", "gaosusheji"], ["des:画师优秀的功底让这名角色美而可爱，这是出色的角色塑造。"]],
                             ougengqi: ["female", "qun", 4, ["huokongld", "zhongxunca", "zhanxianfangyu", "zhanxianfangyu1"], ["des:励志偶像，与标志性舰装，给人以强大的保护。"]],
                             qingye: ["female", "shu", 4, ["huokongld", "zhongxunca", "sawohaizhan"], ["des:励志偶像，与一首动人的歌，与一段坎坷旅途。"]],
@@ -611,7 +612,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "u1405": ["female", "qun", 3, ["qianting", "baiyin_skill", "qianxingtuxi"], ["des:无需隐匿的偷袭大师，马上就让对手的后勤捉襟见肘。"]],
                             jingjishen: ["female", "wu", 3, ["junfu"], ["des:需要武器支援，伙计倒下了。"]],
                             changchun: ["female", "shu", 3, ["daoqu", "rand"], ["des:尚处于正能量之时。"]],
-                            skilltest: ["male", "qun", 9, ["rand"], ["forbidai", "des:测试用"]],
+                            skilltest: ["male", "qun", 9, ["jujianmengxiang","jujianmengxiang_reflash"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
                             _yuanhang: {
@@ -4018,7 +4019,98 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                                 "_priority": 0,
-                            }
+                            },
+                            jujianmengxiang:{
+                                enable:"phaseUse",
+                                prompt:"失去一点体力并视为使用一张基本牌或非延时类锦囊牌（每回合每种牌名限一次）。",
+                            
+                                content:function(){
+                                    "step 0"
+                                    player.loseHp(1);
+                                    "step 1"
+                                     
+                                    //
+                                    var list=[];
+                                    for(var i=0;i<lib.inpile.length;i++){
+                                        var name=lib.inpile[i];
+                                        var type=get.type(name);
+                                        if(type=='trick'||type=='basic'){
+                                            if(lib.filter.cardEnabled({name:name},player)&&!player.storage.jujianmengxiang.contains(name)){
+                                                list.push([get.translation(type),'',name]);
+                                            }
+                                        }
+                                    }
+                                    var dialog=ui.create.dialog('巨舰梦想',[list,'vcard']);
+                                    var taoyuan=0,nanman=0;
+                                    var players=game.filterPlayer();
+                                    for(var i=0;i<players.length;i++){
+                                        var eff1=get.effect(players[i],{name:'taoyuan'},player,player);
+                                        var eff2=get.effect(players[i],{name:'nanman'},player,player);
+                                        if(eff1>0){
+                                            taoyuan++;
+                                        }
+                                        else if(eff1<0){
+                                            taoyuan--;
+                                        }
+                                        if(eff2>0){
+                                            nanman++;
+                                        }
+                                        else if(eff2<0){
+                                            nanman--;
+                                        }
+                                    }
+                                    player.chooseButton(dialog).ai=function(button){
+                                        var name=button.link[2];
+                                        if(Math.max(taoyuan,nanman)>1){
+                                            if(taoyuan>nanman) return name=='taoyuan'?1:0;
+                                            return name=='nanman'?1:0;
+                                        }
+                                        if(player.countCards('h')<player.hp&&player.hp>=2){
+                                            return name=='wuzhong'?1:0;
+                                        }
+                                        if(player.hp<player.maxHp&&player.hp<3){
+                                            return name=='tao'?1:0;
+                                        }
+                                        return name=='zengbin'?1:0;
+                                    }
+                                    'step 2'
+                                    if(result.bool){
+                                        player.chooseUseTarget(true,result.links[0][2]);
+                                        player.storage.jujianmengxiang.add(result.links[0][2]);
+                                    }
+                                    //
+                                },
+                                ai:{
+                                    basic:{
+                                        order:1,
+                                    },
+                                    result:{
+                                        player:function(player){
+                                            if(player.countCards('h')>=player.hp-1) return -1;
+                                            if(player.hp<3) return -1;
+                                            return 1;
+                                        },
+                                    },
+                                },
+                                "_priority":0,
+                                
+                            },
+                            jujianmengxiang_reflash:{
+                                trigger: {
+                                    player: ["phaseZhunbeiBegin"],
+                                },
+                                force:true,
+                                frequent:true,
+                                content: function () {
+                                    
+                                    if(player.storage.jujianmengxiang){
+                                    delete player.storage.jujianmengxiang;
+                                    }
+                                    player.storage.jujianmengxiang=[];
+                                    game.log("巨舰梦想");
+                                    
+                                },
+                             }
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -4048,6 +4140,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jingjishen: "竞技神",
                             "u1405": "u1405",
                             changchun: "长春",
+                            "1913":"1913战巡",
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐舰", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -4132,6 +4225,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             shizhibuyu1_eff: "矢志不渝", "shizhibuyu1_eff_info": "直到回合结束，手牌上限+1，出杀次数+1",
                             qianxingtuxi: "潜行突袭", "qianxingtuxi_info": "摸牌阶段摸牌时，你可以少摸任意张牌，然后获得等量的角色的各一张手牌",
                             "31jiezhongdui": "31节中队", "31jiezhongdui_info": "每名玩家每回合限一次，有角色使用杀指定目标后，若使用者的体力值小于目标的体力值，你可以选择一项:1令此杀不可响应;2令此杀伤害+1;3令此杀使用者摸两张牌然后直到你的回合开始不能发动此技能。:1令此杀不可响应;2令此杀伤害+1;3令此杀使用者摸两张牌然后本轮不能发动此技能。",
+                            jujianmengxiang: "巨舰梦想", "jujianmengxiang_info": "出牌阶段，你可以失去一点体力，视为使用一张基本牌或非延时锦囊牌（每回合每种牌名限一次）。",
                         },
                     };
                     if (lib.device || lib.node) {
