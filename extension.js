@@ -4206,8 +4206,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     global: "useCardToPlayered",
                                 },
                                 filter: function (event, player) {
-                                    return (event.card.name == 'sha' || event.card.name == 'sheji9') && !player.countMark('31jiezhongdui') ;
-                                    //&& _status.currentPhase.hp < event.target.hp;
+                                    return (event.card.name == 'sha' || event.card.name == 'sheji9') && !player.countMark('31jiezhongdui')&& _status.currentPhase.hp < event.target.hp;
                                 },
                                 content: function () {
                                     'step 0'
@@ -4540,7 +4539,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             zhongzhuangcike: {
-                                group: ["zhongzhuangcike_1", "zhongzhuangcike_2"],
+                                group: ["zhongzhuangcike_1", "jueqing"],
                                 "_priority": 0,
                             },
                             zhongzhuangcike_1: {
@@ -4548,7 +4547,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player: "useCardToPlayered",
                                 },
                                 filter: function (event) {
-                                    game.log("重装刺客1判断条件：使用杀指定目标");
+                                    //game.log("重装刺客1判断条件：使用杀指定目标");
                                     return (event.card.name == 'sha' || event.card.name == 'sheji9');
                                 },
                                 forced: true,
@@ -4566,7 +4565,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 prompt: "你装备区内有牌时，你使用的杀无视防具",
                             },
-                            zhongzhuangcike_2: {
+                            /*zhongzhuangcike_2: {
                                 trigger: {
                                     source: "damageSource",
                                 },
@@ -4585,7 +4584,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                 },
                                 prompt: "造成伤害后可以弃置目标角色的一张装备牌或摸一张牌",
-                            },
+                            },*/
                             /*zhongzhuangcike_3: {
                                 enable: ["chooseToRespond", "chooseToUse"],
                                 filterCard(card, player) {
@@ -5295,8 +5294,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jujianmengxiang: "巨舰梦想", "jujianmengxiang_info": "出牌阶段，你可以失去一点体力，视为使用一张基本牌或非延时锦囊牌（每回合每种牌名限一次）。",
                             sidajingang: "四大金刚", "sidajingang_info": "你使用杀造成伤害后，你可以与目标拼点，若你赢你获得其一张牌。你发动[远航摸牌]后可以摸一张牌。",
                             jiujingzhanzhen: "久经战阵", "jiujingzhanzhen_info": "结束阶段，你可以选择X名角色，其各选择一项:1摸一张牌，2令你获得一点护甲(至多为一)。X为你本回合弃置的红牌数。",
-                            wuweizhuangji: "无畏撞击", "wuweizhuangji_info": "限定技，出牌阶段，若你的体力值最少，你可以失去所有体力，然后对一名角色造成x点伤害（x为你装备区内的牌数+1）",
-                            zhongzhuangcike: "重装刺客", "zhongzhuangcike_info": "你装备区内有牌时，你使用的杀无视防具；你使用杀造成伤害后，若目标装备区不为空，你可以弃置目标角色装备区的一张牌，否则你摸一张牌。",
+                            wuweizhuangji: "无畏撞击", "wuweizhuangji_info": "限定技，出牌阶段，若你的体力值最少，你可以失去所有体力，然后对一名角色造成x点伤害(x为你当前的体力上限)",
+                            zhongzhuangcike: "重装刺客", "zhongzhuangcike_info": "你装备区内有牌时，你使用的杀无视防具；你即将造成的伤害视为体力流失",
                             duomianshou: "多面手", "duomianshou_info": "出牌阶段限一次，你可以弃置将一张手牌视为使用一张牌堆中同点数的其他类型的牌(不受次数限制），如列表里没牌，技能使用次数+1，且本回合不能使用该点数发动技能；每回合限一次，你对其他中小型船使用转化后的牌时其选择一项：1弃置一张牌，2令你摸一张牌。",
                             duomianshou_1: "多面手", "duomianshou_1_info": "每回合限一次，你对其他中小型船使用转化后的牌时其选择一项：1弃置一张牌，2令你摸一张牌。",
                             kaixuanzhige: "凯旋之歌", "kaixuanzhige_info": "当你使用【杀】指定唯一其他角色为目标后，你可以进行判定，若结果为锦囊牌，此【杀】伤害+1且无视防具。你的体力值小于3时，你使用的【杀】无视防具。",
