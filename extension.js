@@ -4820,12 +4820,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.judge(function () { return 0 });
                                     "step 1"
                                     game.log("此杀伤害基数" + trigger.getParent().baseDamage);
-                                    game.log(get.color(result));
+                                    game.log(get.suit(result));
                                     game.log(trigger.target);
-                                    if (get.color(result) == "red") {
+                                    if (get.suit(result) != "heart") {
                                         trigger.getParent().baseDamage++;
 
-                                    } else if (get.color(result) != "red") {
+                                    } else if (get.suit(result) == "heart") {
                                         game.log("else");
                                         trigger.targets.length = 0;
                                         trigger.getParent().triggeredTargets1.length = 0;//取消所有目标，来自秦宓谏征
@@ -5289,7 +5289,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             duomianshou: "多面手", "duomianshou_info": "出牌阶段限一次，你可以弃置将一张手牌视为使用一张牌堆中同点数的其他类型的牌(不受次数限制），如列表里没牌，技能使用次数+1，且本回合不能使用该点数发动技能；每回合限一次，你对其他中小型船使用转化后的牌时其选择一项：1弃置一张牌，2令你摸一张牌。",
                             duomianshou_1: "多面手", "duomianshou_1_info": "每回合限一次，你对其他中小型船使用转化后的牌时其选择一项：1弃置一张牌，2令你摸一张牌。",
                             kaixuanzhige: "凯旋之歌", "kaixuanzhige_info": "当你使用【杀】指定唯一其他角色为目标后，你可以进行判定，若结果为锦囊牌，此【杀】伤害+1且无视防具。你的体力值小于3时，你使用的【杀】无视防具。",
-                            yishisheji: "意式设计", "yishisheji_info": "每轮限一次，你可以免疫一次伤害。你使用杀指定唯一目标时可以进行判定，若判定结果为红色，此杀基础伤害+1，否则此杀无效。出牌阶段你使用或打出的第一张杀无距离限制。",
+                            yishisheji: "意式设计", "yishisheji_info": "每轮限一次，你可以免疫一次伤害。你使用杀指定唯一目标时可以进行判定，若判定结果不为红桃，此杀基础伤害+1，否则此杀无效。出牌阶段你使用或打出的第一张杀无距离限制。",
                             yishisheji_1: "意式设计", "yishisheji_1_info": "",
                             jueshengzhibing: "决胜之兵", "juezhanzhibing_info": "你使用杀指定有护甲的目标时，你可以弃置其一张牌；你使用锦囊牌时，你可以摸一张牌。若你以此法摸或弃置了总计两张牌，你结束出牌阶段，反之，回合结束时你获得'智愚'直到下回合开始。",
                             zhanfu: "战斧", "zhanfu_info": "你手牌数为场上最多时，你使用杀无视距离",
