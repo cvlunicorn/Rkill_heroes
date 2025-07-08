@@ -762,6 +762,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lishizhanyi_danmaihaixia: ["", ""],
                                 lishizhanyi_shanhuhai: ["", ""],
                                 lishizhanyi_haixiafujizhan: ["", ""],
+                                weijingzhizhi: ["jifu"],
                             },
 
                         },
@@ -798,7 +799,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             baiyanjuren: ["female", "RN", 3, ["junfu", "hangkongzhanshuguang"], ["des:需要武器支援，伙计倒下了。"]],
                             changchun: ["female", "PLAN", 3, ["daoqu", "rand", "sidajingang"], ["des:尚处于正能量之时。"]],
 
-                            skilltest: ["male", "OTHER", 9, ["zhanlie"], ["forbidai", "des:测试用"]],
+                            jifu: ["female", "ΒΜΦCCCP", 2, ["quzhudd", "jifu_weicheng", "jifu_yuanjing", "jifu_lingwei", "jifu_yuanqin","jifu_yuanqin"], ["des:。"]],
+
+                            skilltest: ["male", "OTHER", 9, ["zhanlie", "jifu_weicheng"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
                             _yuanhang: {
@@ -4151,7 +4154,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             Zqujingying: {
                                 audio: "ext:舰R牌将:true",
-                                enable:"phaseUse",
+                                enable: "phaseUse",
                                 usable: 1,
                                 filterCard: true,
                                 filterTarget: function (card, player, target) {
@@ -4199,12 +4202,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }).setContent('gaincardMultiple');
                                     'step 1'
                                     game.log("给出了" + cards.length);
-                                    if (cards.length >= 1) {player.addTempSkill("xiangrui", { player: 'phaseBegin' });game.log("获得祥瑞");}
-                                    if (cards.length >= 2) {player.draw(2);}
-                                    if (cards.length >= 3) {player.addTempSkill("Zqu3", { player: 'phaseBegin' });game.log("获得伤害+1");}
-                                    if (cards.length >= 4) {player.moveCard(true);}
-                                    if (cards.length >= 5) {player.addTempSkill("Zqu5", { player: 'phaseBegin' });game.log("获得强命");}
-                                    if (cards.length >= 6) {player.addTempSkill("Zqu6", { player: 'phaseBegin' });game.log("获得看破");}
+                                    if (cards.length >= 1) { player.addTempSkill("xiangrui", { player: 'phaseBegin' }); game.log("获得祥瑞"); }
+                                    if (cards.length >= 2) { player.draw(2); }
+                                    if (cards.length >= 3) { player.addTempSkill("Zqu3", { player: 'phaseBegin' }); game.log("获得伤害+1"); }
+                                    if (cards.length >= 4) { player.moveCard(true); }
+                                    if (cards.length >= 5) { player.addTempSkill("Zqu5", { player: 'phaseBegin' }); game.log("获得强命"); }
+                                    if (cards.length >= 6) { player.addTempSkill("Zqu6", { player: 'phaseBegin' }); game.log("获得看破"); }
                                     game.log("获得技能数" + cards.length);
                                     //player.gain(lib.card.ying.getYing(2 * cards.length), 'gain2');
                                 },
@@ -4221,78 +4224,78 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                                 "_priority": 0,
-/*
-                                trigger: {
-                                    player: "phaseZhunbeiBegin",
-                                },
-                                direct: true,
-                                forceaudio: true,
-                                filter: function (event, player) {
-                                    return true;
-                                },
-                                content: function () {
-                                    'step 0'
-                                    event.num = game.countGroup();
-                                    'step 1'
-                                    var list = [];
-                                    if (event.num >= 1 && !player.hasSkill('leiji')) list.push('leiji');
-                                    if (event.num >= 2 && !player.hasSkill('reyiji')) list.push('reyiji');
-                                    if (event.num >= 3 && !player.hasSkill('reshengxi')) list.push('reshengxi');
-                                    if (event.num >= 4 && !player.hasSkill('tiandu')) list.push('tiandu');
-                                    if (!list.length) {
-                                        event.finish();
-                                        return;
-                                    }
-                                    var prompt2 = '你可以获得下列一项技能直到下回合开始';
-                                    *****
-                                    //选两次技能改为选一次技能
-                                    if (event.done) {
-                                        prompt2 += ' (2/2)';
-                                    }
-                                    else {
-                                        prompt2 += ' (1/2)';
-                                    }
-                                        *****
-                                        list.push('cancel2');
-                                    player.chooseControl(list).set('prompt', get.translation('Zqujingying')).
-                                        set('prompt2', prompt2).set('centerprompt2', true).set('ai', function (evt, player) {
-                                            var controls = _status.event.controls;
-                                            if (controls.contains('leiji')) {
-                                                return 'leiji';
-                                            }
-                                            if (controls.contains('reyiji')) {
-                                                return 'reyiji';
-                                            }
-                                            if (controls.contains('reshengxi')) {
-                                                return 'reshengxi';
-                                            }
-                                            if (controls.contains('tiandu')) {
-                                                return 'tiandu';
-                                            }
-                                            return controls.randomGet();
-                                        });
-                                    'step 2'
-                                    if (result.control != 'cancel2') {
-                                        player.addTempSkill(result.control, { player: 'phaseBegin' });
-                                        //if (!event.done) player.logSkill('jiahe_put');
-                                        game.log(player, '获得了技能', '【' + get.translation(skill) + '】');
-                                        *****
-                                        //选两次技能改为选一次技能
-                                        if (!event.done) {
-                                            event.done = true;
-                                            event.goto(1);
-                                        }
-                                            *****
-                                    }
-                                },
-                                */
+                                /*
+                                                                trigger: {
+                                                                    player: "phaseZhunbeiBegin",
+                                                                },
+                                                                direct: true,
+                                                                forceaudio: true,
+                                                                filter: function (event, player) {
+                                                                    return true;
+                                                                },
+                                                                content: function () {
+                                                                    'step 0'
+                                                                    event.num = game.countGroup();
+                                                                    'step 1'
+                                                                    var list = [];
+                                                                    if (event.num >= 1 && !player.hasSkill('leiji')) list.push('leiji');
+                                                                    if (event.num >= 2 && !player.hasSkill('reyiji')) list.push('reyiji');
+                                                                    if (event.num >= 3 && !player.hasSkill('reshengxi')) list.push('reshengxi');
+                                                                    if (event.num >= 4 && !player.hasSkill('tiandu')) list.push('tiandu');
+                                                                    if (!list.length) {
+                                                                        event.finish();
+                                                                        return;
+                                                                    }
+                                                                    var prompt2 = '你可以获得下列一项技能直到下回合开始';
+                                                                    *****
+                                                                    //选两次技能改为选一次技能
+                                                                    if (event.done) {
+                                                                        prompt2 += ' (2/2)';
+                                                                    }
+                                                                    else {
+                                                                        prompt2 += ' (1/2)';
+                                                                    }
+                                                                        *****
+                                                                        list.push('cancel2');
+                                                                    player.chooseControl(list).set('prompt', get.translation('Zqujingying')).
+                                                                        set('prompt2', prompt2).set('centerprompt2', true).set('ai', function (evt, player) {
+                                                                            var controls = _status.event.controls;
+                                                                            if (controls.contains('leiji')) {
+                                                                                return 'leiji';
+                                                                            }
+                                                                            if (controls.contains('reyiji')) {
+                                                                                return 'reyiji';
+                                                                            }
+                                                                            if (controls.contains('reshengxi')) {
+                                                                                return 'reshengxi';
+                                                                            }
+                                                                            if (controls.contains('tiandu')) {
+                                                                                return 'tiandu';
+                                                                            }
+                                                                            return controls.randomGet();
+                                                                        });
+                                                                    'step 2'
+                                                                    if (result.control != 'cancel2') {
+                                                                        player.addTempSkill(result.control, { player: 'phaseBegin' });
+                                                                        //if (!event.done) player.logSkill('jiahe_put');
+                                                                        game.log(player, '获得了技能', '【' + get.translation(skill) + '】');
+                                                                        *****
+                                                                        //选两次技能改为选一次技能
+                                                                        if (!event.done) {
+                                                                            event.done = true;
+                                                                            event.goto(1);
+                                                                        }
+                                                                            *****
+                                                                    }
+                                                                },
+                                                                */
                             },
                             Zqu3: {
                                 trigger: {
                                     source: "damageBegin1",
                                 },
                                 filter(event) {
-                                    return event.card && (event.card.name == 'sha' || event.card.name == 'sheji9' || event.card.name == 'juedou' || event.card.name == 'juedouba9') && event.notLink();
+                                    return event.card && (event.card.name == 'sha' || event.card.name == 'sheji9') && event.notLink();
                                 },
                                 forced: true,
                                 async content(event, trigger, player) {
@@ -5633,6 +5636,160 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
+                            jifu_weicheng: {
+                                trigger: { player: "phaseZhunbeiBegin" },
+                                forced: true,
+                                content: function () {
+                                    "step 0"
+                                    player.judge();
+                                    "step 1"
+                                    if (result.color == 'red') {
+                                        player.recover(1);
+                                        player.addTempSkill('jifu_shanghai', { player: 'phaseJieshuBegin' });
+                                    }
+                                    if (result.color == 'black') {
+                                        player.loseHp(1);
+                                    }
+                                },
+                                "_priority": 0,
+                            },
+                            jifu_shanghai: {
+                                trigger: {
+                                    source: "damageBegin1",
+                                },
+                                filter(event) {
+                                    return event.card && event.notLink();
+                                },
+                                forced: true,
+                                async content(event, trigger, player) {
+                                    trigger.num++;
+                                },
+                                ai: {
+                                    damageBonus: true,
+                                },
+                                "_priority": 0,
+                            },
+                            jifu_yuanjing: {
+                                trigger: {
+                                    player: "dying",
+                                },
+                                juexingji: true,
+                                forced: true,
+                                skillAnimation: true,
+                                animationColor: "gray",
+                                filter: function (event, player) {
+                                    return player.hp <= 0;
+                                },
+                                content: function () {
+                                    'step 0'
+                                    player.awakenSkill(' jifu_yuanjing');
+                                    'step 1'
+                                    player.gainMaxHp(1);
+                                    'step 2'
+                                    player.recover(player.maxHp - player.hp);
+                                    player.removeSkills('jifu_weicheng');
+                                },
+                            },
+                            jifu_lingwei: {
+                                trigger: {
+                                    global: "useCardToPlayered",
+                                },
+                                filter: function (event, player) {
+                                    if (player.countMark('jifu_lingwei') >= 3) return false;
+                                    return get.tag(event.card, 'damage') && player.countCards("hes");
+                                },
+                                content: function () {
+                                    'step 0'
+                                    player.chooseToDiscard(1);
+                                    'step 1'
+                                    var str = get.translation(trigger.player);
+                                    player.chooseControl('cancel2').set('choiceList', [
+                                        '令此牌伤害+1',
+                                        '令此牌无法响应',
+                                    ]).set('ai', function () {
+                                        var player = _status.event.player, target = _status.event.getTrigger().target;
+                                        if (get.attitude(player, trigger.target) > 0) {
+                                            game.log("return'cancel2'");
+                                            return 'cancel2';
+                                        }
+                                        if (trigger.target.Hp + trigger.target.hujia <= 2 && _status.currentPhase.countCards("h") > 1) {
+                                            return target.mayHaveShan() ? 1 : 0;
+                                        }
+                                        return 1;
+                                    });
+                                    'step 2'
+                                    if (result.control != 'cancel2') {
+                                        var target = trigger.target;
+                                        player.logSkill('jifu_lingwei', target);
+                                        if (result.index == 1) {
+                                            game.log(trigger.card, '不可被响应');
+                                            trigger.directHit.add(target);
+                                        }
+                                        else {//多目标牌目前会出问题，不能正常加伤。
+                                            game.log(trigger.card, '伤害+1');
+                                            var map = trigger.getParent().customArgs, id = target.playerid;
+                                            if (!map[id]) map[id] = {};
+                                            if (!map[id].extraDamage) map[id].extraDamage = 0;
+                                            map[id].extraDamage++;
+                                        }
+                                    }
+                                    'step 3'
+                                    game.log(_status.currentPhase.group);
+                                    if (_status.currentPhase.hasSkill("quzhudd") || _status.currentPhase.group == 'ΒΜΦCCCP') {
+
+                                        if (_status.currentPhase != player) { _status.currentPhase.draw(1); }
+                                        player.draw(1);
+                                    }
+                                    player.addMark("jifu_lingwei", 1);
+
+                                },
+                                marktext: "领卫",
+                                intro: {
+                                    name: "领卫",
+                                    content: "本轮已发动过$次",
+                                },
+                                group: "jifu_lingwei_reflash",
+                                subSkill: {
+                                    reflash: {
+                                        trigger: {
+                                            player: ["phaseZhunbeiBegin"],
+                                        },
+                                        forced: true,
+                                        filter: function (event, player) {
+                                            return player.countMark('jifu_lingwei');
+                                        },
+                                        content: function () {
+                                            var i = player.countMark('jifu_lingwei');
+                                            player.removeMark('jifu_lingwei', i);
+                                        },
+                                        sub: true,
+                                        "_priority": 0,
+                                    },
+                                },
+
+
+
+
+                                "_priority": 0,
+
+                            },
+                            jifu_yuanqin: {
+                                trigger: {
+                                    target: "taoBegin",
+                                },
+                                zhuSkill: true,
+                                forced: true,
+                                filter(event, player) {
+                                    if (event.player == player) return false;
+                                    if (event.player != player&&(event.player.group = 'RM'||event.player.name== 'tashigan')) return true;
+                                    return false;
+                                },
+                                async content(event, trigger, player) {
+                                    trigger.baseDamage++;
+                                },
+                                "_priority": 0,
+                            }
+
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -5664,6 +5821,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             changchun: "长春",
                             "1913": "1913战巡",
                             yinghuochong: "萤火虫",
+                            jifu: "基辅",
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐舰", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -5769,7 +5927,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             //xinqidian_1:"新起点",xinqidian_1_info:"",
                             jilizhixin: "激励之心", 'jilizhixin_info': "若你的宝物栏为空，你视为装备着'侦察机'。你可以弃一张牌并跳过出牌阶段，令一名角色获得一个额外回合。",
                             hangkongzhanshuguang: "航空战曙光", 'hangkongzhanshuguang_info': "出牌阶段限一次，你可以令一名角色摸一张牌。若目标是航母，改为摸两张牌。",
-                            jianrjinji: "舰r武将",
+
+                            jifu_weicheng: "未成", 'jifu_weicheng_info': "锁定技，准备阶段你进行判定，若结果为红色：你回复一点体力，本回合你造成的伤害+1。若结果为黑色，你流失一点体力。",
+                            jifu_shanghai: "伤害+1", 'jifu_shanghai_info': "伤害+1",
+                            jifu_yuanjing: "愿景", 'jifu_yuanjing_info': "觉醒技，当你进入濒死时，增加一点体力上限，将体力调整至上限，然后失去未成",
+                            jifu_lingwei: "领卫", 'jifu_lingwei_info': "每轮限三次，有角色用伤害类牌时，你可以弃置一张牌，然后选择一项：1、令此牌伤害+1。2、此牌无法被响应。若使用牌的角色是驱逐或S国船，则你与被选择的目标各摸一张牌。",
+                            jifu_yuanqin: "远亲", 'jifu_yuanqin_info': "锁定技，/*你使塔什干与I国船回复体力时，回复的体力值+1，*/塔什干与I国船使你回复体力时，回复的体力值+1。",
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
                             lishizhanyi_naerweike: '历史战役-纳尔维克',
@@ -5777,6 +5940,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             lishizhanyi_danmaihaixia: '历史战役-丹麦海峡',
                             lishizhanyi_shanhuhai: '历史战役-珊瑚海',
                             lishizhanyi_haixiafujizhan: '历史战役-海峡伏击战',
+                            weijingzhizhi: '未竟之志',
                         },
                     };
                     if (lib.device || lib.node) {
