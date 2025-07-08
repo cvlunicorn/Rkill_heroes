@@ -720,6 +720,22 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 };
             };//选项触发内容，原因见config
 
+            lib.skill.DieSound={//死亡时台词
+                trigger:{global:'dieBegin',},
+                //direct:true,
+                priority:2,
+                forced:true,
+                unique:true,
+                frequent:true,
+                filter:function (event,player){
+                return !event.player.isAlive();
+                },
+                content:function(){
+                game.playAudio('..','extension','舰R牌将',trigger.player.name);
+                
+                },
+                }
+
             //全局技能写在这上面
         }, precontent: function (jianrjinji) {
 
@@ -4219,6 +4235,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             jujianmengxiang: {
+                                //audio:"ext:舰R牌将:1",
                                 enable: "phaseUse",
                                 prompt: "失去一点体力并视为使用一张基本牌或非延时类锦囊牌（每回合每种牌名限一次）。",
 
