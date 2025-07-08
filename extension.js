@@ -3799,16 +3799,21 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                      return false;
                                  },*/
                                 content: function () {
+                                    'step 0'
 
-                                    game.log('zhanxianfangyu', trigger.target);
+                                    //game.log('zhanxianfangyu', trigger.target);
 
                                     player.chooseToDiscard(1);
+                                    'step 1'
+                                    if(result.bool){
+                                    game.log('zhanxianfangyu', trigger.target);
                                     trigger.getParent().targets.remove(trigger.target);
                                     trigger.getParent().triggeredTargets2.remove(trigger.target);
                                     trigger.getParent().targets.push(player);
                                     trigger.untrigger();
                                     trigger.player.line(player);
                                     game.delayx();
+                                    }
                                 },
                                 ai: {
 
@@ -3828,6 +3833,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 popup: false,
                                 direct: true,
                                 filter: function (event, player) {
+                                    if(!player.hasEmptySlot(2)) return false;
                                     return (event.card.name == 'sha' || event.card.name == 'sheji9') && get.color(event.card) == 'black';
                                 },
                                 content: function () {
@@ -5099,7 +5105,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             wufenzhong4: "命运的五分钟", "wufenzhong4_info": "你可以跳过弃牌阶段并翻面，视为使用一张雷杀或火杀。",
                             qijianshashou: "旗舰杀手", "qijianshashou_info": "出牌阶段开始时，你可以与一名角色进行拼点，若你赢，本回合你与该角色距离视为1，你对该目标使用杀伤害+1，若你没赢，你跳过出牌阶段和弃牌阶段。",
                             qijianshashou_1: "旗舰杀手", "qijianshashou_1_info": "",
-                            zhanxianfangyu: "战线防御", "zhanxianfangyu_info": "每回合限一次，你成为黑色杀的目标时，你取消之。每回合限一次，距你为1的角色成为杀的目标时，你可以弃置一张牌并代替该名角色成为此杀的目标。",
+                            zhanxianfangyu: "战线防御", "zhanxianfangyu_info": "每回合限一次，若你没有装备防具，你成为黑色杀的目标时，取消之。每回合限一次，距你为1的角色成为杀的目标时，你可以弃置一张牌并代替该名角色成为此杀的目标。",
                             zhanxianfangyu1: "战线防御", "zhanxianfangyu1_info": "",
                             Zqujingying: "Z驱菁rn", "Zqujingying_info": "回合开始时，根据场上势力数，你可以选择获得以下技能中的一项:大于等于一，rn姿;大于等于二，观星;大于等于三，反馈;大于等于四，谋识。直到你的下回合开始。",
                             huhangyuanhu: "护航援护", "huhangyuanhu_info": "当一名其他角色成为杀的目标后，若你至该角色的距离为一，你可以摸一张牌，若如此做，你交给其一张牌并展示之。若为装备牌，该角色可以使用此牌。",
