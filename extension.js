@@ -213,7 +213,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     var target = result.targets[0]; event.target = target; player.logSkill('_yuanhang_dietogain', target);
                                     //if(target==trigger.source){target.draw(Math.max(1,player.maxHp))}else
                                     if (player.identity == 'zhong') { target.draw(1); };
-                                    if (player.identity == 'nei') { target.gain(game.createCard('shan'), 'gain2'); };
+                                    //if (player.identity == 'nei') { target.gain(game.createCard('shan'), 'gain2'); };
                                     //if (player.identity == 'fan') { target.draw(1); };
                                 } else event.finish();
                             },
@@ -775,7 +775,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             shuileizhanduichuixue: ["female", "IJN", 3, ["huibi", "quzhudd", "shuileizhandui",], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
                             minsike: ["female", "ΒΜΦCCCP", 3, ["huibi", "quzhudd", "manchangzhanyi", "manchangzhanyi_1"], ["des:跑得快，看得多。"]],
                             yinghuochong: ["female", "RN", 3, ["huibi", "quzhudd", "zhongzhuangcike", "wuweizhuangji"], ["des:为你施加勇气的魔法!"]],
-                            "u1405": ["female", "KMS", 3, ["qianting", "baiyin_skill", "qianxingtuxi"], ["des:无需隐匿的偷袭大师，马上就让对手的后勤捉襟见肘。"]],
+                            "u1405": ["female", "KMS", 3, ["qianting", "qianxingtuxi"], ["des:无需隐匿的偷袭大师，马上就让对手的后勤捉襟见肘。"]],
                             baiyanjuren: ["female", "RN", 3, ["junfu", "hangkongzhanshuguang"], ["des:需要武器支援，伙计倒下了。"]],
                             changchun: ["female", "PLAN", 3, ["daoqu", "rand", "sidajingang"], ["des:尚处于正能量之时。"]],
 
@@ -841,9 +841,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             if (result.bool) {
                                                 var target = result.targets[0]; event.target = target; player.logSkill('_yuanhang_dietogain', target);
                                                 //if(target==trigger.source){target.draw(Math.max(1,player.maxHp))}else
-                                                if (player.identity == 'zhong') { target.draw(2); };
-                                                if (player.identity == 'nei') { target.gain(game.createCard('shan'), 'gain2'); };
-                                                if (player.identity == 'fan') { target.draw(1); };
+                                                if (player.identity == 'zhong') { target.draw(1); };
+                                                //if (player.identity == 'nei') { target.gain(game.createCard('shan'), 'gain2'); };
+                                                //if (player.identity == 'fan') { target.draw(1); };
                                             } else event.finish();
                                         },
                                         sub: true,
