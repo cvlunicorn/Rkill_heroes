@@ -2865,7 +2865,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (get.type(event.card) != 'trick') return false;
                                     if (get.info(event.card).multitarget) return false;
                                     if (!player.countCards('he')) return false;
-                                    if (event.targets.length < 2) return false; return true;
+                                    if (event.targets.length < 2) return false; 
+                                    return true;
                                 },
                                 direct: true,
                                 content: function () {
@@ -2888,7 +2889,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return _status.event.targets.contains(target) && !target.hasSkill('fangkong2_aibiexuan') && get.distance(player, target) <= (1 + player.countMark('jinengup'));
                                         },//选择事件包含的目标，同trigger的目标。有其他同技能的角色时，ai不要重复选择目标。
                                         ai1: function (card) {
-                                            if (ui.selected.cards && ui.selected.cards.length >= Math.max(player.countCards('h') / 3, 1)) return -1; return 12 - get.useful(card);
+                                            return 7 - get.useful(card);
                                         },//建议卡牌以7为标准就行，怕ai不救队友，所以调高了。同时ai顺次选择卡牌时不要选太多卡牌，要形成持续的牵制。
                                         ai2: function (target) {
                                             var trigger = _status.event.getTrigger();
@@ -2901,6 +2902,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         event.target = result.targets;//前面有目标target，可以返回target。
                                         if (event.target != undefined) { for (var i = 0; i < trigger.targets.length; i += (1)) { if (event.target.contains(trigger.targets[i])) { trigger.getParent().excluded.add(trigger.targets[i]); trigger.targets[i].addSkill('fangkong_aibiexuan'); game.log('取消卡牌目标', trigger.targets[i], '编号', i) } } };//三级选择，集合target是否包含trigger.target。同时测试是否选到了目标。
                                         player.logSkill('fangkong2', event.target);
+
                                         if (player.hasSkill('duikongfangyu')) player.draw(event.target.length);//对空防御的技能效果。若玩家拥有对空防御，则发动防空后可以摸牌。
                                     }//让技能发语音，发历史记录。
                                 },
