@@ -3705,14 +3705,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player: "phaseUseBegin",
                                 },
                                 direct: true,
-                                //enable: "phaseUse",
-                                //usable: 1,
-                                //filterTarget: function (card, player, target) {
-                                //    return player.canCompare(target);
-                                //},
-                                //filter: function (event, player) {
-                                //    return player.countCards('h') > 0;
-                                //},
                                 content: function () {
                                     'step 0'
                                     player.chooseTarget(get.prompt2('qijianshashou'), function (card, player, target) {
@@ -3765,11 +3757,16 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 charlotte: true,
                                 forced: true,
                                 filter: function (event, player) {
-                                    return event.card && (event.card.name == "sha" || event.card.name == "sheji9") && event.player.getStorage('qijianshashou_1') && event.player != player;
+                                    
+                                    return event.card && (event.card.name == "sha" || event.card.name == "sheji9") && player.getStorage('qijianshashou_1') && event.player != player;
                                 },
                                 content: function () {
+                                    game.log("目标"+trigger.player.name);
+                                    game.log("目标包含"+player.getStorage('qijianshashou_1').contains(trigger.player));
+                                    if(player.getStorage('qijianshashou_1').contains(trigger.player)){
                                     trigger.num++;
                                     game.log("伤害+1");
+                                    }
                                 },
                                 "_priority": 0,
                             },
@@ -4710,12 +4707,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             yishisheji: {
-                                init(player) {
-                                    if (player.getHistory('useCard', evt => get.name(evt.card) == 'sha' || "sheji9").length) player.addTempSkill('yishisheji_used');
-                                },
+                                
                                 mod: {
+                                    
                                     targetInRange(card, player, target) {
-                                        if ((get.name(card) == 'sha' || get.name(card) == "sheji9") && !player.hasSkill('yishisheji_used')) return true;
+                                        game.log(player.getHistory('useCard', evt => get.name(evt.card) == 'sha' || "sheji9"));
+                                        if ((get.name(card) == 'sha' || get.name(card) == "sheji9") && !player.getHistory('useCard', evt => get.name(evt.card) == 'sha' || "sheji9").length) return true;
                                     },
                                 },
                                 shaRelated: true,
@@ -4732,8 +4729,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 content: function () {
                                     "step 0"
                                     player.judge(function () { return 0 });
-
-                                    //game.log("trigger.target1"+JSON.stringify(trigger.target[0]));
                                     "step 1"
                                     game.log("此杀伤害基数" + trigger.getParent().baseDamage);
                                     game.log(get.color(result));
@@ -4817,7 +4812,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 usable: 1,
 
                                 filterTarget: function (card, player, target) {
-                                    return player != target;
+                                    return player != target&&target.countCards("h");
                                 },
                                 selectTarget: function () {
                                     return [1, 3];
@@ -4885,13 +4880,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     for (let j = 0; j < targets.length; j++) {
                                         if (flag) {
 
-                                            game.log(targets[j] + "摸牌");
+                                            game.log(targets[j].name + "摸牌");
                                             targets[j].draw();
                                         }
 
                                         if (!flag) {
 
-                                            game.log(targets[j] + "获得技能");
+                                            game.log(targets[j].name + "获得技能");
                                             targets[j].addTempSkill("mashu", { player: "phaseJieshuBegin" });
                                         }
                                     }
@@ -5122,7 +5117,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             duomianshou: "多面手", "duomianshou_info": "出牌阶段限一次，你可以弃置将一张手牌视为使用一张牌堆中同点数的其他类型的牌(不受次数限制），如列表里没牌，技能使用次数+1，且本回合不能使用该点数发动技能；对其他中小型船使用此法转化后的牌时其选择一项：1.你摸一张牌；2.其弃置一张牌。",
                             duomianshou_1: "多面手", "duomianshou_1_info": "对其他中小型船使用转化后的牌时其选择一项：1.你摸一张牌；2.其弃置一张牌。",
                             kaixuanzhige: "凯旋之歌", "kaixuanzhige_info": "当你使用【杀】指定唯一其他角色为目标后，你可以进行判定，若结果为锦囊牌，此【杀】伤害+1且无视防具。你的体力值小于3时，你使用的【杀】无视防具。",
-                            yishisheji: "意式设计", "yishisheji_info": "每轮限一次，你可以免疫一次伤害。你使用杀指定唯一目标时可以进行判定，若判定结果为红色，此杀基础伤害+1，否则此杀无效。出牌阶段你使用的第一张杀无距离限制。",
+                            yishisheji: "意式设计", "yishisheji_info": "每轮限一次，你可以免疫一次伤害。你使用杀指定唯一目标时可以进行判定，若判定结果为红色，此杀基础伤害+1，否则此杀无效。出牌阶段你使用或打出的第一张杀无距离限制。",
                             yishisheji_1: "意式设计", "yishisheji_1_info": "",
                             jueshengzhibing: "决胜之兵", "juezhanzhibing_info": "锁定技，其他角色弃置牌时，若你的手牌数不为全场最多，你可以摸一张牌",
                             zhanfu: "战斧", "zhanfu_info": "你手牌数为场上最多时，你使用杀无视距离",
