@@ -4871,22 +4871,81 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             jueshengzhibing: {
+
+                                derivation: "zhiyu",
                                 trigger: {
-                                    global: ["loseAfter", "loseAsyncAfter"],
+                                    player: "phaseJieshuBegin",
                                 },
-                                force: true,
-                                direct: true,
+                                forced: true,
                                 filter: function (event, player) {
-                                    if (event.type != 'discard' || _status.currentPhase == player || event.getlx === false) return false;
-                                    if (event.name == 'lose' && event.player == player) return false;
-                                    //game.log("jueshengzhibing");
-                                    return !player.isMaxHandcard();
+                                    return player.countMark('jueshengzhibing_count') < 2;
                                 },
                                 content: function () {
-                                    player.draw(1);
-                                    //game.log("jueshengzhibing");
+                                    player.addTempSkill('zhiyu', { player: 'phaseBegin' });
+                                },
+                                group: ["jueshengzhibing_discard", "jueshengzhibing_draw"],
+                                preHidden: ["jueshengzhibing_discard", "jueshengzhibing_draw"],
+                                subSkill: {
+                                    discard: {
+                                        logTarget: "target",
+                                        trigger: {
+                                            player: "useCardToPlayered",
+                                        },
+                                        filter: function (event, player) {
+                                            game.log(event.target.hujia);
+                                            return player == _status.currentPhase && player.countMark('jueshengzhibing_count') < 2 && event.target.hujia > 0 &&
+                                                (event.card.name == 'sha' || event.card.name == 'sheji9');
+                                        },
+                                        check: function (event, player) {
+                                            return get.attitude(player, event.target) <= 0;
+                                        },
+                                        content: function () {
+                                            player.discardPlayerCard('he', trigger.target, 1, true);
+                                            player.addTempSkill('jueshengzhibing_count');
+                                            player.addMark('jueshengzhibing_count', 1, false);
 
-                                }
+                                            if (player.countMark('jueshengzhibing_count') >= 2) {
+                                                var evt = _status.event.getParent('phaseUse');
+                                                if (evt && evt.name == 'phaseUse') {
+                                                    evt.skipped = true;
+                                                    event.finish();
+                                                }
+                                            }
+                                        },
+                                        sub: true,
+                                        "_priority": 0,
+                                    },
+                                    draw: {
+                                        trigger: {
+                                            player: "useCard",
+                                        },
+                                        filter: function (event, player) {
+                                            return player == _status.currentPhase &&  player.countMark('jueshengzhibing_count') < 2 && event.card.isCard && get.type2(event.card) == 'trick';
+                                        },
+                                        content: function () {
+                                            player.draw();
+                                            player.addTempSkill('jueshengzhibing_count');
+                                            player.addMark('jueshengzhibing_count', 1, false);
+
+                                            if (player.countMark('jueshengzhibing_count') >= 2) {
+                                                var evt = _status.event.getParent('phaseUse');
+                                                if (evt && evt.name == 'phaseUse') {
+                                                    evt.skipped = true;
+                                                    event.finish();
+                                                }
+                                            }
+                                        },
+                                        sub: true,
+                                        "_priority": 0,
+                                    },
+                                    count: {
+                                        onremove: true,
+                                        sub: true,
+                                        "_priority": 0,
+                                    },
+                                },
+                                "_priority": 0,
+
                             },
                             zhanfu: {
                                 mod: {
@@ -5215,7 +5274,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qijianshashou_1: "旗舰杀手", "qijianshashou_1_info": "",
                             zhanxianfangyu: "战线防御", "zhanxianfangyu_info": "每回合限一次，若你没有装备防具，你成为黑色杀的目标时，取消之。每回合限一次，距你为1的角色成为杀的目标时，你可以弃置一张牌并代替该名角色成为此杀的目标。",
                             zhanxianfangyu1: "战线防御", "zhanxianfangyu1_info": "",
-                            Zqujingying: "Z驱菁英", "Zqujingying_info": "回合开始时，根据场上势力数，你可以选择获得以下技能中的一项:大于等于一，rn姿;大于等于二，观星;大于等于三，反馈;大于等于四，谋识。直到你的下回合开始。",
+                            Zqujingying: "Z驱菁英", "Zqujingying_info": "回合开始时，根据场上势力数，你可以选择获得以下技能中的一项:大于等于一，雷击;大于等于二，遗计;大于等于三，生息;大于等于四，天妒。直到你的下回合开始。",
                             huhangyuanhu: "护航援护", "huhangyuanhu_info": "当一名其他角色成为杀的目标后，若你至该角色的距离为一，你可以摸一张牌，若如此做，你交给其一张牌并展示之。若为装备牌，该角色可以使用此牌。",
                             shizhibuyu: "矢志不渝", "shizhibuyu_info": "当你受到伤害时，你可以弃置两张颜色相同的牌令此伤害-1，然后进行判定，若结果为红色，你摸一张牌。 当你的判定牌生效后，你可以令一名角色使用杀次数+1和手牌上限+1直到你的下回合开始。",
                             shizhibuyu1: "矢志不渝", "shizhibuyu1_info": "",
@@ -5234,7 +5293,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             kaixuanzhige: "凯旋之歌", "kaixuanzhige_info": "当你使用【杀】指定唯一其他角色为目标后，你可以进行判定，若结果为锦囊牌，此【杀】伤害+1且无视防具。你的体力值小于3时，你使用的【杀】无视防具。",
                             yishisheji: "意式设计", "yishisheji_info": "每轮限一次，你可以免疫一次伤害。你使用杀指定唯一目标时可以进行判定，若判定结果为红色，此杀基础伤害+1，否则此杀无效。出牌阶段你使用或打出的第一张杀无距离限制。",
                             yishisheji_1: "意式设计", "yishisheji_1_info": "",
-                            jueshengzhibing: "决胜之兵", "juezhanzhibing_info": "锁定技，其他角色弃置牌时，若你的手牌数不为全场最多，你可以摸一张牌",
+                            jueshengzhibing: "决胜之兵", "juezhanzhibing_info": "你使用杀指定有护甲的目标时，你可以弃置其一张牌；你使用锦囊牌时，你可以摸一张牌。若你以此法摸或弃置了总计两张牌，你结束出牌阶段，反之，回合结束时你获得'智愚'直到下回合开始。",
                             zhanfu: "战斧", "zhanfu_info": "你手牌数为场上最多时，你使用杀无视距离",
                             xinqidian: "新起点", "xinqidian_info": "出牌阶段限一次，你可以选择至多3名角色，你与这些角色各展示一张牌:若展示的牌类型均不相同，每人摸1张牌;否则，参与展示牌的角色计算与其他角色距离-1直至其的下个回合结束。",
                             //xinqidian_1:"新起点",xinqidian_1_info:"",
