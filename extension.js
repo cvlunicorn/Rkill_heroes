@@ -776,7 +776,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             minsike: ["female", "ΒΜΦCCCP", 3, ["huibi", "quzhudd", "manchangzhanyi", "manchangzhanyi_1"], ["des:跑得快，看得多。"]],
                             yinghuochong: ["female", "RN", 3, ["huibi", "quzhudd", "zhongzhuangcike", "wuweizhuangji"], ["des:为你施加勇气的魔法!"]],
                             "u1405": ["female", "KMS", 3, ["qianting", "baiyin_skill", "qianxingtuxi"], ["des:无需隐匿的偷袭大师，马上就让对手的后勤捉襟见肘。"]],
-                            jingjishen: ["female", "RN", 3, ["junfu"], ["des:需要武器支援，伙计倒下了。"]],
+                            baiyanjuren: ["female", "RN", 3, ["junfu","hangkongzhanshuguang"], ["des:需要武器支援，伙计倒下了。"]],
                             changchun: ["female", "PLAN", 3, ["daoqu", "rand", "sidajingang"], ["des:尚处于正能量之时。"]],
 
                             skilltest: ["male", "OTHER", 9, ["zhanlie"], ["forbidai", "des:测试用"]],
@@ -5019,6 +5019,29 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.removeSkill('jilizhixin3');
                                 }
                             },
+                            hangkongzhanshuguang:{
+                                usable:1,
+                                enable: "phaseUse",
+                                filterTarget:true,
+                                content:function(){
+                                    game.log(target);
+                                    if(target.hasSkill("hangmucv")||target.hasSkill("junfu"))
+                                    {
+                                        game.log("CV");
+                                        target.draw(2);
+                                    }
+                                    else{
+                                        game.log("!=CV");
+                                        target.draw(1);
+                                    }
+                                },
+                                ai:{
+                                    order:7.2,
+                                    result:{
+                                        player:1,
+                                    },
+                                },
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -5045,7 +5068,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             shuileizhanduichuixue: "水雷战队吹雪",
                             guzhuyizhichuixue: "孤注一掷吹雪",
                             minsike: "明斯克",
-                            jingjishen: "竞技神",
+                            baiyanjuren: "百眼巨人",
                             "u1405": "u1405",
                             changchun: "长春",
                             "1913": "1913战巡",
@@ -5150,6 +5173,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             xinqidian: "新起点", "xinqidian_info": "出牌阶段限一次，你可以选择至多3名角色，你与这些角色各展示一张牌:若展示的牌类型均相同，每人摸1张牌;若不同，参与展示牌的角色计算与其他角色距离-1直至其的下个回合结束。",
                             //xinqidian_1:"新起点",xinqidian_1_info:"",
                             jilizhixin: "激励之心", jilizhixin_info: "若你的宝物栏为空，你视为装备着'侦察机'。你可以弃一张牌并跳过出牌阶段，令一名角色获得一个额外回合。",
+                            hangkongzhanshuguang:"航空战曙光",hangkongzhanshuguang_info:"出牌阶段限一次，你可以令一名角色摸一张牌。若目标是航母或军辅，改为摸两张牌。"
                         },
                     };
                     if (lib.device || lib.node) {
@@ -6523,7 +6547,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     shuileizhanduichuixue: ["female", "shu", 3, ["huibi", "quzhudd", "shuileizhandui",], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
                     minsike: ["female", "qun", 3, ["huibi", "quzhudd", "manchangzhanyi", "manchangzhanyi_1"], ["des:跑得快，看得多。"]],
                     "u1405": ["female", "wu", 2, ["qianting", "baiyin_skill"], ["des:无需隐匿的偷袭大师，马上就让对手的后勤捉襟见肘。"]],
-                    jingjishen: ["female", "wu", 3, ["junfu"], ["des:需要武器支援，伙计倒下了。"]],
+                    baiyanjuren: ["female", "wu", 3, ["junfu"], ["des:需要武器支援，伙计倒下了。"]],
                     changchun: ["female", "wu", 3, ["daoqu", "tianyi"], ["des:尚处于正能量之时。"]],*/
                 },
                 translate: {
