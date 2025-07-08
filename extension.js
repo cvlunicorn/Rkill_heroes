@@ -4220,7 +4220,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     global: "useCardToPlayered",
                                 },
                                 filter: function (event, player) {
-                                    return (event.card.name == 'sha' || event.card.name == 'sheji9') && !player.countMark('31jiezhongdui') && _status.currentPhase.hp < event.target.hp;
+                                    return (event.card.name == 'sha' || event.card.name == 'sheji9') && !player.countMark('31jiezhongdui') ;
+                                    //&& _status.currentPhase.hp < event.target.hp;
                                 },
                                 content: function () {
                                     'step 0'
@@ -4231,8 +4232,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         '令当前回合角色摸两张牌，然后"31节中队"暂时失效',
                                     ]).set('prompt', get.prompt('31jiezhongdui', trigger.target)).setHiddenSkill('31jiezhongdui').set('ai', function () {
                                         var player = _status.event.player, target = _status.event.getTrigger().target;
-                                        if (get.attitude(player, target) > 0) return 2;
-                                        return target.mayHaveShan() ? 1 : 0;
+                                        if (get.attitude(player, trigger.target) > 0) {
+                                            game.log("return'cancel2'");
+                                            return 'cancel2';
+                                        }
+                                        if(trigger.target.Hp+trigger.target.hujia<=2&&_status.currentPhase.countCards("h")>1){
+                                            return target.mayHaveShan() ? 1 : 0;
+                                        }
+                                        return 2;
+                                        
                                     });
                                     'step 1'
                                     if (result.control != 'cancel2') {
@@ -4541,7 +4549,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             zhongzhuangcike: {
-                                group: ["zhongzhuangcike_1","zhongzhuangcike_2"],
+                                group: ["zhongzhuangcike_1", "zhongzhuangcike_2"],
                                 "_priority": 0,
                             },
                             zhongzhuangcike_1: {
@@ -4553,7 +4561,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return (event.card.name == 'sha' || event.card.name == 'sheji9');
                                 },
                                 forced: true,
-                                direct:true,
+                                direct: true,
                                 logTarget: "target",
                                 content: function () {
                                     game.log("重装刺客1执行代码");
@@ -4571,7 +4579,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     source: "damageSource",
                                 },
-                                filter:function (event, player) {
+                                filter: function (event, player) {
                                     if (event._notrigger.contains(event.player)) return false;
                                     return (event.card && (event.card.name == 'sha' || event.card.name == 'sheji9') && (event.getParent().name == 'sha' || event.getParent().name == 'sheji9'));
                                 },
@@ -4580,8 +4588,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     //game.log(trigger.player);
                                     //game.log(player);
                                     if (trigger.player.countCards('e')) {
-                                        player.discardPlayerCard('e', trigger.player,1,true);
-                                    }else{
+                                        player.discardPlayerCard('e', trigger.player, 1, true);
+                                    } else {
                                         player.draw(1);
                                     }
                                 },
@@ -5255,7 +5263,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             huijiahuihe: "额外回合",
                             "huijiahuihe_info": "当你有护甲时，你可以移除所有护甲并进行一个额外的回合；额外回合的摸牌数等于护甲数。此回合没有输出时，摸一张牌。",
                             junfu: "军辅船",
-                            "junfu_info": "其他人回合开始时,你可以把至多1/2/3张手牌存于武将牌上，如手牌般使用。<br>其他角色回合开始时，你可以把存储的牌交给ta，然后你摸一张牌。<br>可以强化(目标的手牌数<8才能使用此技能)<br>拥有技能强化和远航强化即可起飞。",
+                            "junfu_info": "回合开始时,你可以把至多1/2/3张手牌存于武将牌上，如手牌般使用。<br>其他角色回合开始时，你可以把存储的牌交给ta，然后你摸一张牌。<br>可以强化(目标的手牌数<8才能使用此技能)<br>拥有技能强化和远航强化即可起飞。",
                             manchangzhanyi: "漫长战役", "manchangzhanyi_info": "每轮限一次，你受到锦囊牌的伤害时，你免疫此伤害。你攻击范围内的其他角色的准备阶段，你可以弃置其一张手牌。",
                             manchangzhanyi_1: "漫长战役", "manchangzhanyi_1_info": "",
                             guzhuyizhi: "孤注一掷", "guzhuyizhi_info": "出牌阶段开始时，你可以摸两张牌并弃置所有手牌，然后摸等量的牌，如此做，你的其他技能失效且你不能使用桃或快修直到你的下回合开始，你计算与其他角色的距离-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。",
@@ -5266,7 +5274,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             dumuchenglin_2: "独木成林2", "dumuchenglin_2_info": "杀使用次数+1，你于你的回合造成的第一次伤害时若受伤角色不是你此伤害+1。",
                             xiangrui: "祥瑞", "xiangrui_info": "每名玩家的回合限一次，当你受到伤害前，你可以进行判定，判定结果为黑桃，免疫此次伤害，然后获得[祥瑞]标记。",
                             yumian: "御免", "yumian_info": "锁定技，结束阶段，你移除所有[祥瑞]标记。你可以选择距你为1的目标，让其失去一点体力并摸两张牌。若你失去了一个或以上的祥瑞标记，你可以选择的目标不受距离限制",
-                            hangkongzhanshuxianqu: "航空战术先驱", "hangkongzhanshuxianqu_info": "你使用转化的锦囊牌指定目标时，你摸x张牌(x为你指定的目标数，至多为4)",
+                            hangkongzhanshuxianqu: "航空战术先驱", "hangkongzhanshuxianqu_info": "你使用转化的锦囊牌指定目标时，你可以展示牌堆顶的x张牌，获取其中花色各不相同的牌(x为你指定的目标数，至多为4)",
                             gaosusheji: "高速射击", "gaosusheji_info": "当你使用的杀是本回合你使用的第一张牌，你可以令此杀结算两次。",
                             qixi_cv: "奇袭", "qixi_cv_info": "限定技，出牌阶段，你可以令所有其他角色依次选择一项:1你弃置其区域内的两张牌，2本回合不能使用或打出手牌，3翻面。然后你可以视为使用【近距支援】。",
                             rand: "随机数", "rand_info": "遇事不决？扔一个骰子吧。该技能可以生成1~6的随机数",
@@ -5280,9 +5288,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             wufenzhong4: "命运的五分钟", "wufenzhong4_info": "你可以跳过弃牌阶段并翻面，视为使用一张雷杀或火杀。",
                             qijianshashou: "旗舰杀手", "qijianshashou_info": "出牌阶段开始时，你可以与一名角色进行拼点，若你赢，本回合你与该角色距离视为1，你对该目标使用杀伤害+1，若你没赢，你跳过出牌阶段和弃牌阶段。",
                             qijianshashou_1: "旗舰杀手", "qijianshashou_1_info": "",
-                            zhanxianfangyu: "战线防御", "zhanxianfangyu_info": "每回合限一次，若你没有装备防具，你成为黑色杀的目标时，取消之。每回合限一次，距你为1的角色成为杀的目标时，你可以弃置一张牌并代替该名角色成为此杀的目标。",
+                            zhanxianfangyu: "战线防御", "zhanxianfangyu_info": "每名角色回合回合限一次，若你没有装备防具，你成为黑色杀的目标时，取消之。每回合限一次，距你为1的角色成为杀的目标时，你可以弃置一张牌并代替该名角色成为此杀的目标。",
                             zhanxianfangyu1: "战线防御", "zhanxianfangyu1_info": "",
-                            Zqujingying: "Z驱菁英", "Zqujingying_info": "回合开始时，根据场上势力数，你可以选择获得以下技能中的一项:大于等于一，雷击;大于等于二，遗计;大于等于三，生息;大于等于四，天妒。直到你的下回合开始。",
+                            Zqujingying: "Z驱菁英", "Zqujingying_info": "准备阶段，根据场上势力数，你可以选择获得以下技能中的一项:大于等于一，雷击;大于等于二，遗计;大于等于三，生息;大于等于四，天妒。直到你的下回合开始。",
                             huhangyuanhu: "护航援护", "huhangyuanhu_info": "当一名其他角色成为杀的目标后，若你至该角色的距离为一，你可以摸一张牌，若如此做，你交给其一张牌并展示之。若为装备牌，该角色可以使用此牌。",
                             shizhibuyu: "矢志不渝", "shizhibuyu_info": "当你受到伤害时，你可以弃置两张颜色相同的牌令此伤害-1，然后进行判定，若结果为红色，你摸一张牌。 当你的判定牌生效后，你可以令一名角色使用杀次数+1和手牌上限+1直到你的下回合开始。",
                             shizhibuyu1: "矢志不渝", "shizhibuyu1_info": "",
@@ -5291,7 +5299,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qianxingtuxi_debuff: "被袭", "qianxingtuxi_debuff_info": "锁定技，你第一次造成伤害时须进行一次判定，如果为黑桃，此次伤害-1。",
                             "31jiezhongdui": "31节中队", "31jiezhongdui_info": "每名玩家每回合限一次，有角色使用杀指定目标后，若使用者的体力值小于目标的体力值，你可以选择一项:1令此杀不可响应;2令此杀伤害+1;3令此杀使用者摸两张牌然后直到你的回合开始不能发动此技能。:1令此杀不可响应;2令此杀伤害+1;3令此杀使用者摸两张牌然后本轮不能发动此技能。",
                             jujianmengxiang: "巨舰梦想", "jujianmengxiang_info": "出牌阶段，你可以失去一点体力，视为使用一张基本牌或非延时锦囊牌（每回合每种牌名限一次）。",
-                            sidajingang: "四大金刚", "sidajingang_info": "你使用杀造成伤害时，你可以与目标拼点，若你赢你获得其一张牌。你发动[远航摸牌]后可以摸一张牌。",
+                            sidajingang: "四大金刚", "sidajingang_info": "你使用杀造成伤害后，你可以与目标拼点，若你赢你获得其一张牌。你发动[远航摸牌]后可以摸一张牌。",
                             jiujingzhanzhen: "久经战阵", "jiujingzhanzhen_info": "结束阶段，你可以选择X名角色，其各选择一项:1摸一张牌，2令你获得一点护甲(至多为一)。X为你本回合弃置的红牌数。",
                             wuweizhuangji: "无畏撞击", "wuweizhuangji_info": "限定技，出牌阶段，若你的体力值最少，你可以失去所有体力，然后对一名角色造成x点伤害（x为你装备区内的牌数+1）",
                             zhongzhuangcike: "重装刺客", "zhongzhuangcike_info": "你装备区内有牌时，你使用的杀无视防具；你使用杀造成伤害后，若目标装备区不为空，你可以弃置目标角色装备区的一张牌，否则你摸一张牌。",
