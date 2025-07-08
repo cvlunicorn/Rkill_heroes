@@ -2919,7 +2919,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         if (event.target != undefined) { for (var i = 0; i < trigger.targets.length; i += (1)) { if (event.target.contains(trigger.targets[i])) { trigger.getParent().excluded.add(trigger.targets[i]); trigger.targets[i].addSkill('fangkong_aibiexuan'); game.log('取消卡牌目标', trigger.targets[i], '编号', i) } } };//三级选择，集合target是否包含trigger.target。同时测试是否选到了目标。
                                         player.logSkill('fangkong2', event.target);
 
-                                        if (player.hasSkill('duikongfangyu')) player.draw(2);//对空防御的技能效果。若玩家拥有对空防御，则发动防空后可以摸牌。
+                                        if (player.hasSkill('duikongfangyu')&&_status.currentPhase!=player) player.draw(2);//对空防御的技能效果。若玩家拥有对空防御，则发动防空后可以摸牌。
                                     }//让技能发语音，发历史记录。
                                 },
                                 subSkill: {
@@ -3535,34 +3535,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     game.log("随机选择的选项是:" + selectedOption);
                                 }
                             },
-                            duikongfangyu: {//对空防御的免伤部分。对空防御的摸牌部分写在防空
-                                trigger: {
-                                    player: "damageBegin4",
-                                },
+                            duikongfangyu: {//对空防御的摸牌部分写在防空
                                 forced: true,
-                                check: function (event, player) {
-                                    if (player == event.player) return true;
-                                    return false;
-                                },
-                                filter: function (event, player) {
-                                    return event.card && (event.card.name == 'wanjian' || event.card.name == 'jinjuzy');
-                                },
-                                content: function () {
-                                    trigger.cancel();
-                                },
+                                
 
                                 ai: {
                                     notrick: true,
-                                    notricksource: true,
                                     effect: {
                                         target: function (card, player, target, current) {
-                                            if (get.type(card) == 'trick' && get.tag(card, 'damage')) {
-                                                return 'zeroplayertarget';
-                                            }
-                                        },
-                                        player: function (card, player, target, current) {
-                                            if (get.type(card) == 'trick' && get.tag(card, 'damage')) {
-                                                return 'zeroplayertarget';
+                                            if(target.countCards('he')<=1) return;
+                                            if (get.type(card) == 'trick' &&(get.name(card) == 'nanman' ||get.name(card) == 'wanjian' ||get.name(card) == 'jinjuzy9' ||get.name(card) == 'manchangyy9' ||get.name(card) == 'zhiyuangj9' ||get.name(card) == 'lastfriend9' ||get.name(card) == 'paohuofg9' )) {
+                                                return 0.6;
                                             }
                                         },
                                     },
@@ -5023,17 +5006,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     game.broadcastAll('closeDialog', videoId);
 
 
-                                    const type = get.type(cards[0], false);
-                                    game.log("flag0" + type);
+                                    const suit = get.suit(cards[0], false);
+                                    game.log("flag0" + suit);
                                     let flag = false;
                                     for (let i = 0; i < targets.length; i++) {
                                         for (let j = 0; j < i; j++) {
-                                            if (get.type(cards[j], false) != get.type(cards[i], false)) {
-                                                game.log("flag=true" + get.type(cards[i], false));
+                                            if (get.suit(cards[j], false) != get.color(cards[i], false)) {
+                                                game.log("flag=true" + get.suit(cards[i], false));
                                                 flag = true;
                                             }
                                             else {
-                                                game.log("flag=false" + get.type(cards[i], false));
+                                                game.log("flag=false" + get.suit(cards[i], false));
                                                 flag = false;
                                                 i = targets.length;//触发上级停止条件，跳出循环
 
@@ -5043,7 +5026,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }
 
                                     }
-                                    game.log("种类不同？" + flag);
+                                    game.log("花色不同？" + flag);
                                     game.log(targets);
                                     for (let j = 0; j < targets.length; j++) {
                                         if (flag) {
@@ -5167,7 +5150,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filterTarget: true,
                                 content: function () {
                                     game.log(target);
-                                    if (target.hasSkill("hangmucv") || target.hasSkill("junfu")) {
+                                    if (target.hasSkill("hangmucv") ) {
                                         game.log("CV");
                                         target.draw(2);
                                     }
@@ -5278,7 +5261,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             gaosusheji: "高速射击", "gaosusheji_info": "当你使用的杀是本回合你使用的第一张牌，你可以令此杀结算两次。",
                             qixi_cv: "奇袭", "qixi_cv_info": "限定技，出牌阶段，你可以令所有其他角色依次选择一项:1你弃置其区域内的两张牌，2本回合不能使用或打出手牌，3翻面。然后你可以视为使用【近距支援】。",
                             rand: "随机数", "rand_info": "遇事不决？扔一个骰子吧。该技能可以生成1~6的随机数",
-                            duikongfangyu: "对空防御", "duikongfangyu_info": "你受到万箭齐发和近距支援伤害时，你防止此伤害。你发动[防空]后，你摸2张牌",
+                            duikongfangyu: "对空防御", "duikongfangyu_info": "你在回合外发动[防空]后，你摸2张牌",
                             zhudaojiandui: "柱岛舰队", "zhudaojiandui_info": "锁定技，每当你使用或打出一张非虚拟非转化的基本牌，你获得一个[柱]标记。你可以移去三个柱标记视为使用一张不计入次数限制的杀。",
                             sawohaizhan: "萨沃海战", "sawohaizhan_info": "出牌阶段，若你拥有[火控]，你可以失去[火控]，摸等同于体力值的牌。若如此做你本回合使用杀无距离次数限制且雷杀伤害+1。",
                             sawohaizhan_1: "萨沃海战", "sawohaizhan_1_info": "本回合使用杀无距离次数限制且雷杀伤害+1。",
@@ -5310,10 +5293,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             yishisheji_1: "意式设计", "yishisheji_1_info": "",
                             jueshengzhibing: "决胜之兵", "juezhanzhibing_info": "你使用杀指定有护甲的目标时，你可以弃置其一张牌；你使用锦囊牌时，你可以摸一张牌。若你以此法摸或弃置了总计两张牌，你结束出牌阶段，反之，回合结束时你获得'智愚'直到下回合开始。",
                             zhanfu: "战斧", "zhanfu_info": "你手牌数为场上最多时，你使用杀无视距离",
-                            xinqidian: "新起点", "xinqidian_info": "出牌阶段限一次，你可以选择至多3名角色，你与这些角色各展示一张牌:若展示的牌类型均不相同，每人摸1张牌;否则，参与展示牌的角色计算与其他角色距离-1直至其的下个回合结束。",
+                            xinqidian: "新起点", "xinqidian_info": "出牌阶段限一次，你可以选择至多3名角色，你与这些角色各展示一张牌:若展示的牌颜色均不相同，每人摸1张牌;否则，参与展示牌的角色计算与其他角色距离-1直至其的下个回合结束。",
                             //xinqidian_1:"新起点",xinqidian_1_info:"",
                             jilizhixin: "激励之心", 'jilizhixin_info': "若你的宝物栏为空，你视为装备着'侦察机'。你可以弃一张牌并跳过出牌阶段，令一名角色获得一个额外回合。",
-                            hangkongzhanshuguang: "航空战曙光", 'hangkongzhanshuguang_info': "出牌阶段限一次，你可以令一名角色摸一张牌。若目标是航母或军辅，改为摸两张牌。"
+                            hangkongzhanshuguang: "航空战曙光", 'hangkongzhanshuguang_info': "出牌阶段限一次，你可以令一名角色摸一张牌。若目标是航母，改为摸两张牌。"
                         },
                     };
                     if (lib.device || lib.node) {
