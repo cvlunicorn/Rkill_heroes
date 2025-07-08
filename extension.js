@@ -761,7 +761,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lishizhanyi_matapanjiao: ["", ""],
                                 lishizhanyi_danmaihaixia: ["", ""],
                                 lishizhanyi_shanhuhai: ["", ""],
-                                lishizhanyi_haixiafujizhan: ["", ""],
+                                lishizhanyi_haixiafujizhan: ["u47", ""],
                                 weijingzhizhi: ["jifu"],
                             },
 
@@ -798,7 +798,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "u1405": ["female", "KMS", 3, ["qianting", "qianxingtuxi"], ["des:无需隐匿的偷袭大师，马上就让对手的后勤捉襟见肘。"]],
                             baiyanjuren: ["female", "RN", 3, ["junfu", "hangkongzhanshuguang"], ["des:需要武器支援，伙计倒下了。"]],
                             changchun: ["female", "PLAN", 3, ["daoqu", "rand", "sidajingang"], ["des:尚处于正能量之时。"]],
-
+                            "u47": ["female", "KMS", 3, ["qianting", "u47_langben", "u47_xinbiao", "u47_huxi"], ["des:"]],
                             jifu: ["female", "ΒΜΦCCCP", 2, ["quzhudd", "jifu_weicheng", "jifu_yuanjing", "jifu_lingwei", "jifu_yuanqin", "jifu_yuanqin"], ["des:。"]],
 
                             skilltest: ["male", "OTHER", 9, ["zhanlie", "jifu_weicheng"], ["forbidai", "des:测试用"]],
@@ -5762,6 +5762,164 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     trigger.baseDamage++;
                                 },
                                 "_priority": 0,
+                            },
+                            u47_langben: {
+                                enable: "phaseUse",
+                                usable: 2,
+                                filterTarget: function (card, player, target) {
+                                    if (player == target) return false;
+                                    if (player.countCards('hes') == 0) return false;
+                                    if (target.hasSkill("u47_langben_target")) return false;
+                                    return true;
+                                },
+                                filterCard: true,
+                                check: function (card) {
+                                    if (card.name == 'du') return 20;
+                                    if (get.owner(card).countCards('hes') < get.owner(card).hp) return 0;
+                                    return 4 - get.value(card);
+                                },
+                                content: function () {
+                                    "step 0"
+                                    target.gain(cards, player);
+                                    target.addTempSkill('u47_langben_target', "phaseBegin");
+                                },
+                                ai: {
+                                    result: {
+                                        target: function (player, target) {
+                                            if (ui.selected.cards.length && ui.selected.cards[0].name == 'du') {
+                                                return -1;
+                                            }
+                                            return 1;
+                                        },
+                                    },
+                                    order: 1,
+                                },
+                            },
+                            u47_langben_target: {
+                                mod: {
+                                    globalTo(from, to, distance) {
+                                        return 1;
+                                    },
+                                },
+                                "_priority": 0,
+                            },
+                            u47_xinbiao: {
+                                trigger: {
+                                    global: ["damageEnd", "loseHpEnd"],
+                                },
+                                //direct: true,
+                                filter(event, player) {
+
+                                    return player.countCards('he', { color: 'black' }) > 0;
+                                },
+                                content: function () {
+                                    "step 0"
+                                    game.log(trigger.player);
+                                    var i = 0;
+                                    var allplayers = game.players.sortBySeat(player);
+                                    game.log(allplayers.length);
+                                    for (i = 0; i < allplayers.length; i++) {
+                                        game.log(allplayers[i], i);
+                                        //game.log("1");
+                                        if (allplayers[i].hasSkill("u47_xinbiao_hp")) {
+                                            //game.log("2");
+                                            game.log(allplayers[i].group);
+                                            game.log(trigger.player.group);
+                                            if (allplayers[i].group == trigger.player.group) {
+                                                event.finish();
+                                                //game.log("3");
+                                            }
+                                        }
+                                        //game.log("4");
+                                    }
+
+                                    "step 1"
+                                    player.chooseToDiscard('he', '是否弃置一张黑色牌并记录' + get.translation(trigger.player) + '状态？', { color: 'black' });
+                                    "step 2"
+                                    if (result.bool) {
+                                        trigger.player.addSkill("u47_xinbiao_hp");
+                                        trigger.player.addSkill("u47_xinbiao_cards");
+                                        trigger.player.addMark("u47_xinbiao_hp", trigger.player.hp);
+                                        trigger.player.addMark("u47_xinbiao_cards", trigger.player.countCards('h'));
+                                        game.log(trigger.player, trigger.player.countMark("u47_xinbiao_hp"));
+                                        markAuto('u47_xinbiao', [trigger.player]);
+                                        
+                                    }
+                                },
+                            },
+                            u47_xinbiao_hp: {
+                                mark: true,
+                                marktext: "体力",
+                                intro: {
+                                    name: "体力",
+                                    content: "已记录体力值$",
+                                },
+                            },
+                            u47_xinbiao_cards: {
+                                mark: true,
+                                marktext: "手牌",
+                                intro: {
+                                    name: "手牌",
+                                    content: "已记录手牌数$",
+                                },
+                            },
+                            u47_huxi: {
+                                trigger: {
+                                    player: "useCardAfter",
+                                },
+                                forced: true,
+                                filter: function (event, player) {
+                                    return get.tag(event.card, 'damage') && !event.player.hasHistory('sourceDamage', function (evt) {
+                                        return evt.card == event.card;
+                                    });
+                                },
+                                content: function () {
+                                    "step 0"
+                                    player.chooseTarget(get.prompt2('u47_huxi'),function(card,player,target){
+                                        return target.hasSkill('u47_xinbiao_hp');
+                                    }).set('ai', target => {
+                                        var att=get.attitude(player, target);
+                                        if(att >= 0){
+                                            return (target.countMark('u47_xinbiao_hp')-target.hp)*2+(target.countMark('u47_xinbiao_cards')-target.countCards("h"));     
+                                        }else if(att > 0){
+                                            return (target.hp-target.countMark('u47_xinbiao_hp'))*2+(target.countCards("h")-target.countMark('u47_xinbiao_cards'));
+                                        }else{
+                                        return 1;
+                                        }
+                                    }); 
+                                    'step 1'
+                                    if(result.bool){
+                                    player.logSkill('u47_huxi');
+                                    var target=result.targets[0];
+                                    var i1 = target.countMark('u47_xinbiao_hp');
+                                    target.removeMark('u47_xinbiao_hp', i1);
+                                    var i2 = target.countMark('u47_xinbiao_cards');
+                                    target.removeMark('u47_xinbiao_cards', i2);
+                                    var hp = target.hp - i1;
+                                    var cards = target.countCards("h") - i2;
+                                    game.log("hp",hp,"cards",cards);
+                                    game.log("hp",Math.abs(hp),"cards",Math.abs(cards));
+                                    if (hp > 0) {
+                                        target.loseHp(Math.abs(hp));
+
+                                    } else if (hp < 0) {
+                                        target.recover(Math.abs(hp));
+                                    }
+                                    if (cards > 0) {
+                                        target.discard(Math.abs(cards));
+
+                                    } else if (cards < 0) {
+                                        target.draw(Math.abs(cards));
+                                    }
+                                    target.removeSkill('u47_xinbiao_hp');
+                                    target.removeSkill('u47_xinbiao_cards');
+                                    player.draw(1);
+                                }else{
+                                    game.log("结束结算");
+                                    event.finish();
+                                }
+                                },
+                                "_priority": 0,
                             }
 
                             //在这里添加新技能。
@@ -5796,6 +5954,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "1913": "1913战巡",
                             yinghuochong: "萤火虫",
                             jifu: "基辅",
+                            "u47": "u47",
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐舰", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -5903,6 +6062,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jifu_yuanjing: "愿景", 'jifu_yuanjing_info': "觉醒技，当你进入濒死时，增加一点体力上限，将体力调整至上限，然后失去未成",
                             jifu_lingwei: "领卫", 'jifu_lingwei_info': "当有角色使用伤害类牌指定唯一目标时，你可以弃置一张牌，然后选择一项：1、令此牌伤害+1。2、此牌无法被响应。若此牌的使用者是驱逐或S国船，则你与此牌的使用者各摸一张牌。（若此牌的使用者是你自己，则只摸一张牌）若因“领卫”技能效果造成了伤害，则本轮失去“领卫”。",
                             jifu_yuanqin: "远亲", 'jifu_yuanqin_info': "锁定技，塔什干与I国船使你回复体力时，回复的体力值+1。",
+                            u47_langben: "狼奔", u47_langben_info: "出牌阶段限两次，你可以交给一名其他角色一张牌，令其他角色计算与其的距离为1直到其下个回合开始时。",
+                            u47_langben_target: "狼奔目标", u47_langben_target_info: "其他角色计算与你距离为1。",
+                            u47_xinbiao: "信标", u47_xinbiao_info: "有角色体力值减少后，你可以弃置一张黑色牌并记录该角色当前的体力值与手牌数。每个势力只能有一名角色被记录。",
+                            u47_xinbiao_hp: "信标", u47_xinbiao_hp_info: "信标",
+                            u47_xinbiao_cards: "信标", u47_xinbiao_cards_info: "信标",
+
+                            u47_huxi: "虎袭", u47_huxi_info: "你使用伤害类牌后若未造成伤害，你可以将一名被记录的角色的体力值和手牌数调整为记录值，然后摸一张牌并移除记录，",
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
                             lishizhanyi_naerweike: '历史战役-纳尔维克',
