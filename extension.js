@@ -3,7 +3,8 @@
 game.import("extension", function (lib, game, ui, get, ai, _status) {
 
     return {
-        name: "舰R牌将", content: function (config, pack) {
+        name: "舰R牌将", 
+        content: function (config, pack) {
             /*lib.group.push('RN');
             lib.translate.RN = '<span style="color:#FFCD7F32">英</span>';
             lib.group.push('USN');
@@ -753,6 +754,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         name: 'jianrjinji',//武将包命名（必填）
                         connect: true,//该武将包是否可以联机（必填）,"xianjinld""zhiyangai","baiyin_skill",
                         //全局技能"_yuanhang","_jianzaochuan","_qianghuazhuang",
+                        characterSort:{
+                            jianrjinji:{
+                                jianrbiaozhun:[ "liekexingdun","qixichicheng","wufenzhongchicheng","dumuchenglinqiye","bisimai","misuli","weineituo","lisailiu","1913","changmen","kunxi","ougengqi","qingye","beianpudun","jiujinshan","jiujinshan","yixian","tianlangxing","dadianrendian","yatelanda","z31","xuefeng","kangfusi","47project","guzhuyizhichuixue","shuileizhanduichuixue","minsike","yinghuochong","u1405","baiyanjuren","changchun"],
+                                lishizhanyi_naerweike:["",""],
+                                lishizhanyi_matapanjiao:["",""],
+                                lishizhanyi_danmaihaixia:["",""],
+                                lishizhanyi_shanhuhai:["",""],
+                                lishizhanyi_haixiafujizhan:["",""],
+                            },
+                          
+                        },
                         character: {
                             liekexingdun: ["female", "USN", 4, ["hangmucv", "hangkongzhanshuxianqu"], ["zhu", "des:血量中等的航母，温柔，体贴，过渡期追着大船打的航母。"]],
                             qixichicheng: ["female", "IJN", 4, ["hangmucv", "qixi_cv"], ["zhu", "des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
@@ -4788,7 +4800,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             zhongzhuangcike: {
-                                group: ["wushifangju", "jueqing"],
+                                group: ["wushifangju", "liushitili"],
                                 "_priority": 0,
                             },
                             wushifangju: {
@@ -4814,6 +4826,24 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     event.finish;
                                 },
                                 prompt: "你装备区内有牌时，你使用的杀无视防具",
+                            },
+
+                            liushitili:{
+                                audio: "ext:舰R牌将:true",
+                                trigger:{
+                                    source:"damageBefore",
+                                },
+                                forced:true,
+                                audio:2,
+                                check:function(){return false;},
+                                content:function(){
+                                    trigger.cancel();
+                                    trigger.player.loseHp(trigger.num);
+                                },
+                                ai:{
+                                    jueqing:true,
+                                },
+                                "_priority":0,
                             },
                             /*zhongzhuangcike_2: {
                                 trigger: {
@@ -5563,7 +5593,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             xinqidian: "新起点", "xinqidian_info": "出牌阶段限一次，你可以选择至多3名角色，你与这些角色各展示一张牌:若展示的牌花色均不相同，每人摸1张牌;否则，参与展示牌的角色计算与其他角色距离-1直至其的下个回合结束。",
                             //xinqidian_1:"新起点",xinqidian_1_info:"",
                             jilizhixin: "激励之心", 'jilizhixin_info': "若你的宝物栏为空，你视为装备着'侦察机'。你可以弃一张牌并跳过出牌阶段，令一名角色获得一个额外回合。",
-                            hangkongzhanshuguang: "航空战曙光", 'hangkongzhanshuguang_info': "出牌阶段限一次，你可以令一名角色摸一张牌。若目标是航母，改为摸两张牌。"
+                            hangkongzhanshuguang: "航空战曙光", 'hangkongzhanshuguang_info': "出牌阶段限一次，你可以令一名角色摸一张牌。若目标是航母，改为摸两张牌。",
+                            jianrjinji:"舰r武将",
+                            jianrbiaozhun:"舰r标准",
+                            lishizhanyi:'历史战役',
+                            lishizhanyi_naerweike:'历史战役-纳尔维克',
+                            lishizhanyi_matapanjiao:'历史战役-马塔潘角',
+                            lishizhanyi_danmaihaixia:'历史战役-丹麦海峡',
+                            lishizhanyi_shanhuhai:'历史战役-珊瑚海',
+                            lishizhanyi_haixiafujizhan:'历史战役-海峡伏击战',
                         },
                     };
                     if (lib.device || lib.node) {
