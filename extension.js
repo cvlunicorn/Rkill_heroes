@@ -4527,45 +4527,42 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                 limited: true,
                                 filter: function (event, player) {
-                                    return player.hasEnabledSlot();
+                                    return player.isMinHp();
                                 },
                                 filterTarget: function (card, player, target) {
-                                    return target != player;
+                                    return true;
                                 },
                                 content: function () {
                                     player.awakenSkill('wuweizhuangji');
-                                    var num = player.countCards('e');
-                                    var disables = [];
-                                    for (var i = 1; i <= 5; i++) {
-                                        for (var j = 0; j < player.countEnabledSlot(i); j++) {
-                                            disables.push(i);
-                                        }
-                                    }
-                                    if (disables.length > 0) player.disableEquip(disables);
+                                    var num = player.maxHp;
+                                    player.loseHp(player.hp);
                                     target.damage(num);
 
                                 },
                             },
                             zhongzhuangcike: {
-                                group: ["zhongzhuangcike_1", "zhongzhuangcike_2", "zhongzhuangcike_3"],
+                                group: ["zhongzhuangcike_1","zhongzhuangcike_2"],
                                 "_priority": 0,
                             },
                             zhongzhuangcike_1: {
-
                                 trigger: {
                                     player: "useCardToPlayered",
                                 },
                                 filter: function (event) {
+                                    game.log("重装刺客1判断条件：使用杀指定目标");
                                     return (event.card.name == 'sha' || event.card.name == 'sheji9');
                                 },
                                 forced: true,
+                                direct:true,
                                 logTarget: "target",
                                 content: function () {
+                                    game.log("重装刺客1执行代码");
                                     if (player.countCards('e')) {
                                         trigger.target.addTempSkill('qinggang2');
                                         trigger.target.storage.qinggang2.add(trigger.card);
                                         trigger.target.markSkill('qinggang2');
                                     }
+                                    game.log("重装刺客1执行结束");
                                     event.finish;
                                 },
                                 prompt: "你装备区内有牌时，你使用的杀无视防具",
@@ -4574,12 +4571,23 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     source: "damageSource",
                                 },
-                                content: function () {
-                                    player.gainPlayerCard(trigger.player, 'e', true, trigger.num);
+                                filter:function (event, player) {
+                                    if (event._notrigger.contains(event.player)) return false;
+                                    return (event.card && (event.card.name == 'sha' || event.card.name == 'sheji9') && (event.getParent().name == 'sha' || event.getParent().name == 'sheji9'));
                                 },
-                                prompt: "造成伤害后可以获得目标角色的一张装备牌",
+                                content: function () {
+                                    game.log("重装刺客2执行代码");
+                                    //game.log(trigger.player);
+                                    //game.log(player);
+                                    if (trigger.player.countCards('e')) {
+                                        player.discardPlayerCard('e', trigger.player,1,true);
+                                    }else{
+                                        player.draw(1);
+                                    }
+                                },
+                                prompt: "造成伤害后可以弃置目标角色的一张装备牌或摸一张牌",
                             },
-                            zhongzhuangcike_3: {
+                            /*zhongzhuangcike_3: {
                                 enable: ["chooseToRespond", "chooseToUse"],
                                 filterCard(card, player) {
                                     if (get.zhu(player, 'shouyue')) return true;
@@ -4598,7 +4606,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                 },
                                 prompt: "将一张装备牌当杀使用或打出",
-                            },
+                            },*/
                             duomianshou: {
                                 enable: "phaseUse",
                                 usable: 1,
@@ -4920,7 +4928,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             player: "useCard",
                                         },
                                         filter: function (event, player) {
-                                            return player == _status.currentPhase &&  player.countMark('jueshengzhibing_count') < 2 && event.card.isCard && get.type2(event.card) == 'trick';
+                                            return player == _status.currentPhase && player.countMark('jueshengzhibing_count') < 2 && event.card.isCard && get.type2(event.card) == 'trick';
                                         },
                                         content: function () {
                                             player.draw();
@@ -5285,9 +5293,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jujianmengxiang: "巨舰梦想", "jujianmengxiang_info": "出牌阶段，你可以失去一点体力，视为使用一张基本牌或非延时锦囊牌（每回合每种牌名限一次）。",
                             sidajingang: "四大金刚", "sidajingang_info": "你使用杀造成伤害时，你可以与目标拼点，若你赢你获得其一张牌。你发动[远航摸牌]后可以摸一张牌。",
                             jiujingzhanzhen: "久经战阵", "jiujingzhanzhen_info": "结束阶段，你可以选择X名角色，其各选择一项:1摸一张牌，2令你获得一点护甲(至多为一)。X为你本回合弃置的红牌数。",
-                            wuweizhuangji: "无畏撞击", "wuweizhuangji_info": "限定技，你可以废除自己的全部装备栏，然后对一名角色造成x点伤害（x为你此前装备区内牌的数量）",
-                            zhongzhuangcike: "重装刺客", "zhongzhuangcike_info": "你装备区内有牌时，你使用的杀无视防具；你造成伤害后可以获得目标角色的一张装备牌；你可以将装备牌当作杀使用或打出。",
-                            zhongzhuangcike_3: "重装刺客", "zhongzhuangcike_3_info": "你可以将装备牌当作杀使用或打出。",
+                            wuweizhuangji: "无畏撞击", "wuweizhuangji_info": "限定技，出牌阶段，若你的体力值最少，你可以失去所有体力，然后对一名角色造成x点伤害（x为你装备区内的牌数+1）",
+                            zhongzhuangcike: "重装刺客", "zhongzhuangcike_info": "你装备区内有牌时，你使用的杀无视防具；你使用杀造成伤害后，若目标装备区不为空，你可以弃置目标角色装备区的一张牌，否则你摸一张牌。",
                             duomianshou: "多面手", "duomianshou_info": "出牌阶段限一次，你可以弃置将一张手牌视为使用一张牌堆中同点数的其他类型的牌(不受次数限制），如列表里没牌，技能使用次数+1，且本回合不能使用该点数发动技能；每回合限一次，你对其他中小型船使用转化后的牌时其选择一项：1弃置一张牌，2令你摸一张牌。",
                             duomianshou_1: "多面手", "duomianshou_1_info": "每回合限一次，你对其他中小型船使用转化后的牌时其选择一项：1弃置一张牌，2令你摸一张牌。",
                             kaixuanzhige: "凯旋之歌", "kaixuanzhige_info": "当你使用【杀】指定唯一其他角色为目标后，你可以进行判定，若结果为锦囊牌，此【杀】伤害+1且无视防具。你的体力值小于3时，你使用的【杀】无视防具。",
@@ -5297,8 +5304,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhanfu: "战斧", "zhanfu_info": "你手牌数为场上最多时，你使用杀无视距离",
                             xinqidian: "新起点", "xinqidian_info": "出牌阶段限一次，你可以选择至多3名角色，你与这些角色各展示一张牌:若展示的牌类型均不相同，每人摸1张牌;否则，参与展示牌的角色计算与其他角色距离-1直至其的下个回合结束。",
                             //xinqidian_1:"新起点",xinqidian_1_info:"",
-                            jilizhixin: "激励之心", jilizhixin_info: "若你的宝物栏为空，你视为装备着'侦察机'。你可以弃一张牌并跳过出牌阶段，令一名角色获得一个额外回合。",
-                            hangkongzhanshuguang: "航空战曙光", hangkongzhanshuguang_info: "出牌阶段限一次，你可以令一名角色摸一张牌。若目标是航母或军辅，改为摸两张牌。"
+                            jilizhixin: "激励之心", 'jilizhixin_info': "若你的宝物栏为空，你视为装备着'侦察机'。你可以弃一张牌并跳过出牌阶段，令一名角色获得一个额外回合。",
+                            hangkongzhanshuguang: "航空战曙光", 'hangkongzhanshuguang_info': "出牌阶段限一次，你可以令一名角色摸一张牌。若目标是航母或军辅，改为摸两张牌。"
                         },
                     };
                     if (lib.device || lib.node) {
