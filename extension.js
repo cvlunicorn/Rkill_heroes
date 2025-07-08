@@ -5011,7 +5011,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     let flag = false;
                                     for (let i = 0; i < targets.length; i++) {
                                         for (let j = 0; j < i; j++) {
-                                            if (get.suit(cards[j], false) != get.color(cards[i], false)) {
+                                            if (get.suit(cards[j], false) != get.suit(cards[i], false)) {
                                                 game.log("flag=true" + get.suit(cards[i], false));
                                                 flag = true;
                                             }
