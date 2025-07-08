@@ -254,17 +254,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             if (config._jianzaochuan) {//弃牌提升血量上限或回血的技能，也解锁强化上限
                 lib.skill._jianzaochuan = {
                     name: "建造", prompt: function (event, player) {//<br>或弃置三张牌，回复一点血量。或弃置四张牌，回复两点体力,两个改动的测试结果是过于强悍.
-                        if (event.parent.name == 'phaseUse') { return '1.出牌阶段，<br>你可以弃置3张不同花色的牌，提升一点血量上限。' }; if (event.type == 'dying') { return "2.当你濒死时，<br>你可以弃置4张不同花色的牌，回复一点体力。" };
+                        if (event.parent.name == 'phaseUse') { return '1.出牌阶段，<br>你可以弃置3张不同花色的牌，提升一点血量上限。' }; //if (event.type == 'dying') { return "2.当你濒死时，<br>你可以弃置4张不同花色的牌，回复一点体力。" };
                     }, limited: false, complexCard: true,
                     enable: "chooseToUse", position: "hejs",
                     filter: function (event, player) {
                         if (config._qianghuazhuang) {
                             var info = lib.skill._qianghuazhuang.getInfo(player); var a = info[0] + info[1] + info[2] + info[3] + info[4] + info[5]
                         } else { var a = 1 };
-                        if (event.type == 'dying') { if (player != event.dying) return false; return player.countCards('hejs') >= 3; }
-                        else if (event.parent.name == 'phaseUse' && (a) > 0 && !player.hasMark('_jianzaochuan')) { return (player.countCards('hejs') >= 2) && a && (get.mode() != 'boss' || (get.mode() == 'boss' && !lib.character[player.name][4].contains('boss') && player.identity == 'cai')); } return false;//没有建造标记时才能建造，即主动建造上限1次，
+                        /*if (event.type == 'dying') { if (player != event.dying) return false; return player.countCards('hejs') >= 3; }
+                        else*/ if (event.parent.name == 'phaseUse' && (a) > 0 && !player.hasMark('_jianzaochuan')) { return (player.countCards('hejs') >= 2) && a && (get.mode() != 'boss' || (get.mode() == 'boss' && !lib.character[player.name][4].contains('boss') && player.identity == 'cai')); } return false;//没有建造标记时才能建造，即主动建造上限1次，
                     },
-                    selectCard: function (event, player) { var event = _status.event; if (event.type == 'dying') return [4, 4]; return [3, 3]; },
+                    selectCard: function (event, player) { var event = _status.event; /*if (event.type == 'dying') return [4, 4]; */return [3, 3]; },
                     filterCard: function (card) {
                         var suit = get.suit(card);
                         for (var i = 0; i < ui.selected.cards.length; i++) {
@@ -328,10 +328,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     },
                     filter: function (event, player) {//
                         var a = player.countMark('mopaiup'), b = player.countMark('jinengup'), c = player.countMark('wuqiup'), d = player.countMark('useshaup'), e = player.countMark('jidongup'), f = player.countMark('shoupaiup'), g = player.countMark('songpaiup'), h = player.countMark('Expup'), k = player.countMark('_jianzaochuan') + 1, lv = 0; if (k < 3) { lv = k * 6 };/*if(k>=3){lv=k+10};*///远航上限降低为2，总可用强化数量公式作相应修改
-                        if (player.countCards('he') > 0) { if ((a + b + c + d + e + f + g) >= (lv)) return false }; return player.countCards('e') > 0 || player.countCards('he') > 1 || player.countMark('Expup') > 1;
+                        if (player.countCards('h') > 0) { if ((a + b + c + d + e + f + g) >= (lv)) return false }; return player.countCards('h') > 1 || player.countMark('Expup') > 1;
                         //比较保守的设计，便于设计与更改。
                         ;
-                    }, filterCard: {}, position: "hejs", selectCard: function (card) {
+                    }, filterCard: {}, position: "h", selectCard: function (card) {
                         var player = _status.event.player, num = 0;/*num+=(player.countMark('Expup'));if(ui.selected.cards.length&&get.type(ui.selected.cards[0],'equip')=='equip'){num+=(1)};if(ui.selected.cards.length>1&&get.type(ui.selected.cards[1],'equip')=='equip'){num+=(1)};*///装备不再记为2强化点数
                         return [Math.max(2 - num, 0), Math.max(4 - num, 2)];
                     },
@@ -339,9 +339,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     check: function (card) {//ui，参考仁德，ai执行判断，卡牌价值大于1就执行（只管卡片）当然，能把玩家设置进来就可以if玩家没桃 return-1。
                         var player = _status.event.player;
                         if (ui.selected.cards.length && get.type(ui.selected.cards[0], 'equip') == 'equip') return 5 - get.value(card);
-                        if (ui.selected.cards.length >= Math.max(1, player.countCards('he') / 2)) return 0;
-                        if (game.phaseNumber < 3) return 8 - get.value(card);
-                        return 4 - get.value(card);
+                        if (ui.selected.cards.length >= Math.max(1, player.countCards('h') / 2)) return 0;
+                        if (game.phaseNumber < 3) return 7 - get.value(card);
+                        return 3 - get.value(card);
                     },
                     content: function () {//choiceList.unshift
                         'step 0'
@@ -886,10 +886,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 enable: "chooseToUse", position: "hejs",
                                 filter: function (event, player) {
                                     var info = lib.skill._qianghuazhuang.getInfo(player); var a = info[0] + info[1] + info[2] + info[3] + info[4] + info[5];
-                                    if (event.type == 'dying') { if (player != event.dying) return false; return player.countCards('hejs') >= 3; }
-                                    else if (event.parent.name == 'phaseUse' && (a) > 0 && !player.hasMark('_jianzaochuan')) { return (player.countCards('hejs') >= 2) && a && (get.mode() != 'boss' || (get.mode() == 'boss' && !lib.character[player.name][4].contains('boss') && player.identity == 'cai')); } return false;//没有建造标记时才能建造，即主动建造上限1次，
+                                    /*if (event.type == 'dying') { if (player != event.dying) return false; return player.countCards('hejs') >= 3; }
+                                    else*/ if (event.parent.name == 'phaseUse' && (a) > 0 && !player.hasMark('_jianzaochuan')) { return (player.countCards('hejs') >= 2) && a && (get.mode() != 'boss' || (get.mode() == 'boss' && !lib.character[player.name][4].contains('boss') && player.identity == 'cai')); } return false;//没有建造标记时才能建造，即主动建造上限1次，
                                 },
-                                selectCard: function (event, player) { var event = _status.event; if (event.type == 'dying') return [4, 4]; return [3, 3]; },
+                                selectCard: function (event, player) { var event = _status.event; /*if (event.type == 'dying') return [4, 4];*/ return [3, 3]; },
                                 filterCard: function (card) {
                                     var suit = get.suit(card);
                                     for (var i = 0; i < ui.selected.cards.length; i++) {
@@ -904,7 +904,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     player.addMark('_jianzaochuan'); game.log(event.parent.name, event.cards);
-                                    if (event.cards.length <= 3) { player.gainMaxHp(1); }; if (event.cards.length > 3) { player.recover(); };
+                                    if (event.cards.length <= 3) { player.gainMaxHp(1); }; /*if (event.cards.length > 3) { player.recover(); };*/
                                 },
                                 ai: {
                                     save: true, expose: 0, threaten: 0, order: 2,
@@ -950,10 +950,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 filter: function (event, player) {//
                                     var a = player.countMark('mopaiup'), b = player.countMark('jinengup'), c = player.countMark('wuqiup'), d = player.countMark('useshaup'), e = player.countMark('jidongup'), f = player.countMark('shoupaiup'), g = player.countMark('songpaiup'), h = player.countMark('Expup'), k = player.countMark('_jianzaochuan') + 1, lv = 0; if (k < 3) { lv = k * 6 };/*if(k>=3){lv=k+10};*///远航上限降低为2，总可用强化数量公式作相应修改
-                                    if (player.countCards('he') > 0) { if ((a + b + c + d + e + f + g) >= (lv)) return false }; return player.countCards('e') > 0 || player.countCards('he') > 1 || player.countMark('Expup') > 1;
+                                    if (player.countCards('h') > 0) { if ((a + b + c + d + e + f + g) >= (lv)) return false }; return  player.countCards('h') > 1 || player.countMark('Expup') > 1;
                                     //比较保守的设计，便于设计与更改。
                                     ;
-                                }, filterCard: {}, position: "hejs", selectCard: function (card) {
+                                }, filterCard: {}, position: "h", selectCard: function (card) {
                                     var player = _status.event.player, num = 0;/*num+=(player.countMark('Expup'));if(ui.selected.cards.length&&get.type(ui.selected.cards[0],'equip')=='equip'){num+=(1)};if(ui.selected.cards.length>1&&get.type(ui.selected.cards[1],'equip')=='equip'){num+=(1)};*///装备不再记为2强化点数
                                     return [Math.max(2 - num, 0), Math.max(4 - num, 2)];
                                 },
@@ -961,9 +961,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 check: function (card) {//ui，参考仁德，ai执行判断，卡牌价值大于1就执行（只管卡片）当然，能把玩家设置进来就可以if玩家没桃 return-1。
                                     var player = _status.event.player;
                                     if (ui.selected.cards.length && get.type(ui.selected.cards[0], 'equip') == 'equip') return 5 - get.value(card);
-                                    if (ui.selected.cards.length >= Math.max(1, player.countCards('he') / 2)) return 0;
-                                    if (game.phaseNumber < 3) return 8 - get.value(card);
-                                    return 4 - get.value(card);
+                                    if (ui.selected.cards.length >= Math.max(1, player.countCards('h') / 2)) return 0;
+                                    if (game.phaseNumber < 3) return 7 - get.value(card);
+                                    return 3 - get.value(card);
                                 },
                                 content: function () {//choiceList.unshift
                                     'step 0'
@@ -5162,7 +5162,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 ai: {
                                     order: 7.2,
                                     result: {
-                                        player: 1,
+                                        player:1,
                                     },
                                 },
                             },
