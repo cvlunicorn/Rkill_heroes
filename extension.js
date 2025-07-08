@@ -3,7 +3,7 @@
 game.import("extension", function (lib, game, ui, get, ai, _status) {
 
     return {
-        name: "舰R牌将", 
+        name: "舰R牌将",
         content: function (config, pack) {
             /*lib.group.push('RN');
             lib.translate.RN = '<span style="color:#FFCD7F32">英</span>';
@@ -754,16 +754,16 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         name: 'jianrjinji',//武将包命名（必填）
                         connect: true,//该武将包是否可以联机（必填）,"xianjinld""zhiyangai","baiyin_skill",
                         //全局技能"_yuanhang","_jianzaochuan","_qianghuazhuang",
-                        characterSort:{
-                            jianrjinji:{
-                                jianrbiaozhun:[ "liekexingdun","qixichicheng","wufenzhongchicheng","dumuchenglinqiye","bisimai","misuli","weineituo","lisailiu","1913","changmen","kunxi","ougengqi","qingye","beianpudun","jiujinshan","jiujinshan","yixian","tianlangxing","dadianrendian","yatelanda","z31","xuefeng","kangfusi","47project","guzhuyizhichuixue","shuileizhanduichuixue","minsike","yinghuochong","u1405","baiyanjuren","changchun"],
-                                lishizhanyi_naerweike:["",""],
-                                lishizhanyi_matapanjiao:["",""],
-                                lishizhanyi_danmaihaixia:["",""],
-                                lishizhanyi_shanhuhai:["",""],
-                                lishizhanyi_haixiafujizhan:["",""],
+                        characterSort: {
+                            jianrjinji: {
+                                jianrbiaozhun: ["liekexingdun", "qixichicheng", "wufenzhongchicheng", "dumuchenglinqiye", "bisimai", "misuli", "weineituo", "lisailiu", "1913", "changmen", "kunxi", "ougengqi", "qingye", "beianpudun", "jiujinshan", "jiujinshan", "yixian", "tianlangxing", "dadianrendian", "yatelanda", "z31", "xuefeng", "kangfusi", "47project", "guzhuyizhichuixue", "shuileizhanduichuixue", "minsike", "yinghuochong", "u1405", "baiyanjuren", "changchun"],
+                                lishizhanyi_naerweike: ["", ""],
+                                lishizhanyi_matapanjiao: ["", ""],
+                                lishizhanyi_danmaihaixia: ["", ""],
+                                lishizhanyi_shanhuhai: ["", ""],
+                                lishizhanyi_haixiafujizhan: ["", ""],
                             },
-                          
+
                         },
                         character: {
                             liekexingdun: ["female", "USN", 4, ["hangmucv", "hangkongzhanshuxianqu"], ["zhu", "des:血量中等的航母，温柔，体贴，过渡期追着大船打的航母。"]],
@@ -3394,7 +3394,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     player: "useCard",
                                 },
-                                
+
                                 filter: function (event, player) {
                                     var evtx = event.getParent('phaseUse');
                                     if (!evtx || evtx.player != player) return false;
@@ -4150,6 +4150,78 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             Zqujingying: {
+                                audio: "ext:舰R牌将:true",
+                                enable:"phaseUse",
+                                usable: 1,
+                                filterCard: true,
+                                filterTarget: function (card, player, target) {
+                                    return player != target;
+                                },
+                                selectCard: [1, Infinity],
+                                selectTarget: [1, Infinity],
+                                position: "h",
+                                filterOk: function () {
+                                    return ui.selected.cards.length == ui.selected.targets.length;
+                                },
+                                check: function (card) {
+                                    var player = get.player();
+                                    if (ui.selected.cards.length >= game.countPlayer(current => {
+                                        return current != player && get.attitude(player, current) > 0;
+                                    })) return 0;
+                                    return 5 - get.value(card);
+                                },
+                                prompt: "按顺序选择卡牌和角色，并将卡牌交给对应顺序的角色。",
+                                complexSelect: true,
+                                multitarget: true,
+                                multiline: true,
+                                discard: false,
+                                lose: false,
+                                delay: false,
+                                contentBefore: function () {
+                                    event.getParent()._jsrgxushi_targets = targets.slice();
+                                },
+                                content: function () {
+                                    'step 0'
+                                    var targets = event.getParent()._jsrgxushi_targets;
+                                    var list = [];
+                                    for (var i = 0; i < targets.length; i++) {
+                                        var target = targets[i];
+                                        var card = cards[i];
+                                        list.push([target, card]);
+                                        player.line(target);
+                                    }
+                                    game.loseAsync({
+                                        gain_list: list,
+                                        player: player,
+                                        cards: cards,
+                                        giver: player,
+                                        animate: 'giveAuto',
+                                    }).setContent('gaincardMultiple');
+                                    'step 1'
+                                    game.log("给出了" + cards.length);
+                                    if (cards.length >= 1) {player.addTempSkill("xiangrui", { player: 'phaseBegin' });game.log("获得祥瑞");}
+                                    if (cards.length >= 2) {player.draw(2);}
+                                    if (cards.length >= 3) {player.addTempSkill("Zqu3", { player: 'phaseBegin' });game.log("获得伤害+1");}
+                                    if (cards.length >= 4) {player.moveCard(true);}
+                                    if (cards.length >= 5) {player.addTempSkill("Zqu5", { player: 'phaseBegin' });game.log("获得强命");}
+                                    if (cards.length >= 6) {player.addTempSkill("Zqu6", { player: 'phaseBegin' });game.log("获得看破");}
+                                    game.log("获得技能数" + cards.length);
+                                    //player.gain(lib.card.ying.getYing(2 * cards.length), 'gain2');
+                                },
+                                ai: {
+                                    order: 2.5,
+                                    result: {
+                                        target: function (player, target) {
+                                            var card = ui.selected.cards[ui.selected.targets.length];
+                                            if (!card) return 0;
+                                            if (get.value(card) < 0) return -1;
+                                            if (get.value(card) < 1.5) return (get.sgnAttitude(player, target) + 0.01) / 5;
+                                            return Math.sqrt(5 - Math.min(4, target.countCards('h')));
+                                        },
+                                    },
+                                },
+                                "_priority": 0,
+/*
                                 trigger: {
                                     player: "phaseZhunbeiBegin",
                                 },
@@ -4172,13 +4244,16 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         return;
                                     }
                                     var prompt2 = '你可以获得下列一项技能直到下回合开始';
-                                    /*if (event.done) {
+                                    *****
+                                    //选两次技能改为选一次技能
+                                    if (event.done) {
                                         prompt2 += ' (2/2)';
                                     }
                                     else {
                                         prompt2 += ' (1/2)';
-                                    }*/
-                                    list.push('cancel2');
+                                    }
+                                        *****
+                                        list.push('cancel2');
                                     player.chooseControl(list).set('prompt', get.translation('Zqujingying')).
                                         set('prompt2', prompt2).set('centerprompt2', true).set('ai', function (evt, player) {
                                             var controls = _status.event.controls;
@@ -4201,14 +4276,111 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player.addTempSkill(result.control, { player: 'phaseBegin' });
                                         //if (!event.done) player.logSkill('jiahe_put');
                                         game.log(player, '获得了技能', '【' + get.translation(skill) + '】');
-                                        /*if (!event.done) {
+                                        *****
+                                        //选两次技能改为选一次技能
+                                        if (!event.done) {
                                             event.done = true;
                                             event.goto(1);
-                                        }*/
+                                        }
+                                            *****
                                     }
                                 },
+                                */
+                            },
+                            Zqu3: {
+                                trigger: {
+                                    source: "damageBegin1",
+                                },
+                                filter(event) {
+                                    return event.card && (event.card.name == 'sha' || event.card.name == 'sheji9' || event.card.name == 'juedou' || event.card.name == 'juedouba9') && event.notLink();
+                                },
+                                forced: true,
+                                async content(event, trigger, player) {
+                                    trigger.num++;
+                                },
+                                ai: {
+                                    damageBonus: true,
+                                },
                                 "_priority": 0,
-
+                            },
+                            Zqu5: {
+                                audio: 2,
+                                forced: true,
+                                trigger: {
+                                    player: "useCard",
+                                },
+                                filter: function (event, player) {
+                                    return event.card && (get.type(event.card) == 'trick' || get.type(event.card) == 'basic' && !['shan', 'tao', 'jiu', 'du'].includes(event.card.name)) && game.hasPlayer(function (current) {
+                                        return current != player;
+                                    });
+                                },
+                                content: function () {
+                                    trigger.directHit.addArray(game.filterPlayer(function (current) {
+                                        return current != player;
+                                    }));
+                                },
+                                ai: {
+                                    "directHit_ai": true,
+                                    skillTagFilter: function (player, tag, arg) {
+                                        return 1;
+                                    },
+                                },
+                                "_priority": 0,
+                            },
+                            Zqu6: {
+                                mod: {
+                                    aiValue: function (player, card, num) {
+                                        if (get.name(card) != 'wuxie' && get.color(card) != 'black') return;
+                                        var cards = player.getCards('hs', function (card) {
+                                            return get.name(card) == 'wuxie' || get.color(card) == 'black';
+                                        });
+                                        cards.sort(function (a, b) {
+                                            return (get.name(b) == 'wuxie' ? 1 : 2) - (get.name(a) == 'wuxie' ? 1 : 2);
+                                        });
+                                        var geti = function () {
+                                            if (cards.includes(card)) {
+                                                return cards.indexOf(card);
+                                            }
+                                            return cards.length;
+                                        };
+                                        if (get.name(card) == 'wuxie') return Math.min(num, [6, 4, 3][Math.min(geti(), 2)]) * 0.6;
+                                        return Math.max(num, [6, 4, 3][Math.min(geti(), 2)]);
+                                    },
+                                    aiUseful: function () {
+                                        return lib.skill.kanpo.mod.aiValue.apply(this, arguments);
+                                    },
+                                },
+                                locked: false,
+                                audio: 2,
+                                enable: "chooseToUse",
+                                filterCard: function (card) {
+                                    return get.color(card) == 'black';
+                                },
+                                viewAsFilter: function (player) {
+                                    return player.countCards('hs', { color: 'black' }) > 0;
+                                },
+                                viewAs: {
+                                    name: "wuxie",
+                                },
+                                position: "hs",
+                                prompt: "将一张黑色手牌当无懈可击使用",
+                                check: function (card) {
+                                    var tri = _status.event.getTrigger();
+                                    if (tri && tri.card && tri.card.name == 'chiling') return -1;
+                                    return 8 - get.value(card)
+                                },
+                                threaten: 1.2,
+                                ai: {
+                                    basic: {
+                                        useful: [6, 4, 3],
+                                        value: [6, 4, 3],
+                                    },
+                                    result: {
+                                        player: 1,
+                                    },
+                                    expose: 0.2,
+                                },
+                                "_priority": 0,
                             },
                             wuziliangjiangdao: {//军争可用的五子良将纛
 
@@ -4828,22 +5000,22 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 prompt: "你装备区内有牌时，你使用的杀无视防具",
                             },
 
-                            liushitili:{
+                            liushitili: {
                                 audio: "ext:舰R牌将:true",
-                                trigger:{
-                                    source:"damageBefore",
+                                trigger: {
+                                    source: "damageBefore",
                                 },
-                                forced:true,
-                                audio:2,
-                                check:function(){return false;},
-                                content:function(){
+                                forced: true,
+                                audio: 2,
+                                check: function () { return false; },
+                                content: function () {
                                     trigger.cancel();
                                     trigger.player.loseHp(trigger.num);
                                 },
-                                ai:{
-                                    jueqing:true,
+                                ai: {
+                                    jueqing: true,
                                 },
-                                "_priority":0,
+                                "_priority": 0,
                             },
                             /*zhongzhuangcike_2: {
                                 trigger: {
@@ -5570,7 +5742,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qijianshashou_1: "旗舰杀手", "qijianshashou_1_info": "",
                             zhanxianfangyu: "战线防御", "zhanxianfangyu_info": "每名角色回合回合限一次，若你没有装备防具，你成为黑色杀的目标时，取消之。每回合限一次，距你为1的角色成为杀的目标时，你可以弃置一张牌并代替该名角色成为此杀的目标。",
                             zhanxianfangyu1: "战线防御", "zhanxianfangyu1_info": "",
-                            Zqujingying: "Z驱菁英", "Zqujingying_info": "准备阶段，根据场上势力数，你可以选择获得以下技能中的一项:大于等于一，雷击;大于等于二，遗计;大于等于三，生息;大于等于四，天妒。直到你的下回合开始。",
+                            Zqujingying: "Z驱菁英", "Zqujingying_info": "出牌阶段，你可以交给任意名其他角色各一张手牌，根据交出的手牌数量依次获得以下效果直到你的下回合开始：一、获得[祥瑞]，二、摸两张牌，三、使用杀造成的伤害+1，四、移动场上的一张牌，五、其他角色不能响应你使用的牌，六、可以将一张黑色牌当做无懈可击使用。",
+                            Zqu3: "Z驱菁英", "Zqu3_info": "使用杀造成的伤害+1",
+                            Zqu5: "Z驱菁英", "Zqu5_info": "其他角色不能响应你使用的牌",
+                            Zqu6: "Z驱菁英", "Zqu6_info": "可以将一张黑色牌当做无懈可击使用",
                             huhangyuanhu: "护航援护", "huhangyuanhu_info": "当一名其他角色成为杀的目标后，若你至该角色的距离为一，你可以摸一张牌，若如此做，你交给其一张牌并展示之。若为装备牌，该角色可以使用此牌。",
                             shizhibuyu: "矢志不渝", "shizhibuyu_info": "当你受到伤害时，你可以弃置两张颜色相同的牌令此伤害-1，然后进行判定，若结果为红色，你摸一张牌。 当你的判定牌生效后，你可以令一名角色使用杀次数+1和手牌上限+1直到你的下回合开始。",
                             shizhibuyu1: "矢志不渝", "shizhibuyu1_info": "",
@@ -5594,14 +5769,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             //xinqidian_1:"新起点",xinqidian_1_info:"",
                             jilizhixin: "激励之心", 'jilizhixin_info': "若你的宝物栏为空，你视为装备着'侦察机'。你可以弃一张牌并跳过出牌阶段，令一名角色获得一个额外回合。",
                             hangkongzhanshuguang: "航空战曙光", 'hangkongzhanshuguang_info': "出牌阶段限一次，你可以令一名角色摸一张牌。若目标是航母，改为摸两张牌。",
-                            jianrjinji:"舰r武将",
-                            jianrbiaozhun:"舰r标准",
-                            lishizhanyi:'历史战役',
-                            lishizhanyi_naerweike:'历史战役-纳尔维克',
-                            lishizhanyi_matapanjiao:'历史战役-马塔潘角',
-                            lishizhanyi_danmaihaixia:'历史战役-丹麦海峡',
-                            lishizhanyi_shanhuhai:'历史战役-珊瑚海',
-                            lishizhanyi_haixiafujizhan:'历史战役-海峡伏击战',
+                            jianrjinji: "舰r武将",
+                            jianrbiaozhun: "舰r标准",
+                            lishizhanyi: '历史战役',
+                            lishizhanyi_naerweike: '历史战役-纳尔维克',
+                            lishizhanyi_matapanjiao: '历史战役-马塔潘角',
+                            lishizhanyi_danmaihaixia: '历史战役-丹麦海峡',
+                            lishizhanyi_shanhuhai: '历史战役-珊瑚海',
+                            lishizhanyi_haixiafujizhan: '历史战役-海峡伏击战',
                         },
                     };
                     if (lib.device || lib.node) {
