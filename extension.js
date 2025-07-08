@@ -3851,7 +3851,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             '无效，或袖手旁观', function (card) {
                                                 return get.type(card) != 'basic';
                                             }).set('ai', function (card) {
-                                                return get.attitude(target, _status.event.sourcex) >= 0 ? 1 : -1;
+                                                return get.attitude(target, player) >= 0 ? 1 : -1;
                                             });
                                         game.delay();
                                     }
