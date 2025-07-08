@@ -4296,7 +4296,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     var dialog = ui.create.dialog('巨舰梦想', [list, 'vcard']);
 
                                     game.log("巨舰梦想列表已生成")
-                                    if (!list == "") {
+                                    if (!list == ""&&(list.includes("juedouba9")&&list.includes("manchangyy9")&&list.includes("jingjixiuli9")&&list.includes("ewaibuji9"))) {
                                         player.chooseButton(dialog).ai = function (button) {
                                             var player = _status.event.player;
                                             var recover = 0, lose = 1, players = game.filterPlayer();
@@ -4339,7 +4339,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 return (button.link[2] == 'manchangyy9') ? 1 : -1;
                                             }
                                             else if (!player.storage.jujianmengxiang.contains('jingjixiuli9') && lose < recover && recover > 0) {
-                                                game.log('jinjixiuli9' + (button.link[2] == 'jingjixiuli9'));
+                                                game.log('jingjixiuli9' + (button.link[2] == 'jingjixiuli9'));
                                                 return (button.link[2] == 'jingjixiuli9') ? 1 : -1;
                                             }
                                             else {
@@ -4349,12 +4349,16 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                         }
                                     } else {
+                                        game.log("AI没有可用的牌了！</br>也许您没有正确安装并启用‘舰r美化’卡牌包？");
+                                        player.storage.jujianmengxiang.add("error");
                                         event.finish();
                                     }
                                     'step 1'
                                     game.log("结果bool" + result.bool);
 
                                     if (result.bool) {
+                                        game.log("没有选择牌！</br>如果AI没有选择牌，也许您没有正确安装并启用‘舰r美化’卡牌包？");
+                                        player.storage.jujianmengxiang.add("error");
                                         event.finish();
                                     }
 
@@ -4374,6 +4378,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                     result: {
                                         player: function (player) {
+                                            if (player.storage.jujianmengxiang.contains('error')) return -1;
                                             if (player.countCards('h') >= player.hp - 1) return -1;
                                             if (player.hp < 3) return -1;
                                             if (player.storage.jujianmengxiang.contains('ewaibuji9')) return -1;
