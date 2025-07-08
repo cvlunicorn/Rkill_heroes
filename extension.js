@@ -799,7 +799,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             baiyanjuren: ["female", "RN", 3, ["junfu", "hangkongzhanshuguang"], ["des:需要武器支援，伙计倒下了。"]],
                             changchun: ["female", "PLAN", 3, ["daoqu", "rand", "sidajingang"], ["des:尚处于正能量之时。"]],
 
-                            jifu: ["female", "ΒΜΦCCCP", 2, ["quzhudd", "jifu_weicheng", "jifu_yuanjing", "jifu_lingwei", "jifu_yuanqin","jifu_yuanqin"], ["des:。"]],
+                            jifu: ["female", "ΒΜΦCCCP", 2, ["quzhudd", "jifu_weicheng", "jifu_yuanjing", "jifu_lingwei", "jifu_yuanqin", "jifu_yuanqin"], ["des:。"]],
 
                             skilltest: ["male", "OTHER", 9, ["zhanlie", "jifu_weicheng"], ["forbidai", "des:测试用"]],
                         },
@@ -5645,7 +5645,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     "step 1"
                                     if (result.color == 'red') {
                                         player.recover(1);
-                                        player.addTempSkill('jifu_shanghai', { player: 'phaseJieshuBegin' });
+                                        player.draw(1);
+                                        //player.addTempSkill('jifu_shanghai', { player: 'phaseJieshuBegin' });
                                     }
                                     if (result.color == 'black') {
                                         player.loseHp(1);
@@ -5673,21 +5674,23 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     player: "dying",
                                 },
+                                unique: true,
                                 juexingji: true,
                                 forced: true,
                                 skillAnimation: true,
                                 animationColor: "gray",
                                 filter: function (event, player) {
-                                    return player.hp <= 0;
+                                    if (player.storage.jifu_yuanjing) return false;
+                                    return player.hasSkill["jifu_weicheng"] && player.hp <= 0;
                                 },
                                 content: function () {
                                     'step 0'
-                                    player.awakenSkill(' jifu_yuanjing');
+                                    player.awakenSkill('jifu_yuanjing');
                                     'step 1'
                                     player.gainMaxHp(1);
                                     'step 2'
                                     player.recover(player.maxHp - player.hp);
-                                    player.removeSkills('jifu_weicheng');
+                                    player.removeSkill('jifu_weicheng');
                                 },
                             },
                             jifu_lingwei: {
@@ -5695,28 +5698,31 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     global: "useCardToPlayered",
                                 },
                                 filter: function (event, player) {
-                                    if (player.countMark('jifu_lingwei') >= 3) return false;
-                                    return get.tag(event.card, 'damage') && player.countCards("hes");
+                                    return player != event.target && event.targets.length == 1 && get.tag(event.card, 'damage') && player.countCards("hes");
                                 },
                                 content: function () {
                                     'step 0'
                                     player.chooseToDiscard(1);
                                     'step 1'
-                                    var str = get.translation(trigger.player);
-                                    player.chooseControl('cancel2').set('choiceList', [
-                                        '令此牌伤害+1',
-                                        '令此牌无法响应',
-                                    ]).set('ai', function () {
-                                        var player = _status.event.player, target = _status.event.getTrigger().target;
-                                        if (get.attitude(player, trigger.target) > 0) {
-                                            game.log("return'cancel2'");
-                                            return 'cancel2';
-                                        }
-                                        if (trigger.target.Hp + trigger.target.hujia <= 2 && _status.currentPhase.countCards("h") > 1) {
-                                            return target.mayHaveShan() ? 1 : 0;
-                                        }
-                                        return 1;
-                                    });
+                                    if (result.bool == true) {
+                                        var str = get.translation(trigger.player);
+                                        player.chooseControl('cancel2').set('choiceList', [
+                                            '令此牌伤害+1',
+                                            '令此牌无法响应',
+                                        ]).set('ai', function () {
+                                            var player = _status.event.player, target = _status.event.getTrigger().target;
+                                            if (get.attitude(player, trigger.target) > 0) {
+                                                game.log("return'cancel2'");
+                                                return 'cancel2';
+                                            }
+                                            if (trigger.target.Hp + trigger.target.hujia <= 2 && _status.currentPhase.countCards("h") > 1) {
+                                                return target.mayHaveShan() ? 1 : 0;
+                                            }
+                                            return 1;
+                                        });
+                                    } else {
+                                        event.finish();
+                                    }
                                     'step 2'
                                     if (result.control != 'cancel2') {
                                         var target = trigger.target;
@@ -5725,7 +5731,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             game.log(trigger.card, '不可被响应');
                                             trigger.directHit.add(target);
                                         }
-                                        else {//多目标牌目前会出问题，不能正常加伤。
+                                        else {
                                             game.log(trigger.card, '伤害+1');
                                             var map = trigger.getParent().customArgs, id = target.playerid;
                                             if (!map[id]) map[id] = {};
@@ -5740,33 +5746,38 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         if (_status.currentPhase != player) { _status.currentPhase.draw(1); }
                                         player.draw(1);
                                     }
-                                    player.addMark("jifu_lingwei", 1);
+                                    'step 4'
+                                    logskill("lingwei");
+                                    game.log(player.hasHistory('sourceDamage'));
+                                    if (player.isIn() && player.getHistory('sourceDamage', function (evt) {
+                                        return evt.getParent(2) == event.parent;
+                                    }).length > 0) {
+                                        player.tempBanSkill('jifu_lingwei', 'roundStart');
+                                    }
+
 
                                 },
-                                marktext: "领卫",
-                                intro: {
-                                    name: "领卫",
-                                    content: "本轮已发动过$次",
-                                },
-                                group: "jifu_lingwei_reflash",
+                                group: "jifu_lingwei_ban",
                                 subSkill: {
-                                    reflash: {
+                                    ban: {
                                         trigger: {
-                                            player: ["phaseZhunbeiBegin"],
+                                            global: "useCardAfter",
                                         },
                                         forced: true,
                                         filter: function (event, player) {
-                                            return player.countMark('jifu_lingwei');
+                                            return (player.getHistory('useSkill', function (evt) {
+                                                return evt.skill == 'jifu_lingwei';
+                                            }).length) &&event.targets.length==1&& event.player.hasHistory('sourceDamage', function (evt) {
+                                                return evt.card == event.card;
+                                            });
                                         },
                                         content: function () {
-                                            var i = player.countMark('jifu_lingwei');
-                                            player.removeMark('jifu_lingwei', i);
+                                            player.tempBanSkill('jifu_lingwei', 'roundStart');
                                         },
                                         sub: true,
                                         "_priority": 0,
                                     },
                                 },
-
 
 
 
@@ -5777,11 +5788,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     target: "taoBegin",
                                 },
-                                zhuSkill: true,
                                 forced: true,
                                 filter(event, player) {
-                                    if (event.player == player) return false;
-                                    if (event.player != player&&(event.player.group = 'RM'||event.player.name== 'tashigan')) return true;
+                                    if (event.player == player){ return false;}
+                                    if (event.player != player && (event.player.group = 'RM' || event.player.name == 'tashigan')) {return true;}
                                     return false;
                                 },
                                 async content(event, trigger, player) {
@@ -5928,11 +5938,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jilizhixin: "激励之心", 'jilizhixin_info': "若你的宝物栏为空，你视为装备着'侦察机'。你可以弃一张牌并跳过出牌阶段，令一名角色获得一个额外回合。",
                             hangkongzhanshuguang: "航空战曙光", 'hangkongzhanshuguang_info': "出牌阶段限一次，你可以令一名角色摸一张牌。若目标是航母，改为摸两张牌。",
 
-                            jifu_weicheng: "未成", 'jifu_weicheng_info': "锁定技，准备阶段你进行判定，若结果为红色：你回复一点体力，本回合你造成的伤害+1。若结果为黑色，你流失一点体力。",
+                            jifu_weicheng: "未成", 'jifu_weicheng_info': "锁定技，准备阶段你进行判定，若结果为红色：你回复一点体力，摸一张牌。若结果为黑色，你流失一点体力。",
                             jifu_shanghai: "伤害+1", 'jifu_shanghai_info': "伤害+1",
                             jifu_yuanjing: "愿景", 'jifu_yuanjing_info': "觉醒技，当你进入濒死时，增加一点体力上限，将体力调整至上限，然后失去未成",
-                            jifu_lingwei: "领卫", 'jifu_lingwei_info': "每轮限三次，有角色用伤害类牌时，你可以弃置一张牌，然后选择一项：1、令此牌伤害+1。2、此牌无法被响应。若使用牌的角色是驱逐或S国船，则你与被选择的目标各摸一张牌。",
-                            jifu_yuanqin: "远亲", 'jifu_yuanqin_info': "锁定技，/*你使塔什干与I国船回复体力时，回复的体力值+1，*/塔什干与I国船使你回复体力时，回复的体力值+1。",
+                            jifu_lingwei: "领卫", 'jifu_lingwei_info': "当有角色使用伤害类牌指定唯一目标时，你可以弃置一张牌，然后选择一项：1、令此牌伤害+1。2、此牌无法被响应。若此牌的使用者是驱逐或S国船，则你与此牌的使用者各摸一张牌。（若此牌的使用者是你自己，则只摸一张牌）若因“领卫”技能效果造成了伤害，则本轮失去“领卫”。",
+                            jifu_yuanqin: "远亲", 'jifu_yuanqin_info': "锁定技，塔什干与I国船使你回复体力时，回复的体力值+1。",
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
                             lishizhanyi_naerweike: '历史战役-纳尔维克',
