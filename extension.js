@@ -766,7 +766,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "1913": ["female", "ROCN", 4, ["zhuangjiafh", "zhanliebb", "jujianmengxiang", "jujianmengxiang_reflash"], ["zhu", "des:在大舰巨炮的黄金年代，让国人也拥有主力战舰，堪称最为奢侈的海军梦想了——而今日，妾身有幸以此姿态回应诸位之诉求。"]],
                             kunxi: ["female", "USN", 4, ["huokongld", "zhongxunca", "gaosusheji"], ["des:画师优秀的功底让这名角色美而可爱，这是出色的角色塑造。"]],
                             ougengqi: ["female", "KMS", 4, ["huokongld", "zhongxunca", "zhanxianfangyu", "zhanxianfangyu1"], ["des:励志偶像，与标志性舰装，给人以强大的保护。"]],
-                            qingye: ["female", "IJN", 4, ["huokongld", "zhongxunca", "sawohaizhan","qingyeqingyeqing"], ["des:励志偶像，与一首动人的歌，与一段坎坷旅途。"]],
+                            qingye: ["female", "IJN", 4, ["huokongld", "zhongxunca", "sawohaizhan", "qingyeqingyeqing"], ["des:励志偶像，与一首动人的歌，与一段坎坷旅途。"]],
                             beianpudun: ["female", "USN", 4, ["huokongld", "zhongxunca", "huhangyuanhu"], ["des:励志青年，在旅途中成长，与恋人坚定的望向远方。"]],
                             jiujinshan: ["female", "USN", 4, ["huokongld", "zhongxunca", "jiujingzhanzhen"], ["des:航海服饰，侦查员与火炮观瞄。"]],
                             yixian: ["female", "ROCN", 3, ["fangkong2", "qingxuncl", "shizhibuyu", "shizhibuyu1"], ["des:经典美术设计的款式，意气风发，威猛先生"]],
@@ -3373,16 +3373,35 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     player: "useCard",
                                 },
+                                zhuanhuanji: true,
+                                mark: true,
+                                marktext: "☯",
+                                intro: {
+                                    content: function (storage, player) {
+                                        if (storage) return '出牌阶段你使用的第一张牌为普通锦囊牌时，你可以令此牌额外结算一次。';
+                                        return '出牌阶段你使用的第一张牌为基本牌时，你可以令此牌额外结算一次。';
+                                    },
+                                },
                                 filter: function (event, player) {
                                     var evtx = event.getParent('phaseUse');
                                     if (!evtx || evtx.player != player) return false;
-                                    //return player.getHistory('useCard', evt => {
-                                    return _status.currentPhase == player && player.countUsed() == 1 && (event.card.name == 'sha' || event.card.name == 'sheji9') & event.getParent('phaseUse') == evtx;
-                                    //}).indexOf(event) == 0;
+                                    if (player.countUsed() != 1) return false;
+                                    game.log(evtx);
+                                    if (player.storage.gaosusheji) {
+                                        game.log("阳");
+                                        return _status.currentPhase == player && (get.type(event.card) == 'trick') & event.getParent('phaseUse') == evtx;
+                                    } else {
+                                        game.log("阴");
+                                        return _status.currentPhase == player && (get.type(event.card) == 'basic') & event.getParent('phaseUse') == evtx;
+
+                                    }
+
                                 },
-                                direct: true,
+                                //direct: true,
                                 content: function () {
+                                    player.changeZhuanhuanji('gaosusheji');
                                     trigger.effectCount++;
+                                    game.logskill(gaosusheji);
                                 },
                             },
                             qixi_cv: {
@@ -5503,7 +5522,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             xiangrui: "祥瑞", "xiangrui_info": "每名玩家的回合限一次，当你受到伤害前，你可以进行判定，判定结果为黑桃，免疫此次伤害，然后获得[祥瑞]标记。",
                             yumian: "御免", "yumian_info": "锁定技，结束阶段，你移除所有[祥瑞]标记。你可以选择距你为1的目标，让其失去一点体力并摸两张牌。若你失去了一个或以上的祥瑞标记，你可以选择的目标不受距离限制",
                             hangkongzhanshuxianqu: "航空战术先驱", "hangkongzhanshuxianqu_info": "你使用转化的锦囊牌指定目标时，你可以展示牌堆顶的x张牌，获取其中花色各不相同的牌(x为你指定的目标数，至多为4)",
-                            gaosusheji: "高速射击", "gaosusheji_info": "当你使用的杀是本回合你使用的第一张牌，你可以令此杀结算两次。",
+                            gaosusheji: "高速射击", "gaosusheji_info": "转换技，出牌阶段你使用的第一张牌为：阳：基本牌时；阴：普通锦囊牌时。你可以令此牌额外结算一次。",
                             qixi_cv: "奇袭", "qixi_cv_info": "限定技，出牌阶段，你可以令所有其他角色依次选择一项:1你弃置其区域内的两张牌，2本回合不能使用或打出手牌，3翻面。然后你可以视为使用【近距支援】。",
                             rand: "随机数", "rand_info": "遇事不决？扔一个骰子吧。该技能可以生成1~6的随机数",
                             duikongfangyu: "对空防御", "duikongfangyu_info": "你在回合外发动[防空]后，你摸2张牌",
@@ -5533,7 +5552,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jiujingzhanzhen: "久经战阵", "jiujingzhanzhen_info": "结束阶段，你可以选择X名角色，其各选择一项:1摸一张牌，2令你获得一点护甲(至多为一)。X为你本回合弃置的红牌数。",
                             wuweizhuangji: "无畏撞击", "wuweizhuangji_info": "限定技，出牌阶段，若你的体力值最少，你可以失去所有体力，然后对一名角色造成x点伤害(x为你当前的体力上限)",
                             zhongzhuangcike: "重装刺客", "zhongzhuangcike_info": "你装备区内有牌时，你使用的杀无视防具；你即将造成的伤害视为体力流失",
-                            duomianshou: "多面手", "duomianshou_info": "出牌阶段限一次，你可以弃置将一张手牌视为使用一张牌堆中同点数的其他类型的牌(不受次数限制），如列表里没牌，技能使用次数+1，且本回合不能使用该点数发动技能；每回合限一次，你对其他中小型船使用转化后的牌时其选择一项：1弃置一张牌，2令你摸一张牌。",
+                            duomianshou: "多面手", "duomianshou_info": "出牌阶段限一次，你可以弃置一张手牌，视为使用一张牌堆中点数相同的牌(不受次数限制），若牌堆中没有相同点数的牌名，重置该技能发动次数，且本回合不能再使用该点数发动技能；每回合限一次，你对其他中小型船使用转化牌时，其选择弃置一张牌或令你摸一张牌。",
                             duomianshou_1: "多面手", "duomianshou_1_info": "每回合限一次，你对其他中小型船使用转化后的牌时其选择一项：1弃置一张牌，2令你摸一张牌。",
                             kaixuanzhige: "凯旋之歌", "kaixuanzhige_info": "当你使用【杀】指定唯一其他角色为目标后，你可以进行判定，若结果为锦囊牌，此【杀】伤害+1且无视防具。你的体力值小于3时，你使用的【杀】无视防具。",
                             yishisheji: "意式设计", "yishisheji_info": "每轮限一次，你可以免疫一次伤害。你使用杀指定唯一目标时可以进行判定，若判定结果不为红桃，此杀基础伤害+1，否则此杀无效。出牌阶段你使用或打出的第一张杀无距离限制。",
