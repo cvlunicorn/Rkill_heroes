@@ -3370,9 +3370,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             gaosusheji: {
                                 audio: "ext:舰R牌将:true",
-                                trigger: {
-                                    player: "useCard",
-                                },
                                 zhuanhuanji: true,
                                 mark: true,
                                 marktext: "☯",
@@ -3382,6 +3379,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         return '出牌阶段你使用的第一张牌为基本牌时，你可以令此牌额外结算一次。';
                                     },
                                 },
+                                trigger: {
+                                    player: "useCard",
+                                },
+                                
                                 filter: function (event, player) {
                                     var evtx = event.getParent('phaseUse');
                                     if (!evtx || evtx.player != player) return false;
