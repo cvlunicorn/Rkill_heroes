@@ -2486,7 +2486,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 subSkill: {
                                     choose: {
                                         trigger: {
-                                            global: "phaseBegin",
+                                            player: "phaseBegin",
                                         },
                                         forced: true,
                                         popup: false,
@@ -2500,7 +2500,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             'step 0'
                                             var nh = Math.min(player.countCards('h'), Math.ceil(player.getHandcardLimit()));
                                             var duiyou = game.countPlayer(function (current) { return get.attitude(player, current) > 0; });
-                                            var zongshu = Math.max(player.getHandcardLimit() / 2, duiyou - 1), cunpaishu = player.getExpansions('tunchu').length + player.getCards('s', function (card) { return card.hasGaintag('tunchu') }).length;
+                                            var zongshu = 1 + player.countMark('jinengup'), cunpaishu = player.getExpansions('tunchu').length + player.getCards('s', function (card) { return card.hasGaintag('tunchu') }).length;
                                             if (nh && zongshu > cunpaishu) {
                                                 player.chooseCard('h', [1, Math.min(nh, zongshu - cunpaishu)], '将任意张手牌置于你的武将牌上,<br>存牌上限为1+技能强化等级。<br>单次存牌量上限为手牌上限,<br>这些牌可以在回合外递给其他角色').set('ai', function (card) {
                                                     var player = _status.event.player;
@@ -4799,7 +4799,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     player.draw(1);
-                                    game.logskill("jueshengzhibing");
+                                    //game.log("jueshengzhibing");
 
                                 }
                             },
