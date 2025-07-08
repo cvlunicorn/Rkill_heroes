@@ -1590,7 +1590,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     basic: {
                                         order: 8.5,
                                         useful: 1,
-                                        value: 5,
+                                        value: 7,
                                     },
                                     wuxie: function (target, card, player, viewer) {
                                         if (get.attitude(viewer, target) > 0 && target.countCards('h', 'shan')) {
@@ -1598,7 +1598,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }
                                     },
                                     result: {
-                                        "target_use": function (player, target) {
+                                        /*"target_use": function (player, target) {
                                             if (player.hasUnknown(2) && get.mode() != 'guozhan') return 0;
                                             var nh = target.countCards('h');
                                             if (get.mode() == 'identity') {
@@ -1616,6 +1616,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             if (nh == 0) return -2;
                                             if (nh == 1) return -1.7
                                             return -1.5;
+                                        },*/
+                                        player: function (player) {
+                                            return 1;
                                         },
                                     },
                                     tag: {
@@ -5161,8 +5164,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 ai: {
                                     order: 7.2,
-                                    result: {
-                                        player:1,
+                                    result:{
+                                        target(player,target){
+                                            if(get.attitude(player, target)>=0)return 1;
+                                            return 0;
+                                        },
                                     },
                                 },
                             },
