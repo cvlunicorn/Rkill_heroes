@@ -5805,37 +5805,35 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             u47_xinbiao: {
                                 trigger: {
-                                    global: ["damageEnd", "loseHpEnd"],
+                                    global: ["damageEnd", "loseHpEnd","dying"],
                                 },
-                                //direct: true,
+                                direct: true,
                                 filter(event, player) {
-
-                                    return player.countCards('he', { color: 'black' }) > 0;
-                                },
-                                content: function () {
-                                    "step 0"
-                                    game.log(trigger.player);
+                                    if(player.countCards('he', { color: 'black' }) <= 0)return false;
+                                    if(!event.player.isIn())return false;
                                     var i = 0;
                                     var allplayers = game.players.sortBySeat(player);
                                     game.log(allplayers.length);
                                     for (i = 0; i < allplayers.length; i++) {
                                         game.log(allplayers[i], i);
-                                        //game.log("1");
+                                        
                                         if (allplayers[i].hasSkill("u47_xinbiao_hp")) {
-                                            //game.log("2");
+                                           
                                             game.log(allplayers[i].group);
-                                            game.log(trigger.player.group);
-                                            if (allplayers[i].group == trigger.player.group) {
-                                                event.finish();
-                                                //game.log("3");
+                                            game.log(event.player.group);
+                                            if (allplayers[i].group == event.player.group) {
+                                               return false;
+                                                
                                             }
                                         }
-                                        //game.log("4");
+                                        
                                     }
-
-                                    "step 1"
+                                    return player.countCards('he', { color: 'black' }) > 0;
+                                },
+                                content: function () {
+                                    "step 0"
                                     player.chooseToDiscard('he', '是否弃置一张黑色牌并记录' + get.translation(trigger.player) + '状态？', { color: 'black' });
-                                    "step 2"
+                                    "step 1"
                                     if (result.bool) {
                                         trigger.player.addSkill("u47_xinbiao_hp");
                                         trigger.player.addSkill("u47_xinbiao_cards");
@@ -5869,7 +5867,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 forced: true,
                                 filter: function (event, player) {
-                                    return get.tag(event.card, 'damage') && !event.player.hasHistory('sourceDamage', function (evt) {
+                                    return game.countPlayer(function (current) {
+                                        return current.hasSkill('u47_xinbiao_hp');
+                                    })&&get.tag(event.card, 'damage') && !event.player.hasHistory('sourceDamage', function (evt) {
                                         return evt.card == event.card;
                                     });
                                 },
