@@ -12,6 +12,8 @@ yield需要无名杀版本1.10.10或更高版本的支持
 //注意每个全局技能（前面有下划线的）代码在本文件钟有两个，单机前一个（带lib.的）生效，多人后一个生效。
 //目录：全局技能、武将列表、武将技能、武将和技能翻译、卡牌包与卡牌技能、卡牌翻译、配置（config）、单机武将列表、扩展简介、全局函数模块
 
+const { connect } = require("ws");
+
 //const { connect } = require("ws");突然生成出来的，暂未查明原因，先注释了试运行。
 //2025.1.19升级至无名杀1.10.12版本，该版本联机允许扩展，不额外需要“一劳永逸”扩展。
 game.import("extension", function (lib, game, ui, get, ai, _status) {
@@ -779,9 +781,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         characterSort: {
                             jianrjinji: {
                                 jianrbiaozhun: ["liekexingdun", "qixichicheng", "wufenzhongchicheng", "qiye", "bisimai", "misuli", "weineituo", "lisailiu", "1913", "changmen", "kunxi", "ougengqi", "qingye", "beianpudun", "jiujinshan", "jiujinshan", "yixian", "tianlangxing", "dadianrendian", "yatelanda", "z31", "xuefeng", "kangfusi", "47project", "guzhuyizhichuixue", "shuileizhanduichuixue", "minsike", "yinghuochong", "u1405", "baiyanjuren", "changchun"],
-                                lishizhanyi_naerweike: ["z17", "z18", "z21", "z22", "gesakeren"],
+                                lishizhanyi_naerweike: ["shengwang", "z17", "z18", "z21", "z22", "gesakeren"],
                                 lishizhanyi_matapanjiao: ["kewei", "kente"],
-                                lishizhanyi_danmaihaixia: ["hude", "z1", "z16"],
+                                lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "z1", "z16"],
                                 lishizhanyi_shanhuhai: [],
                                 lishizhanyi_haixiafujizhan: ["u47", "u81"],
                                 weijingzhizhi: ["jifu", "dujiaoshou"],
@@ -833,6 +835,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             hude: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "huangjiahaijunderongyao", "huangjiaxunyou", "tianshi"], ["zhu", "des:      英国史上最著名的战列巡洋舰。在20至30年代，胡德号长期作为英国海军的象征，频繁出访世界各地。胡德号在40年参与了针对投降后法国舰队的抛石机行动，重创了法国海军。41年的海战中，胡德号同威尔士亲王号一同拦截俾斯麦号和欧根亲王号。"]],
                             gesakeren: ["female", "RN", 3, ["huibi", "quzhudd", "tiaobangzuozhan"], ["des:部族级驱逐舰的4号舰，该级驱逐舰是最著名的英国驱逐舰。哥萨克人号参加了第二次纳尔维克海战，痛击了德军驱逐舰。41年参与过围歼俾斯麦号的行动。1941年10月哥萨克人号被德军潜艇击沉。"]],
                             kente: ["female", "RN", 3, ["huokongld", "zhongxunca", "guochuan", "baixiang"], ["des:该舰为肯特级重巡洋舰首舰，由于防护薄弱，经常被戏称为“白象”。肯特号于20年代服役，初期水线装甲带只有25.4毫米。在30年代末期，肯特号和其余重巡都进行了改装，加强了防护。肯特号在二战中参加了围捕斯佩伯爵海军上将号的战斗，1940年在地中海被击伤，回到本土修理时加装了大量雷达设备。1941年年末肯特号搭载外交官前往苏联会见总书记。肯特号平安的度过了战争，于1948年退役。"]],
+                            shengwang: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "zuihouderongyao", "29jienaerxun"], ["des:声望级战列巡洋舰首舰。声望级追求高航速而防护不足，在30年代的改装中，声望级重点加强了装甲防护。在战争开始前进行了更彻底的改装，更新了舰桥和防空火力。战争爆发后声望号参加挪威战役，在韦斯特湾海战中声望号利用有利条件单舰击退了两艘沙恩霍斯特级。1941年参与了围歼俾斯麦号行动，后长期担任直布罗陀H舰队旗舰，并幸存到战后，也是英国三艘战巡中唯一幸存到战后的。"]],
+                            shenluopujun: ["female", "RN", 3, ["huokongld", "zhongxunca", "hongseqiangwei"], ["des:什罗普郡是伦敦级重巡洋舰四号舰。在战争早期，什罗普郡主要执行护航与武装巡逻任务。在萨沃岛海战中，原澳海军堪培拉号重巡洋舰战沉。皇家海军将什罗普郡转交澳海军顶替堪培拉号巡洋舰的战损。什罗普郡参加了太平洋战场诸多战役，在苏里高海战中与盟军一道截击了来袭战列舰。在战争胜利时，什罗普郡参加了签字仪式。"]],
 
                             jifu: ["female", "ΒΜΦCCCP", 2, ["quzhudd", "huibi", "jifu_weicheng", "jifu_yuanjing", "jifu_lingwei", "jifu_yuanqin", "jifu_yuanqin"], ["des:基辅是苏联海军大舰队计划中的一环，她的设计吸取了塔什干和列宁格勒等驱逐舰的技术，同时航速和火力也保持了非常强的水平。尽管基辅在战前已经开工，但还是因为战况的影响而停工。在战争末期，未完工的基辅被拖回船厂，并修改了设计准备继续建造，但由于相比战后的新驱逐舰设计优势不大，所以并没有最终建造完成。"]],
 
@@ -5465,7 +5469,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return get.attitude(player, event.target) <= 0;
                                 },
                                 filter: function (event, player) {
-                                    return player != event.target && event.targets.length == 1 && event.card.name == 'sha';
+                                    return player != event.target && event.targets.length == 1 && (event.card.name == 'sha' || event.card.name == 'sheji9');
                                 },
                                 logTarget: "target",
                                 content: function () {
@@ -7864,6 +7868,156 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
                             },
+                            zuihouderongyao: {
+                                init: function (player) {
+                                    if (typeof player.storage.zuihouderongyao === 'undefined') player.storage.zuihouderongyao = 0;
+                                },
+                                mark: true,
+                                marktext: "距离",
+                                intro: {
+                                    name: "攻击距离",
+                                    content: function (storage, player) {
+                                        var str = "你的攻击距离增加" + get.translation(player.storage.zuihouderongyao + game.dead.length);
+                                        return str;
+                                    },
+                                },
+                                mod: {
+                                    attackFrom: function (from, to, distance) {
+                                        var number = game.dead.length;
+                                        return distance = (distance - number - from.storage.zuihouderongyao);
+                                    },
+                                    maxHandcard: function (player, num) {
+                                        var number = game.dead.length;
+                                        return num = (num + number);
+                                    },
+                                },
+                                trigger: {
+                                    player: "phaseDrawBegin2",
+                                },
+                                filter: function (event, player) {
+                                    return !event.numFixed;
+                                },
+                                direct: true,
+                                content: function () {
+                                    "step 0";
+                                    player.chooseControl("zuihouderongyao_less", "zuihouderongyao_more", "cancel2", function () {
+                                        var player = _status.event.player;
+                                        if (player.countCards("h") > 3) {
+                                            return "zuihouderongyao_less";
+                                        }
+                                        if (player.hp - player.countCards("h") > 1) {
+                                            return "zuihouderongyao_more";
+                                        }
+                                        return "cancel2";
+                                    });
+                                    "step 1";
+                                    if (result.control == "zuihouderongyao_less") {
+                                        trigger.num--;
+                                        player.storage.zuihouderongyao++;
+                                        player.logSkill("zuihouderongyao");
+                                    } else if (result.control == "zuihouderongyao_more") {
+                                        trigger.num++;
+                                        player.storage.zuihouderongyao--;
+                                        player.logSkill("zuihouderongyao");
+                                    }
+                                },
+                                "_priority": 0,
+                            },
+                            '29jienaerxun': {
+                                trigger: {
+                                    player: "useCardToPlayer",
+                                },
+                                direct: 1,
+                                usable: 1,
+                                filter: function (event, player) {
+                                    return player != event.target && (event.card.name == 'sha' || event.card.name == 'sheji9');
+                                },
+                                content: function () {
+                                    game.log('29jienaerxun');
+                                    if (player.getAttackRange() >= 3) {
+                                        game.log(trigger.card, '不可被', trigger.target, '响应');
+                                        trigger.directHit.add(trigger.target);
+                                    }
+                                    if (player.isMaxHp()) {
+                                        game.log(trigger.card, '对', trigger.target, '的伤害+1');
+                                        var map = trigger.getParent().customArgs, id = trigger.target.playerid;
+                                        if (!map[id]) map[id] = {};
+                                        if (!map[id].extraDamage) map[id].extraDamage = 0;
+                                        //game.log(map[id].extraDamage);
+                                        map[id].extraDamage++;
+                                    }
+                                },
+                            },
+                            hongseqiangwei: {
+                                marktext: "花",
+                                intro: {
+                                    content: "expansion",
+                                    markcount: "expansion",
+                                },
+                                trigger: {
+                                    player: "useCardAfter",
+                                },
+                                filter: function (event, player) {
+                                    return get.tag(event.card, 'damage');
+                                },
+                                content: function () {
+                                    'step 0'
+                                    player.chooseCard(get.prompt('hongseqiangwei', event.target), 1, 'h').set('ai', card => {
+                                        if (!game.players[number(card) - 1].isIn()) { return 0; }
+                                        if (get.attitude(game.players[number(card) - 1] < 0)) { return 0; }
+                                        return 9 - get.value(card);
+                                    });
+                                    'step 1'
+                                    if (result.bool) {
+                                        var num = result.cards.length;
+                                        player.addToExpansion(result.cards, player, 'give').gaintag.add('hongseqiangwei');
+                                    }
+                                },
+                                group: ["hongseqiangwei_damage"],
+                                subSkill: {
+                                    damage: {
+                                        force: true,
+                                        direct: true,
+                                        trigger: {
+                                            global: "damageBegin3",
+                                        },
+                                        filter: function (event, player) {
+                                            if (event.num <= 0) { return 0; }
+                                            var cards = player.getExpansions('hongseqiangwei');
+                                            var num = event.player.getSeatNum();
+                                            for (i = 0; i < player.getExpansions('hongseqiangwei').length; i++) {
+                                                if (get.number(cards[i]) == num) {
+                                                    return event.player.isIn();
+                                                }
+                                            }
+                                            return 0;
+                                        },
+                                        content: function () {
+                                            "step 0"
+                                            trigger.cancel();
+                                            "step 1"
+                                            var num = trigger.player.getSeatNum();
+                                            var list = [];
+                                            var Fcards = player.getExpansions('hongseqiangwei');
+                                            for (var i = 0; i < Fcards.length; i++) {
+                                                //game.log("蔷薇的点数" + get.number(Fcards[i]));
+                                                if (get.number(Fcards[i]) == num) {
+                                                    list.push(Fcards[i]);
+                                                }
+                                            }
+                                            game.log(list);
+                                            if (list.length > 0) {
+                                                player.chooseCardButton('移去一张蔷薇', true, list).set('ai', function (button) {
+                                                    return 1;
+                                                });
+                                            }
+                                            else event.finish();
+                                            'step 2'
+                                            player.loseToDiscardpile(result.links);
+                                        },
+                                    },
+                                },
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -7910,6 +8064,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             dujiaoshou: "独角兽",
                             gesakeren: "哥萨克人",
                             kente: "肯特",
+                            shengwang: "声望",
+                            shenluopujun: "什罗普郡",
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -8054,13 +8210,18 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jishiyu: "及时雨", jishiyu_info: "你的判定牌生效后，你可以获得之。",
                             yongbuchenmodezhanjian: "永不沉没的战舰", yongbuchenmodezhanjian_info: "主公技，每回合限一次，你有护甲值时，你可以弃置一张牌令受到的伤害-1。",
                             xiuqi: "修葺", xiuqi_info: "当你发动军辅将牌交给一名其他角色时，你可以令其获得以下效果：你首次造成伤害时，可以回复一点体力。直到其回合结束。",
-                            
                             xiuqi2: "修葺", xiuqi2_info: "每回合限一次，你造成伤害时可以回复一点体力。",
                             wanbei: "完备", wanbei_info: "锁定技，你获得开幕航空，你的开幕航空无法升级。你的手牌上限+X，X为你发动军辅置于武将牌上的牌的数量",
-                           //iuqi2: "修葺2", xiuqi2_info: "下一次发动开幕航空的技能等级+1",
+                            //iuqi2: "修葺2", xiuqi2_info: "下一次发动开幕航空的技能等级+1",
                             tiaobangzuozhan: "跳帮作战", tiaobangzuozhan_info: "出牌阶段限一次，你可以视为对一名角色使用决斗。若你以此法造成伤害，你观看其手牌并获得其区域内一张牌；若你因此受到伤害，你令其获得你一张手牌，然后防止此伤害。",
                             baixiang: "白象", baixiang_info: "锁定技，你无法使用防具牌。当你受到雷属性伤害时，防止之。",
                             guochuan: "过穿", guochuan_info: "锁定技，你受到大于一的伤害时，你令此伤害数值减为一。然后你可以将一张装备牌交给一名与你相邻的角色(不能是伤害来源)，令其承受此伤害-1。",
+                            zuihouderongyao: "最后的荣耀", zuihouderongyao_info: "锁定技，摸牌阶段开始时，你选择以下一项：1，多摸一张牌且你的攻击范围-1。2，少摸一张牌且你的攻击范围+1。你的攻击范围与手牌上限+X。(X已阵亡角色数)",
+                            '29jienaerxun': "29节纳尔逊", '29jienaerxun_info': "当你本回合内第一次使用“杀”指定目标时，若你的攻击范围大于等于3，此杀不可响应，若你的体力为全场最高时，此杀伤害+1。",
+                            zuihouderongyao_less: "少摸加距离",
+                            zuihouderongyao_more: "多摸减距离",
+                            hongseqiangwei: "红色蔷薇", hongseqiangwei_info: "你使用伤害类牌后，可以将一张手牌置于武将牌上称为[花]。[花]包含对应座次的角色受到伤害时，你须弃置一张对应点数的[花]并防止此伤害。",
+
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
