@@ -2578,22 +2578,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         //player.loseToDiscardpile(result.links);player.discoverCard(get.inpile('trick'));target.loseToSpecial(event.cards2,'asara_yingwei',player).visible=true;player.draw(1);player.draw(1);player.loseToSpecial(,'junfu',player).visible=true;
                                         trigger.player.gain(result.links, player);
                                         //独角兽的技能修葺
-                                        if (trigger.player.hasSkill("hangmucv") && player.hasSkill("xiuqi") && (!trigger.player.hasSkill("xiuqi2"))) {
-
+                                        if (player.hasSkill("xiuqi") && (!trigger.player.hasSkill("xiuqi2"))) {
                                             game.log(get.translation(trigger.player) + "获得了【修葺】带来的提升！");
-                                            var a = trigger.player.countMark('mopaiup'), b = trigger.player.countMark('jinengup'), c = trigger.player.countMark('wuqiup'), d = trigger.player.countMark('useshaup'), e = trigger.player.countMark('jidongup'), f = trigger.player.countMark('shoupaiup'), g = trigger.player.countMark('songpaiup'), h = trigger.player.countMark('Expup'), k = trigger.player.countMark('_jianzaochuan') + 1;
-                                            if (b < 2) {
-                                                b = b + 1;
-                                                trigger.player.addSkill('xiuqi2');
-                                                trigger.player.addMark('xiuqi2', 1);
-                                                trigger.player.storage._qianghuazhuang = [a, b, c, d, e, f, g, h];
-                                            }
+                                            trigger.player.addTempSkill('xiuqi2', { player: 'phaseAfter' });
                                         }
-                                        if (!trigger.player.hasSkill("hangmucv") && player.hasSkill("xiuqi") && (!trigger.player.hasSkill("xiuqi2"))) {
 
-                                            game.log(get.translation(trigger.player) + "获得了【修葺】带来的航空支援！");
-                                            trigger.player.addTempSkill('hangmucv', { player: 'phaseAfter' });
-                                        }
                                         //
                                         player.draw(1);
                                     } else event.finish();
@@ -7013,8 +7002,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         var list = [];
                                         var Zcards = player.getExpansions('Z');
                                         for (var i = 0; i < Zcards.length; i++) {
-                                            game.log("Z的牌名" + get.name(Zcards[i]));
-                                            game.log("弃的牌名" + get.name(result.cards[0]));
+                                            //game.log("Z的牌名" + get.name(Zcards[i]));
+                                            //game.log("弃的牌名" + get.name(result.cards[0]));
                                             if (get.name(Zcards[i]) == get.name(result.cards[0])) {
                                                 list.push(Zcards[i]);
                                             }
@@ -7536,11 +7525,19 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 forced: true,
                                 filter(event, player) {
+                                    if (player.countCards("he") == 0) return false;
                                     return player.hujia > 0 && event.num >= 1;
                                 },
                                 content() {
-                                    if (trigger.num >= 1) {
-                                        trigger.num--;
+                                    'step 0'
+                                    player.chooseToDiscard(1).set("ai", function (card) {
+                                        return 9 - get.value(card);
+                                    });
+                                    'step 1'
+                                    if (result.bool == true) {
+                                        if (trigger.num >= 1) {
+                                            trigger.num--;
+                                        }
                                     }
                                 },
                                 ai: {
@@ -7562,27 +7559,39 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         return get.translation(skill + '_info');
                                     },
                                 },
-                                usable:1,
-                                trigger:{
-                                    global:"useCardAfter",
+                                /*able: 1,
+                                trigger: {
+                                    global: "useCardAfter",
                                 },
-                                forced:true,
+                                forced: true,
                                 filter(event, player) {
-                                    return (event.card.name == "jinjuzy"||event.card.name == "wanjian")  && event.cards.someInD();
+                                    return (event.card.name == "jinjuzy" || event.card.name == "wanjian") && event.player != player && event.cards.someInD();
                                 },
                                 content() {
                                     player.gain(trigger.cards.filterInD(), "gain2");
                                 },
-                                ai:{
-                                    effect:{
+                                ai: {
+                                    effect: {
                                         target(card) {
-                                            if (card.name == "jinjuzy"||card.name == "wanjian") return [0, 1];
+                                            if (card.name == "jinjuzy" || card.name == "wanjian") return [0, 1];
                                         },
                                     },
-                                },
-                                "_priority":0,
+                                },*/
+                                "_priority": 0,
                             },
                             xiuqi2: {
+                                usable: 1,
+                                trigger: {
+                                    source: "damageSource",
+                                },
+                                filter(event, player) {
+                                    return event.num > 0;
+                                },
+                                content() {
+                                    player.recover(1);
+                                },
+                            },
+                            /*xiuqi2: {//上一版本的修葺
                                 name: "修葺",
                                 intro: {
                                     marktext: "修葺",
@@ -7612,7 +7621,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 200,
                                 sub: true,
-                            },
+                            },*/
                             wanbei: {
                                 force: true,
                                 mod: {
@@ -8043,10 +8052,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             tianshi: "天使", tianshi_info: "主公技，你的判定牌生效前，E国势力的角色可以打出一张红牌代替之",
                             tianshi2: "天使2", tianshi2_info: "拥有“天使”的角色判定牌生效前，E国势力的角色可以打出一张红牌代替之",
                             jishiyu: "及时雨", jishiyu_info: "你的判定牌生效后，你可以获得之。",
-                            yongbuchenmodezhanjian: "永不沉没的战舰", yongbuchenmodezhanjian_info: "主公技，每回合限一次，你有护甲值时，你受到的伤害-1。",
-                            xiuqi: "修葺", xiuqi_info: "当你发动军辅将牌交给：航母时，其下一次发动开幕航空的技能等级+1；非航母时，其获得开幕航空直到其下回合结束。每名角色回合限一次，万箭齐发或近距支援结算结束后你获得词牌对应的所有实体牌",
+                            yongbuchenmodezhanjian: "永不沉没的战舰", yongbuchenmodezhanjian_info: "主公技，每回合限一次，你有护甲值时，你可以弃置一张牌令受到的伤害-1。",
+                            xiuqi: "修葺", xiuqi_info: "当你发动军辅将牌交给一名其他角色时，你可以令其获得以下效果：你首次造成伤害时，可以回复一点体力。直到其回合结束。",
+                            
+                            xiuqi2: "修葺", xiuqi2_info: "每回合限一次，你造成伤害时可以回复一点体力。",
                             wanbei: "完备", wanbei_info: "锁定技，你获得开幕航空，你的开幕航空无法升级。你的手牌上限+X，X为你发动军辅置于武将牌上的牌的数量",
-                            xiuqi2: "修葺2", xiuqi2_info: "下一次发动开幕航空的技能等级+1",
+                           //iuqi2: "修葺2", xiuqi2_info: "下一次发动开幕航空的技能等级+1",
                             tiaobangzuozhan: "跳帮作战", tiaobangzuozhan_info: "出牌阶段限一次，你可以视为对一名角色使用决斗。若你以此法造成伤害，你观看其手牌并获得其区域内一张牌；若你因此受到伤害，你令其获得你一张手牌，然后防止此伤害。",
                             baixiang: "白象", baixiang_info: "锁定技，你无法使用防具牌。当你受到雷属性伤害时，防止之。",
                             guochuan: "过穿", guochuan_info: "锁定技，你受到大于一的伤害时，你令此伤害数值减为一。然后你可以将一张装备牌交给一名与你相邻的角色(不能是伤害来源)，令其承受此伤害-1。",
