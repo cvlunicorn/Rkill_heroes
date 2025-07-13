@@ -3503,9 +3503,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 forced: true,
                                 direct: true,
-                                filterTarget: function (card, player, target) {
+                                /*filterTarget: function (card, player, target) {
                                     return get.distance(player, target) <= 1 && target.isAlive;
-                                },
+                                },*/
                                 content: function () {
                                     "step 0"
                                     //player.addMark('xiangrui', 1);
