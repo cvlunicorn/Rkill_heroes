@@ -12,6 +12,8 @@ yield需要无名杀版本1.10.10或更高版本的支持
 //注意每个全局技能（前面有下划线的）代码在本文件钟有两个，单机前一个（带lib.的）生效，多人后一个生效。
 //目录：全局技能、武将列表、武将技能、武将和技能翻译、卡牌包与卡牌技能、卡牌翻译、配置（config）、单机武将列表、扩展简介、全局函数模块
 
+const { connect } = require("ws");
+
 //const { connect } = require("ws");突然生成出来的，暂未查明原因，先注释了试运行。
 
 game.import("extension", function (lib, game, ui, get, ai, _status) {
@@ -816,7 +818,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         characterSort: {
                             jianrjinji: {
                                 jianrbiaozhun: ["liekexingdun", "qixichicheng", "wufenzhongchicheng", "dumuchenglinqiye", "bisimai", "misuli", "weineituo", "lisailiu", "1913", "changmen", "kunxi", "ougengqi", "qingye", "beianpudun", "jiujinshan", "jiujinshan", "yixian", "tianlangxing", "dadianrendian", "yatelanda", "z31", "xuefeng", "kangfusi", "47project", "guzhuyizhichuixue", "shuileizhanduichuixue", "minsike", "yinghuochong", "u1405", "baiyanjuren", "changchun"],
-                                lishizhanyi_naerweike: ["z17", "z18"],
+                                lishizhanyi_naerweike: ["z17", "z18", "Z21", "Z22"],
                                 lishizhanyi_matapanjiao: ["", ""],
                                 lishizhanyi_danmaihaixia: ["Z1", "Z16"],
                                 lishizhanyi_shanhuhai: ["", ""],
@@ -864,8 +866,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "z16": ["female", "KMS", 3, ["huibi", "quzhudd", "Z", "z16_lianhuanbaopo", "z16_shuileibuzhi"], ["des:1934A型驱逐舰11号舰，1934A是1934的改良型，改进了适航性与动力系统设计。Z16号（弗里德里希·埃科尔特号）开战之后主要执行对英国的布雷任务。在巴伦支海海战中被英国轻巡洋舰谢菲尔德号击沉。"]],
                             "z18": ["female", "KMS", 3, ["huibi", "quzhudd", "z18_weisebaoxingdong"], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
                             "z17": ["female", "KMS", 3, ["huibi", "quzhudd", "z17_naerweikejingjie"], ["des:　德国1936型驱逐舰总体上加大了吨位，改善了舰艏设计以提高适航性。Z17（迪特尔·冯·勒德尔）号驱逐舰在纳尔维克海战中击伤了哥萨克人号，最终被英军击沉。"]],
-                            //"z21": ["female", "KMS", 3, ["huibi", "quzhudd", "", ""], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
-                            //"z22": ["female", "KMS", 3, ["huibi", "quzhudd", "", ""], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
+                            "z21": ["female", "KMS", 3, ["huibi", "quzhudd", "z21_tuxi"], ["des:1936型驱逐舰5号舰，1936年型是是1934型的放大改良型，表现出了不俗的性能，可以与英国部族级对攻而不落下风。Z21号（威廉·海德坎姆号）于1939年服役，1940年参与了攻击北欧行动，并占领了纳尔维克，之后英军驱逐舰突袭了港内的德国驱逐舰，旗舰Z21号遭到英军厌战号战列舰的炮击沉没。"]],
+                            "z22": ["female", "KMS", 3, ["huibi", "quzhudd", "z22_tuxixiawan"], ["des:1936型驱逐舰6号舰。1940年6艘1936型驱逐舰都参加了攻击北欧行动，在纳尔维克海战中，Z22号（安东·施米特号）被英国海军击沉，而这次海战中，参战的6艘1936型全部被击沉。"]],
 
                             jifu: ["female", "ΒΜΦCCCP", 2, ["quzhudd", "huibi", "jifu_weicheng", "jifu_yuanjing", "jifu_lingwei", "jifu_yuanqin", "jifu_yuanqin"], ["des:基辅是苏联海军大舰队计划中的一环，她的设计吸取了塔什干和列宁格勒等驱逐舰的技术，同时航速和火力也保持了非常强的水平。尽管基辅在战前已经开工，但还是因为战况的影响而停工。在战争末期，未完工的基辅被拖回船厂，并修改了设计准备继续建造，但由于相比战后的新驱逐舰设计优势不大，所以并没有最终建造完成。"]],
 
@@ -5191,11 +5193,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filterCard(card, player) {
                                     var player = _status.event.player;
                                     //var event = _status.event;
-                                    game.log("选择卡牌过滤器" + JSON.stringify(player.storage.duomianshou));
+                                    //game.log("选择卡牌过滤器" + JSON.stringify(player.storage.duomianshou));
                                     var numbers = [];
 
                                     if (player.storage.duomianshou.length) {
-                                        game.log("进入了if");
+                                        //game.log("进入了if");
                                         for (var i = 0; i < player.storage.duomianshou.length; i++) {
                                             numbers.add(get.number(player.storage.duomianshou[i]));
                                         }
@@ -5206,7 +5208,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
 
                                     return false;
-                                    // return true;
                                 },
 
                                 position: "hs",
@@ -5230,7 +5231,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         var type = get.type(i);
                                         if (type == 'trick' || type == 'basic') {
                                             if (lib.filter.cardEnabled({ name: name }, player) && type != get.type(card) && get.number(card) == get.number(i)) {
-                                                game.log(type);
+                                                //game.log(type);
                                                 game.log(i);
                                                 list.push(i);
                                                 //list.push(game.createCard2(get.name(i), get.suit(card), get.number(i), get.nature(i)));
@@ -5256,13 +5257,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         var MostValuableCard = card;
 
                                         for (var j of list) {
-                                            game.log("目标卡牌价值" + get.value(j));
-                                            game.log("最大卡牌价值" + MostValue);
+                                            game.log(j + "价值" + get.value(j));
+                                            //game.log("最大卡牌价值" + MostValue);
 
                                             if (get.value(j) > MostValue) {
                                                 MostValuableCard = j;
                                                 MostValue = get.value(j);
-                                                game.log("最有价值的卡牌变更为" + get.name(MostValuableCard));
+                                                //game.log("最有价值的卡牌变更为" + get.name(MostValuableCard));
                                             }
 
                                         }
@@ -5297,7 +5298,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     
                                     }*/
                                     'step 1'
-                                    game.log("结果bool" + result.bool);
+                                    //game.log("结果bool" + result.bool);
 
                                     if (result.bool) {
                                         event.finish();
@@ -6943,7 +6944,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             Z_reward: {
-                                direct:true,
+                                direct: true,
                                 charlotte: true,
                                 trigger: {
                                     player: "damageEnd",
@@ -6962,7 +6963,190 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger.source.gain(result.links, player, 'give');
                                     }
                                 },
-                            }
+                            },
+                            z21_tuxi: {
+                                trigger: {
+                                    player: "phaseUseBegin",
+                                },
+                                filter: function (event, player) {
+                                    return game.hasPlayer(current => player.inRange(current));
+                                },
+                                content: function () {
+                                    'step 0'
+                                    player.chooseTarget(get.prompt2('z21_tuxi'), function (card, player, target) {
+                                        return target != player && player.inRange(target);
+                                    }).set('ai', function (target) {
+                                        if (get.attitude(_status.event.player, target) < 0) {
+                                            return 1;
+                                        }
+                                        return 0;
+                                    });
+                                    'step 1'
+                                    game.log("2");
+                                    if (result.bool) {
+                                        event.target = result.targets[0];
+                                        player.discardPlayerCard(event.target, 'he', true);
+                                    } else {
+                                        event.finish();
+                                    }
+                                    'step 2'
+                                    game.log("4");
+                                    if (result.bool) {
+                                        event.target.addToExpansion(result.cards, event.target, 'give').gaintag.add('Z');
+                                    }
+                                },
+                                ai: {
+                                    order: 4,
+                                    expose: 0.2,
+                                    result: {
+                                        target: -1,
+                                        player: function (player, target) {
+                                            if (target.countCards('h') == 0) return 0;
+                                            if (target.countCards('h') == 1) return -0.1;
+                                            return -0.5;
+                                        },
+                                    },
+                                    threaten: 1.1,
+                                },
+                                group: ["z21_tuxi_discard"],
+                                subSkill: {
+                                    discard: {
+                                        trigger: {
+                                            global: "damageEnd",
+                                        },
+                                        filter: function (event, player) {
+                                            //game.log(event.player);
+                                            return event.player.getExpansions('Z').length;
+                                        },
+                                        check: function (event, player) {
+                                            return get.attitude(player, event.player) < 0;
+                                        },
+                                        prompt: "你可以令其随机弃置一张牌并弃置所有Z",
+                                        content: function () {
+                                            'step 0'
+                                            trigger.player.randomDiscard(1);
+                                            'step 1'
+                                            var cards = trigger.player.getExpansions('Z');
+                                            for (var i = 0; i < cards.length; i++) {
+                                                trigger.player.loseToDiscardpile(cards[i]);
+                                            }
+                                        },
+                                    },
+                                },
+                            },
+                            z22_tuxixiawan: {
+                                trigger: {
+                                    player: "phaseUseBegin",
+                                },
+                                filter: function (event, player) {
+                                    return true;
+                                },
+                                content: function () {
+                                    'step 0'
+                                    player.chooseTarget(get.prompt2('z22_tuxixiawan'), function (card, player, target) {
+                                        return target != player && target.countCards("he");
+                                    }).set('ai', function (target) {
+                                        if (get.attitude(_status.event.player, target) < 0) {
+                                            return 1;
+                                        }
+                                        return 0;
+                                    });
+                                    'step 1'
+                                    if (result.bool) {
+                                        event.target = result.targets[0];
+                                        player.discardPlayerCard(event.target, 'he', true);
+                                    } else {
+                                        event.finish();
+                                    }
+                                    'step 2'
+                                    if (result.bool) {
+                                        player.addToExpansion(result.cards, player, 'give').gaintag.add('Z');
+                                    }
+                                },
+                                ai: {
+                                    order: 4,
+                                    expose: 0.2,
+                                    result: {
+                                        target: -1,
+                                        player: function (player, target) {
+                                            if (target.countCards('h') == 0) return 0;
+                                            if (target.countCards('h') == 1) return -0.1;
+                                            return -0.5;
+                                        },
+                                    },
+                                    threaten: 1.1,
+                                },
+                                group: ["z22_tuxixiawan_discard"],
+                                subSkill: {
+                                    discard: {
+                                        trigger: {
+                                            global: "damageSource",
+                                        },
+                                        filter: function (event, player) {
+                                            return player.getExpansions('Z').length;
+                                        },
+                                        check: function (event, player) {
+                                            return get.attitude(player, event.player) < 0;
+                                        },
+                                        prompt: "你可以令其进行一次判定，本回合无法使用或打出与判定牌相同花色的牌",
+                                        content: function () {
+                                            'step 0'
+                                            var cards = player.getExpansions('Z'), count = cards.length;
+                                            if (count > 0) {
+                                                player.chooseCardButton('移去一张Z', true, cards).set('ai', function (button) {
+                                                    return 1;
+                                                });
+                                            }
+                                            else event.finish();
+                                            'step 1'
+                                            event.cards = result.links;
+                                            player.loseToDiscardpile(event.cards);
+                                            'step 2'
+                                            player.judge(function (card) {
+
+                                                if (!trigger.source.hasSkill('cardsDisabled_suit')) {
+                                                    trigger.source.addTempSkill('cardsDisabled_suit', { player: 'phaseAfter' });
+                                                }
+                                                trigger.source.markAuto('cardsDisabled_suit', [get.suit(card)]);
+                                            });
+                                            event.finish();
+                                        },
+                                    },
+                                },
+                            },
+                            cardsDisabled_suit: {
+                                charlotte: true,
+                                direct: true,
+                                trigger: {
+                                    player: 'phaseEnd',
+                                },
+                                intro: {
+                                    content: "不可使用的花色：$",
+                                    onunmark: true,
+                                },
+                                mod: {
+                                    cardEnabled: function (card, player) {
+                                        var suit = get.suit(card);
+                                        if (player.storage.cardsDisabled_suit.includes(suit)) return false;
+                                    },
+                                    cardUsable: function (card, player) {
+                                        var suit = get.suit(card);
+                                        if (player.storage.cardsDisabled_suit.includes(suit)) return false;
+                                    },
+                                    cardRespondable: function (card, player) {
+                                        var suit = get.suit(card);
+                                        if (player.storage.cardsDisabled_suit.includes(suit)) return false;
+                                    },
+                                    cardSavable: function (card, player) {
+                                        var suit = get.suit(card);
+                                        if (player.storage.cardsDisabled_suit.includes(suit)) return false;
+                                    },
+                                },
+                                content: function () {
+                                    player.unmarkSkill('cardsDisabled_suit');
+                                },
+                                "_priority": 0,
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -7001,6 +7185,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "z16": "z16",
                             "z18": "z18",
                             "z17": "z17",
+                            "z21": "z21",
+                            "z22": "z22",
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐舰", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -7132,8 +7318,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                             z17_naerweikejingjie: "纳尔维克警戒", z17_naerweikejingjie_info: "出牌阶段，你可以将任意张手牌置于武将牌上，称为Z，然后将一名角色至多等量张手牌置于其武将牌上，也称为Z。(全局)对有Z的角色造成伤害时，可以获得一张Z。",
 
-
-
+                            z21_tuxi: "突袭", z21_tuxi_info: "出牌阶段开始时，你可以选择攻击范围内的一名角色，将其一张牌置于其武将牌上，称为Z。当有Z的武将受到伤害后，你可以令其随机弃置一张牌并弃置所有Z",
+                            z22_tuxixiawan: "突袭峡湾", z22_tuxixiawan_info: "出牌阶段开始时，你可以将任意角色一张手牌置于自己的武将牌上，称为Z。其他角色造成伤害后，若你有Z，你可以移去一枚Z，进行一次判定，令当前回合角色不能使用或打出与判定牌花色相同的牌直到回合结束。",
+                            cardsDisabled_suit: "不能使用_花色", cardsDisabled_suit_info: "你不能使用或打出对应花色的手牌。",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
