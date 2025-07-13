@@ -2652,7 +2652,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             junfu: {
                                 trigger: {
-                                    global: ["phaseBegin"],
+                                    global: ["phaseZhunbeiBegin"],
                                 },
                                 direct: true,
                                 lastDo: true,
@@ -2746,7 +2746,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 group: [],
                                 ai: {
                                     expose: 0,
-                                    threaten: 4.8,
+                                    threaten: 1.8,
                                     order: 5,
                                     result: {
                                         player: 1,
@@ -3500,7 +3500,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             dumuchenglin: {
                                 nobracket: true,
                                 trigger: {
-                                    player: "phaseBegin",
+                                    player: "phaseZhunbeiBegin",
                                 },
                                 forced: true,
                                 content: function () {
@@ -3715,7 +3715,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.gain(cards2, 'log', 'gain2');
                                 },
                                 ai: {
-                                    threaten: 4,
+                                    threaten: 3,
                                 },
                             },
                             gaosusheji: {
@@ -5768,7 +5768,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (result.bool == false) player.draw();
                                 },
                                 ai: {
-                                    threaten: 8,
+                                    threaten: 2.6,
                                 },
                                 "_priority": 0,
                             },
@@ -7984,11 +7984,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 return get.order({ name: "sha" }) + 3;
                                             },
                                             result: {
-                                                target: function (player, target) {
-                                                    var val = target.getUseValue({ name: "sha" }, true);
-                                                    return Math.sign(val);
-                                                },
+                                                player: 1,
                                             },
+                                            threaten: 1.5,
                                         },
                                     },
                                     respond: {
@@ -9296,6 +9294,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     game.log(history);
                                     trigger.num += history;
                                 },
+                                ai:{
+                                    threaten:0.8,
+                                },
                             },
                             pingduzhanhuo: {
                                 nobracket: true,
@@ -9374,7 +9375,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 ai: {
                                     order: 2,
                                     expose: 0.3,
-                                    threaten: 1.8,
+                                    threaten: 3.2,
                                     result: {
                                         target: function (player, target) {
                                             if (target.hasSkillTag("noturn")) return 0;
@@ -9415,6 +9416,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             pangguanzhe: {
+                                nobracket: true,
                                 init(player, skill) {
                                     if (!player.storage.pangguanzhe) player.storage.pangguanzhe = [];
                                 },
@@ -9427,7 +9429,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     //if (player.storage.pangguanzhe.length) return false;
                                     return true;
                                 },
-                                bannedList: ["pangguanzhe", "zhanliebb", "hangmucv", "zhongxunca", "qingxuncl", "quzhudd", "qianting", "junfu", "daoqu", "fangqu", "zhuangjiafh", "dajiaoduguibi", "huokongld", "fangkong2","shixiangquanneng"],
+                                bannedList: ["pangguanzhe", "zhanliebb", "hangmucv", "zhongxunca", "qingxuncl", "quzhudd", "qianting", "junfu", "daoqu", "fangqu", "zhuangjiafh", "dajiaoduguibi", "huokongld", "fangkong2", "shixiangquanneng"],
                                 content: function () {
                                     "step 0"
                                     if (player.storage.pangguanzhe.length) {
@@ -9489,7 +9491,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             var currentParent = event.getParent();
                                             //game.log(currentParent.name);
                                             //game.log(player.storage.pangguanzhe);
-                                            if(currentParent.name==player.storage.pangguanzhe){return true;}
+                                            if (currentParent.name == player.storage.pangguanzhe) { return true; }
                                             //if (event.fixedResult && event.fixedResult.suit) return true;
                                             //return get.suit(event.player.judging[0], event.player);
                                             return false;
@@ -9656,7 +9658,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             huijiahuihe: "额外回合",
                             "huijiahuihe_info": "当你有护甲时，你可以移除所有护甲并进行一个额外的回合；额外回合的摸牌数等于护甲数。此回合没有输出时，摸一张牌。",
                             junfu: "军辅船",
-                            "junfu_info": "回合开始时,你可以把至多1/2/3张手牌存于武将牌上，如手牌般使用。<br>其他角色回合开始时，你可以把存储的牌交给ta，然后你摸一张牌。<br>可以强化(目标的手牌数<8才能使用此技能)<br>拥有技能强化和远航强化即可起飞。",
+                            "junfu_info": "准备阶段,你可以把至多1/2/3张手牌存于武将牌上，如手牌般使用。<br>其他角色回合开始时，你可以把存储的牌交给ta，然后你摸一张牌。<br>可以强化(目标的手牌数<8才能使用此技能)<br>拥有技能强化和远航强化即可起飞。",
                             manchangzhanyi: "漫长战役", "manchangzhanyi_info": "每轮限一次，你受到锦囊牌的伤害时，你免疫此伤害。你攻击范围内的其他角色的准备阶段，你可以弃置其一张手牌。",
                             manchangzhanyi_1: "漫长战役", "manchangzhanyi_1_info": "",
                             guzhuyizhi: "孤注一掷", "guzhuyizhi_info": "准备阶段，你可以摸两张牌并弃置所有手牌，然后摸等量的牌，如此做，你的其他技能失效直到你的下回合开始，你计算与其他角色的距离-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。",
