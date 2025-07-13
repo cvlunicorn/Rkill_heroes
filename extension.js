@@ -5632,7 +5632,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 intro: {
                                     name: "多面手",
                                     content: function (storage, player) {
-                                        var str = "已发动次数：" + get.translation( player.getStat('skill').duomianshou);
+                                        var str = "已发动次数：" + get.translation(player.getStat('skill').duomianshou);
                                         return str;
                                     },
                                 },
@@ -5726,7 +5726,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     'step 1'
                                     //game.log("结果bool" + result.bool);
 
-                                    
+
 
                                     if (result && result.bool && result.links[0]) {
                                         game.log("选中的结果" + JSON.stringify(get.name(result.links[0])));
@@ -5734,7 +5734,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         //player.addTempSkill("duomianshou_1", "useCardToTargeted");
                                         player.chooseUseTarget(true, get.name(result.links[0]));
                                         player.storage.duomianshou = [];
-                                    }else{
+                                    } else {
                                         player.getStat('skill').duomianshou -= 1;
                                     }
                                 },
@@ -9302,8 +9302,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     game.log(history);
                                     trigger.num += history;
                                 },
-                                ai:{
-                                    threaten:0.8,
+                                ai: {
+                                    threaten: 0.8,
                                 },
                             },
                             pingduzhanhuo: {
@@ -9369,7 +9369,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filterCard: true,
                                 selectCard: -1,
                                 filter: function (event, player) {
-                                    return player.countCards("h") > 0;
+                                    return player.countCards("h") > 3;
                                 },
                                 check: function (card) {
                                     return 8 - get.value(card);
@@ -9378,7 +9378,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return player != target;
                                 },
                                 content: function () {
+                                    player.turnOver();
+                                    player.addSkill("mujizhengren_turnover");
                                     target.turnOver();
+                                    target.addSkill("mujizhengren_turnover");
                                 },
                                 ai: {
                                     order: 2,
@@ -9389,6 +9392,26 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             if (target.hasSkillTag("noturn")) return 0;
                                             if (target.isTurnedOver()) return 2;
                                             return -1;
+                                        },
+                                    },
+                                },
+                                subSkill: {
+                                    turnover: {
+                                        mod: {
+                                            globalTo(from, to, distance) {
+                                                return distance + 2;
+                                            },
+                                        },
+                                        force: true,
+                                        direct:true,
+                                        trigger: {
+                                            player: "turnOverEnd",
+                                        },
+                                        filter: function (event, player) {
+                                            return !player.isTurnedOver();
+                                        },
+                                        content() {
+                                            player.removeSkills("mujizhengren_turnover");
                                         },
                                     },
                                 },
@@ -9500,7 +9523,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             //game.log(currentParent.player);
                                             //game.log(currentParent.name);
                                             //game.log(player.storage.pangguanzhe);
-                                            if (currentParent.name == player.storage.pangguanzhe&&currentParent.player==player) { return true; }
+                                            if (currentParent.name == player.storage.pangguanzhe && currentParent.player == player) { return true; }
                                             //if (event.fixedResult && event.fixedResult.suit) return true;
                                             //return get.suit(event.player.judging[0], event.player);
                                             return false;
@@ -9718,7 +9741,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             xiongjiaqibin: "胸甲骑兵", "xiongjiaqibin_info": "锁定技，你计算与座次比你靠后的角色距离-1。",
                             yishisheji: "意式设计", "yishisheji_info": "每轮限一次，你可以免疫一次伤害。你使用杀指定唯一目标时可以进行判定，若判定结果不为红桃，此杀基础伤害+1，否则此杀无效。出牌阶段你使用或打出的第一张杀无距离限制。",
                             yishisheji_1: "意式设计", "yishisheji_1_info": "",
-                            jueshengzhibing: "决胜之兵", "juezhanzhibing_info": "你使用杀指定有护甲的目标时，你可以弃置其一张牌；你使用锦囊牌时，你可以摸一张牌。若你以此法摸或弃置了总计两张牌，你结束出牌阶段，反之，回合结束时你获得'智愚'直到下回合开始。",
+                            jueshengzhibing: "决胜之兵", "jueshengzhibing_info": "你使用杀指定有护甲的目标时，你可以弃置其一张牌；你使用锦囊牌时，你可以摸一张牌。若你以此法摸或弃置了总计两张牌，你结束出牌阶段，反之，回合结束时你获得[智愚]直到下回合开始。",
                             zhanfu: "战斧", "zhanfu_info": "你手牌数为场上最多时，你使用杀无视距离",
                             xinqidian: "新起点", "xinqidian_info": "出牌阶段限一次，你可以选择至多3名角色，你与这些角色各展示一张牌:若展示的牌花色均不相同，每人摸1张牌;否则，参与展示牌的角色计算与其他角色距离-1直至其的下个回合结束。",
                             //xinqidian_1:"新起点",xinqidian_1_info:"",
@@ -9789,7 +9812,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             houfu: "后福", houfu_info: "出牌阶段限一次，你可以选择一名其他角色，其选择一项:1视为对你使用一张杀(无距离限制)，2令你从牌堆中获得一张基本牌。",
                             zhanliexianfuchou: "战列线复仇", zhanliexianfuchou_info: "你造成的伤害+X，X=你本轮成为其他角色伤害类牌目标的次数",
                             pingduzhanhuo: "平度战火", pingduzhanhuo_info: "结束阶段，若你本回合未造成伤害，你摸一张牌；准备阶段，若你自上个结束阶段起未受到伤害，你摸一张牌",
-                            mujizhengren: "目击证人", mujizhengren_info: "出牌阶段限一次，你可以弃置全部手牌，然后令一名角色翻面。",
+                            mujizhengren: "目击证人", mujizhengren_info: "出牌阶段限一次，你可以弃置全部手牌（至少四张），然后令自己与一名角色翻面，其他角色计算与以此法翻面的角色距离+2直到翻回正面。",
+                            mujizhengren_turnover: "翻面", mujizhengren_turnover_info: "其他角色计算与你距离+2",
                             shixiangquanneng: "十项全能", shixiangquanneng_info: "锁定技，你的舰种技能无法升级，每轮开始时，你失去以此法获得的技能，然后从以下技能中选择一项获得：1、防空，2、开幕航空，3、军辅",
                             pangguanzhe: "旁观者", pangguanzhe_info: "锁定技，你的回合开始时，失去上回合以此法获得的技能，随机获得在场角色武将牌上的一个技能。若该技能带有判定，你可以选择判定结果。(远航，强化，航母，战列，巡洋，驱逐，潜艇，开幕航空，火控雷达，先制鱼雷，十项全能除外;主公技，限定技，使命技，觉醒技除外)",
 
