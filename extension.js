@@ -3047,7 +3047,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             manchangzhanyi: {
                                 trigger: { global: "phaseZhunbeiBegin" }, // 触发时机：其他角色的准备阶段
                                 filter: function (event, player) {
-                                    return player.inRange(event.player); // 在你的攻击范围内
+                                    return player.inRange(event.player)&&event.player.countCards("h"); // 在你的攻击范围内
                                 },
                                 check: function (event, player) {
                                     return get.attitude(player, event.player) <= 0;
@@ -3069,16 +3069,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         {
                                             player: "damageBefore",
                                             source: "damageSource",
-                                            filter: function (event, player) { return true },
+
                                         },
+                                        filter: function (event, player) { return !player.hasSkill('manchangzhanyi_1_disable') && event.card && event.card.name != 'sha' && event.card.name != 'sheji9' },
                                         forced: true,
                                         content: function () {
 
-                                            if (!player.hasSkill('manchangzhanyi_1_disable') && trigger.card && trigger.card.name != 'sha' && trigger.card.name != 'sheji9') {
                                                 trigger.cancel();
                                                 game.log(get.translation(player), "免疫了一次锦囊牌造成的伤害。");
                                                 player.addTempSkill('manchangzhanyi_1_disable', 'roundStart');
-                                            }
                                         },
                                         mark: false,
                                         sub: true,
@@ -5578,16 +5577,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         {
                                             player: "damageBefore",
                                             //source: "damageSource",
-                                            filter: function (event, player) { return true },
+                                            
                                         },
+                                        filter: function (event, player) { return !player.hasSkill('yishisheji_1_disable') && event.card },
                                         forced: true,
                                         content: function () {
-
-                                            if (!player.hasSkill('yishisheji_1_disable') && trigger.card) {
                                                 trigger.cancel();
                                                 game.log(player, "免疫了一次伤害。");
                                                 player.addTempSkill('yishisheji_1_disable', 'roundStart');
-                                            }
                                         },
                                         mark: false,
                                         sub: true,
