@@ -3511,25 +3511,38 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     //player.addMark('xiangrui', 1);
                                     var i = player.countMark('xiangrui');
                                     player.removeMark('xiangrui', i);
-                                    game.log(i);
-                                    var s = (i <= 0);
-
-                                    //if (s) {
-                                    //game.log("finish");
-                                    //event.finish;
-                                    //} else {
-                                    player.chooseTarget(get.prompt2('yumian'), function (card, player, target) { if (s) { return get.distance(player, target) <= 1; } else { return true } }).set('ai', function (target) {
-                                        if (get.attitude(_status.event.player, target) < 0) {
-                                            return 1 / Math.sqrt(target.hp + 1);
-                                        }
-                                        return 0;
-                                    }).animate = false;
+                                    game.log("i" + i);
+                                    if (i > 0) {
+                                        player.chooseTarget(get.prompt2('yumian'), true, function (card, player, target) {
+                                            return 1;
+                                        }).set('ai', function (target) {
+                                            if (get.attitude(_status.event.player, target) < 0) {
+                                                return 1 / Math.sqrt(target.hp + 1);
+                                            }
+                                            return 0;
+                                        });
+                                    } else {
+                                        player.chooseTarget(get.prompt2('yumian'), true, function (card, player, target) {
+                                            //if (i > 0) { return 1; }
+                                            return get.distance(player, target) <= 1;
+                                        }).set('ai', function (target) {
+                                            if (get.attitude(_status.event.player, target) < 0) {
+                                                return 1 / Math.sqrt(target.hp + 1);
+                                            }
+                                            return 0;
+                                        });
+                                    }
                                     //}
                                     "step 1"
-                                    if (result.bool && result.targets.length) {
+                                    game.log("result.bool" + result.bool);
+                                    if (result.bool) {
                                         result.targets[0].loseHp(1);
                                         result.targets[0].draw(2);
-                                    }
+                                    } else event.finish();
+                                },
+                                ai: {
+                                    damage: true,
+                                    threaten: 1.3,
                                 },
                             },
                             hangkongzhanshuxianqu: {
