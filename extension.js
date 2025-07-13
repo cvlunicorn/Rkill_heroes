@@ -4035,7 +4035,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.chooseTarget(get.prompt2('qijianshashou'), function (card, player, target) {
                                         return player.canCompare(target);
                                     }).set('ai', function (target) {
-                                        return -get.attitude(player, target);
+                                        return -get.attitude(player, target)-1;
                                     });
                                     'step 1'
                                     if (result.bool) {
@@ -4061,6 +4061,21 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 ai: {
                                     expose: 0.2,
+                                    result: {
+                                        target(player, target) {
+                                            var hs = player.getCards("h");
+                                            if (hs.length < 3) return 0;
+                                            var bool = false;
+                                            for (var i = 0; i < hs.length; i++) {
+                                                if (hs[i].number >= 9 && get.value(hs[i]) < 7) {
+                                                    bool = true;
+                                                    break;
+                                                }
+                                            }
+                                            if (!bool) return 0;
+                                            return -1;
+                                        },
+                                    },
                                 },
                             },
                             qijianshashou_1: {
