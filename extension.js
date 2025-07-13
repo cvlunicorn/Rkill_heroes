@@ -11,10 +11,14 @@ yield需要无名杀版本1.10.10或更高版本的支持
 //dialog = ui.create.dialog在多人模式中不可用，目前使用chosebutton{}（参考神郭嘉佐幸）。
 //注意每个全局技能（前面有下划线的）代码在本文件钟有两个，单机前一个（带lib.的）生效，多人后一个生效。
 //目录：全局技能、武将列表、武将技能、武将和技能翻译、卡牌包与卡牌技能、卡牌翻译、配置（config）、单机武将列表、扩展简介、全局函数模块
-
-const { connect } = require("ws");
-
-//const { connect } = require("ws");突然生成出来的，暂未查明原因，先注释了试运行。
+let connect;
+     try {
+       const ws = require("ws");
+       connect = ws.connect;
+     } catch (error) {
+       console.warn("require('ws') failed");
+     }
+//const { connect } = require("ws");//突然生成出来的，暂未查明生成原因，且难以复现。require导入属于cjs格式，在手机上会报错，电脑上不会。写为import来导入会产生另一种错误。目前使用try-catch包裹起来。
 //2025.1.19升级至无名杀1.10.12版本，该版本联机允许扩展，不额外需要“一劳永逸”扩展。
 game.import("extension", function (lib, game, ui, get, ai, _status) {
 
@@ -8059,7 +8063,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     isCard: true,
                                 },
                                 viewAsFilter: function (player) {
-                                    return (!player.hasSkill('buju_wuxie_disable')) && player.countMark('shenfeng')>=1;
+                                    return (!player.hasSkill('buju_wuxie_disable')) && player.countMark('shenfeng') >= 1;
                                 },
                                 filterCard: () => false,
                                 prompt: "视为使用【无懈可击】",
@@ -8097,11 +8101,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             buju_jiu: {
                                 enable: "chooseToUse",
                                 hiddenCard: function (player, name) {
-                                    if (name == "jiu") return player.countMark('shenfeng')>=1;
+                                    if (name == "jiu") return player.countMark('shenfeng') >= 1;
                                     return false;
                                 },
                                 filter: function (event, player) {
-                                    return (!player.hasSkill('buju_jiu_disable')) && player.countMark('shenfeng')>=1 && event.filterCard({ name: "jiu", isCard: true }, player, event);
+                                    return (!player.hasSkill('buju_jiu_disable')) && player.countMark('shenfeng') >= 1 && event.filterCard({ name: "jiu", isCard: true }, player, event);
                                 },
                                 content: function () {
                                     if (_status.event.getParent(2).type == "dying") {
@@ -8461,8 +8465,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             buju: "不惧", buju_info: "每轮各限一次，你可以移去一个“风”视为使用酒或无懈可击。 以此法使用的无懈可击结算后，你重置[援军]。",
                             qiangyun: "强运", qiangyun_info: "觉醒技，当你进入濒死时，恢复一点体力。",
                             yuanjun: "援军", yuanjun_info: "限定技，若你有至少6个“风”标记，你可以移去所有“风”视为使用万箭齐发。",
-                            buju_wuxie: "不惧_无懈",buju_wuxie_disable:"无懈_不可用",
-                            buju_jiu: "不惧_酒",buju_jiu_disable:"酒_不可用",
+                            buju_wuxie: "不惧_无懈", buju_wuxie_disable: "无懈_不可用",
+                            buju_jiu: "不惧_酒", buju_jiu_disable: "酒_不可用",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
