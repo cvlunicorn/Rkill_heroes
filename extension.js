@@ -833,6 +833,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "z22": ["female", "KMS", 3, ["huibi", "quzhudd", "z22_tuxixiawan"], ["des:1936型驱逐舰6号舰。1940年6艘1936型驱逐舰都参加了攻击北欧行动，在纳尔维克海战中，Z22号（安东·施米特号）被英国海军击沉，而这次海战中，参战的6艘1936型全部被击沉。"]],
                             kewei: ["female", "RN", 4, ["hangmucv", "matapanjiaozhijian", "zhongbangtuxi"], ["des:      装甲航母可畏号在地中海战场有着出色的表现，在马塔潘角海战中，可畏出色的航空掩护有力支援了英国舰队的作战，她的鱼雷机击伤了维内托和意大利巡洋舰，直接助攻了厌战等主力舰的战绩。尽管在克里特战役期间可畏号遭到轰炸，但由于防护出色，可畏号并未战沉。在战争末期的太平洋战场，受到神风攻击的可畏号受损程度也明显小于美式航母，证明了自身设计的价值。可畏号在战争胜利后，于47年退役。"]],
                             hude: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "huangjiahaijunderongyao", "huangjiaxunyou", "tianshi"], ["zhu", "des:      英国史上最著名的战列巡洋舰。在20至30年代，胡德号长期作为英国海军的象征，频繁出访世界各地。胡德号在40年参与了针对投降后法国舰队的抛石机行动，重创了法国海军。41年的海战中，胡德号同威尔士亲王号一同拦截俾斯麦号和欧根亲王号。"]],
+                            gesakeren: ["female", "RN", 3, ["huibi", "quzhudd", "tiaobangzuozhan"], ["des:部族级驱逐舰的4号舰，该级驱逐舰是最著名的英国驱逐舰。哥萨克人号参加了第二次纳尔维克海战，痛击了德军驱逐舰。41年参与过围歼俾斯麦号的行动。1941年10月哥萨克人号被德军潜艇击沉。"]],
 
                             jifu: ["female", "ΒΜΦCCCP", 2, ["quzhudd", "huibi", "jifu_weicheng", "jifu_yuanjing", "jifu_lingwei", "jifu_yuanqin", "jifu_yuanqin"], ["des:基辅是苏联海军大舰队计划中的一环，她的设计吸取了塔什干和列宁格勒等驱逐舰的技术，同时航速和火力也保持了非常强的水平。尽管基辅在战前已经开工，但还是因为战况的影响而停工。在战争末期，未完工的基辅被拖回船厂，并修改了设计准备继续建造，但由于相比战后的新驱逐舰设计优势不大，所以并没有最终建造完成。"]],
 
@@ -4937,7 +4938,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             }
                                         } else {
                                             game.log("AI没有可用的牌了！</br>也许您没有正确安装并启用‘舰r美化’卡牌包？");
-                                            player.markAuto('jujianmengxiang',"error");
+                                            player.markAuto('jujianmengxiang', "error");
                                             //player.getStorage('jujianmengxiang').includes("error");
                                             event.finish();
                                         }
@@ -5401,26 +5402,36 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 logTarget: "target",
                                 content: function () {
                                     "step 0"
-                                    player.judge(function () { return 0 });
-
-                                    //game.log("trigger.target1"+JSON.stringify(trigger.target[0]));
-                                    "step 1"
-                                    game.log("此杀伤害基数" + trigger.getParent().baseDamage);
-                                    game.log(get.type(result));
-                                    game.log(trigger.target);
-                                    if (get.type(result) == "trick") {
-                                        //game.log("进入if");
-                                        trigger.getParent().baseDamage++;
-                                        //game.log("trigger.target2"+JSON.stringify(trigger.target[0]));
-                                        trigger.target.addTempSkill('qinggang2');
-                                        trigger.target.storage.qinggang2.add(trigger.card);
-                                        trigger.target.markSkill('qinggang2');
-
-                                    }
                                     if (player.hp < 3 && !trigger.target.hasSkill('qinggang2')) {
                                         trigger.target.addTempSkill('qinggang2');
                                         trigger.target.storage.qinggang2.add(trigger.card);
                                         trigger.target.markSkill('qinggang2');
+                                    }
+                                    "step 1"
+                                    player.judge(function (card) {
+                                        return 0;
+                                    }).set('callback', function () {
+                                        game.log(get.type(card));
+                                        if (get.type(card) == 'trick' || get.type(card) == 'delay') {
+                                            game.log("是锦囊");
+                                        } else if (get.type(card) != 'trick' && get.type(card) != 'delay') {
+                                            game.log("非锦囊");
+                                            if (get.position(event.judgeResult.card, true) == 'o') { player.gain(event.judgeResult.card, 'gain2', 'log'); }//该语句只能在callback中执行
+                                        } else {
+                                            event.finish();
+                                        }
+                                    });
+                                    "step 2"
+                                    if (get.type(result) == 'trick' || get.type(result) == 'delay') {
+                                        game.log("此杀伤害基数" + trigger.getParent().baseDamage);
+                                        game.log(trigger.target);
+                                        trigger.getParent().baseDamage++;//该语句不能在callback中执行
+                                        //game.log("trigger.target2"+JSON.stringify(trigger.target[0]));
+                                        trigger.target.addTempSkill('qinggang2');
+                                        trigger.target.storage.qinggang2.add(trigger.card);
+                                        trigger.target.markSkill('qinggang2');
+                                    } else {
+                                        event.finish();
                                     }
                                 },
                                 ai: {
@@ -7313,7 +7324,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter(event, player) {
                                     if (!event.source && event.source.isIn()) return false;
                                     var target = (player == event.player) ? event.source : event.player;
-                                    return event.player.countCards("h")!=0&&target.isAlive();
+                                    return event.player.countCards("h") != 0 && target.isAlive();
                                 },
                                 content() {
                                     'step 0'
@@ -7570,6 +7581,105 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
+                            tiaobangzuozhan: {
+                                enable: "chooseToUse",
+                                usable: 1,
+                                viewAs: {
+                                    name: "juedou",
+                                    isCard: true,
+                                },
+                                filterCard: () => false,
+                                selectCard: -1,
+                                log: false,
+                                precontent: function () {
+                                    'step 0'
+                                    player.logSkill('tiaobangzuozhan');
+                                },
+                                ai: {
+                                    order: function () {
+                                        return get.order({ name: 'juedou' }) - 0.5;
+                                    },
+                                    wuxie: function (target, card, player, viewer, status) {
+                                        if (player === game.me && get.attitude(viewer, player._trueMe || player) > 0) return 0;
+                                        if (status * get.attitude(viewer, target) * get.effect(target, card, player, target) >= 0) return 0;
+                                    },
+                                    basic: {
+                                        order: 5,
+                                        useful: 1,
+                                        value: 5.5,
+                                    },
+                                    result: {
+                                        target: -1.5,
+                                        player: function (player, target, card) {
+                                            if (player.hasSkillTag('directHit_ai', true, {
+                                                target: target,
+                                                card: card,
+                                            }, true)) {
+                                                return 0;
+                                            }
+                                            if (get.damageEffect(target, player, target) > 0 && get.attitude(player, target) > 0 && get.attitude(target, player) > 0) {
+                                                return 0;
+                                            }
+                                            var hs1 = target.getCards('h', 'sha');
+                                            var hs2 = player.getCards('h', 'sha');
+                                            if (hs1.length > hs2.length + 1) {
+                                                return -2;
+                                            }
+                                            var hsx = target.getCards('h');
+                                            if (hsx.length > 2 && hs2.length == 0 && hsx[0].number < 6) {
+                                                return -2;
+                                            }
+                                            if (hsx.length > 3 && hs2.length == 0) {
+                                                return -2;
+                                            }
+                                            if (hs1.length > hs2.length && (!hs2.length || hs1[0].number > hs2[0].number)) {
+                                                return -2;
+                                            }
+                                            return -0.5;
+                                        },
+                                    },
+                                    tag: {
+                                        respond: 2,
+                                        respondSha: 2,
+                                        damage: 1,
+                                    },
+                                },
+                                group: ["tiaobangzuozhan_self","tiaobangzuozhan_damage"],
+                                subSkill: {
+                                    self: {
+                                        trigger: {
+                                            player: "damageBegin2",
+                                        },
+                                        forced: true,
+                                        filter: function (event, player) {
+                                            var evt = event.getParent();
+                                            return evt.skill == 'tiaobangzuozhan' && evt.player == player;
+                                        },
+                                        content: function () {
+                                            trigger.source.gainPlayerCard(player, true, 'h');
+                                            trigger.cancel();
+                                        },
+                                        sub: true,
+                                        "_priority": 0,
+                                    },
+                                    damage:{
+                                        trigger: {
+                                            source: "damageSource",
+                                        },
+                                        forced: true,
+                                        filter: function (event, player) {
+                                            var evt = event.getParent();
+                                            return evt.skill == 'tiaobangzuozhan' && evt.player == player;
+                                        },
+                                        content: function () {
+                                            //player.viewHandcards(trigger.player);
+                                            player.gainPlayerCard(trigger.player,'hej',true,'visible');
+                                        },
+                                        sub: true,
+                                        "_priority": 0,
+                                    },
+                                },
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -7614,8 +7724,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             hude: "胡德",
                             shiyu: "时雨",
                             dujiaoshou: "独角兽",
+                            gesakeren: "哥萨克人",
                             skilltest: "skill测试武将test",
-                            quzhudd: "驱逐舰", "quzhudd_info": "",
+                            quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
                             zhongxunca: "重巡", "zhongxunca_info": "",
                             zhanliebb: "战列", "zhanliebb_info": "",
@@ -7758,6 +7869,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             xiuqi: "修葺", xiuqi_info: "当你发动军辅将牌交给航母时，其下一次发动开幕航空的技能等级+1",
                             wanbei: "完备", wanbei_info: "锁定技，你获得开幕航空，你的开幕航空无法升级。你的手牌上限+X，X为你发动军辅置于武将牌上的牌的数量",
                             xiuqi2: "修葺2", xiuqi2_info: "下一次发动开幕航空的技能等级+1",
+                            tiaobangzuozhan: "跳帮作战", tiaobangzuozhan_info: "出牌阶段限一次，你可以视为对一名角色使用决斗。若你以此法造成伤害，你观看其手牌并获得其区域内一张牌；若你因此受到伤害，你令其获得你一张手牌，然后防止此伤害。",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
