@@ -5548,7 +5548,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                     if (list == "") {
                                         game.log('牌堆中没有符合要求的牌');
-                                        delete player.getStat('skill').duomianshou;
+                                        player.getStat('skill').duomianshou-=1;
                                         player.storage.duomianshou.push(card);
                                         event.finish();
                                     }
