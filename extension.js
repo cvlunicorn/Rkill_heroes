@@ -5628,7 +5628,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                     return false;
                                 },
-
+                                mark: true,
+                                intro: {
+                                    name: "多面手",
+                                    content: function (storage, player) {
+                                        var str = "已发动次数：" + get.translation( player.getStat('skill').duomianshou);
+                                        return str;
+                                    },
+                                },
                                 position: "hs",
                                 discard: false,
                                 lose: false,
@@ -5719,9 +5726,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     'step 1'
                                     //game.log("结果bool" + result.bool);
 
-                                    if (result.bool) {
-                                        event.finish();
-                                    }
+                                    
 
                                     if (result && result.bool && result.links[0]) {
                                         game.log("选中的结果" + JSON.stringify(get.name(result.links[0])));
@@ -5729,6 +5734,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         //player.addTempSkill("duomianshou_1", "useCardToTargeted");
                                         player.chooseUseTarget(true, get.name(result.links[0]));
                                         player.storage.duomianshou = [];
+                                    }else{
+                                        player.getStat('skill').duomianshou -= 1;
                                     }
                                 },
                                 ai: {
