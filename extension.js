@@ -3499,12 +3499,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             gaosusheji: {
+                                init: function (player) {
+                                    game.log("高速射击初始化检查");
+                                    game.log(typeof player.storage.gaosusheji);
+                                    if (typeof player.storage.gaosusheji === 'undefined') player.storage.gaosusheji = false;
+                                },
                                 audio: "ext:舰R牌将:true",
                                 zhuanhuanji: true,
                                 mark: true,
                                 marktext: "☯",
                                 intro: {
-                                    content: function (storage, player) {
+                                    content: function (storage, player, skill) {
                                         if (storage) return '出牌阶段你使用的第一张牌为普通锦囊牌时，你可以令此牌额外结算一次。';
                                         return '出牌阶段你使用的第一张牌为基本牌时，你可以令此牌额外结算一次。';
                                     },
@@ -3517,22 +3522,30 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     var evtx = event.getParent('phaseUse');
                                     if (!evtx || evtx.player != player) return false;
                                     if (player.countUsed() != 1) return false;
-                                    game.log(evtx);
+                                    game.log("高速射击初始化检查");
+                                    game.log(typeof player.storage.gaosusheji);
+                                    if (typeof player.storage.gaosusheji === 'undefined') player.storage.gaosusheji = false;
                                     if (player.storage.gaosusheji) {
                                         game.log("阳");
-                                        return _status.currentPhase == player && (get.type(event.card) == 'trick') & event.getParent('phaseUse') == evtx;
+                                        return (_status.currentPhase == player && (get.type(event.card) == 'trick') & event.getParent('phaseUse') == evtx);
                                     } else {
                                         game.log("阴");
-                                        return _status.currentPhase == player && (get.type(event.card) == 'basic') & event.getParent('phaseUse') == evtx;
+                                        return (_status.currentPhase == player && (get.type(event.card) == 'basic') & event.getParent('phaseUse') == evtx);
 
                                     }
 
                                 },
-                                //direct: true,
+                                check(event,player){
+                                    return !get.tag(event.card,'norepeat')
+                                },
                                 content: function () {
-                                    player.changeZhuanhuanji('gaosusheji');
+                                    if (typeof player.storage.gaosusheji === 'undefined') {player.storage.gaosusheji = false;}
+                                    game.log("1:"+player.storage.gaosusheji);
+                                    player.storage.gaosusheji=(!player.storage.gaosusheji);
+                                    //player.changeZhuanhuanji('gaosusheji');
+                                    game.log("2:"+player.storage.gaosusheji);
                                     trigger.effectCount++;
-                                    game.logskill(gaosusheji);
+                                    //game.logskill('gaosusheji');
                                 },
                             },
                             qixi_cv: {
@@ -5553,7 +5566,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             jueshengzhibing: {
                                 audio: "ext:舰R牌将:true",
-                                derivation: "zhiyu",
                                 trigger: {
                                     player: "phaseJieshuBegin",
                                 },
@@ -8491,7 +8503,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             xingyun: {
                                 image: 'ext:舰R牌将/xingyun.png',
-                                derivation: "majun",
                                 type: "equip",
                                 subtype: "equip3",
                                 ai: {
@@ -8550,20 +8561,18 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 fullskin: true,
                             },
                             lianxugongji: {
-                                image: 'ext:舰R牌将/lianxugongji.png',
+                                image: 'ext:舰R牌将/yishichuanjiadan.jpg',
                                 type: "basic",
-                                cardcolor: "club",
-                                derivation: "gjqt_xieyi",
                                 enable: true,
                                 selectTarget: 1,
                                 filter: function (event, player) { return player.canUse('sha'); },
                                 filterTarget: function (card, player, target) { return target != player && player.canUse('sha', target); },
                                 content: function () {
                                     'step 0'
-                                    event.num = 0;
+                                    /*event.num = 0;
                                     'step 1'
                                     game.log("event.num" + event.num);
-                                    event.num++;
+                                    event.num++;*/
                                     /*var choice = 'liutouge';
                                     player.chooseVCardButton('选择一张牌视为使用之', ['sha', 'sha', 'sha']).set('ai', function (button) {
                                         if (button.link[2] == _status.event.choice) return 2;
@@ -8571,17 +8580,18 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }).set('choice', choice).set('filterButton', function (button) {
                                         return _status.event.player.hasUseTarget(button.link[2]);
                                     });*/
-                                    player.chooseUseTarget({
+                                    player.useCard({ name: 'sha' },target, true);
+                                    player.useCard({ name: 'sha' },target, true);
+                                    /*player.chooseUseTarget({
                                         name: 'sha',
-                                        //nature:'fire',
                                         isCard: true,
-                                    }, '请选择【杀】的目标（' + (event.num == 2 ? '2' : event.num) + '/2）', false);
+                                    }, '请选择【杀】的目标（' + (event.num == 2 ? '2' : event.num) + '/2）', false);*/
 
-                                    'step 2'
+                                    /*'step 2'
                                     if (result.bool && event.num < 2) event.goto(1);
                                     else {
                                         event.finish();
-                                    }
+                                    }*/
                                 },
                                 ai: {
                                     order: 5,
@@ -9151,7 +9161,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             "tansheqi3": {
                                 image: 'ext:舰R牌将/tansheqi3.png',
-                                derivation: "majun",
                                 type: "equip",
                                 subtype: "equip4",
                                 ai: {
@@ -9312,7 +9321,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "fasheqi3": "发射器",
                             "fasheqi3_info": "发射导弹的同时要牺牲一个火控雷达槽位（没有特殊效果）",
                         },
-                        list: [["heart", "1", "hangkongzhan"], ["heart", "1", "xingyun"], ["heart", "1", "lianxugongji"], ["heart", "1", "jinjuzy"], ["heart", "1", "jiakongls"]],//牌堆添加
+                        list: [["heart", "1", "hangkongzhan"], ["diamond", "1", "xingyun"], ["spade", "1", "lianxugongji"], ["club", "1", "jinjuzy"], ["heart", "1", "jiakongls"]],//牌堆添加
                     }
                     return jianrjinjibao
                 });
