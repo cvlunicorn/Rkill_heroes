@@ -4615,7 +4615,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     global: "useCardToTargeted",
                                 },
                                 filter: function (event, player) {
-                                    return (event.card.name == 'sha' || event.card.name == 'sheji9') && get.distance(player, event.target) <= 1 && event.target.isIn() && player != event.target;
+                                    return (event.card.name == 'sha' || event.card.name == 'sheji9') && get.distance(player, event.target) <= 1 && event.target.isIn();
                                 },
                                 check: function (event, player) {
                                     return get.attitude(player, event.target) >= 0;
@@ -4623,7 +4623,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 logTarget: "target",
                                 content: function () {
                                     "step 0"
-                                    player.draw();
                                     if (trigger.target != player) {
                                         player.chooseCard(true, 'he', '交给' + get.translation(trigger.target) + '一张牌').set('ai', function (card) {
                                             if (get.position(card) == 'e') return -1;
@@ -4633,17 +4632,54 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         });
                                     }
                                     else {
-                                        event.finish();
+                                        event.goto(2);
+
                                     }
                                     "step 1"
                                     player.give(result.cards, trigger.target, 'give');
                                     game.delay();
-                                    event.card = result.cards[0];
+                                    if (trigger.target.countCards("ej")) {
+                                        player.gainPlayerCard(trigger.target, 'ej', true, 'visible').set('ai', function (card) {
+                                            if (get.type(card) == "delay") return 1;
+                                            return -get.value(card);
+                                        });
+                                    }
+                                    event.finish();
                                     "step 2"
-                                    if (trigger.target.getCards('h').contains(card) && get.type(card) == 'equip') {
-                                        trigger.target.chooseUseTarget(card);
+                                    player.chooseTarget(function (card, player, target) {
+                                        game.log(target);
+                                        game.log(get.distance(player, target));
+                                        if (get.distance(player, target) <= 1) { return 1 }
+                                        return 0;
+                                    }, "你可以选择一名距离1的角色，其可以交给你一张牌并获得你场上的一张牌。").set('ai', function (ard, player, target) {
+                                        return get.attitude(player, target);
+                                    });
+                                    "step 3"
+                                    if (result.bool) {
+                                        event.target = result.targets[0];
+                                        event.target.chooseCard('he', '交给' + get.translation(player) + '一张牌，并获得其场上的一张牌').set('ai', function (card) {
+                                            if (get.attitude(event.target, player) <= 0) return -get.value(card);
+                                            if (get.position(card) == 'e') return -1;
+                                            if (card.name == 'shan') return 1;
+                                            if (get.type(card) == 'equip') return 0.5;
+                                            return 0;
+                                        });
+                                    }
+                                    "step 4"
+                                    event.target.give(result.cards, player, 'give');
+                                    game.delay();
+                                    if (trigger.target.countCards("ej")) {
+                                        event.target.gainPlayerCard(player, 'ej', true, 'visible').set('ai', function (card) {
+                                            if (get.attitude(event.target, player) >= 0) {
+                                                if (get.type(card) == "delay") return 1;
+                                                return -get.value(card);
+                                            } else {
+                                                return get.value(card);
+                                            }
+                                        });
                                     }
                                 },
+
                                 ai: {
                                     threaten: 1.1,
                                 },
@@ -5313,17 +5349,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     /*player.chooseButton(dialog).ai = function (button) {
                                         var MostValue = 0;
                                         var MostValuableCard = card;
-
+ 
                                         for (var j of list) {
                                             game.log("目标卡牌价值" + get.value(j));
                                             game.log("最大卡牌价值" + MostValue);
-
+ 
                                             if (get.value(j) > MostValue) {
                                                 MostValuableCard = j;
                                                 MostValue = get.value(j);
                                                 game.log("最有价值的卡牌变更为" + get.name(MostValuableCard));
                                             }
-
+ 
                                         }
                                         //game.log("button.link[0]"+JSON.stringify(button.link));
                                         //game.log("MostValuableCard"+JSON.stringify(MostValuableCard));
@@ -7277,9 +7313,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.awakenSkill('zhongbangtuxi');
                                     player.storage.zhongbangtuxi = true;
                                     player.chooseToDiscard(get.prompt('zhongbangtuxi'), "弃置任意张牌，然后指定至多等量名角色为目标", [1, Infinity], 'hes', { color: 'red' }).set('ai', card => {
-                                        if (ui.selected.cards.length >= _status.event.max) return 0;
-                                        if (_status.event.goon) return 4.5 - get.value(card);
-                                        return 0;
+                                        return 7 - get.value(card);
                                     }).set('max', game.countPlayer(function (current) {
                                         return get.attitude(player, current) < 0;
                                     })).set('goon', 1);
@@ -7304,7 +7338,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                 },
                                 ai: {
-                                    order: 1,
+                                    order: 4,
                                     fireAttack: true,
                                     result: {
                                         target(player, target) {
@@ -7739,8 +7773,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     });
                                     "step 2"
                                     if (result.bool) {
-                                        var target=result.targets[0];
-                                        var cards=result.cards[0];
+                                        var target = result.targets[0];
+                                        var cards = result.cards[0];
                                         player.give(cards, target);
                                         target.damage(event.num - 1);
                                     }
@@ -7881,7 +7915,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhanxianfangyu1: "战线防御", "zhanxianfangyu1_info": "",
                             Zqujingying: "Z驱菁英", "Zqujingying_info": "限定技，出牌阶段，你可以把任意张牌交给等量名角色，获得牌的角色依次选择:令你强化一项或令你获得其两张牌。",
                             Z_qianghua: "Z强化", "Z_qianghua_info": "出牌阶段，你可以移去一张Z,强化一项。",
-                            huhangyuanhu: "护航援护", "huhangyuanhu_info": "当一名其他角色成为杀的目标后，若你至该角色的距离为一，你可以摸一张牌，若如此做，你交给其一张牌并展示之。若为装备牌，该角色可以使用此牌。",
+                            huhangyuanhu: "护航援护", "huhangyuanhu_info": "当除你外，与你距离为1的目标成为杀的唯一目标时，你可以交给其一张牌并获得其区域内的一张牌；当你成为杀的唯一目标时，你可以选择一名目标，其可以选择交给你一张牌并获得你区域内的一张牌",
                             shizhibuyu: "矢志不渝", "shizhibuyu_info": "当你受到伤害时，你可以弃置两张颜色相同的牌令此伤害-1，然后进行判定，若结果为红色，你摸一张牌。 当你的判定牌生效后，你可以令一名角色使用杀次数+1和手牌上限+1直到你的下回合开始。",
                             shizhibuyu1: "矢志不渝", "shizhibuyu1_info": "",
                             shizhibuyu1_eff: "矢志不渝", "shizhibuyu1_eff_info": "直到回合结束，手牌上限+1，出杀次数+1",
