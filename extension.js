@@ -840,7 +840,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             gesakeren: ["female", "RN", 3, ["huibi", "quzhudd", "tiaobangzuozhan"], ["des:部族级驱逐舰的4号舰，该级驱逐舰是最著名的英国驱逐舰。哥萨克人号参加了第二次纳尔维克海战，痛击了德军驱逐舰。41年参与过围歼俾斯麦号的行动。1941年10月哥萨克人号被德军潜艇击沉。"]],
                             kente: ["female", "RN", 3, ["huokongld", "zhongxunca", "guochuan", "baixiang"], ["des:该舰为肯特级重巡洋舰首舰，由于防护薄弱，经常被戏称为“白象”。肯特号于20年代服役，初期水线装甲带只有25.4毫米。在30年代末期，肯特号和其余重巡都进行了改装，加强了防护。肯特号在二战中参加了围捕斯佩伯爵海军上将号的战斗，1940年在地中海被击伤，回到本土修理时加装了大量雷达设备。1941年年末肯特号搭载外交官前往苏联会见总书记。肯特号平安的度过了战争，于1948年退役。"]],
                             shengwang: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "zuihouderongyao", "29jienaerxun"], ["des:声望级战列巡洋舰首舰。声望级追求高航速而防护不足，在30年代的改装中，声望级重点加强了装甲防护。在战争开始前进行了更彻底的改装，更新了舰桥和防空火力。战争爆发后声望号参加挪威战役，在韦斯特湾海战中声望号利用有利条件单舰击退了两艘沙恩霍斯特级。1941年参与了围歼俾斯麦号行动，后长期担任直布罗陀H舰队旗舰，并幸存到战后，也是英国三艘战巡中唯一幸存到战后的。"]],
-                            shenluopujun: ["female", "RN", 3, ["huokongld", "zhongxunca", "hongseqiangwei"], ["des:什罗普郡是伦敦级重巡洋舰四号舰。在战争早期，什罗普郡主要执行护航与武装巡逻任务。在萨沃岛海战中，原澳海军堪培拉号重巡洋舰战沉。皇家海军将什罗普郡转交澳海军顶替堪培拉号巡洋舰的战损。什罗普郡参加了太平洋战场诸多战役，在苏里高海战中与盟军一道截击了来袭战列舰。在战争胜利时，什罗普郡参加了签字仪式。"]],
+                            shenluopujun: ["female", "RN", 4, ["huokongld", "zhongxunca", "hongseqiangwei"], ["des:什罗普郡是伦敦级重巡洋舰四号舰。在战争早期，什罗普郡主要执行护航与武装巡逻任务。在萨沃岛海战中，原澳海军堪培拉号重巡洋舰战沉。皇家海军将什罗普郡转交澳海军顶替堪培拉号巡洋舰的战损。什罗普郡参加了太平洋战场诸多战役，在苏里高海战中与盟军一道截击了来袭战列舰。在战争胜利时，什罗普郡参加了签字仪式。"]],
                             lafei: ["female", "USN", 3, ["huibi", "quzhudd", "bujushenfeng"], ["des:艾伦·萨姆纳级拉菲号驱逐舰（DD724）的舰名继承自一艘英雄军舰，前代拉菲号曾经在所罗门海战中勇敢地挑战日军的比睿号战列舰。而这一代拉菲也毫不逊色。在冲绳战役期间，她执行雷达哨舰任务时在短时间内遭到了约五十架神风飞机的攻击，被直接撞击六架，命中四弹。但是拉菲坚持战斗，舰长拒绝弃舰并率舰返回了关岛。这是战争史上的一个奇迹，而这艘坚毅的驱逐舰一直服役到了冷战时期。75年退役后成为了博物馆。"]],
                             sp_lafei: ["female", "USN", 3, ["huibi", "quzhudd", "shenfeng", "buju", "qiangyun", "yuanjun"], ["des:艾伦·萨姆纳级拉菲号驱逐舰（DD724）的舰名继承自一艘英雄军舰，前代拉菲号曾经在所罗门海战中勇敢地挑战日军的比睿号战列舰。而这一代拉菲也毫不逊色。在冲绳战役期间，她执行雷达哨舰任务时在短时间内遭到了约五十架神风飞机的攻击，被直接撞击六架，命中四弹。但是拉菲坚持战斗，舰长拒绝弃舰并率舰返回了关岛。这是战争史上的一个奇迹，而这艘坚毅的驱逐舰一直服役到了冷战时期。75年退役后成为了博物馆。"]],
 
@@ -3097,7 +3097,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                             guzhuyizhi: {
                                 audio: "ext:舰R牌将:true",
-                                trigger: { player: 'phaseUseBegin' },
+                                trigger: { player: 'phaseZhunbeiBegin' },
 
                                 check: function (event, player) {
                                     var nh = player.countCards('h') - player.countCards('h', { type: 'equip' });
@@ -3108,9 +3108,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return false;
                                 },
                                 content: function () {
+                                    
+                                    player.addTempSkill('guzhuyizhi2', { player: 'phaseBegin' });
                                     player.discard(player.getCards("h"));
                                     player.draw(player.countCards("h") + 2);
-                                    player.addTempSkill('guzhuyizhi2', { player: 'phaseBegin' });
                                 },
                                 intro: {
                                     content: function () {
@@ -7969,8 +7970,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 content: function () {
                                     'step 0'
                                     player.chooseCard(get.prompt('hongseqiangwei', event.target), 1, 'h').set('ai', card => {
-                                        if (!game.players[get.number(card) - 1].isIn()) { return 0; }
-                                        if (get.attitude(game.players[get.number(card) - 1] < 0)) { return 0; }
+                                        if (!game.players[get.number(card)%game.countPlayer() - 1].isAlive()) { return 0; }
+                                        if (get.attitude(game.players[get.number(card)%game.countPlayer() - 1] < 0)) { return 0; }
                                         return 9 - get.value(card);
                                     });
                                     'step 1'
@@ -7992,8 +7993,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             var cards = player.getExpansions('hongseqiangwei');
                                             var num = event.player.getSeatNum();
                                             for (i = 0; i < player.getExpansions('hongseqiangwei').length; i++) {
-                                                if (get.number(cards[i]) == num) {
-                                                    return event.player.isIn();
+                                                if (get.number(cards[i])%game.countPlayer() == num) {
+                                                    return event.player.isAlive();
                                                 }
                                             }
                                             return 0;
@@ -8007,7 +8008,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             var Fcards = player.getExpansions('hongseqiangwei');
                                             for (var i = 0; i < Fcards.length; i++) {
                                                 //game.log("蔷薇的点数" + get.number(Fcards[i]));
-                                                if (get.number(Fcards[i]) == num) {
+                                                if (get.number(Fcards[i])%game.countPlayer() == num) {
                                                     list.push(Fcards[i]);
                                                 }
                                             }
@@ -8749,7 +8750,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             '29jienaerxun': "29节纳尔逊", '29jienaerxun_info': "当你本回合内第一次使用“杀”指定目标时，若你的攻击范围大于等于3，此杀不可响应，若你的体力为全场最高时，此杀伤害+1。",
                             zuihouderongyao_less: "少摸加距离",
                             zuihouderongyao_more: "多摸减距离",
-                            hongseqiangwei: "红色蔷薇", hongseqiangwei_info: "你使用伤害类牌后，可以将一张手牌置于武将牌上称为[花]。[花]包含对应座次的角色受到伤害时，你须弃置一张对应点数的[花]并防止此伤害。",
+                            hongseqiangwei: "红色蔷薇", hongseqiangwei_info: "你使用伤害类牌后，可以将一张手牌置于武将牌上称为[花]。[花]包含对应座次（点数超出游戏人数则减去游戏人数）的角色受到伤害时，你须弃置一张对应点数的[花]并防止此伤害。",
                             bujushenfeng: "不惧神风", bujushenfeng_info: "当你受到伤害时，你可以获得造成伤害的牌。你的手牌上限基数为你的体力上限。",
                             shenfeng: "神风", shenfeng_info: "当你受到一点伤害时，你获得一个“风”标记。",
                             buju: "不惧", buju_info: "每轮各限一次，你可以移去一个“风”视为使用酒或无懈可击。 以此法使用的无懈可击结算后，你重置[援军]。",
