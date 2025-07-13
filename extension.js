@@ -12,10 +12,8 @@ yield需要无名杀版本1.10.10或更高版本的支持
 //注意每个全局技能（前面有下划线的）代码在本文件钟有两个，单机前一个（带lib.的）生效，多人后一个生效。
 //目录：全局技能、武将列表、武将技能、武将和技能翻译、卡牌包与卡牌技能、卡牌翻译、配置（config）、单机武将列表、扩展简介、全局函数模块
 
-//const { connect } = require("ws");
-
 //const { connect } = require("ws");突然生成出来的，暂未查明原因，先注释了试运行。
-
+//2025.1.19升级至无名杀1.10.12版本，该版本联机允许扩展，不额外需要“一劳永逸”扩展。
 game.import("extension", function (lib, game, ui, get, ai, _status) {
 
     return {
@@ -824,7 +822,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             changchun: ["female", "PLAN", 3, ["daoqu", "rand", "sidajingang"], ["des:　苏联愤怒级驱逐舰17号舰，苏联建造的愤怒级借鉴了意大利的设计经验。前后背负式布置了4门130毫米舰炮。由于苏联对德国战争中，海战并不是主战场，因此果敢号主要执行护航任务。果敢号参加了二战并幸存下来，战后在1955年被出售给新中国海军，改名为长春号，90年退役后保存在山东乳山市。"]],
 
                             "u47": ["female", "KMS", 3, ["qianting", "u47_xinbiao", "u47_huxi"], ["des:U-47号是德军的一艘王牌潜艇，属VIIB型。1939年10月她大胆穿越了斯卡帕湾的封锁线，潜入英国海军的基地内，当晚用鱼雷击沉了英国皇家橡树号战列舰。回到港口后U-47号受到了热烈的欢迎，并被授予了骑士十字勋章。在随后的战斗巡航中，U-47号总共击沉了16万吨的船只。1941年3月7日的第九次战斗巡航中U-47号失踪，至今没有其下落和定论。"]],
-                            "u81": ["female", "KMS", 3, ["qianting", "u47_langben", "u81_conglie", "u81_xunyi"], ["des:U-81号潜艇最著名的战例发生在1941年的地中海。当时皇家方舟号航母从马耳他驶出后，遭到了U-81的雷击，尽管U-81只命中了皇家方舟号一枚鱼雷，但是处置不当导致这艘在追歼俾斯麦中立下功劳的航母最终沉没。此后的U-81在破交作战中击沉了不少商船。1944年1月，U-81遭到空袭沉没。"]],
+                            "u81": ["female", "KMS", 3, ["qianting", "u81_langben", "u81_zonglie", "u81_xunyi"], ["des:U-81号潜艇最著名的战例发生在1941年的地中海。当时皇家方舟号航母从马耳他驶出后，遭到了U-81的雷击，尽管U-81只命中了皇家方舟号一枚鱼雷，但是处置不当导致这艘在追歼俾斯麦中立下功劳的航母最终沉没。此后的U-81在破交作战中击沉了不少商船。1944年1月，U-81遭到空袭沉没。"]],
                             "z1": ["female", "KMS", 3, ["huibi", "quzhudd", "Z", "z1_Zqulingjian"], ["des:1934型舰队驱逐舰首舰。德国突破条约之后开始建造大型驱逐舰，吨位比他国驱逐舰都略大一些，装备5门单装127毫米炮。由于高温锅炉的技术问题，她动力系统稳定性不高。Z1号（莱伯勒希特·马斯号）的服役生涯很短暂，1939年执行了布雷任务，在1940年破交战中遭到己方HE111轰炸机误击沉没。"]],
                             "z16": ["female", "KMS", 3, ["huibi", "quzhudd", "Z", "z16_lianhuanbaopo", "z16_shuileibuzhi"], ["des:1934A型驱逐舰11号舰，1934A是1934的改良型，改进了适航性与动力系统设计。Z16号（弗里德里希·埃科尔特号）开战之后主要执行对英国的布雷任务。在巴伦支海海战中被英国轻巡洋舰谢菲尔德号击沉。"]],
                             "z18": ["female", "KMS", 3, ["huibi", "quzhudd", "z18_weisebaoxingdong"], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
@@ -6051,13 +6049,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
                             },
-                            u47_langben: {
+                            u81_langben: {
                                 enable: "phaseUse",
                                 usable: 2,
                                 filterTarget: function (card, player, target) {
                                     if (player == target) return false;
                                     if (player.countCards('hes') == 0) return false;
-                                    if (target.hasSkill("u47_langben_target")) return false;
+                                    if (target.hasSkill("u81_langben_target")) return false;
                                     return true;
                                 },
                                 filterCard: true,
@@ -6073,7 +6071,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 content: function () {
                                     "step 0"
                                     player.give(cards, targets[0]);
-                                    target.addTempSkill('u47_langben_target', "phaseBegin");
+                                    target.addTempSkill('u81_langben_target', "phaseBegin");
                                 },
                                 ai: {
                                     result: {
@@ -6087,7 +6085,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     order: 1,
                                 },
                             },
-                            u47_langben_target: {
+                            u81_langben_target: {
                                 mod: {
                                     globalTo(from, to, distance) {
                                         return 1;
@@ -6239,7 +6237,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
                             },
-                            u81_conglie: {
+                            u81_zonglie: {
                                 direct: true,
                                 trigger: {
                                     source: "damageBegin",
@@ -6262,11 +6260,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         //game.log(JSON.stringify(result1));
                                         trigger.player.give(result1.cards, player);
                                         trigger.cancel();
-                                        if (!trigger.player.hasSkill("u81_conglie_shanghai")) {
+                                        if (!trigger.player.hasSkill("u81_zonglie_shanghai")) {
                                             game.log("添加技能");
-                                            trigger.player.addSkill("u81_conglie_shanghai");
+                                            trigger.player.addSkill("u81_zonglie_shanghai");
                                         }
-                                        trigger.player.addMark('u81_conglie_shanghai', 1, false);
+                                        trigger.player.addMark('u81_zonglie_shanghai', 1, false);
                                     } else {
                                         game.log("不给牌结束");
                                         event.finish();
@@ -6275,11 +6273,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 }
 
                             },
-                            u81_conglie_shanghai: {
+                            u81_zonglie_shanghai: {
                                 mark: true,
-                                marktext: "从猎",
+                                marktext: "纵猎",
                                 intro: {
-                                    name: "从猎",
+                                    name: "纵猎",
                                     content: "下次受到的伤害+$",
                                 },
                                 trigger: {
@@ -6289,13 +6287,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 direct: true,
                                 onremove: true,
                                 filter: function (event, player) {
-                                    game.log("从猎标记数量" + player.countMark("u81_conglie_shanghai"));
-                                    return player.countMark("u81_conglie_shanghai");
+                                    game.log("纵猎标记数量" + player.countMark("u81_zonglie_shanghai"));
+                                    return player.countMark("u81_zonglie_shanghai");
                                 },
                                 content: function () {
-                                    trigger.num += player.countMark('u81_conglie_shanghai');
-                                    game.log(player, '受到的伤害+' + player.countMark('u81_conglie_shanghai'));
-                                    player.removeSkill('u81_conglie_shanghai');
+                                    trigger.num += player.countMark('u81_zonglie_shanghai');
+                                    game.log(player, '受到的伤害+' + player.countMark('u81_zonglie_shanghai'));
+                                    player.removeSkill('u81_zonglie_shanghai');
                                 },
                                 "_priority": 0,
                             },
@@ -7988,14 +7986,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jifu_yuanjing: "愿景", 'jifu_yuanjing_info': "觉醒技，当你进入濒死时，体力上限+1，将体力恢复至上限，然后失去未成",
                             jifu_lingwei: "领卫", 'jifu_lingwei_info': "当有角色使用伤害类牌指定唯一目标时，你可以弃置一张牌，然后选择一项：1、令此牌伤害+1。2、此牌无法被响应。若此牌的使用者是驱逐或S国船，则你与此牌的使用者各摸一张牌。（若此牌的使用者是你自己，则只摸一张牌）若因“领卫”技能效果造成了伤害，则本轮失去“领卫”。",
                             jifu_yuanqin: "远亲", 'jifu_yuanqin_info': "锁定技，塔什干与I国船使你回复体力时，回复的体力值+1。",
-                            u47_langben: "狼奔", u47_langben_info: "出牌阶段限两次，你可以交给一名其他角色一张牌，令其他角色计算与其的距离为1直到其下个回合开始时。",
-                            u47_langben_target: "狼奔目标", u47_langben_target_info: "其他角色计算与你距离为1。",
+                            u81_langben: "狼奔", u81angben_info: "出牌阶段限两次，你可以交给一名其他角色一张牌，令其他角色计算与其的距离为1直到其下个回合开始时。",
+                            u81_langben_target: "狼奔目标", u81_langben_target_info: "其他角色计算与你距离为1。",
                             u47_xinbiao: "信标", u47_xinbiao_info: "有角色体力值减少后，你可以弃置一张黑色牌并记录该角色当前的体力值与手牌数。每个势力只能有一名角色被记录。",
                             u47_xinbiao_hp: "信标", u47_xinbiao_hp_info: "信标",
                             u47_xinbiao_cards: "信标", u47_xinbiao_cards_info: "信标",
                             u47_huxi: "虎袭", u47_huxi_info: "你使用伤害类牌后若未造成伤害，你可以将一名被记录的角色的体力值和手牌数调整为记录值，然后摸一张牌并移除记录，",
-                            u81_conglie_shanghai: "从猎", u81_conglie_shanghai_info: "",
-                            u81_conglie: "从猎", u81_conglie_info: "你对其他角色造成伤害时，其可以交给你一张手牌，防止此伤害，然后其受到的下次伤害+1。",
+                            u81_zonglie_shanghai: "纵猎", u81_zonglie_shanghai_info: "",
+                            u81_zonglie: "纵猎", u81_zonglie_info: "你对其他角色造成伤害时，其可以交给你一张手牌，防止此伤害，然后其受到的下次伤害+1。",
                             u81_xunyi: "巡弋", u81_xunyi_info: "锁定技，你攻击范围内的角色在从其他角色处获得牌时，你对其造成一点雷电伤害。",
                             z1_Zqulingjian: "Z驱领舰", z1_Zqulingjian_info: "当G国驱逐舰受到/造成伤害后，你可以将造成伤害的牌置于武将牌上称为“Z”。有其他角色受到雷属性伤害时，你可以弃置一张“Z”，令此伤害-1；当你造成雷属性伤害时，你可以弃置一张“Z”，令此伤害+1。准备阶段，你可以移动一张“Z”。(全局)有Z的角色受到伤害时，可以移去所有Z，防止此伤害。",
                             z1_Zqulingjian_source: "Z驱领舰_加伤", z1_Zqulingjian_source_info: "当你造成雷属性伤害时，你可以弃置一张“Z”，令此伤害+1。",
