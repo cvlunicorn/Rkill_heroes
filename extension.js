@@ -242,7 +242,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             filter: function (event, player) { return player.hp <= 0 && event.num < 0 && (get.mode() != 'boss' || (get.mode() == 'boss' && !lib.character[player.name][4].contains('boss') && player.identity == 'cai')); },
                             "prompt2": function (event, player) {
                                 if ((player.hasMark('_yuanhang_bingsimopai'))) { return '当你进入濒死状态时，你可以摸一张牌,<br>若血量上限大于2，你需失去一点体力上限，摸一张牌。' };
-                                if ((!player.hasMark('_yuanhang_bingsimopai'))) { return '当你进入濒死状态时，你可以摸一张牌,<br>若血量上限大于2，你需失去一点体力上限，摸一张牌。同时，依据舰种获得以下技能：<br>潜艇-志继（姜维）、重生（）；驱逐-镇卫（文聘）、齐攻（）；<br>轻巡-齐攻；重巡-刚烈改（改自夏侯惇）；<br>战列-刚烈改（夏侯惇)；航母-界连营（陆逊）；军辅：藏匿（）；导驱-界连营（陆逊）' };
+                                if ((!player.hasMark('_yuanhang_bingsimopai'))) { return '当你进入濒死状态时，你可以摸一张牌,<br>若血量上限大于2，你需失去一点体力上限，摸一张牌。'/*同时，依据舰种获得以下技能：<br>潜艇-志继（姜维）、重生（）；驱逐-镇卫（文聘）、齐攻（）；<br>轻巡-齐攻；重巡-刚烈改（改自夏侯惇）；<br>战列-刚烈改（夏侯惇)；航母-界连营（陆逊）；军辅：藏匿（）；导驱-界连营（陆逊）*/ };
                             },
                             content: function () {//兵粮寸断与据守，刚烈， 镇卫同疾吸伤害，国风防锦囊牌。
                                 //轻巡提升己方防守与攻击距离，粮策全体发牌。重巡提供免伤。战列刚烈反击。 
@@ -784,9 +784,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lishizhanyi_naerweike: ["shengwang", "z17", "z18", "z21", "z22", "gesakeren"],
                                 lishizhanyi_matapanjiao: ["kewei", "kente"],
                                 lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "z1", "z16"],
-                                lishizhanyi_shanhuhai: [],
+                                lishizhanyi_shanhuhai: ["lafei"],
                                 lishizhanyi_haixiafujizhan: ["u47", "u81"],
-                                weijingzhizhi: ["jifu", "dujiaoshou"],
+                                weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei"],
                             },
 
                         },
@@ -837,11 +837,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             kente: ["female", "RN", 3, ["huokongld", "zhongxunca", "guochuan", "baixiang"], ["des:该舰为肯特级重巡洋舰首舰，由于防护薄弱，经常被戏称为“白象”。肯特号于20年代服役，初期水线装甲带只有25.4毫米。在30年代末期，肯特号和其余重巡都进行了改装，加强了防护。肯特号在二战中参加了围捕斯佩伯爵海军上将号的战斗，1940年在地中海被击伤，回到本土修理时加装了大量雷达设备。1941年年末肯特号搭载外交官前往苏联会见总书记。肯特号平安的度过了战争，于1948年退役。"]],
                             shengwang: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "zuihouderongyao", "29jienaerxun"], ["des:声望级战列巡洋舰首舰。声望级追求高航速而防护不足，在30年代的改装中，声望级重点加强了装甲防护。在战争开始前进行了更彻底的改装，更新了舰桥和防空火力。战争爆发后声望号参加挪威战役，在韦斯特湾海战中声望号利用有利条件单舰击退了两艘沙恩霍斯特级。1941年参与了围歼俾斯麦号行动，后长期担任直布罗陀H舰队旗舰，并幸存到战后，也是英国三艘战巡中唯一幸存到战后的。"]],
                             shenluopujun: ["female", "RN", 3, ["huokongld", "zhongxunca", "hongseqiangwei"], ["des:什罗普郡是伦敦级重巡洋舰四号舰。在战争早期，什罗普郡主要执行护航与武装巡逻任务。在萨沃岛海战中，原澳海军堪培拉号重巡洋舰战沉。皇家海军将什罗普郡转交澳海军顶替堪培拉号巡洋舰的战损。什罗普郡参加了太平洋战场诸多战役，在苏里高海战中与盟军一道截击了来袭战列舰。在战争胜利时，什罗普郡参加了签字仪式。"]],
+                            lafei: ["female", "USN", 3, ["huibi", "quzhudd", "bujushenfeng"], ["des:艾伦·萨姆纳级拉菲号驱逐舰（DD724）的舰名继承自一艘英雄军舰，前代拉菲号曾经在所罗门海战中勇敢地挑战日军的比睿号战列舰。而这一代拉菲也毫不逊色。在冲绳战役期间，她执行雷达哨舰任务时在短时间内遭到了约五十架神风飞机的攻击，被直接撞击六架，命中四弹。但是拉菲坚持战斗，舰长拒绝弃舰并率舰返回了关岛。这是战争史上的一个奇迹，而这艘坚毅的驱逐舰一直服役到了冷战时期。75年退役后成为了博物馆。"]],
+                            sp_lafei: ["female", "USN", 3, ["huibi", "quzhudd", "shenfeng", "buju", "qiangyun", "yuanjun"], ["des:艾伦·萨姆纳级拉菲号驱逐舰（DD724）的舰名继承自一艘英雄军舰，前代拉菲号曾经在所罗门海战中勇敢地挑战日军的比睿号战列舰。而这一代拉菲也毫不逊色。在冲绳战役期间，她执行雷达哨舰任务时在短时间内遭到了约五十架神风飞机的攻击，被直接撞击六架，命中四弹。但是拉菲坚持战斗，舰长拒绝弃舰并率舰返回了关岛。这是战争史上的一个奇迹，而这艘坚毅的驱逐舰一直服役到了冷战时期。75年退役后成为了博物馆。"]],
 
                             jifu: ["female", "ΒΜΦCCCP", 2, ["quzhudd", "huibi", "jifu_weicheng", "jifu_yuanjing", "jifu_lingwei", "jifu_yuanqin", "jifu_yuanqin"], ["des:基辅是苏联海军大舰队计划中的一环，她的设计吸取了塔什干和列宁格勒等驱逐舰的技术，同时航速和火力也保持了非常强的水平。尽管基辅在战前已经开工，但还是因为战况的影响而停工。在战争末期，未完工的基辅被拖回船厂，并修改了设计准备继续建造，但由于相比战后的新驱逐舰设计优势不大，所以并没有最终建造完成。"]],
 
                             shiyu: ["female", "IJN", 3, ["huibi", "quzhudd", "jishiyu"], ["des:她在海军中以幸运而著名，参加过多次激烈海战都能最终幸存下来。在激烈的苏里高海战和维拉湾海战中，她都是编队中唯一的幸存。不过到45年，她还是被一艘潜艇击中沉没。"]],
                             dujiaoshou: ["female", "RN", 3, ["junfu", "xiuqi", "wanbei"], ["des:30年代英国设计了一级飞机修理舰，以修理航母部队载机，由于要求修复的飞机可以直接起飞，索性将她设计成了航母的结构，可当成航母使用。独角兽号于1942年完工，初期主要被当作航母使用，在地中海执行支援任务。1943年年末起，独角兽号加入太平洋战场作为航母支援舰使用，在冲绳战役期间修复了大量飞机。冷战时期独角兽号还参加了朝鲜战争，最终于50年代退役。"]],
+
                             skilltest: ["male", "OTHER", 9, ["zhanlie", "jifu_weicheng"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
@@ -8018,6 +8021,236 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
+                            bujushenfeng: {
+                                mod: {
+                                    maxHandcardBase: function (player, num) {
+                                        return player.maxHp;
+                                    },
+                                },
+                                preHidden: true,
+                                trigger: {
+                                    player: "damageEnd",
+                                },
+                                filter(event, player) {
+                                    return get.itemtype(event.cards) == "cards" && get.position(event.cards[0], true) == "o";
+                                },
+                                async content(event, trigger, player) {
+                                    player.gain(trigger.cards, "gain2");
+                                },
+                                ai: {
+                                    maixie: true,
+                                    "maixie_hp": true,
+                                    effect: {
+                                        target(card, player, target) {
+                                            if (player.hasSkillTag("jueqing", false, target)) return [1, -1];
+                                            if (get.tag(card, "damage")) return [1, 0.55];
+                                        },
+                                    },
+                                },
+                                "_priority": 0,
+                            },
+                            buju: {
+                                group: ["buju_wuxie", "buju_jiu"],
+                            },
+                            buju_wuxie: {
+                                enable: "chooseToUse",
+                                viewAs: {
+                                    name: "wuxie",
+                                    isCard: true,
+                                },
+                                viewAsFilter: function (player) {
+                                    return (!player.hasSkill('buju_wuxie_disable')) && player.countMark('shenfeng')>=1;
+                                },
+                                filterCard: () => false,
+                                prompt: "视为使用【无懈可击】",
+                                selectCard: 0,
+                                check: () => 1,
+                                precontent: function () {
+                                    player.logSkill("buju_wuxie");
+                                    player.removeMark('shenfeng', 1);
+                                    player.addTempSkill('buju_wuxie_disable', 'roundStart');
+                                    player.restoreSkill("yuanjun");
+                                    delete event.result.skill;
+                                },
+                                ai: {
+                                    order: 4,
+                                    basic: {
+                                        useful: [6, 4, 3],
+                                        value: [6, 4, 3],
+                                    },
+                                    result: {
+                                        player: 1,
+                                    },
+                                    expose: 0.2,
+                                },
+                                sub: true,
+                                "_priority": 0,
+                            },
+                            buju_wuxie_disable: {
+                                mark: true,
+                                marktext: "禁",
+                                intro: {
+                                    content: "无懈_本轮已发动",
+                                },
+                                sub: true,
+                            },
+                            buju_jiu: {
+                                enable: "chooseToUse",
+                                hiddenCard: function (player, name) {
+                                    if (name == "jiu") return player.countMark('shenfeng')>=1;
+                                    return false;
+                                },
+                                filter: function (event, player) {
+                                    return (!player.hasSkill('buju_jiu_disable')) && player.countMark('shenfeng')>=1 && event.filterCard({ name: "jiu", isCard: true }, player, event);
+                                },
+                                content: function () {
+                                    if (_status.event.getParent(2).type == "dying") {
+                                        event.dying = player;
+                                        event.type = "dying";
+                                    }
+                                    player.removeMark('shenfeng', 1);
+                                    player.addTempSkill('buju_jiu_disable', 'roundStart');
+                                    player.useCard({ name: "jiu", isCard: true }, player);
+                                },
+                                ai: {
+                                    order: 5,
+                                    result: {
+                                        player: function (player) {
+                                            if (_status.event.parent.name == "phaseUse") {
+                                                if (player.countCards("h", "jiu") > 0) return 0;
+                                                if (player.getEquip("zhuge") && player.countCards("h", "sha") > 1) return 0;
+                                                if (!player.countCards("h", "sha")) return 0;
+                                                var targets = [];
+                                                var target;
+                                                var players = game.filterPlayer();
+                                                for (var i = 0; i < players.length; i++) {
+                                                    if (get.attitude(player, players[i]) < 0) {
+                                                        if (player.canUse("sha", players[i], true, true)) {
+                                                            targets.push(players[i]);
+                                                        }
+                                                    }
+                                                }
+                                                if (targets.length) {
+                                                    target = targets[0];
+                                                } else {
+                                                    return 0;
+                                                }
+                                                var num = get.effect(target, { name: "sha" }, player, player);
+                                                for (var i = 1; i < targets.length; i++) {
+                                                    var num2 = get.effect(targets[i], { name: "sha" }, player, player);
+                                                    if (num2 > num) {
+                                                        target = targets[i];
+                                                        num = num2;
+                                                    }
+                                                }
+                                                if (num <= 0) return 0;
+                                                var e2 = target.getEquip(2);
+                                                if (e2) {
+                                                    if (e2.name == "tengjia") {
+                                                        if (!player.countCards("h", { name: "sha", nature: "fire" }) && !player.getEquip("zhuque")) return 0;
+                                                    }
+                                                    if (e2.name == "renwang") {
+                                                        if (!player.countCards("h", { name: "sha", color: "red" })) return 0;
+                                                    }
+                                                    if (e2.name == "baiyin") return 0;
+                                                }
+                                                if (player.getEquip("guanshi") && player.countCards("he") > 2) return 1;
+                                                return target.countCards("h") > 3 ? 0 : 1;
+                                            }
+                                            if (player == _status.event.dying) return 3;
+                                        },
+                                    },
+                                    effect: {
+                                        target: function (card, player, target) {
+                                            if (card.name == "guiyoujie") return [0, 0.5];
+                                        },
+                                    },
+                                },
+                            },
+                            buju_jiu_disable: {
+                                mark: true,
+                                marktext: "禁",
+                                intro: {
+                                    content: "酒_本轮已发动",
+                                },
+                                sub: true,
+                            },
+                            shenfeng: {
+                                mark: true,
+                                marktext: "风",
+                                intro: {
+                                    name: "风",
+                                    content: "拥有$个风标记",
+                                },
+                                trigger: {
+                                    player: "damageEnd",
+                                },
+                                frequent: true,
+                                filter: function (event) {
+                                    return event.num > 0;
+                                },
+                                getIndex(event, player, triggername) {
+                                    return event.num;
+                                },
+                                content: function () {
+                                    player.addMark('shenfeng', 1);
+                                },
+                                ai: {
+                                    maixie: true,
+                                    "maixie_hp": true,
+                                },
+                            },
+                            qiangyun: {
+                                mark: true,
+                                marktext: "运",
+                                intro: {
+                                    name: "强运",
+                                    content: "强运未发动",
+                                },
+                                trigger: {
+                                    player: "dying",
+                                },
+                                unique: true,
+                                juexingji: true,
+                                forced: true,
+                                skillAnimation: true,
+                                animationColor: "metal",
+                                filter: function (event, player) {
+                                    if (player.storage.qiangyun) return false;
+                                    return player.hasSkill("qiangyun") && player.hp <= 0;
+                                },
+                                content: function () {
+                                    'step 0'
+                                    player.awakenSkill('qiangyun');
+                                    'step 1'
+                                    player.recover(1 - player.hp);
+                                    player.removeSkill('qiangyun');
+                                },
+                                "_priority": 0,
+                            },
+                            yuanjun: {
+                                audio: "ext:舰R牌将:true",
+                                unique: true,
+                                enable: "phaseUse",
+                                skillAnimation: true,
+                                animationColor: "gray",
+                                mark: true,
+                                limited: true,
+                                filter: function (event, player) {
+                                    return player.countMark('shenfeng') >= 6;
+                                },
+                                content: function () {
+                                    player.awakenSkill('yuanjun');
+                                    var i = player.countMark('shenfeng');
+                                    player.removeMark('shenfeng', i);
+                                    player.chooseUseTarget("wanjian", true);
+                                },
+                                intro: {
+                                    content: "limited",
+                                },
+                                init: (player, skill) => (player.storage[skill] = false),
+                                "_priority": 0,
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -8066,6 +8299,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             kente: "肯特",
                             shengwang: "声望",
                             shenluopujun: "什罗普郡",
+                            lafei: "拉菲",
+                            sp_lafei: "SP拉菲",
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -8221,7 +8456,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zuihouderongyao_less: "少摸加距离",
                             zuihouderongyao_more: "多摸减距离",
                             hongseqiangwei: "红色蔷薇", hongseqiangwei_info: "你使用伤害类牌后，可以将一张手牌置于武将牌上称为[花]。[花]包含对应座次的角色受到伤害时，你须弃置一张对应点数的[花]并防止此伤害。",
-
+                            bujushenfeng: "不惧神风", bujushenfeng_info: "当你受到伤害时，你可以获得造成伤害的牌。你的手牌上限基数为你的体力上限。",
+                            shenfeng: "神风", shenfeng_info: "当你受到一点伤害时，你获得一个“风”标记。",
+                            buju: "不惧", buju_info: "每轮各限一次，你可以移去一个“风”视为使用酒或无懈可击。 以此法使用的无懈可击结算后，你重置[援军]。",
+                            qiangyun: "强运", qiangyun_info: "觉醒技，当你进入濒死时，恢复一点体力。",
+                            yuanjun: "援军", yuanjun_info: "限定技，若你有至少6个“风”标记，你可以移去所有“风”视为使用万箭齐发。",
+                            buju_wuxie: "不惧_无懈",buju_wuxie_disable:"无懈_不可用",
+                            buju_jiu: "不惧_酒",buju_jiu_disable:"酒_不可用",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
