@@ -12,7 +12,7 @@ yield需要无名杀版本1.10.10或更高版本的支持
 //注意每个全局技能（前面有下划线的）代码在本文件钟有两个，单机前一个（带lib.的）生效，多人后一个生效。
 //目录：全局技能、武将列表、武将技能、武将和技能翻译、卡牌包与卡牌技能、卡牌翻译、配置（config）、单机武将列表、扩展简介、全局函数模块
 
-const { connect } = require("ws");
+//const { connect } = require("ws");
 
 //const { connect } = require("ws");突然生成出来的，暂未查明原因，先注释了试运行。
 
@@ -860,8 +860,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             baiyanjuren: ["female", "RN", 3, ["junfu", "hangkongzhanshuguang"], ["des:百眼巨人号航母是世界上第一级全通甲板的航空母舰。在飞机运用到海战中之后，为了加强飞机的运用能力，英国人便改装了一些军舰以搭载飞机，经过经验的积累，英国人改装了百眼巨人号航母，使用了全通的飞行甲板。百眼巨人号没有赶上一战，在二战中主要执行训练任务。"]],
                             changchun: ["female", "PLAN", 3, ["daoqu", "rand", "sidajingang"], ["des:　苏联愤怒级驱逐舰17号舰，苏联建造的愤怒级借鉴了意大利的设计经验。前后背负式布置了4门130毫米舰炮。由于苏联对德国战争中，海战并不是主战场，因此果敢号主要执行护航任务。果敢号参加了二战并幸存下来，战后在1955年被出售给新中国海军，改名为长春号，90年退役后保存在山东乳山市。"]],
 
-                            "u47": ["female", "KMS", 3, ["qianting", "u47_langben", "u47_xinbiao", "u47_huxi"], ["des:U-47号是德军的一艘王牌潜艇，属VIIB型。1939年10月她大胆穿越了斯卡帕湾的封锁线，潜入英国海军的基地内，当晚用鱼雷击沉了英国皇家橡树号战列舰。回到港口后U-47号受到了热烈的欢迎，并被授予了骑士十字勋章。在随后的战斗巡航中，U-47号总共击沉了16万吨的船只。1941年3月7日的第九次战斗巡航中U-47号失踪，至今没有其下落和定论。"]],
-                            "u81": ["female", "KMS", 3, ["qianting", "u81_conglie", "u81_xunyi"], ["des:U-81号潜艇最著名的战例发生在1941年的地中海。当时皇家方舟号航母从马耳他驶出后，遭到了U-81的雷击，尽管U-81只命中了皇家方舟号一枚鱼雷，但是处置不当导致这艘在追歼俾斯麦中立下功劳的航母最终沉没。此后的U-81在破交作战中击沉了不少商船。1944年1月，U-81遭到空袭沉没。"]],
+                            "u47": ["female", "KMS", 3, ["qianting", "u47_xinbiao", "u47_huxi"], ["des:U-47号是德军的一艘王牌潜艇，属VIIB型。1939年10月她大胆穿越了斯卡帕湾的封锁线，潜入英国海军的基地内，当晚用鱼雷击沉了英国皇家橡树号战列舰。回到港口后U-47号受到了热烈的欢迎，并被授予了骑士十字勋章。在随后的战斗巡航中，U-47号总共击沉了16万吨的船只。1941年3月7日的第九次战斗巡航中U-47号失踪，至今没有其下落和定论。"]],
+                            "u81": ["female", "KMS", 3, ["qianting", "u47_langben", "u81_conglie", "u81_xunyi"], ["des:U-81号潜艇最著名的战例发生在1941年的地中海。当时皇家方舟号航母从马耳他驶出后，遭到了U-81的雷击，尽管U-81只命中了皇家方舟号一枚鱼雷，但是处置不当导致这艘在追歼俾斯麦中立下功劳的航母最终沉没。此后的U-81在破交作战中击沉了不少商船。1944年1月，U-81遭到空袭沉没。"]],
                             "z1": ["female", "KMS", 3, ["huibi", "quzhudd", "Z", "z1_Zqulingjian"], ["des:1934型舰队驱逐舰首舰。德国突破条约之后开始建造大型驱逐舰，吨位比他国驱逐舰都略大一些，装备5门单装127毫米炮。由于高温锅炉的技术问题，她动力系统稳定性不高。Z1号（莱伯勒希特·马斯号）的服役生涯很短暂，1939年执行了布雷任务，在1940年破交战中遭到己方HE111轰炸机误击沉没。"]],
                             "z16": ["female", "KMS", 3, ["huibi", "quzhudd", "Z", "z16_lianhuanbaopo", "z16_shuileibuzhi"], ["des:1934A型驱逐舰11号舰，1934A是1934的改良型，改进了适航性与动力系统设计。Z16号（弗里德里希·埃科尔特号）开战之后主要执行对英国的布雷任务。在巴伦支海海战中被英国轻巡洋舰谢菲尔德号击沉。"]],
                             "z18": ["female", "KMS", 3, ["huibi", "quzhudd", "z18_weisebaoxingdong"], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
@@ -4397,8 +4397,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                             return 0;
                                         });
-
-
                                     game.log(lib.target);
                                     game.log("选择完成");
                                     'step 4'
@@ -4411,7 +4409,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         game.log("强化");
 
                                     }
-
 
                                     'step 5'
                                     var a = player.countMark('mopaiup'), b = player.countMark('jinengup'), c = player.countMark('wuqiup'), d = player.countMark('useshaup'), e = player.countMark('jidongup'), f = player.countMark('shoupaiup'), g = player.countMark('songpaiup'), h = player.countMark('Expup'), k = player.countMark('_jianzaochuan') + 1, exp1 = 0;
@@ -5938,6 +5935,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return true;
                                 },
                                 filterCard: true,
+                                selectCard: 1,
+                                position: "h",
+                                discard: false,
+                                lose: false,
                                 check: function (card) {
                                     if (card.name == 'du') return 20;
                                     if (get.owner(card).countCards('hes') < get.owner(card).hp) return 0;
@@ -5945,7 +5946,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     "step 0"
-                                    target.gain(cards, player);
+                                    player.give(cards, targets[0]);
                                     target.addTempSkill('u47_langben_target', "phaseBegin");
                                 },
                                 ai: {
@@ -6173,22 +6174,22 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             u81_xunyi: {
-
                                 trigger: {
                                     global: "gainAfter",
                                 },
-                                forced: true,
+                                //direct: true,
                                 popup: false,
                                 filter: function (event, player) {
                                     if (player.inRange(event.player)) {
                                         for (var i in game.players) {
-                                            game.log(i);
+                                            //game.log(i);
                                             if (event.getl(game.players[i]).cards2.length != 0) {
-                                                game.log(event.getl(game.players[i]).cards2.length);
+                                                //game.log(event.getl(game.players[i]).cards2.length);
                                                 return event.getl(game.players[i]).cards2;
                                             }
                                         }
                                     }
+                                    return false;
                                 },
                                 content: function () {
                                     trigger.player.damage('thunder');
@@ -6968,6 +6969,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     player: "phaseUseBegin",
                                 },
+                                direct: true,
                                 filter: function (event, player) {
                                     return game.hasPlayer(current => player.inRange(current));
                                 },
@@ -7011,6 +7013,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 group: ["z21_tuxi_discard"],
                                 subSkill: {
                                     discard: {
+                                        direct: true,
                                         trigger: {
                                             global: "damageEnd",
                                         },
@@ -7038,6 +7041,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     player: "phaseUseBegin",
                                 },
+                                direct: true,
                                 filter: function (event, player) {
                                     return true;
                                 },
@@ -7086,7 +7090,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return player.getExpansions('Z').length;
                                         },
                                         check: function (event, player) {
-                                            return get.attitude(player, event.player) < 0;
+                                            return get.attitude(player, event.source) < 0;
                                         },
                                         prompt: "你可以令其进行一次判定，本回合无法使用或打出与判定牌相同花色的牌",
                                         content: function () {
