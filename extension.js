@@ -863,8 +863,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             dujiaoshou: ["female", "RN", 3, ["junfu", "xiuqi", "wanbei"], ["des:30年代英国设计了一级飞机修理舰，以修理航母部队载机，由于要求修复的飞机可以直接起飞，索性将她设计成了航母的结构，可当成航母使用。独角兽号于1942年完工，初期主要被当作航母使用，在地中海执行支援任务。1943年年末起，独角兽号加入太平洋战场作为航母支援舰使用，在冲绳战役期间修复了大量飞机。冷战时期独角兽号还参加了朝鲜战争，最终于50年代退役。"]],
                             jiate: ["female", "USN", 3, ["fangqu", "mb_meibu"], ["des:基林级驱逐舰之一，由于服役太晚没有参加二战的实战。服役之后主要在大西洋活动。在1955年基阿特进行了改装，成为世界上第一艘导弹驱逐舰，其换装了双联防空导弹发射架，76毫米高炮和反潜鱼雷。在1957年为了显示其地位，刷上了DDG-1的编号。这艘划时代的军舰于1968年退役。"]],
                             getelan: ["female", "OTHER", 3, ["mujizhengren", "pingduzhanhuo", "shixiangquanneng"], ["des:出于海防和海军航空的需求，瑞典设计建造了这一级航空巡洋舰。尽管吨位在5000吨左右，但是哥特兰的装备齐全，载机量也达到了6-8架。哥特兰也是最早的航空巡洋舰，之后的类似军舰或多或少均受其影响。哥特兰漫长的服役期中最著名的事迹是发现了俾斯麦和欧根的编队。而在这之前英海军正在满世界找她们。"]],
+                            rangbaer: ["female", "MN", 4, ["zhanliebb", "zhuangjiafh", "pangguanzhe"], ["des:让巴尔号战列舰是黎塞留级2号舰。在陆地战场失利时，黎塞留接近完工并撤退到海外，而让巴尔仅完成了一座炮塔，且具备航行能力，撤退到了达喀尔。在停泊期间，她还受到了马萨诸塞炮击和突击者的轰炸。两舰在后来都加入盟军作战，但由于让巴尔完工程度不高，并未参加战斗。在战争胜利后，考虑到战列舰巨大的象征意义，让巴尔以战列舰状态建造完工。她的电子设备和防空能力比黎塞留更强，船体也修改了设计，有更好的水下防护系统。在运河冲突中，让巴尔也曾开火支援。"]],
 
-                            skilltest: ["male", "OTHER", 9, ["zhanlie", "jifu_weicheng"], ["forbidai", "des:测试用"]],
+                            skilltest: ["male", "OTHER", 9, ["zhanliebb"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
                             _yuanhang: {
@@ -9413,6 +9414,136 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
                             },
+                            pangguanzhe: {
+                                init(player, skill) {
+                                    if (!player.storage.pangguanzhe) player.storage.pangguanzhe = [];
+                                },
+                                trigger: {
+                                    player: "phaseBegin",
+                                },
+                                force: true,
+                                direct: true,
+                                filter(event, player) {
+                                    //if (player.storage.pangguanzhe.length) return false;
+                                    return true;
+                                },
+                                bannedList: ["pangguanzhe", "zhanliebb", "hangmucv", "zhongxunca", "qingxuncl", "quzhudd", "qianting", "junfu", "daoqu", "fangqu", "zhuangjiafh", "dajiaoduguibi", "huokongld", "fangkong2","shixiangquanneng"],
+                                content: function () {
+                                    "step 0"
+                                    if (player.storage.pangguanzhe.length) {
+                                        player.removeSkills(player.storage.pangguanzhe[0]);
+
+                                    }
+                                    player.storage.pangguanzhe = [];
+                                    "step 1"
+                                    var listm = [];
+                                    var listv = [];
+                                    event.skills = [];
+                                    var func = function (skill) {
+                                        var info = get.info(skill);
+                                        if (!info || info.charlotte || info.hiddenSkill || info.zhuSkill || info.juexingji || info.limited || info.dutySkill || (info.unique && !info.gainable) || lib.skill.pangguanzhe.bannedList.includes(skill)) return false;
+                                        return true;
+                                    };
+                                    event.players = game.filterPlayer();
+                                    for (i in event.players) {
+                                        game.log(event.players[i]);
+                                        if (event.players[i].name1 != undefined) listm = lib.character[event.players[i].name1][3];//主将
+                                        else listm = lib.character[event.players[i].name][3];
+                                        if (event.players[i].name2 != undefined) listv = lib.character[event.players[i].name2][3];//副将
+                                        listm = listm.concat(listv);
+                                        for (var i = 0; i < listm.length; i++) {
+                                            if (func(listm[i])) event.skills.push(listm[i]);
+                                        }
+                                    }
+                                    game.log(event.skills);
+                                    "step 2"
+                                    if (event.skills.length > 0) {
+                                        event.result = event.skills.randomGet();
+                                        /*player.chooseControl(event.skills)
+                                            .set('filterButton', button => {
+                                                if (ui.selected.buttons) {
+                                                    return true;
+                                                }
+                                            }).set('ai', function (button) {
+                                                return event.skills.randomGet();
+                                            }).set('selectButton', 1);*///玩家选择一项
+                                    } else event.finish();
+                                    "step 3"
+                                    game.log(event.result);
+                                    player.addTempSkills(event.result, { player: "dieAfter" });
+                                    player.storage.pangguanzhe = [event.result];
+                                    game.log(player, '获得了技能', '#g【' + get.translation(event.result) + '】');
+                                    /*game.log(result.control);
+                                    player.addTempSkills(result.control, { player: "dieAfter" });
+                                    player.storage.pangguanzhe = [result.control];
+                                    game.log(player, '获得了技能', '#g【' + get.translation(result.control) + '】');*/
+                                },
+                                group: ["pangguanzhe_judge"],
+                                subSkill: {
+                                    judge: {
+                                        trigger: {
+                                            global: "judge",
+                                        },
+                                        direct: true,
+                                        filter(event, player) {
+                                            var currentParent = event.getParent();
+                                            //game.log(currentParent.name);
+                                            //game.log(player.storage.pangguanzhe);
+                                            if(currentParent.name==player.storage.pangguanzhe){return true;}
+                                            //if (event.fixedResult && event.fixedResult.suit) return true;
+                                            //return get.suit(event.player.judging[0], event.player);
+                                            return false;
+                                        },
+                                        content() {
+                                            "step 0";
+                                            var str = "请将其改为一种花色";
+                                            player
+                                                .chooseControl("spade", "heart", "diamond", "club")
+                                                .set("prompt", str)
+                                                .set("ai", function () {
+                                                    var judging = _status.event.judging;
+                                                    var trigger = _status.event.getTrigger();
+                                                    var res1 = trigger.judge(judging);
+                                                    var list = lib.suit.slice(0);
+                                                    var attitude = get.attitude(player, trigger.player);
+                                                    if (attitude == 0) return 0;
+                                                    var getj = function (suit) {
+                                                        return trigger.judge({
+                                                            name: get.name(judging),
+                                                            nature: get.nature(judging),
+                                                            suit: suit,
+                                                            number: get.number(judging),
+                                                        });
+                                                    };
+                                                    list.sort(function (a, b) {
+                                                        return (getj(b) - getj(a)) * get.sgn(attitude);
+                                                    });
+                                                    return list[0];
+                                                })
+                                                .set("judging", trigger.player.judging[0]);
+                                            "step 1";
+                                            if (result.control != "cancel2") {
+                                                player.addExpose(0.25);
+                                                player.popup(result.control);
+                                                game.log(player, "将判定结果改为了", "#y" + get.translation(result.control + 2));
+                                                if (!trigger.fixedResult) trigger.fixedResult = {};
+                                                trigger.fixedResult.suit = result.control;
+                                                trigger.fixedResult.color = get.color({ suit: result.control });
+                                            }
+                                        },
+                                        ai: {
+                                            rejudge: true,
+                                            tag: {
+                                                rejudge: 0.4,
+                                            },
+                                            expose: 0.5,
+                                        },
+                                        "_priority": 0,
+                                    },
+                                },
+                                "_priority": 0,
+
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -9469,6 +9600,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "u505": "u505",
                             jialifuniya: "加利福尼亚",
                             getelan: "哥特兰",
+                            rangbaer: "让巴尔",
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -9648,6 +9780,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             pingduzhanhuo: "平度战火", pingduzhanhuo_info: "结束阶段，若你本回合未造成伤害，你摸一张牌；准备阶段，若你自上个结束阶段起未受到伤害，你摸一张牌",
                             mujizhengren: "目击证人", mujizhengren_info: "出牌阶段限一次，你可以弃置全部手牌，然后令一名角色翻面。",
                             shixiangquanneng: "十项全能", shixiangquanneng_info: "锁定技，你的舰种技能无法升级，每轮开始时，你失去以此法获得的技能，然后从以下技能中选择一项获得：1、防空，2、开幕航空，3、军辅",
+                            pangguanzhe: "旁观者", pangguanzhe_info: "锁定技，你的回合开始时，失去上回合以此法获得的技能，随机获得在场角色武将牌上的一个技能。若该技能带有判定，你可以选择判定结果。(远航，强化，航母，战列，巡洋，驱逐，潜艇，开幕航空，火控雷达，先制鱼雷，十项全能除外;主公技，限定技，使命技，觉醒技除外)",
+
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
