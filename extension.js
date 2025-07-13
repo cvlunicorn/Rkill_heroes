@@ -6117,7 +6117,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             global: "damageBegin3",
                                         },
                                         filter: function (event, player) {
-                                            return event.hasNature("thunder") && event.player != player;
+                                            return player.getExpansions('Z').length&&event.hasNature("thunder") && event.player != player;
                                         },
                                         content: function () {
                                             'step 0'
@@ -6144,6 +6144,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger: {
                                             player: "phaseZhunbeiBegin",
                                         },
+                                        filter:function (event, player) {
+                                            return game.findPlayer(current => current.getExpansions('Z').length);;
+                                        },
                                         content: function* (event, map) {
                                             "step 0"
                                             var player = map.player;
@@ -6151,7 +6154,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 if (ui.selected.targets.length) {
                                                     return true;
                                                 }
-                                                return true;
+                                                return target.getExpansions('Z').length;
                                             }).set('targetprompt', ['移走Z', '获得Z']).set('multitarget', true).set('ai', target => {
                                                 var aiTargets = get.event('aiTargets');
                                                 if (aiTargets) {
@@ -6721,7 +6724,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             guzhuyizhi2: "孤注一掷", "guzhuyizhi2_info": "",
                             shuileizhandui_1: "水雷战队", "shuileizhandui_1_info": "",
                             shuileizhandui: "水雷战队", "shuileizhandui_info": "你可以交给一名角色任意张牌。若你是本回合第一次发动本技能，你可以从牌堆和弃牌堆获得一张雷杀。",
-                            dumuchenglin: "独木成林", "dumuchenglin_info": "你获得【规避】。当场上没有其他航母时，杀使用次数+1，你于你的回合造成的第一次伤害时若受伤角色不是你此伤害+1。",
+                            dumuchenglin: "独木成林", "dumuchenglin_info": "你获得【规避】。当场上没有其他航母时，杀使用次数+1，你于你的回合对其他角色造成的第一次伤害时此伤害+1。",
                             dumuchenglin_2: "独木成林2", "dumuchenglin_2_info": "杀使用次数+1，你于你的回合造成的第一次伤害时若受伤角色不是你此伤害+1。",
                             xiangrui: "祥瑞", "xiangrui_info": "每名玩家的回合限一次，当你受到伤害前，你可以进行判定，判定结果为黑桃，免疫此次伤害，然后获得[祥瑞]标记。",
                             yumian: "御免", "yumian_info": "锁定技，结束阶段，你移除所有[祥瑞]标记。你可以选择距你为1的目标，让其失去一点体力并摸两张牌。若你失去了一个或以上的祥瑞标记，你可以选择的目标不受距离限制",
