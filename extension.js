@@ -862,7 +862,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "u81": ["female", "KMS", 3, ["qianting", "u81_conglie", "u81_xunyi"], ["des:U-81号潜艇最著名的战例发生在1941年的地中海。当时皇家方舟号航母从马耳他驶出后，遭到了U-81的雷击，尽管U-81只命中了皇家方舟号一枚鱼雷，但是处置不当导致这艘在追歼俾斯麦中立下功劳的航母最终沉没。此后的U-81在破交作战中击沉了不少商船。1944年1月，U-81遭到空袭沉没。"]],
                             "z1": ["female", "KMS", 3, ["huibi", "quzhudd", "Z", "z1_Zqulingjian"], ["des:1934型舰队驱逐舰首舰。德国突破条约之后开始建造大型驱逐舰，吨位比他国驱逐舰都略大一些，装备5门单装127毫米炮。由于高温锅炉的技术问题，她动力系统稳定性不高。Z1号（莱伯勒希特·马斯号）的服役生涯很短暂，1939年执行了布雷任务，在1940年破交战中遭到己方HE111轰炸机误击沉没。"]],
                             "z16": ["female", "KMS", 3, ["huibi", "quzhudd", "Z", "z16_lianhuanbaopo", "z16_shuileibuzhi"], ["des:1934A型驱逐舰11号舰，1934A是1934的改良型，改进了适航性与动力系统设计。Z16号（弗里德里希·埃科尔特号）开战之后主要执行对英国的布雷任务。在巴伦支海海战中被英国轻巡洋舰谢菲尔德号击沉。"]],
-                            //"z18": ["female", "KMS", 3, ["huibi", "quzhudd", "z18_weisebaoxingdong", "z18_shuileibeizhan"], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
+                            "z18": ["female", "KMS", 3, ["huibi", "quzhudd", "z18_weisebaoxingdong", "z18_shuileibeizhan"], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
+//"z18": ["female", "KMS", 3, ["huibi", "quzhudd", "z18_weisebaoxingdong", "z18_shuileibeizhan"], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
+//"z17": ["female", "KMS", 3, ["huibi", "quzhudd", "", ""], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
+//"z21": ["female", "KMS", 3, ["huibi", "quzhudd", "", ""], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
+//"z22": ["female", "KMS", 3, ["huibi", "quzhudd", "", ""], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
 
                             jifu: ["female", "ΒΜΦCCCP", 2, ["quzhudd", "huibi", "jifu_weicheng", "jifu_yuanjing", "jifu_lingwei", "jifu_yuanqin", "jifu_yuanqin"], ["des:基辅是苏联海军大舰队计划中的一环，她的设计吸取了塔什干和列宁格勒等驱逐舰的技术，同时航速和火力也保持了非常强的水平。尽管基辅在战前已经开工，但还是因为战况的影响而停工。在战争末期，未完工的基辅被拖回船厂，并修改了设计准备继续建造，但由于相比战后的新驱逐舰设计优势不大，所以并没有最终建造完成。"]],
 
@@ -1650,35 +1654,84 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 content: function () {
                                     "step 0"
                                     if (player.countMark('jinengup') <= 0) {
-                                        player.chooseToDiscard(2, "h", function (card) {
+                                        player.chooseCardTarget({
+                                            prompt:"弃置两张黑桃或梅花手牌，视为使用【万箭齐发】",
+                                            filterCard:{color:'black'},
+                                            position:'h',
+                                            selectCard:2,
+                                            selectTarget:[1,Infinity],
+                                            filterTarget:function(card,player,target){
+                                                return player.canUse({name:'jinjuzy'},target);
+                                            },
+                                            ai1:function(card){
+                                                return 4-get.value(card);
+                                            },
+                                            ai2:function(target){
+                                                return get.effect(target,{name:'jinjuzy'},player,player);
+                                            }
+                                        });
+                                        /*player.chooseToDiscard(2, "h", function (card) {
                                             return get.color(card) === 'black';
                                         }, "弃置两张黑桃或梅花手牌，视为使用【万箭齐发】").set("ai", function (card) {
                                             return 4 - get.value(card);
-                                        });
+                                        });*/
                                     } else if (player.countMark('jinengup') == 1) {
-                                        player.chooseToDiscard(2, "h", function (card) {
+                                        player.chooseCardTarget({
+                                            prompt:"弃置两张黑桃或梅花或红桃手牌，视为使用【万箭齐发】",
+                                            filterCard:{suit:['spade','club','heart']},
+                                            position:'h',
+                                            selectCard:2,
+                                            selectTarget:[1,Infinity],
+                                            filterTarget:function(card,player,target){
+                                                return player.canUse({name:'jinjuzy'},target);
+                                            },
+                                            ai1:function(card){
+                                                return 4-get.value(card);
+                                            },
+                                            ai2:function(target){
+                                                return get.effect(target,{name:'jinjuzy'},player,player);
+                                            }
+                                        });
+                                        /*player.chooseToDiscard(2, "h", function (card) {
                                             return get.suit(card) === 'spade' || get.suit(card) === 'club' || get.suit(card) === 'heart';
                                         }, "弃置两张黑桃或梅花或红桃手牌，视为使用【万箭齐发】").set("ai", function (card) {
                                             return 4 - get.value(card);
-                                        });
+                                        });*/
                                     } else if (player.countMark('jinengup') >= 2) {
-                                        player.chooseToDiscard(2, "h", function (card) {
+                                        player.chooseCardTarget({
+                                            prompt:"弃置两张手牌，视为使用【万箭齐发】",
+                                            filterCard:true,
+                                            position:'h',
+                                            selectCard:2,
+                                            selectTarget:[1,Infinity],
+                                            filterTarget:function(card,player,target){
+                                                return player.canUse({name:'jinjuzy'},target);
+                                            },
+                                            ai1:function(card){
+                                                return 4-get.value(card);
+                                            },
+                                            ai2:function(target){
+                                                return get.effect(target,{name:'jinjuzy'},player,player);
+                                            }
+                                        });
+                                        /*player.chooseToDiscard(2, "h", function (card) {
                                             return true;
                                         }, "弃置两张手牌，视为使用【万箭齐发】").set("ai", function (card) {
                                             return 4 - get.value(card);
-                                        });
+                                        });*/
                                     }
-                                    "step 1"
+                                    /*"step 1"
                                     if (result.bool && result.cards && result.cards.length === 2) {
                                         player.chooseTarget("请选择目标，视为使用【万箭齐发】", [1, Infinity], function (card, player, target) {
                                             return player != target;
                                         }).set("ai", function (target) {
                                             return -get.attitude(player, target);
                                         });
-                                    }
-                                    "step 2"
+                                    }*/
+                                    "step 1"
                                     if (result.targets && result.targets.length > 0) {
-                                        player.useCard({ name: 'jinjuzy' }, result.targets, false);
+                                        player.useCard({ name: 'jinjuzy' }, result.cards, result.targets);
+                                        //player.useCard({ name: 'jinjuzy' }, result.targets, false);
                                     }
                                 },
                                 ai: {
@@ -5196,9 +5249,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         [list, 'vcard'],
                                     ]).set('filterButton', button => {
                                         var event = _status.event;
-                                        if (ui.selected.buttons) {     
-                                            return true;  
-                                         }
+                                        if (ui.selected.buttons) {
+                                            return true;
+                                        }
                                     }).set('ai', function (button) {
                                         var MostValue = 0;
                                         var MostValuableCard = card;
@@ -5217,9 +5270,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         //game.log("button.link[0]"+JSON.stringify(button.link));
                                         //game.log("MostValuableCard"+JSON.stringify(MostValuableCard));
                                         return (button.link == MostValuableCard) ? 1 : -1;
-                                    
+
                                     }).set('selectButton', 1);
-                                
+
                                     //var dialog = ui.create.dialog('多面手', [list, 'vcard']);
                                     game.log("多面手列表已生成");
 
@@ -5723,6 +5776,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             jifu_weicheng: {
+                                mod:{
+                                    maxHandcard:function (player, num) {
+                                        return num = (num + 1);
+                                    },
+                                },
                                 trigger: { player: "phaseZhunbeiBegin" },
                                 forced: true,
                                 content: function () {
@@ -5758,7 +5816,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.awakenSkill('jifu_yuanjing');
                                     'step 1'
                                     player.gainMaxHp(1);
-                                    'step 2'
                                     player.recover(player.maxHp - player.hp);
                                     player.removeSkill('jifu_weicheng');
                                 },
@@ -6673,7 +6730,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             'step 1'
                                             event.cards = result.links;
                                             player.chooseTarget('选择兵粮寸断的目标', true, function (card, player, target) {
-                                                return target != player;
+                                                return target != player && (get.distance(player, target) == 1);
                                             }).set('ai', function (target) {
                                                 return -get.attitude(player, target);
                                             });
@@ -6762,7 +6819,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhongxunca: "重巡", "zhongxunca_info": "",
                             zhanliebb: "战列", "zhanliebb_info": "",
                             daoqu: "导驱", "daoqu_info": "你的攻击范围增加2+X(x为技能强化次数)",
-                            hangmucv: "航母", "hangmucv_info": "(可强化)你的出牌阶段开始时，<br>你可以弃置2张：零级强化，黑桃或梅花手牌；一级强化，黑桃或梅花或红桃手牌；二级强化，任意手牌。视为对你选择的任意个目标使用万箭齐发",
+                            hangmucv: "航母", "hangmucv_info": "(可强化)你的出牌阶段开始时，<br>你可以将2张：零级强化，黑桃或梅花手牌；一级强化，黑桃或梅花或红桃手牌；二级强化，任意手牌。当作万箭齐发对你选择的任意个目标使用",
                             qianting_xiji: "袭击", "qianting_xiji_info": "每回合限两次，将♦/♥牌当做顺手牵羊，♣/♠牌当做兵粮寸断使用<br>你使用的锦囊牌可以对距离你2以内的角色使用。",
                             qianting: "潜艇", "qianting_info": "（可强化）准备阶段，你可以弃置一张红桃/红桃或黑桃/红桃或黑桃或方片牌，视为对一个目标使用一张雷杀。",
                             qianting_jiezi: "截辎", "qianting_jiezi_info": "其他角色跳过阶段时，你摸一张牌",
@@ -6860,7 +6917,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             hangkongzhanshuguang: "航空战曙光", 'hangkongzhanshuguang_info': "出牌阶段限一次，你可以令一名角色摸一张牌。若目标是航母，改为摸两张牌。",
 
                             jifu_weicheng: "未成", 'jifu_weicheng_info': "锁定技，准备阶段你进行判定，若结果为红色：你回复一点体力，摸一张牌。若结果为黑色，你流失一点体力。",
-                            jifu_yuanjing: "愿景", 'jifu_yuanjing_info': "觉醒技，当你进入濒死时，增加一点体力上限，将体力调整至上限，然后失去未成",
+                            jifu_yuanjing: "愿景", 'jifu_yuanjing_info': "觉醒技，当你进入濒死时，体力上限+1，将体力恢复至上限，然后失去未成",
                             jifu_lingwei: "领卫", 'jifu_lingwei_info': "当有角色使用伤害类牌指定唯一目标时，你可以弃置一张牌，然后选择一项：1、令此牌伤害+1。2、此牌无法被响应。若此牌的使用者是驱逐或S国船，则你与此牌的使用者各摸一张牌。（若此牌的使用者是你自己，则只摸一张牌）若因“领卫”技能效果造成了伤害，则本轮失去“领卫”。",
                             jifu_yuanqin: "远亲", 'jifu_yuanqin_info': "锁定技，塔什干与I国船使你回复体力时，回复的体力值+1。",
                             u47_langben: "狼奔", u47_langben_info: "出牌阶段限两次，你可以交给一名其他角色一张牌，令其他角色计算与其的距离为1直到其下个回合开始时。",
