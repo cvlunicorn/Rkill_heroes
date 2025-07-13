@@ -1,6 +1,9 @@
-//写在前面：filter中若有需要只能使用event.，不能使用trigger.。trigger.可以在contant中使用。
+//写在前面：本文件中变量名大小写敏感，且需要注意是否有s（例如target-targets）
+//filter中若有需要只能使用event.，不能使用trigger.。trigger.可以在contant中使用。
 //"step 0"必须从0开始，引号可以是单引号或双引号，但是整个技能里面不能变
-/*yield 可以跨步骤储存变量，用于一个技能里需要多次选择目标/牌等造成系统自带result.targets和result.links失效的情况。示例： 
+/*yield 可以跨步骤储存变量，用于一个技能里需要多次选择目标/牌等造成系统自带result.targets和result.links失效的情况。该方法需要content:function*(event,map),并且内容中player和trigger.player(已验证),result（待验证）需要分别使用map.player和map.trigger.player（已验证）,map.result（待验证）代替
+yield需要无名杀版本1.10.10或更高版本的支持
+示例： 
     var result = yield player.chooseCardButton('Z驱领舰：选择一张“Z”移动', true, cards);
     "step 2"
     game.log("result.links");*/
@@ -814,7 +817,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "z16": ["female", "KMS", 3, ["huibi", "quzhudd", "Z", "z16_lianhuanbaopo", "z16_shuileibuzhi"], ["des:1934A型驱逐舰11号舰，1934A是1934的改良型，改进了适航性与动力系统设计。Z16号（弗里德里希·埃科尔特号）开战之后主要执行对英国的布雷任务。在巴伦支海海战中被英国轻巡洋舰谢菲尔德号击沉。"]],
                             //"z18": ["female", "KMS", 3, ["huibi", "quzhudd", "z18_weisebaoxingdong", "z18_shuileibeizhan"], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
 
-                            jifu: ["female", "ΒΜΦCCCP", 2, ["quzhudd", "jifu_weicheng", "jifu_yuanjing", "jifu_lingwei", "jifu_yuanqin", "jifu_yuanqin"], ["des:基辅是苏联海军大舰队计划中的一环，她的设计吸取了塔什干和列宁格勒等驱逐舰的技术，同时航速和火力也保持了非常强的水平。尽管基辅在战前已经开工，但还是因为战况的影响而停工。在战争末期，未完工的基辅被拖回船厂，并修改了设计准备继续建造，但由于相比战后的新驱逐舰设计优势不大，所以并没有最终建造完成。"]],
+                            jifu: ["female", "ΒΜΦCCCP", 2, ["quzhudd", "huibi","jifu_weicheng", "jifu_yuanjing", "jifu_lingwei", "jifu_yuanqin", "jifu_yuanqin"], ["des:基辅是苏联海军大舰队计划中的一环，她的设计吸取了塔什干和列宁格勒等驱逐舰的技术，同时航速和火力也保持了非常强的水平。尽管基辅在战前已经开工，但还是因为战况的影响而停工。在战争末期，未完工的基辅被拖回船厂，并修改了设计准备继续建造，但由于相比战后的新驱逐舰设计优势不大，所以并没有最终建造完成。"]],
 
                             skilltest: ["male", "OTHER", 9, ["zhanlie", "jifu_weicheng"], ["forbidai", "des:测试用"]],
                         },
@@ -3032,16 +3035,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                 check: function (event, player) {
                                     var nh = player.countCards('h') - player.countCards('h', { type: 'equip' });
-                                    if (nh <= 1) return true;
-                                    if (player.countCards('h', 'tao')) return false;
-                                    if (nh <= 2) return Math.random() < 0.7;
-                                    if (nh <= 3) return Math.random() < 0.4;
+                                    if (nh <= 2) return true;
+                                    //if (player.countCards('h', 'tao')) return false;
+                                    if (nh <= 3) return Math.random() < 0.7;
+                                    if (nh <= 4) return Math.random() < 0.4;
                                     return false;
                                 },
                                 content: function () {
-                                    player.draw(2);
                                     player.discard(player.getCards("h"));
-                                    player.draw(player.countCards("h"));
+                                    player.draw(player.countCards("h")+2);
                                     player.addTempSkill('guzhuyizhi2', { player: 'phaseBegin' });
                                 },
                                 intro: {
@@ -3074,9 +3076,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                                 mod: {
-                                    cardEnabled: function (card) {
+                                    /*cardEnabled: function (card) {
                                         if (card.name == 'tao' || card.name == 'kuaixiu9') return false;
-                                    },
+                                    },*/
                                     maxHandcardBase: function (player, num) {
                                         if (player.hp == player.maxHp) {
                                             var damage = player.getStat().damage;
@@ -5771,7 +5773,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 forced: true,
                                 filter(event, player) {
                                     if (event.player == player) { return false; }
-                                    if (event.player != player && (event.player.group = 'RM' || event.player.name == 'tashigan')) { return true; }
+                                    //game.log(event.player);
+                                    //game.log(event.player.group);
+                                    if (event.player != player && (event.player.group == 'RM' || event.player.name == 'tashigan')) { return true; }
                                     return false;
                                 },
                                 async content(event, trigger, player) {
@@ -5861,11 +5865,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (result.bool) {
                                         trigger.player.addSkill("u47_xinbiao_hp");
                                         trigger.player.addSkill("u47_xinbiao_cards");
-                                        trigger.player.addMark("u47_xinbiao_hp", trigger.player.hp);
-                                        trigger.player.addMark("u47_xinbiao_cards", trigger.player.countCards('h'));
-                                        //game.log(trigger.player, trigger.player.countMark("u47_xinbiao_hp"));
-                                        markAuto('u47_xinbiao', [trigger.player]);
-
+                                        //trigger.player.addMark("u47_xinbiao_hp",math.max(trigger.player.hp,1));
+                                        //trigger.player.addMark("u47_xinbiao_cards", math.max(trigger.player.countCards('h'),1));
+                                        trigger.player.markAuto("u47_xinbiao_hp", [trigger.player.hp]);
+                                        trigger.player.storage.u47_xinbiao_hp.sort();
+                                        trigger.player.markAuto("u47_xinbiao_cards", [trigger.player.countCards('h')]);
+                                        trigger.player.storage.u47_xinbiao_cards.sort();
                                     }
                                 },
                             },
@@ -5874,7 +5879,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 marktext: "体力",
                                 intro: {
                                     name: "体力",
-                                    content: "已记录体力值$",
+                                    content: function (storage, player) {
+                                        var str = "已记录体力值：" + get.translation(player.storage.u47_xinbiao_hp);
+                                        return str;
+                                    },
+                                    //content: "已记录体力值$",
                                 },
                             },
                             u47_xinbiao_cards: {
@@ -5882,7 +5891,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 marktext: "手牌",
                                 intro: {
                                     name: "手牌",
-                                    content: "已记录手牌数$",
+                                    content: function (storage, player) {
+                                        var str = "已记录手牌数：" + get.translation(player.storage.u47_xinbiao_cards);
+                                        return str;
+                                    },
+                                    //content: "已记录手牌数$",
                                 },
                             },
                             u47_huxi: {
@@ -5904,9 +5917,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }).set('ai', target => {
                                         var att = get.attitude(player, target);
                                         if (att >= 0) {
-                                            return (target.countMark('u47_xinbiao_hp') - target.hp) * 2 + (target.countMark('u47_xinbiao_cards') - target.countCards("h"));
-                                        } else if (att > 0) {
-                                            return (target.hp - target.countMark('u47_xinbiao_hp')) * 2 + (target.countCards("h") - target.countMark('u47_xinbiao_cards'));
+                                            return (target.storage.u47_xinbiao_hp - target.hp) * 2 + (target.storage.u47_xinbiao_cards - target.countCards("h"));
+                                        } else if (att < 0) {
+                                            return (target.hp - target.storage.u47_xinbiao_hp) * 2 + (target.countCards("h") - target.storage.u47_xinbiao_cards);
                                         } else {
                                             return 1;
                                         }
@@ -5915,10 +5928,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (result.bool) {
                                         player.logSkill('u47_huxi');
                                         var target = result.targets[0];
-                                        var i1 = target.countMark('u47_xinbiao_hp');
-                                        target.removeMark('u47_xinbiao_hp', i1);
-                                        var i2 = target.countMark('u47_xinbiao_cards');
-                                        target.removeMark('u47_xinbiao_cards', i2);
+                                        var i1 = target.storage.u47_xinbiao_hp;
+                                        target.removeMark('u47_xinbiao_hp', target.countMark('u47_xinbiao_hp'));
+                                        var i2 = target.storage.u47_xinbiao_cards;
+                                        target.removeMark('u47_xinbiao_cards', target.countMark('u47_xinbiao_cards'));
                                         var hp = target.hp - i1;
                                         var cards = target.countCards("h") - i2;
                                         game.log("hp", hp, "cards", cards);
@@ -5928,13 +5941,19 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                         } else if (hp < 0) {
                                             target.recover(Math.abs(hp));
+                                        } else {
+                                            ;
                                         }
                                         if (cards > 0) {
                                             target.discard(Math.abs(cards));
 
                                         } else if (cards < 0) {
                                             target.draw(Math.abs(cards));
+                                        } else {
+                                            ;
                                         }
+                                        player.unmarkAuto("u47_xinbiao_hp", [i1]);
+                                        player.unmarkAuto("u47_xinbiao_cards", [i2]);
                                         target.removeSkill('u47_xinbiao_hp');
                                         target.removeSkill('u47_xinbiao_cards');
                                         player.draw(1);
@@ -5951,21 +5970,25 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             u81_conglie: {
                                 direct: true,
                                 trigger: {
-                                    source: "damageBegin1",
+                                    source: "damageBegin",
                                 },
                                 filter(event, player) {
                                     return player != event.player && event.player.countCards("h") > 0;
                                 },
-                                content() {
-
-                                    'step0'
+                                content: function* (event, map) {
+                                    "step0"
+                                    var player = map.player,trigger=map.trigger;
                                     game.log(event.player);
                                     game.log(trigger.player);
-                                    trigger.player.chooseCard('h', '是否交给' + get.translation(player) + '一张手牌免疫此次伤害？').set('ai', (card) => 7 - get.value(card));
-                                    'step1'
-                                    if (result.bool) {
+
+                                    var result1 = yield trigger.player.chooseCard('h', '是否交给' + get.translation(player) + '一张手牌免疫此次伤害？').set('ai', function (card) { return 7 - get.value(card) });
+                                    "step1"
+                                    if (result1.bool) {
                                         game.log("给牌免伤");
-                                        trigger.player.give(result.cards, player);
+                                        game.log(result1.cards);
+                                       // game.log(result1.bool);
+                                        //game.log(JSON.stringify(result1));
+                                        trigger.player.give(result1.cards, player);
                                         trigger.cancel();
                                         if (!trigger.player.hasSkill("u81_conglie_shanghai")) {
                                             game.log("添加技能");
@@ -6159,7 +6182,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 //game.log(result.targets);
                                                 if (result.targets[0].getExpansions('Z').length == 0) {
                                                     game.log("event.finish");
-                                                    event.goto(3);//似乎没有正常运行
+                                                    event.finish();
                                                 }
                                                 //game.log(result.targets[1]);
                                                 /*----下列部分用于检查并给予result.target[1]技能Z----*/
@@ -6551,17 +6574,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             'step 0'
                                             var cards = player.getExpansions('Z'), count = cards.length;
                                             if (count > 0) {
-                                                 player.chooseCardButton('水雷布置：将一张Z当作兵粮寸断使用', true, cards).set('ai', function (button) {
+                                                player.chooseCardButton('水雷布置：将一张Z当作兵粮寸断使用', true, cards).set('ai', function (button) {
                                                     return 1;
                                                 });
                                             }
                                             else event.finish();
                                             'step 1'
                                             event.cards = result.links;
-                                            player.chooseTarget('选择兵粮寸断的目标',true,function(card,player,target){
-                                                return target!=player;
-                                            }).set('ai',function(target){
-                                                return -get.attitude(player,target);
+                                            player.chooseTarget('选择兵粮寸断的目标', true, function (card, player, target) {
+                                                return target != player;
+                                            }).set('ai', function (target) {
+                                                return -get.attitude(player, target);
                                             });
                                             'step 2'
                                             if (result.bool) {
@@ -6577,30 +6600,30 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 }
                             },
                             Z_judge: {
-                                trigger:{
-                                    player:"phaseZhunbeiBegin",
+                                trigger: {
+                                    player: "phaseZhunbeiBegin",
                                 },
                                 prompt: function () {
                                     return "移去一张Z，然后移去判定区内所有花色与之相同的牌";
                                 },
                                 filter: function (event, player) {
-                                    return player.countCards('j')&&player.getExpansions('Z').length;
+                                    return player.countCards('j') && player.getExpansions('Z').length;
                                 },
                                 content: function () {
                                     'step 0'
                                     var cards = player.getExpansions('Z'), count = cards.length;
                                     if (count > 0) {
-                                         player.chooseCardButton('移去一张Z，然后移去判定区内所有花色与之相同的牌', true, cards).set('ai', function (button) {
-                                            return player.countCards('j',function(card){
-                                                return get.suit(card,player)==get.suit(button.link);
+                                        player.chooseCardButton('移去一张Z，然后移去判定区内所有花色与之相同的牌', true, cards).set('ai', function (button) {
+                                            return player.countCards('j', function (card) {
+                                                return get.suit(card, player) == get.suit(button.link);
                                             });
                                         });
                                     }
                                     else event.finish();
                                     'step 1'
-                                    player.loseToDiscardpile(result.links); 
-                                    var cards=player.getCards('j',function(card){
-                                        return get.suit(card,player)==get.suit(result.links);
+                                    player.loseToDiscardpile(result.links);
+                                    var cards = player.getCards('j', function (card) {
+                                        return get.suit(card, player) == get.suit(result.links);
                                     });
                                     player.loseToDiscardpile(cards);
                                 },
