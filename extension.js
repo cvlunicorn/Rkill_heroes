@@ -4772,7 +4772,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return (event.card.name == 'sha' || event.card.name == 'sheji9') && get.distance(player, event.target) <= 1 && event.target.isIn();
                                 },
                                 check: function (event, player) {
-                                    return get.attitude(player, event.target) >= 0;
+                                    return get.attitude(player, event.target) >= 0||player==event.target;
                                 },
                                 logTarget: "target",
                                 content: function () {
@@ -4801,8 +4801,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     event.finish();
                                     "step 2"
                                     player.chooseTarget(function (card, player, target) {
-                                        game.log(target);
-                                        game.log(get.distance(player, target));
+                                        //game.log(target);
+                                        //game.log(get.distance(player, target));
                                         if (get.distance(player, target) <= 1) { return 1 }
                                         return 0;
                                     }, "你可以选择一名距离1的角色，其可以交给你一张牌并获得你场上的一张牌。").set('ai', function (ard, player, target) {
@@ -4812,28 +4812,34 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (result.bool) {
                                         event.target = result.targets[0];
                                         event.target.chooseCard('he', '交给' + get.translation(player) + '一张牌，并获得其场上的一张牌').set('ai', function (card) {
-                                            if (get.attitude(event.target, player) <= 0) return -get.value(card);
+                                            var attitude=get.attitude(event.target, player);
+                                            if (attitude <= 0) return -get.value(card);
                                             if (get.position(card) == 'e') return -1;
-                                            if (card.name == 'shan') return 1;
-                                            if (get.type(card) == 'equip') return 0.5;
-                                            return 0;
+                                            if (card.name == 'shan') return 7;
+                                            if (get.type(card) == 'equip') return get.value(card,player)-get.value(card);
+                                            return get.value(card,player);
                                         });
+                                    } else {
+                                        event.finish();
                                     }
                                     "step 4"
-                                    event.target.give(result.cards, player);
-                                    game.delay();
-                                    if (trigger.target.countCards("ej")) {
-                                        event.target.gainPlayerCard(player, 'ej', true, 'visible').set('ai', function (card) {
-                                            if (get.attitude(event.target, player) >= 0) {
-                                                if (get.type(card) == "delay") return 1;
-                                                return -get.value(card);
-                                            } else {
-                                                return get.value(card);
-                                            }
-                                        });
+                                    if (result.bool) {
+                                        event.target.give(result.cards, player);
+                                        //game.delay();
+                                        if (trigger.target.countCards("ej")) {
+                                            event.target.gainPlayerCard(player, 'ej', true, 'visible').set('ai', function (card) {
+                                                if (get.attitude(event.target, player) >= 0) {
+                                                    if (get.type(card) == "delay") return 1;
+                                                    return -get.value(card);
+                                                } else {
+                                                    return get.value(card);
+                                                }
+                                            });
+                                        }
+                                    } else {
+                                        event.finish();
                                     }
                                 },
-
                                 ai: {
                                     threaten: 0.8,
                                 },
