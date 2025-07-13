@@ -798,7 +798,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             bisimai: ["female", "KMS", 4, ["zhuangjiafh", "zhanliebb", "qijianshashou", "yongbuchenmodezhanjian"], ["zhu", "des:德国于30年代建造的俾斯麦级战列舰首舰，建成之后连英国首相也称赞其是出色的设计。服役之后41年俾斯麦号在欧根亲王号的护航下前出大西洋执行破交任务，在战斗中俾斯麦号击沉了前来拦截的英国胡德号、击伤了威尔士亲王号。之后英国集结大规模兵力围歼俾斯麦号，战斗中皇家方舟号航母的剑鱼击伤了俾斯麦号的船舵，大大影响了俾斯麦号的航行，之后俾斯麦号在英国舰队的围攻下沉没。"]],
                             misuli: ["female", "USN", 4, ["zhuangjiafh", "zhanliebb", "jueshengzhibing", "zhanfu"], ["des:密苏里是新锐衣阿华级战列舰的三号舰，衣阿华级沿用了南达级的防护设计，她装备了当时功率最大的动力系统，所以航速甚至比很多战巡还快。密苏里于45年才赶赴战场，并没有参加多少战斗，只是在45年3月被神风撞中一次，受损不大。让密苏里名垂青史的是日本投降签字仪式在她的甲板上举行，这代表了战争的正式结束。在冷战期间密苏里继续活跃，在80年代甚至重启并进行了导弹化改造，以符合现代海战的需要。91的海湾战争也是战列舰最后一次参加实战。在98年，密苏里作为纪念舰退役，她停泊在珍珠港，正前方正是亚利桑那博物馆，她们分别代表了战争的开始和结束。"]],
                             weineituo: ["female", "RM", 3, ["zhuangjiafh", "zhanliebb", "yishisheji", "yishisheji_1"], ["des:维内托级是意大利的新锐战列舰。该级的整体设计十分出色，值得称道的是381mm主炮的部分威力指标可以达到406mm炮水平。防护设计上，船体采用了普列赛水下防护系统，装甲使用倾斜多层的剥被帽设计。二战中，她在41年的马塔潘角海战中被鱼雷击伤，之后因为缺油不再出动。意大利投降后维内托号疏散到了马耳他，途中还曾被德军的制导炸弹击伤。维内托号最终幸存到了战后。"]],
-                            lisailiu: ["female", "MN", 4, ["zhuangjiafh", "zhanliebb", "kaixuanzhige"], ["des:黎塞留级是法国在30年代设计的新锐战列舰。该级依然沿袭敦刻尔克级的主炮全前置设计。40年，法国迅速战败，未完工的黎塞留号为了避免落入德军之手，于6月15日启航疏散到达喀尔。因惧怕处于流亡状态的六艘法国战列舰落入德国手中，英国舰队制定了名为“抛石机”的行动计划，对法国舰队进行了攻击。交火中黎塞留号被击伤，在此之后流亡非洲的法国舰队一直对战争局势持观望状态。42年黎塞留号同美国达成协议，加入同盟国作战。在美国进行改装后的黎塞留号参加了对日作战，并见证了二战的胜利。战后黎塞留号于1959年退役。"]],
+                            lisailiu: ["female", "MN", 4, ["zhuangjiafh", "zhanliebb", "kaixuan", "changge","xiongjiaqibin"], ["des:黎塞留级是法国在30年代设计的新锐战列舰。该级依然沿袭敦刻尔克级的主炮全前置设计。40年，法国迅速战败，未完工的黎塞留号为了避免落入德军之手，于6月15日启航疏散到达喀尔。因惧怕处于流亡状态的六艘法国战列舰落入德国手中，英国舰队制定了名为“抛石机”的行动计划，对法国舰队进行了攻击。交火中黎塞留号被击伤，在此之后流亡非洲的法国舰队一直对战争局势持观望状态。42年黎塞留号同美国达成协议，加入同盟国作战。在美国进行改装后的黎塞留号参加了对日作战，并见证了二战的胜利。战后黎塞留号于1959年退役。"]],
                             changmen: ["female", "IJN", 4, ["zhuangjiafh", "zhanliebb", "zhudaojiandui"], ["des:她与妹妹都是高火力型日本战列舰的代表，被称为海军假日七巨头之一。她建成时就有高大的六脚桅楼，可看做是日式高塔舰桥的开端。二战开始后，太平洋战场的形势变为航空主导。一直到44年的莱特湾海战，她才得到了一线作战的机会：她所在的栗田编队抓到了美军护航航母编队，但是在美军的拼命反抗下日军没能取得多大的战果。回到本土的她在搁置中迎来了日本投降。美军缴获之后将她用作“十字路口计划”核试验的靶船，于1946年7月沉没。"]],
                             "1913": ["female", "ROCN", 4, ["zhuangjiafh", "zhanliebb", "jujianmengxiang"], ["zhu", "des:1913年时，为针对邻国的海军威胁，国民政府参谋部在海军造舰计划书中提出了颇为夸张的海军扩建计划，其中便包括大量的战列巡洋舰。该型战列巡洋所设想的性能参数为：排水量28000吨，装备10门14英寸火炮，航速29节左右。当然在那个穷困动荡的年代，海军意图获取主力舰无非是不切实际的妄想罢了……"]],
                             kunxi: ["female", "USN", 4, ["huokongld", "zhongxunca", "gaosusheji"], ["des:新奥尔良级重巡洋舰6号舰。新奥尔良级是北安普顿级的改良版本，增强了防护。战争爆发后，昆西号先是执行了在大西洋的岛屿巡逻任务，后于42年5月通过巴拿马运河来到太平洋战场。在萨沃岛海战中，昆西号击中了鸟海号的舰桥，但是之后昆西号被日军集火射击，最终不幸被鱼雷击沉。"]],
@@ -5431,7 +5431,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             duomianshou_1: {
                                 usable: 1,
                                 trigger: {
-                                    player: "useCardToPlayered",
+                                    player: "useCardToPlayer",
                                 },
                                 direct: true,
                                 frequent: true,
@@ -5461,11 +5461,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
                             },
-                            kaixuanzhige: {
+                            kaixuan: {
                                 audio: "ext:舰R牌将:true",
                                 shaRelated: true,
                                 trigger: {
-                                    player: "useCardToPlayered",
+                                    player: "useCardToPlayer",
                                 },
                                 check: function (event, player) {
                                     return get.attitude(player, event.target) <= 0;
@@ -5476,34 +5476,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 logTarget: "target",
                                 content: function () {
                                     "step 0"
-                                    if (player.hp < 3 && !trigger.target.hasSkill('qinggang2')) {
-                                        trigger.target.addTempSkill('qinggang2');
-                                        trigger.target.storage.qinggang2.add(trigger.card);
-                                        trigger.target.markSkill('qinggang2');
-                                    }
+                                    
+                                    player.chooseToDiscard(1);
                                     "step 1"
-                                    player.judge(function (card) {
-                                        return 0;
-                                    }).set('callback', function () {
-                                        game.log(get.type(card));
-                                        if (get.type(card) == 'trick' || get.type(card) == 'delay') {
-                                            game.log("是锦囊");
-                                        } else if (get.type(card) != 'trick' && get.type(card) != 'delay') {
-                                            game.log("非锦囊");
-                                            if (get.position(event.judgeResult.card, true) == 'o') { player.gain(event.judgeResult.card, 'gain2', 'log'); }//该语句只能在callback中执行
-                                        } else {
-                                            event.finish();
-                                        }
-                                    });
-                                    "step 2"
-                                    if (get.type(result) == 'trick' || get.type(result) == 'delay') {
+                                    if (result.bool) {
                                         game.log("此杀伤害基数" + trigger.getParent().baseDamage);
                                         game.log(trigger.target);
                                         trigger.getParent().baseDamage++;//该语句不能在callback中执行
-                                        //game.log("trigger.target2"+JSON.stringify(trigger.target[0]));
-                                        trigger.target.addTempSkill('qinggang2');
-                                        trigger.target.storage.qinggang2.add(trigger.card);
-                                        trigger.target.markSkill('qinggang2');
                                     } else {
                                         event.finish();
                                     }
@@ -5513,6 +5492,34 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     threaten: 1.3,
                                 },
                                 "_priority": 0,
+                            },
+                            changge: {
+                                force: true,
+                                direct: true,
+                                trigger: {
+                                    player: "useCardToPlayered",
+                                },
+                                filter: function (event, player) {
+                                    return event.card.name == "sha";
+                                },
+
+                                content: function () {
+                                    if (trigger.getParent().baseDamage > 1) {
+                                        //game.log("此杀伤害基数" + trigger.getParent().baseDamage);
+                                        trigger.target.addTempSkill("qinggang2");
+                                        trigger.target.storage.qinggang2.add(trigger.card);
+                                        trigger.target.markSkill("qinggang2");
+                                    }
+                                },
+
+                            },
+                            xiongjiaqibin: {
+                                force: true,
+                                mod: {
+                                    globalFrom(from, to, distance) {
+                                        if (from.getSeatNum()<to.getSeatNum()) return distance - 1;
+                                    },
+                                },
                             },
                             yishisheji: {
                                 audio: "ext:舰R牌将:true",
@@ -7922,7 +7929,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "junfu_info": "回合开始时,你可以把至多1/2/3张手牌存于武将牌上，如手牌般使用。<br>其他角色回合开始时，你可以把存储的牌交给ta，然后你摸一张牌。<br>可以强化(目标的手牌数<8才能使用此技能)<br>拥有技能强化和远航强化即可起飞。",
                             manchangzhanyi: "漫长战役", "manchangzhanyi_info": "每轮限一次，你受到锦囊牌的伤害时，你免疫此伤害。你攻击范围内的其他角色的准备阶段，你可以弃置其一张手牌。",
                             manchangzhanyi_1: "漫长战役", "manchangzhanyi_1_info": "",
-                            guzhuyizhi: "孤注一掷", "guzhuyizhi_info": "出牌阶段开始时，你可以摸两张牌并弃置所有手牌，然后摸等量的牌，如此做，你的其他技能失效直到你的下回合开始，你计算与其他角色的距离-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。",
+                            guzhuyizhi: "孤注一掷", "guzhuyizhi_info": "出牌阶段开始时，你可以摸两张牌并弃置所有手牌，然后摸等量的牌，如此做，你的其他技能失效直到你的下回合开始，你计算与其他角色的距离-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。",
                             guzhuyizhi2: "孤注一掷", "guzhuyizhi2_info": "",
                             shuileizhandui_1: "水雷战队", "shuileizhandui_1_info": "",
                             shuileizhandui: "水雷战队", "shuileizhandui_info": "你可以交给一名角色任意张牌。若你是本回合第一次发动本技能，你可以从牌堆和弃牌堆获得一张雷杀。",
@@ -7965,7 +7972,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhongzhuangcike: "重装刺客", "zhongzhuangcike_info": "你装备区内有牌时，你使用的杀无视防具；你即将造成的伤害视为体力流失",
                             duomianshou: "多面手", "duomianshou_info": "出牌阶段限一次，你可以弃置一张手牌，视为使用一张牌堆中点数相同的牌(不受次数限制），若牌堆中没有相同点数的牌名，重置该技能发动次数，且本回合不能再使用该点数发动技能；每回合限一次，你对其他中小型船使用转化牌时，其选择弃置一张牌或令你摸一张牌。",
                             duomianshou_1: "多面手", "duomianshou_1_info": "每回合限一次，你对其他中小型船使用转化后的牌时其选择一项：1弃置一张牌，2令你摸一张牌。",
-                            kaixuanzhige: "凯旋之歌", "kaixuanzhige_info": "当你使用【杀】指定唯一其他角色为目标后，你可以进行判定，若结果为锦囊牌，此【杀】伤害+1且无视防具。你的体力值小于3时，你使用的【杀】无视防具。",
+                            kaixuan: "凯旋", "kaixuan_info": "你使用杀指定唯一目标时，你可弃置一张牌，令此杀伤害+1。",
+                            changge: "长歌", "changge_info": "锁定技，你使用杀即将造成的伤害≥2时，你的杀无视防具。",
+                            xiongjiaqibin: "胸甲骑兵", "xiongjiaqibin_info": "锁定技，你计算与座次比你靠后的角色距离-1。",
                             yishisheji: "意式设计", "yishisheji_info": "每轮限一次，你可以免疫一次伤害。你使用杀指定唯一目标时可以进行判定，若判定结果不为红桃，此杀基础伤害+1，否则此杀无效。出牌阶段你使用或打出的第一张杀无距离限制。",
                             yishisheji_1: "意式设计", "yishisheji_1_info": "",
                             jueshengzhibing: "决胜之兵", "juezhanzhibing_info": "你使用杀指定有护甲的目标时，你可以弃置其一张牌；你使用锦囊牌时，你可以摸一张牌。若你以此法摸或弃置了总计两张牌，你结束出牌阶段，反之，回合结束时你获得'智愚'直到下回合开始。",
