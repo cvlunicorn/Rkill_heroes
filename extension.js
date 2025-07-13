@@ -6482,15 +6482,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     global: "damageEnd",
                                 },
                                 filter: function (event, player) {
-                                    if (!get.itemtype(event.cards) == 'cards') { return false; }
+                                    if (get.itemtype(event.cards) != 'cards'||get.position(event.cards[0], true) != "o") { return false; }
                                     if (event.source && event.source.group == "KMS" && event.source.hasSkill("quzhudd")) {
-                                        game.log("造成伤害是德驱");
+                                        //game.log("造成伤害是德驱");
                                         return true;
                                     } else if (event.player.group == "KMS" && event.player.hasSkill("quzhudd")) {
-                                        game.log("受到伤害是德驱");
+                                        //game.log("受到伤害是德驱");
                                         return true;
                                     } else {
-                                        game.log("不满足发动条件");
+                                        //game.log("不满足发动条件");
                                         return false;
                                     }
                                 },
@@ -7225,15 +7225,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 forced: true,
                                 logTarget: "source",
                                 content: function () {
-                                    'step 0'
+                                    trigger.source.draw(1);
+                                    /*'step 0'
                                     trigger.source.chooseCardButton('选择获得一张“Z”', player.getExpansions('Z'), true);
                                     'step 1'
                                     if (result.bool) {
                                         trigger.source.gain(result.links, player, 'give');
-                                    }
+                                    }*/
                                 },
                             },
                             z21_tuxi: {
+                                global: "z21_tuxi_discard",
                                 trigger: {
                                     player: "phaseUseBegin",
                                 },
@@ -7262,7 +7264,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     'step 2'
                                     game.log("4");
                                     if (result.bool) {
-                                        event.target.addToExpansion(result.cards, event.target, 'give').gaintag.add('Z');
+                                        player.addToExpansion(result.cards, event.target, 'give').gaintag.add('Z');
                                     }
                                 },
                                 ai: {
@@ -7281,31 +7283,38 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 group: ["z21_tuxi_discard"],
                                 subSkill: {
                                     discard: {
-                                        direct: true,
                                         trigger: {
-                                            global: "damageEnd",
+                                            player: "useCardToPlayered",
                                         },
                                         filter: function (event, player) {
                                             //game.log(event.player);
-                                            return event.player.getExpansions('Z').length;
+                                            return player.getExpansions('Z').length&&player!=event.target;
                                         },
                                         check: function (event, player) {
-                                            return get.attitude(player, event.player) < 0;
+                                            return get.attitude(player, event.target) < 0;
                                         },
-                                        prompt: "你可以令其随机弃置一张牌并弃置所有Z",
+                                        prompt: "你可以令其随机弃置一张牌并弃置一张Z",
                                         content: function () {
+
                                             'step 0'
-                                            trigger.player.randomDiscard(1);
-                                            'step 1'
-                                            var cards = trigger.player.getExpansions('Z');
-                                            for (var i = 0; i < cards.length; i++) {
-                                                trigger.player.loseToDiscardpile(cards[i]);
+                                            var cards = player.getExpansions('Z'), count = cards.length;
+                                            if (count > 0) {
+                                                player.chooseCardButton('移去一张Z', true, cards).set('ai', function (button) {
+                                                    return 1;
+                                                });
                                             }
+                                            else event.finish();
+                                            'step 1'
+                                            event.cards = result.links;
+                                            player.loseToDiscardpile(event.cards);
+                                            'step 2'
+                                            trigger.target.randomDiscard(1);
                                         },
                                     },
                                 },
                             },
                             z22_tuxixiawan: {
+                                global: "z22_tuxixiawan_discard",
                                 trigger: {
                                     player: "phaseUseBegin",
                                 },
@@ -8976,9 +8985,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             z16_shuileibuzhi_bingliang: "兵粮寸断", z16_shuileibuzhi_bingliang_info: "出牌阶段，你可以将一张Z当作兵粮寸断使用。",
                             z18_weisebaoxingdong: "威瑟堡行动", z18_weisebaoxingdong_info: "每回合限一次，你可以将至多两张手牌置于等量角色的武将牌上，称为Z。出牌阶段，你可以移去一张Z，观看一名角色的手牌，然后视为使用一张火攻。(全局)武将牌上有Z的角色出牌阶段使用杀的次数+1；使用与Z中包含类型相同的牌时须弃一张牌(没有则不弃)，然后可以弃置一张与使用的牌相同牌名的Z。",
                             z18_weisebaoxingdong_huogong: "火攻", z18_weisebaoxingdong_huogong_info: "你可以移去一张Z，观看一名角色的手牌，然后视为使用一张火攻。",
-                            z17_naerweikejingjie: "纳尔维克警戒", z17_naerweikejingjie_info: "出牌阶段，你可以将任意张手牌置于武将牌上，称为Z，然后将一名角色至多等量张手牌置于其武将牌上，也称为Z。(全局)对有Z的角色造成伤害时，可以获得一张Z。",
-                            z21_tuxi: "突袭", z21_tuxi_info: "出牌阶段开始时，你可以选择攻击范围内的一名角色，将其一张牌置于其武将牌上，称为Z。当有Z的武将受到伤害后，你可以令其随机弃置一张牌并弃置所有Z",
-                            z22_tuxixiawan: "突袭峡湾", z22_tuxixiawan_info: "出牌阶段开始时，你可以将任意角色一张牌置于自己的武将牌上，称为Z。其他角色造成伤害后，若你有Z，你可以移去一枚Z，进行一次判定，令当前回合角色不能使用或打出与判定牌花色相同的牌直到回合结束。",
+                            z17_naerweikejingjie: "纳尔维克警戒", z17_naerweikejingjie_info: "出牌阶段，你可以将任意张手牌置于武将牌上，称为Z，然后将一名角色至多等量张手牌置于其武将牌上，也称为Z。(全局)对有Z的角色造成伤害时，可以摸一张牌。",
+                            z21_tuxi: "突袭", z21_tuxi_info: "出牌阶段开始时，你可以选择攻击范围内的一名角色，将其一张牌置于你的武将牌上，称为Z。（全局）若你有Z，你使用牌指定其他角色为目标后，你可以令其随机弃置一张牌，然后移去一张Z",
+                            z22_tuxixiawan: "突袭峡湾", z22_tuxixiawan_info: "出牌阶段开始时，你可以将任意角色一张牌置于自己的武将牌上，称为Z。(全局）其他角色造成伤害后，若你有Z，你可以移去一枚Z，进行一次判定，令当前回合角色不能使用或打出与判定牌花色相同的牌直到回合结束。",
                             cardsDisabled_suit: "不能使用_花色", cardsDisabled_suit_info: "你不能使用或打出对应花色的手牌。",
                             matapanjiaozhijian: "马塔潘角之箭", matapanjiaozhijian_info: "你使用锦囊牌指定目标后，你可以弃置任意张牌，令等量目标不可响应此牌。",
                             zhongbangtuxi: "重磅突袭", zhongbangtuxi_info: "限定技，结束阶段，你可以弃置任意张红色牌对等量角色各造成一点火焰伤害。",
