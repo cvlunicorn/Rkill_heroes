@@ -394,7 +394,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             list.push('mopaiup');
                             choiceList.push(['mopaiup', jieshao[0]]);
                         };
-                        if (info[1] < k && (info[1] + 2 <= info[7] + exp1) && info[1] <= 2) {
+                        if (info[1] < k && (info[1] + 2 <= info[7] + exp1) && info[1] <= 2 && !player.hasSkill("shixiangquanneng")) {
                             list.push('jinengup');
                             choiceList.push(['jinengup', jieshao[1]]);
                         };
@@ -799,7 +799,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "z1", "z16"],
                                 lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu"],
                                 lishizhanyi_haixiafujizhan: ["u47", "u81", "u505"],
-                                weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei"],
+                                weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan"],
                             },
 
                         },
@@ -862,6 +862,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             shiyu: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "jishiyu", "jishiyu1"], ["des:她在海军中以幸运而著名，参加过多次激烈海战都能最终幸存下来。在激烈的苏里高海战和维拉湾海战中，她都是编队中唯一的幸存。不过到45年，她还是被一艘潜艇击中沉没。"]],
                             dujiaoshou: ["female", "RN", 3, ["junfu", "xiuqi", "wanbei"], ["des:30年代英国设计了一级飞机修理舰，以修理航母部队载机，由于要求修复的飞机可以直接起飞，索性将她设计成了航母的结构，可当成航母使用。独角兽号于1942年完工，初期主要被当作航母使用，在地中海执行支援任务。1943年年末起，独角兽号加入太平洋战场作为航母支援舰使用，在冲绳战役期间修复了大量飞机。冷战时期独角兽号还参加了朝鲜战争，最终于50年代退役。"]],
                             jiate: ["female", "USN", 3, ["fangqu", "mb_meibu"], ["des:基林级驱逐舰之一，由于服役太晚没有参加二战的实战。服役之后主要在大西洋活动。在1955年基阿特进行了改装，成为世界上第一艘导弹驱逐舰，其换装了双联防空导弹发射架，76毫米高炮和反潜鱼雷。在1957年为了显示其地位，刷上了DDG-1的编号。这艘划时代的军舰于1968年退役。"]],
+                            getelan: ["female", "OTHER", 3, ["mujizhengren", "pingduzhanhuo", "shixiangquanneng"], ["des:出于海防和海军航空的需求，瑞典设计建造了这一级航空巡洋舰。尽管吨位在5000吨左右，但是哥特兰的装备齐全，载机量也达到了6-8架。哥特兰也是最早的航空巡洋舰，之后的类似军舰或多或少均受其影响。哥特兰漫长的服役期中最著名的事迹是发现了俾斯麦和欧根的编队。而在这之前英海军正在满世界找她们。"]],
 
                             skilltest: ["male", "OTHER", 9, ["zhanlie", "jifu_weicheng"], ["forbidai", "des:测试用"]],
                         },
@@ -1070,7 +1071,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         list.push('mopaiup');
                                         choiceList.push(['mopaiup', jieshao[0]]);
                                     };
-                                    if (info[1] < k && (info[1] + 2 <= info[7] + exp1) && info[1] <= 2) {
+                                    if (info[1] < k && (info[1] + 2 <= info[7] + exp1) && info[1] <= 2 && !player.hasSkill("shixiangquanneng")) {
                                         list.push('jinengup');
                                         choiceList.push(['jinengup', jieshao[1]]);
                                     };
@@ -2825,7 +2826,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     //if(range[1]==-1) return;var a=game.countPlayer(function(current){return get.attitude(player,current)<=0&&current.inRange(player)})-1;
                                     //if(card.name=='sha') range[1]+=Math.min(player.countMark('jinengup'),a);},
                                     attackRange: function (from, distance) {
-                                        return distance + (2 + from.getExpansions('jinengup').length);
+                                        return distance + (2 + from.countMark('jinengup').length);
                                     },
                                 },
                                 usable: 1,
@@ -2836,16 +2837,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 enable: "phaseUse",
                                 filterCard: function (card) {
                                     var player = _status.event.player;
-                                    if (player.getExpansions('jinengup') <= 0) {
+                                    if (player.countMark('jinengup') <= 0) {
                                         return get.subtype(card) == "equip1";
-                                    } else if (player.getExpansions('jinengup') == 1) {
+                                    } else if (player.countMark('jinengup') == 1) {
                                         return get.subtype(card) == "equip1" || get.subtype(card) == "equip2";
-                                    } else if (player.getExpansions('jinengup') >= 2) {
+                                    } else if (player.countMark('jinengup') >= 2) {
                                         return get.type(card) == "equip";
                                     }
                                 },
                                 selectCard: 1,
                                 content: function () {
+
                                     target.damage("nocard");
                                 },
                                 check: function (card) {
@@ -4725,7 +4727,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         list.push('mopaiup');
                                         choiceList.push(['mopaiup', jieshao[0]]);
                                     };
-                                    if (info[1] < k && (info[1] + 2 <= info[7] + exp1) && info[1] <= 2) {
+                                    if (info[1] < k && (info[1] + 2 <= info[7] + exp1) && info[1] <= 2 && !player.hasSkill("shixiangquanneng")) {
                                         list.push('jinengup');
                                         choiceList.push(['jinengup', jieshao[1]]);
                                     };
@@ -9177,6 +9179,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             dananbusi: {
+                                nobracket: true,
                                 unique: true,
                                 trigger: {
                                     player: "damageBegin4",
@@ -9219,6 +9222,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             houfu: {
+                                nobracket: true,
                                 enable: "phaseUse",
                                 usable: 1,
                                 content: function () {
@@ -9273,6 +9277,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             zhanliexianfuchou: {
+                                nobracket: true,
                                 trigger: {
                                     source: "damageBegin1",
                                 },
@@ -9281,13 +9286,104 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 forced: true,
                                 content: function () {
-                                    var history = player.getRoundHistory("useCard", evt => {
+                                    var history = game.countPlayer2(target => target.getRoundHistory("useCard", evt => {
                                         game.log(evt.targets);
                                         return evt.targets && evt.targets.includes(player);
-                                    }).length;
+                                    }).length);
                                     game.log(history);
                                     trigger.num += history;
                                 },
+                            },
+                            pingduzhanhuo: {
+                                nobracket: true,
+                                group: ["pingduzhanhuo_jieshu", "pingduzhanhuo_zhunbei"],
+                                subSkill: {
+                                    jieshu: {
+                                        trigger: { player: "phaseJieshuBegin", },
+                                        direct: true,
+                                        filter: function (event, player) {
+                                            return player.getHistory("sourceDamage").length == 0;
+                                        },
+                                        content: function () {
+                                            //game.logSkill("pingduzhanhuo");
+                                            player.draw(1);
+
+                                        },
+                                    },
+                                    zhunbei: {
+                                        trigger: { player: "phaseZhunbeiBegin", },
+                                        direct: true,
+                                        filter: function (event, player) {
+                                            return player.getRoundHistory("damage").length == 0;
+                                        },
+                                        content: function () {
+                                            //game.logSkill("pingduzhanhuo");
+                                            player.draw(1);
+
+                                        },
+                                    },
+
+                                },
+
+                                "_priority": 0,
+                            },
+                            mujizhengren: {
+                                nobracket: true,
+                                enable: "phaseUse",
+                                usable: 1,
+                                filterCard: true,
+                                selectCard: -1,
+                                filter: function (event, player) {
+                                    return player.countCards("h") > 0;
+                                },
+                                check: function (card) {
+                                    return 8 - get.value(card);
+                                },
+                                filterTarget: function (card, player, target) {
+                                    return player != target;
+                                },
+                                content: function () {
+                                    target.turnOver();
+                                },
+                                ai: {
+                                    order: 2,
+                                    expose: 0.3,
+                                    threaten: 1.8,
+                                    result: {
+                                        target: function (player, target) {
+                                            if (target.hasSkillTag("noturn")) return 0;
+                                            if (target.isTurnedOver()) return 2;
+                                            return -1;
+                                        },
+                                    },
+                                },
+                                "_priority": 0,
+                            },
+                            shixiangquanneng: {
+                                nobracket: true,
+                                trigger: { global: "roundStart", },
+                                forced: true,
+                                direct: true,
+                                content() {
+                                    "step 0"
+                                    if (player.storage.shixiangquanneng.length) {
+                                        player.removeSkills(player.storage.shixiangquanneng[0]);
+
+                                    }
+                                    player.storage.shixiangquanneng = [];
+                                    "step 1"
+                                    event.skills = ["junfu", "fangkong2", "hangmucv"]
+                                    player
+                                        .chooseControl(event.skills)
+                                        .set("prompt", "请选择要获得的技能")
+                                        .set("ai", function () {
+                                            return event.skills.randomGet();
+                                        });
+                                    "step 2"
+                                    player.addTempSkills(result.control, { player: "dieAfter" });
+                                    player.storage.shixiangquanneng = [result.control];
+                                },
+                                "_priority": 0,
                             },
                             //在这里添加新技能。
 
@@ -9344,6 +9440,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             salemu: "萨勒姆",
                             "u505": "u505",
                             jialifuniya: "加利福尼亚",
+                            getelan: "哥特兰",
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -9514,12 +9611,16 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             buju_wuxie: "不惧_无懈", buju_wuxie_disable: "无懈_不可用",
                             buju_jiu: "不惧_酒", buju_jiu_disable: "酒_不可用",
                             liaowangtai: "瞭望台", liaowangtai_info: "出牌阶段限一次，你视为对所有攻击范围包括你的角色依次使用一张【火攻】。",
-                            jingruizhuangbei: "精锐装备", "jingruizhuangbei_info": "当你装备宝物时，你使用射击造成伤害时可以摸一张牌；当你使用射击指定目标时，你可以进行一次判定，若与此“射击”花色相同，则你可以额外指定一个目标",
+                            jingruizhuangbei: "精锐装备", jingruizhuangbei_info: "当你装备宝物时，你使用射击造成伤害时可以摸一张牌；当你使用射击指定目标时，你可以进行一次判定，若与此“射击”花色相同，则你可以额外指定一个目标",
                             jingruizhuangbei_mopai: "精锐装备_摸牌",
                             jingruizhuangbei_fencha: "精锐装备_分叉",
-                            dananbusi: "大难不死", "dananbusi_info": "限定技，当你受到的伤害不小于你当前体力值时，你可以防止之。",
-                            houfu: "后福", "houfu_info": "出牌阶段限一次，你可以选择一名其他角色，其选择一项:1视为对你使用一张杀(无距离限制)，2令你从牌堆中获得一张基本牌。",
-                            zhanliexianfuchou: "战列线复仇", "zhanliexianfuchou_info": "你造成的伤害+X，X=你本轮成为牌目标的次数",
+                            dananbusi: "大难不死", dananbusi_info: "限定技，当你受到的伤害不小于你当前体力值时，你可以防止之。",
+                            houfu: "后福", houfu_info: "出牌阶段限一次，你可以选择一名其他角色，其选择一项:1视为对你使用一张杀(无距离限制)，2令你从牌堆中获得一张基本牌。",
+                            zhanliexianfuchou: "战列线复仇", zhanliexianfuchou_info: "你造成的伤害+X，X=你本轮成为牌目标的次数",
+                            pingduzhanhuo: "平度战火", pingduzhanhuo_info: "结束阶段，若你本回合未造成伤害，你摸一张牌；准备阶段，若你本轮未受到伤害，你摸一张牌",
+                            mujizhengren: "目击证人", mujizhengren_info: "出牌阶段限一次，你可以弃置全部手牌，然后令一名角色翻面。",
+                            shixiangquanneng: "十项全能", shixiangquanneng_info: "锁定技，你的舰种技能无法升级，每轮开始时，你失去以此法获得的技能，然后从以下技能中选择一项获得：1、防空，2、开幕航空，3、军辅",
+
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
                             lishizhanyi_naerweike: '历史战役-纳尔维克',
