@@ -1,4 +1,13 @@
+//写在前面：filter中若有需要只能使用event.，不能使用trigger.。trigger.可以在contant中使用。
+//"step 0"必须从0开始，引号可以是单引号或双引号，但是整个技能里面不能变
+/*yield 可以跨步骤储存变量，用于一个技能里需要多次选择目标/牌等造成系统自带result.targets和result.links失效的情况。示例： 
+    var result = yield player.chooseCardButton('Z驱领舰：选择一张“Z”移动', true, cards);
+    "step 2"
+    game.log("result.links");*/
+//player.useCard({ name: '牌名' }, result.card, result.targets);可以不使用viewas而使用转化牌.
 //目录：全局技能、武将列表、武将技能、武将和技能翻译、卡牌包与卡牌技能、卡牌翻译、配置（config）、单机武将列表、扩展简介、全局函数模块
+
+const { connect } = require("ws");
 
 game.import("extension", function (lib, game, ui, get, ai, _status) {
 
@@ -757,7 +766,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         characterSort: {
                             jianrjinji: {
                                 jianrbiaozhun: ["liekexingdun", "qixichicheng", "wufenzhongchicheng", "dumuchenglinqiye", "bisimai", "misuli", "weineituo", "lisailiu", "1913", "changmen", "kunxi", "ougengqi", "qingye", "beianpudun", "jiujinshan", "jiujinshan", "yixian", "tianlangxing", "dadianrendian", "yatelanda", "z31", "xuefeng", "kangfusi", "47project", "guzhuyizhichuixue", "shuileizhanduichuixue", "minsike", "yinghuochong", "u1405", "baiyanjuren", "changchun"],
-                                lishizhanyi_naerweike: ["", ""],
+                                lishizhanyi_naerweike: ["z1", "z16", /*"z18"*/],
                                 lishizhanyi_matapanjiao: ["", ""],
                                 lishizhanyi_danmaihaixia: ["", ""],
                                 lishizhanyi_shanhuhai: ["", ""],
@@ -798,8 +807,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "u1405": ["female", "KMS", 3, ["qianting", "qianxingtuxi"], ["des:由于普通潜艇水下动力受电池性能限制，德国海军考虑研发一种不依赖空气的高效水下动力系统。U-1405的动力系统采用使用过氧化氢的瓦尔特发动机，这种动力可以在水下运行，并且能让潜艇在水下达到超过20节的高速。不过发动机的缺陷是自带燃料用光后，潜艇就失去动力。U-1405是作为实战目的建造的瓦尔特潜艇，其吨位只有400吨左右。虽然是实战型号，但是她只参与了训练和实验。"]],
                             baiyanjuren: ["female", "RN", 3, ["junfu", "hangkongzhanshuguang"], ["des:百眼巨人号航母是世界上第一级全通甲板的航空母舰。在飞机运用到海战中之后，为了加强飞机的运用能力，英国人便改装了一些军舰以搭载飞机，经过经验的积累，英国人改装了百眼巨人号航母，使用了全通的飞行甲板。百眼巨人号没有赶上一战，在二战中主要执行训练任务。"]],
                             changchun: ["female", "PLAN", 3, ["daoqu", "rand", "sidajingang"], ["des:　苏联愤怒级驱逐舰17号舰，苏联建造的愤怒级借鉴了意大利的设计经验。前后背负式布置了4门130毫米舰炮。由于苏联对德国战争中，海战并不是主战场，因此果敢号主要执行护航任务。果敢号参加了二战并幸存下来，战后在1955年被出售给新中国海军，改名为长春号，90年退役后保存在山东乳山市。"]],
+
                             "u47": ["female", "KMS", 3, ["qianting", "u47_langben", "u47_xinbiao", "u47_huxi"], ["des:U-47号是德军的一艘王牌潜艇，属VIIB型。1939年10月她大胆穿越了斯卡帕湾的封锁线，潜入英国海军的基地内，当晚用鱼雷击沉了英国皇家橡树号战列舰。回到港口后U-47号受到了热烈的欢迎，并被授予了骑士十字勋章。在随后的战斗巡航中，U-47号总共击沉了16万吨的船只。1941年3月7日的第九次战斗巡航中U-47号失踪，至今没有其下落和定论。"]],
-                            "u81": ["female", "KMS", 3, ["qianting", "u81_conglie", "u81_xunyi"], ["des:U-U-81号潜艇最著名的战例发生在1941年的地中海。当时皇家方舟号航母从马耳他驶出后，遭到了U-81的雷击，尽管U-81只命中了皇家方舟号一枚鱼雷，但是处置不当导致这艘在追歼俾斯麦中立下功劳的航母最终沉没。此后的U-81在破交作战中击沉了不少商船。1944年1月，U-81遭到空袭沉没。"]],
+                            "u81": ["female", "KMS", 3, ["qianting", "u81_conglie", "u81_xunyi"], ["des:U-81号潜艇最著名的战例发生在1941年的地中海。当时皇家方舟号航母从马耳他驶出后，遭到了U-81的雷击，尽管U-81只命中了皇家方舟号一枚鱼雷，但是处置不当导致这艘在追歼俾斯麦中立下功劳的航母最终沉没。此后的U-81在破交作战中击沉了不少商船。1944年1月，U-81遭到空袭沉没。"]],
+                            "z1": ["female", "KMS", 3, ["huibi", "quzhudd", "Z", "z1_Zqulingjian"], ["des:1934型舰队驱逐舰首舰。德国突破条约之后开始建造大型驱逐舰，吨位比他国驱逐舰都略大一些，装备5门单装127毫米炮。由于高温锅炉的技术问题，她动力系统稳定性不高。Z1号（莱伯勒希特·马斯号）的服役生涯很短暂，1939年执行了布雷任务，在1940年破交战中遭到己方HE111轰炸机误击沉没。"]],
+                            "z16": ["female", "KMS", 3, ["huibi", "quzhudd", "Z", "z16_lianhuanbaopo", "z16_shuileibuzhi"], ["des:1934A型驱逐舰11号舰，1934A是1934的改良型，改进了适航性与动力系统设计。Z16号（弗里德里希·埃科尔特号）开战之后主要执行对英国的布雷任务。在巴伦支海海战中被英国轻巡洋舰谢菲尔德号击沉。"]],
+                            //"z18": ["female", "KMS", 3, ["huibi", "quzhudd", "z18_weisebaoxingdong", "z18_shuileibeizhan"], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
 
                             jifu: ["female", "ΒΜΦCCCP", 2, ["quzhudd", "jifu_weicheng", "jifu_yuanjing", "jifu_lingwei", "jifu_yuanqin", "jifu_yuanqin"], ["des:基辅是苏联海军大舰队计划中的一环，她的设计吸取了塔什干和列宁格勒等驱逐舰的技术，同时航速和火力也保持了非常强的水平。尽管基辅在战前已经开工，但还是因为战况的影响而停工。在战争末期，未完工的基辅被拖回船厂，并修改了设计准备继续建造，但由于相比战后的新驱逐舰设计优势不大，所以并没有最终建造完成。"]],
 
@@ -3208,7 +3221,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return Math.max(1, 5 - nh);
                                         },
                                     },
-
+        
                                     intro: {
                                         content: function () {
                                             return get.translation(skill + '_info');
@@ -5084,7 +5097,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
            
                 if(!numbers.includes(get.number(cards,'trick'))){
                     return 7.5 - get.value(card);
-        
+         
             }
             return false;*/
                                     return 7.5 - get.value(card);
@@ -5843,7 +5856,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             if (target.hp > 2 && target.countCards(h) > 2) return 0;
                                         };
                                         return 12 - get.value(card);
-                                    });;
+                                    });
                                     "step 1"
                                     if (result.bool) {
                                         trigger.player.addSkill("u47_xinbiao_hp");
@@ -5992,6 +6005,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             u81_xunyi: {
+
                                 trigger: {
                                     global: "gainAfter",
                                 },
@@ -6001,7 +6015,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (player.inRange(event.player)) {
                                         for (var i in game.players) {
                                             game.log(i);
-                                            if (event.getl(game.players[i]).cards2.length!=0) {
+                                            if (event.getl(game.players[i]).cards2.length != 0) {
                                                 game.log(event.getl(game.players[i]).cards2.length);
                                                 return event.getl(game.players[i]).cards2;
                                             }
@@ -6012,8 +6026,585 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     trigger.player.damage('thunder');
                                 },
                                 sub: true,
-                            }
+                            },
+                            Z: {
+                                marktext: "Z",
+                                //audio: "z1_Zqulingjian",
+                                intro: {
+                                    content: "expansion",
+                                    markcount: "expansion",
+                                },
+                                onremove(player, skill) {
+                                    var cards = player.getExpansions(skill);
+                                    if (cards.length) player.loseToDiscardpile(cards);
+                                },
+                            },
+                            z1_Zqulingjian: {
+                                global: 'Z_damage',
+                                direct: true,
+                                trigger: {
+                                    global: "damageEnd",
+                                },
+                                filter: function (event, player) {
+                                    if (!get.itemtype(event.cards) == 'cards') { return false; }
+                                    if (event.source && event.source.group == "KMS" && event.source.hasSkill("quzhudd")) {
+                                        game.log("造成伤害是德驱");
+                                        return true;
+                                    } else if (event.player.group == "KMS" && event.player.hasSkill("quzhudd")) {
+                                        game.log("受到伤害是德驱");
+                                        return true;
+                                    } else {
+                                        game.log("不满足发动条件");
+                                        return false;
+                                    }
+                                },
+                                content: function () {
+                                    "step 0"
+                                    player.addToExpansion(trigger.cards, 'gain2').gaintag.add('Z');
+                                },
+                                group: ["z1_Zqulingjian_source", "z1_Zqulingjian_damage", "z1_Zqulingjian_move"],
+                                subSkill: {
+                                    source: {
+                                        trigger: {
+                                            source: "damageBegin4",
+                                        },
+                                        filter: function (event, player) {
+                                            return event.hasNature("thunder") && player.getExpansions('Z').length;
+                                        },
+                                        content: function () {
+                                            'step 0'
+                                            var cards = player.getExpansions('Z'), count = cards.length;
+                                            if (count > 0) {
+                                                if (count == 1) event._result = { links: cards };
+                                                else player.chooseCardButton('Z驱领舰：移去一张“Z”令其受到的伤害+1', true, cards).set('ai', function (button) {
 
+                                                    return 1;
+                                                });
+                                            }
+                                            else event.finish();
+                                            'step 1'
+                                            var cards = result.links;
+                                            player.loseToDiscardpile(cards);
+                                            'step 2'
+                                            trigger.num += 1;
+                                        },
+                                    },
+                                    damage: {
+                                        trigger: {
+                                            global: "damageBegin3",
+                                        },
+                                        filter: function (event, player) {
+                                            return event.hasNature("thunder") && event.player != player;
+                                        },
+                                        content: function () {
+                                            'step 0'
+                                            var cards = player.getExpansions('Z'), count = cards.length;
+                                            if (count > 0) {
+                                                if (count == 1) event._result = { links: cards };
+                                                else player.chooseCardButton('Z驱领舰：移去一张“Z”令其受到的伤害-1', true, cards).set('ai', function (button) {
+
+                                                    return 1;
+                                                });
+                                            }
+                                            else event.finish();
+                                            'step 1'
+                                            var cards = result.links;
+                                            //game.log(result.links);
+                                            //game.log(JSON.stringify(result.links));
+                                            player.loseToDiscardpile(cards);
+                                            'step 2'
+                                            trigger.num -= 1;
+                                        },
+
+                                    },
+                                    move: {
+                                        trigger: {
+                                            player: "phaseZhunbeiBegin",
+                                        },
+                                        content: function* (event, map) {
+                                            "step 0"
+                                            var player = map.player;
+                                            var result = yield player.chooseTarget('Z驱领舰：请选择移动一张Z', true, 2, (card, player, target) => {
+                                                if (ui.selected.targets.length) {
+                                                    return true;
+                                                }
+                                                return true;
+                                            }).set('targetprompt', ['移走Z', '获得Z']).set('multitarget', true).set('ai', target => {
+                                                var aiTargets = get.event('aiTargets');
+                                                if (aiTargets) {
+                                                    return aiTargets[ui.selected.targets.length] == target ? 10 : 0;
+                                                }
+                                                return 0;
+                                            }).set('aiTargets', (() => {
+                                                var targets = [], eff = 0;
+                                                for (var user of game.filterPlayer()) {
+                                                    for (var target of game.filterPlayer()) {
+                                                        if (user == target) continue;
+                                                        var targetsx = [user, target];
+                                                        if (user == player) effx += 1;
+                                                        if (user.getExpansions('Z').length < 2) effx -= 1;
+                                                        if (get.attitude(player, target) > 0) effx += 5;
+                                                        if (target.getExpansions('Z').length < 1) effx += 1;
+                                                        if (effx > eff) {
+                                                            eff = effx;
+                                                            targets = targetsx;
+                                                        }
+                                                    }
+                                                }
+                                                if (targets.length) return targets;
+                                                return null;
+                                            }));
+                                            "step 1"
+                                            if (result.bool) {
+                                                //game.log(result.targets);
+                                                if (result.targets[0].getExpansions('Z').length == 0) {
+                                                    game.log("event.finish");
+                                                    event.goto(3);//似乎没有正常运行
+                                                }
+                                                //game.log(result.targets[1]);
+                                                /*----下列部分用于检查并给予result.target[1]技能Z----*/
+                                                //game.log("result.targets[1].hasSkill?"+player.hasSkill("Z",null,false,false));
+                                                //if (!result.targets[1].hasSkill("Z")) {result.targets[1].addSkills("Z");}
+                                                //game.log("result.targets[1].hasSkill?"+result.targets[1].hasSkill("Z"));
+                                                /*--------*/
+                                                var cards = result.targets[0].getExpansions('Z');
+
+                                                var result1 = yield player.chooseCardButton('Z驱领舰：选择一张“Z”移动', true, cards).set('ai', function (button) {
+                                                    return 1;
+                                                });
+                                            }
+                                            "step 2"
+                                            //game.log(result1.links);
+                                            //game.log(result.targets[0]);
+                                            var cards = result1.links;
+                                            result.targets[0].loseToDiscardpile(cards);
+                                            result.targets[1].addToExpansion(cards, 'gain2').gaintag.add('Z');
+                                            "step 3"
+
+                                            event.finish();
+                                        },
+                                    },
+
+                                },
+                            },
+                            Z_damage: {
+                                trigger: {
+                                    player: "damageBegin4",
+                                },
+                                //discard: false,
+                                //lose: false,
+                                //delay: false,
+                                prompt: function () {
+                                    return "移去所有Z，然后防止此伤害";
+                                },
+                                filter: function (event, player) {
+                                    //game.log("检测是否拥有Z标记");
+                                    return player.getExpansions('Z').length;
+                                },
+                                visible: true,
+                                check: function (event, player) {
+                                    return event.number > 1 || player.hp <= 1;
+                                },
+                                content: function () {
+                                    "step 0"
+                                    var cards = player.getExpansions('Z');
+                                    for (var i = 0; i < cards.length; i++) {
+                                        player.loseToDiscardpile(cards[i]);
+                                    }
+                                    trigger.cancel();
+                                },
+                            },
+                            Z_gain: {//准备阶段获得一张Z，Z驱测试用。
+                                direct: true,
+                                trigger: {
+                                    player: "phaseZhunbeiBegin",
+                                },
+                                filter: function (event, player) {
+                                    return true;
+                                },
+                                content: function () {
+                                    "step 0"
+                                    var cards = get.cards();
+                                    player.addToExpansion(cards[0], 'gain2').gaintag.add('Z');
+                                },
+                            },
+                            z16_lianhuanbaopo: {
+                                enable: "chooseToUse",
+                                filterCard(card) {
+                                    return get.color(card) == 'black' && (get.name(card) == "sheji9" || get.name(card) == "sha");
+                                },
+                                position: "h",
+                                viewAs: {
+                                    name: "sha",
+                                    nature: "thunder",
+                                },
+                                viewAsFilter(player) {
+                                    if (!player.countCards('hes', { color: 'black' })) return false;
+                                },
+                                prompt: "将一张黑色杀当雷杀使用",
+                                check(card) { return 4 - get.value(card) },
+                                ai: {
+                                    yingbian: function (card, player, targets, viewer) {
+                                        if (get.attitude(viewer, player) <= 0) return 0;
+                                        var base = 0, hit = false;
+                                        if (get.cardtag(card, 'yingbian_hit')) {
+                                            hit = true;
+                                            if (targets.some(target => {
+                                                return target.mayHaveShan(viewer, 'use', target.getCards('h', i => {
+                                                    return i.hasGaintag('sha_notshan');
+                                                })) && get.attitude(viewer, target) < 0 && get.damageEffect(target, player, viewer, get.natureList(card)) > 0;
+                                            })) base += 5;
+                                        }
+                                        if (get.cardtag(card, 'yingbian_add')) {
+                                            if (game.hasPlayer(function (current) {
+                                                return !targets.includes(current) && lib.filter.targetEnabled2(card, player, current) && get.effect(current, card, player, player) > 0;
+                                            })) base += 5;
+                                        }
+                                        if (get.cardtag(card, 'yingbian_damage')) {
+                                            if (targets.some(target => {
+                                                return get.attitude(player, target) < 0 && (hit || !target.mayHaveShan(viewer, 'use', target.getCards('h', i => {
+                                                    return i.hasGaintag('sha_notshan');
+                                                })) || player.hasSkillTag('directHit_ai', true, {
+                                                    target: target,
+                                                    card: card,
+                                                }, true)) && !target.hasSkillTag('filterDamage', null, {
+                                                    player: player,
+                                                    card: card,
+                                                    jiu: true,
+                                                })
+                                            })) base += 5;
+                                        }
+                                        return base;
+                                    },
+                                    canLink: function (player, target, card) {
+                                        if (!target.isLinked() && !player.hasSkill('wutiesuolian_skill')) return false;
+                                        if (player.hasSkill('jueqing') || player.hasSkill('gangzhi') || target.hasSkill('gangzhi')) return false;
+                                        return true;
+                                    },
+                                    basic: {
+                                        useful: [5, 3, 1],
+                                        value: [5, 3, 1],
+                                    },
+                                    order: function (item, player) {
+                                        if (player.hasSkillTag('presha', true, null, true)) return 10;
+                                        if (typeof item === 'object' && game.hasNature(item, 'linked')) {
+                                            if (game.hasPlayer(function (current) {
+                                                return current != player && lib.card.sha.ai.canLink(player, current, item) && player.canUse(item, current, null, true) && get.effect(current, item, player, player) > 0;
+                                            }) && game.countPlayer(function (current) {
+                                                return current.isLinked() && get.damageEffect(current, player, player, get.nature(item)) > 0;
+                                            }) > 1) return 3.1;
+                                            return 3;
+                                        }
+                                        return 3.05;
+                                    },
+                                    result: {
+                                        target: function (player, target, card, isLink) {
+                                            let eff = -1.5, odds = 1.35, num = 1;
+                                            if (isLink) {
+                                                let cache = _status.event.getTempCache('sha_result', 'eff');
+                                                if (typeof cache !== 'object' || cache.card !== get.translation(card)) return eff;
+                                                if (cache.odds < 1.35 && cache.bool) return 1.35 * cache.eff;
+                                                return cache.odds * cache.eff;
+                                            }
+                                            if (player.hasSkill('jiu') || player.hasSkillTag('damageBonus', true, {
+                                                target: target,
+                                                card: card
+                                            })) {
+                                                if (target.hasSkillTag('filterDamage', null, {
+                                                    player: player,
+                                                    card: card,
+                                                    jiu: true,
+                                                })) eff = -0.5;
+                                                else {
+                                                    num = 2;
+                                                    if (get.attitude(player, target) > 0) eff = -7;
+                                                    else eff = -4;
+                                                }
+                                            }
+                                            if (!player.hasSkillTag('directHit_ai', true, {
+                                                target: target,
+                                                card: card,
+                                            }, true)) odds -= 0.7 * target.mayHaveShan(player, 'use', target.getCards('h', i => {
+                                                return i.hasGaintag('sha_notshan');
+                                            }), 'odds');
+                                            _status.event.putTempCache('sha_result', 'eff', {
+                                                bool: target.hp > num && get.attitude(player, target) > 0,
+                                                card: get.translation(card),
+                                                eff: eff,
+                                                odds: odds
+                                            });
+                                            return odds * eff;
+                                        },
+                                    },
+                                    tag: {
+                                        respond: 1,
+                                        respondShan: 1,
+                                        damage: function (card) {
+                                            if (game.hasNature(card, 'poison')) return;
+                                            return 1;
+                                        },
+                                        natureDamage: function (card) {
+                                            if (game.hasNature(card, 'linked')) return 1;
+                                        },
+                                        fireDamage: function (card, nature) {
+                                            if (game.hasNature(card, 'fire')) return 1;
+                                        },
+                                        thunderDamage: function (card, nature) {
+                                            if (game.hasNature(card, 'thunder')) return 1;
+                                        },
+                                        poisonDamage: function (card, nature) {
+                                            if (game.hasNature(card, 'poison')) return 1;
+                                        },
+                                    },
+                                },
+                                group: ["z16_lianhuanbaopo_sha", "z16_lianhuanbaopo_leisha"],
+                                subSkill: {
+                                    sha: {
+                                        enable: ["chooseToRespond", "chooseToUse"],
+                                        filterCard(card, player) {
+                                            return get.color(card) == 'black';
+                                        },
+                                        position: "hes",
+                                        viewAs: {
+                                            name: "sha",
+                                        },
+                                        viewAsFilter(player) {
+                                            if (!player.countCards('hes', { color: 'black' })) return false;
+                                        },
+                                        prompt: "将一张黑色牌当杀使用或打出",
+                                        check(card) {
+                                            const val = get.value(card);
+                                            if (_status.event.name == 'chooseToRespond') return 1 / Math.max(0.1, val);
+                                            return 5 - val;
+                                        },
+                                        ai: {
+                                            skillTagFilter(player) {
+
+                                                if (!player.countCards('hes', { color: 'black' })) return false;
+
+                                            },
+                                            respondSha: true,
+                                            yingbian: function (card, player, targets, viewer) {
+                                                if (get.attitude(viewer, player) <= 0) return 0;
+                                                var base = 0, hit = false;
+                                                if (get.cardtag(card, 'yingbian_hit')) {
+                                                    hit = true;
+                                                    if (targets.some(target => {
+                                                        return target.mayHaveShan(viewer, 'use', target.getCards('h', i => {
+                                                            return i.hasGaintag('sha_notshan');
+                                                        })) && get.attitude(viewer, target) < 0 && get.damageEffect(target, player, viewer, get.natureList(card)) > 0;
+                                                    })) base += 5;
+                                                }
+                                                if (get.cardtag(card, 'yingbian_add')) {
+                                                    if (game.hasPlayer(function (current) {
+                                                        return !targets.includes(current) && lib.filter.targetEnabled2(card, player, current) && get.effect(current, card, player, player) > 0;
+                                                    })) base += 5;
+                                                }
+                                                if (get.cardtag(card, 'yingbian_damage')) {
+                                                    if (targets.some(target => {
+                                                        return get.attitude(player, target) < 0 && (hit || !target.mayHaveShan(viewer, 'use', target.getCards('h', i => {
+                                                            return i.hasGaintag('sha_notshan');
+                                                        })) || player.hasSkillTag('directHit_ai', true, {
+                                                            target: target,
+                                                            card: card,
+                                                        }, true)) && !target.hasSkillTag('filterDamage', null, {
+                                                            player: player,
+                                                            card: card,
+                                                            jiu: true,
+                                                        })
+                                                    })) base += 5;
+                                                }
+                                                return base;
+                                            },
+                                            canLink: function (player, target, card) {
+                                                if (!target.isLinked() && !player.hasSkill('wutiesuolian_skill')) return false;
+                                                if (player.hasSkill('jueqing') || player.hasSkill('gangzhi') || target.hasSkill('gangzhi')) return false;
+                                                return true;
+                                            },
+                                            basic: {
+                                                useful: [5, 3, 1],
+                                                value: [5, 3, 1],
+                                            },
+                                            order: function (item, player) {
+                                                if (player.hasSkillTag('presha', true, null, true)) return 10;
+                                                if (typeof item === 'object' && game.hasNature(item, 'linked')) {
+                                                    if (game.hasPlayer(function (current) {
+                                                        return current != player && lib.card.sha.ai.canLink(player, current, item) && player.canUse(item, current, null, true) && get.effect(current, item, player, player) > 0;
+                                                    }) && game.countPlayer(function (current) {
+                                                        return current.isLinked() && get.damageEffect(current, player, player, get.nature(item)) > 0;
+                                                    }) > 1) return 3.1;
+                                                    return 3;
+                                                }
+                                                return 3.05;
+                                            },
+                                            result: {
+                                                target: function (player, target, card, isLink) {
+                                                    let eff = -1.5, odds = 1.35, num = 1;
+                                                    if (isLink) {
+                                                        let cache = _status.event.getTempCache('sha_result', 'eff');
+                                                        if (typeof cache !== 'object' || cache.card !== get.translation(card)) return eff;
+                                                        if (cache.odds < 1.35 && cache.bool) return 1.35 * cache.eff;
+                                                        return cache.odds * cache.eff;
+                                                    }
+                                                    if (player.hasSkill('jiu') || player.hasSkillTag('damageBonus', true, {
+                                                        target: target,
+                                                        card: card
+                                                    })) {
+                                                        if (target.hasSkillTag('filterDamage', null, {
+                                                            player: player,
+                                                            card: card,
+                                                            jiu: true,
+                                                        })) eff = -0.5;
+                                                        else {
+                                                            num = 2;
+                                                            if (get.attitude(player, target) > 0) eff = -7;
+                                                            else eff = -4;
+                                                        }
+                                                    }
+                                                    if (!player.hasSkillTag('directHit_ai', true, {
+                                                        target: target,
+                                                        card: card,
+                                                    }, true)) odds -= 0.7 * target.mayHaveShan(player, 'use', target.getCards('h', i => {
+                                                        return i.hasGaintag('sha_notshan');
+                                                    }), 'odds');
+                                                    _status.event.putTempCache('sha_result', 'eff', {
+                                                        bool: target.hp > num && get.attitude(player, target) > 0,
+                                                        card: get.translation(card),
+                                                        eff: eff,
+                                                        odds: odds
+                                                    });
+                                                    return odds * eff;
+                                                },
+                                            },
+                                            tag: {
+                                                respond: 1,
+                                                respondShan: 1,
+                                                damage: function (card) {
+                                                    if (game.hasNature(card, 'poison')) return;
+                                                    return 1;
+                                                },
+                                                natureDamage: function (card) {
+                                                    if (game.hasNature(card, 'linked')) return 1;
+                                                },
+                                                fireDamage: function (card, nature) {
+                                                    if (game.hasNature(card, 'fire')) return 1;
+                                                },
+                                                thunderDamage: function (card, nature) {
+                                                    if (game.hasNature(card, 'thunder')) return 1;
+                                                },
+                                                poisonDamage: function (card, nature) {
+                                                    if (game.hasNature(card, 'poison')) return 1;
+                                                },
+                                            },
+                                        },
+                                    },
+                                    leisha: {
+                                        mod: {
+                                            cardUsable: function (card) {
+                                                if (card.name == 'sha' && card.nature == "thunder") return Infinity;
+                                            },
+                                            targetInRange: function (card, player, target) {
+                                                if (card.name == 'sha' && card.nature == "thunder") return true;
+                                            },
+                                        },
+                                        sub: true,
+                                        trigger: {
+                                            player: "useCardToPlayered",
+                                        },
+                                        filter: function (event) {
+                                            return event.card.name == 'sha' && event.card.name == "thunder";
+                                        },
+                                        forced: true,
+                                        logTarget: "target",
+                                        content: function () {
+                                            trigger.target.addTempSkill('qinggang2');
+                                            trigger.target.storage.qinggang2.add(trigger.card);
+                                            trigger.target.markSkill('qinggang2');
+                                        },
+                                    },
+                                },
+                            },
+                            z16_shuileibuzhi: {
+                                global: "Z_judge",
+                                direct: true,
+                                trigger: {
+                                    source: "damageSource",
+                                },
+                                filter: function (event, player) {
+                                    return true;
+                                },
+                                content: function () {
+                                    "step 0"
+                                    var cards = get.cards();
+                                    player.addToExpansion(cards[0], 'gain2').gaintag.add('Z');
+                                    game.log("结束标志");
+                                },
+                                group: ["z16_shuileibuzhi_bingliang"],
+                                subSkill: {
+                                    bingliang: {
+                                        enable: "phaseUse",
+                                        filter: function (event, player) {
+                                            return player.getExpansions('Z').length;
+                                        },
+                                        direct: true,
+                                        content: function () {
+                                            'step 0'
+                                            var cards = player.getExpansions('Z'), count = cards.length;
+                                            if (count > 0) {
+                                                 player.chooseCardButton('水雷布置：将一张Z当作兵粮寸断使用', true, cards).set('ai', function (button) {
+                                                    return 1;
+                                                });
+                                            }
+                                            else event.finish();
+                                            'step 1'
+                                            event.cards = result.links;
+                                            player.chooseTarget('选择兵粮寸断的目标',true,function(card,player,target){
+                                                return target!=player;
+                                            }).set('ai',function(target){
+                                                return -get.attitude(player,target);
+                                            });
+                                            'step 2'
+                                            if (result.bool) {
+                                                player.loseToDiscardpile(event.cards);
+                                                player.useCard({ name: 'bingliang' }, event.cards, result.targets);
+                                            }
+                                        },
+                                        ai: {
+                                            threaten: 1.5,
+                                        },
+                                        "_priority": 0,
+                                    }
+                                }
+                            },
+                            Z_judge: {
+                                trigger:{
+                                    player:"phaseZhunbeiBegin",
+                                },
+                                prompt: function () {
+                                    return "移去一张Z，然后移去判定区内所有花色与之相同的牌";
+                                },
+                                filter: function (event, player) {
+                                    return player.countCards('j')&&player.getExpansions('Z').length;
+                                },
+                                content: function () {
+                                    'step 0'
+                                    var cards = player.getExpansions('Z'), count = cards.length;
+                                    if (count > 0) {
+                                         player.chooseCardButton('移去一张Z，然后移去判定区内所有花色与之相同的牌', true, cards).set('ai', function (button) {
+                                            return player.countCards('j',function(card){
+                                                return get.suit(card,player)==get.suit(button.link);
+                                            });
+                                        });
+                                    }
+                                    else event.finish();
+                                    'step 1'
+                                    player.loseToDiscardpile(result.links); 
+                                    var cards=player.getCards('j',function(card){
+                                        return get.suit(card,player)==get.suit(result.links);
+                                    });
+                                    player.loseToDiscardpile(cards);
+                                },
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -6048,6 +6639,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jifu: "基辅",
                             "u47": "u47",
                             "u81": "u81",
+                            "z1": "z1",
+                            "z16": "z16",
+                            //"z18": "z18",
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐舰", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -6056,7 +6650,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             daoqu: "导驱", "daoqu_info": "你的攻击范围增加2+X(x为技能强化次数)",
                             hangmucv: "航母", "hangmucv_info": "(可强化)你的出牌阶段开始时，<br>你可以弃置2张：零级强化，黑桃或梅花手牌；一级强化，黑桃或梅花或红桃手牌；二级强化，任意手牌。视为对你选择的任意个目标使用万箭齐发",
                             qianting_xiji: "袭击", "qianting_xiji_info": "每回合限两次，将♦/♥牌当做顺手牵羊，♣/♠牌当做兵粮寸断使用<br>你使用的锦囊牌可以对距离你2以内的角色使用。",
-                            qianting: "潜艇", "qianting_info": "（可强化）一轮游戏开始时，你可以弃置一张红桃/红桃或黑桃/红桃或黑桃或方片牌，对一个目标使用一张雷杀。没有手牌会结束此技能。",
+                            qianting: "潜艇", "qianting_info": "（可强化）准备阶段，你可以弃置一张红桃/红桃或黑桃/红桃或黑桃或方片牌，视为对一个目标使用一张雷杀。",
                             qianting_jiezi: "截辎", "qianting_jiezi_info": "其他角色跳过阶段时，你摸一张牌",
                             "_yuanhang": "远航", "_yuanhang_info": "受伤时手牌上限+1<br>当你失去手牌后，且手牌数<手牌上限值时，你摸一张牌。使用次数上限0/1/2次，处于自己的回合时+1，每回合回复一次使用次数。<br>当你进入濒死状态时，你摸一张牌，体力上限大于二时需减少一点体力上限，额外摸一张牌；死亡后，你可以按自己的身份，令一名角色摸-/2/1/1（主/忠/反/内）张牌。",
                             kaishimopao: "开始摸牌", "kaishimopao_info": "<br>，判定阶段你可以减少一次摸牌阶段的摸牌，然后在回合结束时摸一张牌。",
@@ -6114,7 +6708,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             rand: "随机数", "rand_info": "遇事不决？扔一个骰子吧。该技能可以生成1~6的随机数",
                             duikongfangyu: "对空防御", "duikongfangyu_info": "你在回合外发动[防空]后，你摸2张牌",
                             zhudaojiandui: "柱岛舰队", "zhudaojiandui_info": "锁定技，每当你使用或打出一张非虚拟非转化的基本牌，你获得一个[柱]标记。你可以移去三个柱标记视为使用一张不计入次数限制的杀。",
-                            sawohaizhan: "萨沃海战", "sawohaizhan_info": "出牌阶段各限一次。你可以将一张红牌当做",
+                            sawohaizhan: "萨沃海战", "sawohaizhan_info": "出牌阶段各限一次。你可以将一张红牌当做当作洞烛先机使用,你可以将一张黑牌当作雷杀使用。",
                             sawohaizhan_1: "雷杀", "sawohaizhan_1_info": "你可以将一张黑牌当作雷杀使用。",
                             sawohaizhan_2: "洞烛先机", "sawohaizhan_2_info": "你可以将一张红牌当作洞烛先机使用（洞烛先机：观星2，然后摸两张牌）。",
                             qingyeqingyeqing: "青叶青叶青", "qingyeqingyeqing_info": "当你成为牌的唯一目标时，你可以指定一名其他角色，其可以选择弃置一张非基本牌令此牌对你无效。",
@@ -6163,7 +6757,22 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             u47_huxi: "虎袭", u47_huxi_info: "你使用伤害类牌后若未造成伤害，你可以将一名被记录的角色的体力值和手牌数调整为记录值，然后摸一张牌并移除记录，",
                             u81_conglie_shanghai: "从猎", u81_conglie_shanghai_info: "",
                             u81_conglie: "从猎", u81_conglie_info: "你对其他角色造成伤害时，其可以交给你一张手牌，防止此伤害，然后其受到的下次伤害+1。",
-                            u81_xunyi: "巡弋", u81_xunyi_info: "锁定技，你攻击范围内的角色在回合外获得牌时，你对其造成一点雷电伤害。",
+                            u81_xunyi: "巡弋", u81_xunyi_info: "锁定技，你攻击范围内的角色在从其他角色处获得牌时，你对其造成一点雷电伤害。",
+                            z1_Zqulingjian: "Z驱领舰", z1_Zqulingjian_info: "当G国驱逐舰受到/造成伤害后，你可以将造成伤害的牌置于武将牌上称为“Z”。有其他角色受到雷属性伤害时，你可以弃置一张“Z”，令此伤害-1；当你造成雷属性伤害时，你可以弃置一张“Z”，令此伤害+1。准备阶段，你可以移动一张“Z”。(全局)有Z的角色受到伤害时，可以移去所有Z，防止此伤害。",
+                            z1_Zqulingjian_source: "Z驱领舰_加伤", z1_Zqulingjian_source_info: "当你造成雷属性伤害时，你可以弃置一张“Z”，令此伤害+1。",
+                            z1_Zqulingjian_damage: "Z驱领舰_减伤", z1_Zqulingjian_damage_info: "有其他角色受到雷属性伤害时，你可以弃置一张“Z”，令此伤害-1。",
+                            z1_Zqulingjian_move: "Z驱领舰_移动Z", z1_Zqulingjian_move_info: "准备阶段，你可以移动一张“Z”。",
+
+                            z16_lianhuanbaopo: "连环爆破", z16_lianhuanbaopo_info: "你的黑色【杀】可以当做【雷杀】使用，你的其他黑色牌可以当做【杀】使用或打出，你使用【雷杀】时无距离次数限制防具。",
+                            z16_lianhuanbaopo_sha: "黑牌当杀", z16_lianhuanbaopo_sha_info: "你的黑色牌可以当做【杀】使用或打出",
+                            z16_shuileibuzhi: "水雷布置", z16_shuileibuzhi_info: "当你造成伤害时，你可以将牌堆顶的一张牌置于武将牌上，称为Z。出牌阶段，你可以将一张Z当作兵粮寸断使用。(全局)有Z的角色准备阶段，可以弃置一张Z并弃置判定区内所有与此牌花色相同的牌。",
+                            z16_shuileibuzhi_bingliang: "兵粮寸断", z16_shuileibuzhi_bingliang_info: "出牌阶段，你可以将一张Z当作兵粮寸断使用。",
+
+                            //z18_weisebaoxingdong: "威瑟堡行动", z18_weisebaoxingdong_info: "你的回合结束时，你可以将至多两张伤害类牌正面向上分别交给任意角色，令其在使用该牌之前不能打出或使用其他基本牌。",
+                            //z18_shuileibeizhan: "水雷备战", z18_shuileibeizhan_info: "准备阶段，你可以选择一项：1.跳过判定阶段和出牌阶段；2.跳过摸牌阶段和弃牌阶段。然后展示牌堆顶上X张牌并获得其中的伤害类牌。X为场上势力数的两倍且最少为4。",
+
+
+
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
