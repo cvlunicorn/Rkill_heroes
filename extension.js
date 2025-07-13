@@ -439,43 +439,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 default: return 0;
                             }
                         }).set('selectButton', [0, xuanze]);
-                        /*
-                        var next = player.chooseButton([
-                            '将手牌转化为强化点数强化以下能力；取消将返还卡牌，<br>未使用完的点数将保留，上限默认为1，发动建造技能后提高。',
-                            [choiceList, 'textbutton'],
-                        ]);
-                        game.log("强化经过了这里2");
-                        var xuanze = cao.length;//xuanze+=(player.countMark('Expup'));if(event.cao.length&&get.type(event.cao[0],'equip')=='equip'){xuanze+=(1)};if(event.cao.length>1&&get.type(event.cao[1],'equip')=='equip'){xuanze+=(1)};//装备不再记为两张牌
-                        next.set('selectButton',  button=> { return [0, Math.max(Math.floor(xuanze / 2), 0)] });//else {next.set('selectButton',[0,Math.max(xuanze,0)])}; //可以选择多个按钮，可计算可加变量。get.select(event.selectButton)为其调取结果。
-                        next.set('filterButton', button=> {
-                            var event = _status.event; 
-                            if (ui.selected.buttons) {//for(var i=0;i<event.cao.length;i+=(1)){};测试失败的函数组合game.log(ui.selected.buttons,get.selectableButtons().contains(ui.selected.buttons),get.selectableButtons());游戏无名杀Button的限制，这个代码并没有起到实时计算的作用。
-                               return true; //return xuanze >= player.countMark(ui.selected.buttons[0]) * 0.5 + 1;
-                            }
-                            game.log("ui.selected.buttons=false");
-                            return true;
-                        });
-                        next.set('prompt', get.prompt('_qianghuazhuang'), '令其中一项+1,好吧不显示这个info');
-                        next.set('ai', function (button) {
-                            var haode = [jieshao[0], jieshao[1]]; var yingji = []; var tunpai = [jieshao[5]];//其实一个例子就行，不如直接if(){return 2;};
-                            if (game.hasPlayer(function (current) { return current.inRange(player) && get.attitude(player, current) < 0; }) < 1) { yingji.push(jieshao[2]) } else if (player.countCards('h', { name: 'sha' }) > 1) { yingji.push(jieshao[3]) };
-                            if (game.hasPlayer(function (current) { return player.inRange(current) && get.attitude(player, current) < 0; }) > 0) yingji.push(jieshao[4]);
-                            switch (ui.selected.buttons.length) {
-                                case 0:
-                                    if (haode.contains(button.link)) return 3;
-                                    if (yingji.contains(button.link)) return 2;
-                                    if (tunpai.contains(button.link)) return 1;
-                                    return Math.random();
-                                case 1:
-                                    if (haode.contains(button.link)) return 3;
-                                    if (yingji.contains(button.link)) return 2;
-                                    if (tunpai.contains(button.link)) return 1;
-                                    return Math.random();
-                                case 2:
-                                    return Math.random();
-                                default: return 0;
-                            }
-                        });*/
                         'step 1'
                         game.log(result.links, result.bool)//只能返还这两个，所以更适合技能，更需要循环的方式进行计算。
                         if (!result.bool) { game.log(event.cao); player.gain(event.cao, player); player.removeMark('Expup1', player.countMark('Expup1')); event.finish(); };//返还牌再计算
@@ -819,7 +782,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jianrjinji: {
                                 jianrbiaozhun: ["liekexingdun", "qixichicheng", "wufenzhongchicheng", "dumuchenglinqiye", "bisimai", "misuli", "weineituo", "lisailiu", "1913", "changmen", "kunxi", "ougengqi", "qingye", "beianpudun", "jiujinshan", "jiujinshan", "yixian", "tianlangxing", "dadianrendian", "yatelanda", "z31", "xuefeng", "kangfusi", "47project", "guzhuyizhichuixue", "shuileizhanduichuixue", "minsike", "yinghuochong", "u1405", "baiyanjuren", "changchun"],
                                 lishizhanyi_naerweike: ["z17", "z18", "z21", "z22"],
-                                lishizhanyi_matapanjiao: [],
+                                lishizhanyi_matapanjiao: ["kewei",],
                                 lishizhanyi_danmaihaixia: ["z1", "z16"],
                                 lishizhanyi_shanhuhai: [],
                                 lishizhanyi_haixiafujizhan: ["u47", "u81"],
@@ -868,6 +831,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "z17": ["female", "KMS", 3, ["huibi", "quzhudd", "z17_naerweikejingjie"], ["des:　德国1936型驱逐舰总体上加大了吨位，改善了舰艏设计以提高适航性。Z17（迪特尔·冯·勒德尔）号驱逐舰在纳尔维克海战中击伤了哥萨克人号，最终被英军击沉。"]],
                             "z21": ["female", "KMS", 3, ["huibi", "quzhudd", "z21_tuxi"], ["des:1936型驱逐舰5号舰，1936年型是是1934型的放大改良型，表现出了不俗的性能，可以与英国部族级对攻而不落下风。Z21号（威廉·海德坎姆号）于1939年服役，1940年参与了攻击北欧行动，并占领了纳尔维克，之后英军驱逐舰突袭了港内的德国驱逐舰，旗舰Z21号遭到英军厌战号战列舰的炮击沉没。"]],
                             "z22": ["female", "KMS", 3, ["huibi", "quzhudd", "z22_tuxixiawan"], ["des:1936型驱逐舰6号舰。1940年6艘1936型驱逐舰都参加了攻击北欧行动，在纳尔维克海战中，Z22号（安东·施米特号）被英国海军击沉，而这次海战中，参战的6艘1936型全部被击沉。"]],
+                            kewei: ["female", "RN", 4, ["hangmucv", "matapanjiaozhijian", "zhongbangtuxi"], ["des:      装甲航母可畏号在地中海战场有着出色的表现，在马塔潘角海战中，可畏出色的航空掩护有力支援了英国舰队的作战，她的鱼雷机击伤了维内托和意大利巡洋舰，直接助攻了厌战等主力舰的战绩。尽管在克里特战役期间可畏号遭到轰炸，但由于防护出色，可畏号并未战沉。在战争末期的太平洋战场，受到神风攻击的可畏号受损程度也明显小于美式航母，证明了自身设计的价值。可畏号在战争胜利后，于47年退役。"]],
 
                             jifu: ["female", "ΒΜΦCCCP", 2, ["quzhudd", "huibi", "jifu_weicheng", "jifu_yuanjing", "jifu_lingwei", "jifu_yuanqin", "jifu_yuanqin"], ["des:基辅是苏联海军大舰队计划中的一环，她的设计吸取了塔什干和列宁格勒等驱逐舰的技术，同时航速和火力也保持了非常强的水平。尽管基辅在战前已经开工，但还是因为战况的影响而停工。在战争末期，未完工的基辅被拖回船厂，并修改了设计准备继续建造，但由于相比战后的新驱逐舰设计优势不大，所以并没有最终建造完成。"]],
 
@@ -1784,44 +1748,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
-
-
-                            /*hangmucv:{
-                            group:["hangmucv_roundonefire"],
-                            subSkill:{
-                            roundonefire:{
-                                audio:"ext:1牌将修改:2",trigger:{player:"phaseUseBegin",},forced:true,lastDo:true,
-                                filter:function(event,player){//意外发现function应用广泛，然而解决不了自动显示隐藏标记。航母开幕，然后根据舰种判断具体出什么杀game.log();不必考虑队友状态的全体攻击，但用完后容易去世
-                    return player.countCards('h')>0;},
-                                content:function(){
-                        'step 0'
-                event.targets=player.getEnemies();
-                //game.playAudio('..','extension','舰R牌将/audio',player.name);
-                //<br>'+player.countMark('jinengup')+'级技能<br>'+num+'：'+d+'的收益，<br>if(player.hasSkill('hangmucv')||player.countCards('e','hangkongzhan')) {
-                   d=game.countPlayer(function(current){return current!=player&&event.targets.contains(current)&&!current.hasSkill('bagua_skill')&&!current.hasSkill('re_bagua_skill')&&!current.hasSkill('tengjia1');});event.tishi='';
-                     if(player.countMark('jinengup')>=1){event.tishi='你的出牌阶段开始时，<br>你可以弃置2张牌，视为对接下来的两位对手使用万箭齐发，<br>';var num=[2,2];}
-                        else if(player.countMark('jinengup')>=1){var num=[1,3];event.tishi+=('弃置1至3张牌，对之后等量的非友方武将使用万箭齐发');}
-                        else if(player.countMark('jinengup')>=2){var num=[1,4];event.tishi+=('弃置4张牌，对下一位对手连续使用三张万箭齐发');}
-                    if(player.countCards('h')>=1){
-                        {player.chooseToDiscard(num).set('prompt2',event.tishi).set('ai',function(card){
-                            if(ui.selected.cards.length>2) return -1;if(card.name=='tao') return -10;
-                            if(card.name=='jiu'&&_status.event.player.hp==1) return -10;return 11-get.value(card);        
-                            }
-                            );
-                        };
-                        if(num<1){player.chooseControl('<span class=yellowtext>友军远射攻击'+'</span>','cancel2').set('prompt',get.prompt('hangmucv')).set('prompt2',event.tishi).set('ai',function(event,player){return 0;});};};
-                        "step 1"//game.log(result.cards);  
-                      if(result.bool||result.control){event.targets=[];event.current=player.next;
-                      for(var i=0;i<game.countPlayer()-1;i++){game.log(event.targets);if(player.getEnemies().contains(event.current)&&result.cards.length>event.targets.length){event.targets.push(event.current)};event.current=event.current.next;};
-                          if(!event.targets==''&&result.cards.length<4){player.chooseUseTarget({name:'wanjian'},event.targets);}else if(!event.targets==''&&result.cards.length<4){player.chooseUseTarget({name:'wanjian'},event.targets[0]);player.chooseUseTarget({name:'wanjian'},event.targets[0]);player.chooseUseTarget({name:'wanjian'},event.targets[0]);
-                          };
-                          }else event.finish();
-                //var e1=player.countCards('e','hangkongzhan'),xiaohao=Math.floor(Math.min(2,event.targets.length/2+0.5));player.gain(result.cards,player,'giveAuto');
-                //if(player.countCards('h')>=1&&(player.hasSkill('hangmucv')||e1>0)){if(player.countCards('h')>=0&&xiaohao>=2){player.discard(player.getCards('h').randomGet());};player.update();player.discard(player.getCards('h').randomGet());player.useCard({name:'jinjuzy',nature:'thunder'},event.targets)};                  //wanjian,jinjuzy                                       content:function(){          
-                },},},
-                                intro:{content:function(){return get.translation(skill+'_info');},
-                                },  },*/
-
                             zhanliebb: {
                                 intro: {
                                     content: function () {
@@ -4504,7 +4430,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     };
                                     //game.log(choiceList);
                                     event.first = true;    //存了6个变量，可以导出为button，与textbutton样式，看需求
-                                    var xuanze = Math.max(h+1,1);
+                                    var xuanze = Math.max(h + 1, 1);
                                     game.log("xuanze" + xuanze);
                                     player.chooseButton([
                                         '将手牌转化为强化点数强化以下能力；取消将返还卡牌，<br>未使用完的点数将保留，上限默认为1，发动建造技能后提高。',
@@ -4534,7 +4460,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             default: return 0;
                                         }
                                     }).set('selectButton', [0, xuanze]);
-                                    
+
                                     'step 3'
                                     game.log(result.links, result.bool)//只能返还这两个，所以更适合技能，更需要循环的方式进行计算。
                                     if (!result.bool) { player.addToExpansion(player, 'give', event.cards).gaintag.add('Z'); player.removeMark('Expup1', player.countMark('Expup1')); event.finish(); };//返还牌再计算
@@ -7200,6 +7126,122 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
                             },
+                            matapanjiaozhijian: {
+                                audio: "ext:舰R牌将:true",
+                                unique: true,
+                                mark: true,
+                                skillAnimation: true,
+                                limited: true,
+                                animationColor: "metal",
+                                init: function (player) {
+                                    player.storage.matapanjiaozhijian = false;
+                                },
+                                direct: true,
+                                trigger: {
+                                    player: "useCardToPlayered",
+                                },
+                                filter: function (event, player) {
+                                    if (event.getParent().triggeredTargets3.length > 1) return false;
+                                    if (player.storage.matapanjiaozhijian) return false;
+                                    if (get.type(event.card) == 'trick') return true;
+
+                                },
+                                ai:{
+                                    
+                                    result:{
+                                        target:function(player,target){
+                                            var cards=ui.selected.cards.slice(0);
+                                            var names=[];
+                                            for(var i of cards) names.add(i.name);
+                                            if(names.length<player.hp) return 0;
+                                            if(player.hasUnknown()&&(player.identity!='fan'||!target.isZhu)) return 0;
+                                            if(get.attitude(player,target)>=0) return -20;
+                                            return 1;
+                                        },
+                                    },
+                                    tag:{
+                                        respond:1,
+                                        respondShan:1,
+                                    },
+                                },
+                                content: function () {
+                                    'step 0'
+                                    player.awakenSkill('matapanjiaozhijian');
+                                    player.storage.matapanjiaozhijian = true;
+                                    player.chooseToDiscard(get.prompt('matapanjiaozhijian', trigger.target),"弃置任意张牌，然后指定至多等量名角色为目标" , [1, Infinity], 'hes').set('ai', card => {
+                                        if (ui.selected.cards.length >= _status.event.max) return 0;
+                                        if (_status.event.goon) return 4.5 - get.value(card);
+                                        return 0;
+                                    }).set('max', player.countDiscardableCards(player, 'hes')).set('goon', get.attitude(player, trigger.target) < 0);
+                                    'step 1'
+                                    if (result.bool) {
+                                        var num = result.cards.length;
+                                        player.chooseTarget(get.prompt('matapanjiaozhijian'),
+                                            [1, num], function (card, player, target) {
+                                                return _status.event.targets.includes(target);
+                                            }).set('ai', function (target) {
+                                                return -get.attitude(target, player);
+                                            }).set('targets', trigger.targets);
+                                    }
+                                    'step 2'
+                                    if (result.bool) { 
+                                        game.log(result.targets, '不能响应', trigger.card);
+                                        for(var i=0;i<result.targets.length;i++){
+                                        trigger.directHit.push(result.targets[i]);
+                                        }
+                                    }
+
+                                },
+                            },
+                            zhongbangtuxi: {
+                                trigger:{
+                                    player:"phaseJieshuBegin",
+                                },
+                                direct:true,
+                                filter:function(event,player){
+                                    return !player.getStat('damage');
+                                },
+                                content: function () {
+                                    'step 0'
+                                    player.chooseToDiscard(get.prompt('zhongbangtuxi'),"弃置任意张牌，然后指定至多等量名角色为目标" , [1, Infinity], 'hes',{color:'red'}).set('ai', card => {
+                                        if (ui.selected.cards.length >= _status.event.max) return 0;
+                                        if (_status.event.goon) return 4.5 - get.value(card);
+                                        return 0;
+                                    }).set('max', game.countPlayer(function(current){
+                                        return get.attitude(player, current) < 0;
+                                    })).set('goon', 1);
+                                    'step 1'
+                                    if (result.bool) {
+                                        game.log(result.cards);
+                                        var num = result.cards.length;
+                                        player.chooseTarget(get.prompt('zhongbangtuxi'),
+                                            [1, num], function (card, player, target) {
+                                                return 1;
+                                            }).set('ai', function (target) {
+                                                return -get.attitude(target, player);
+                                            });
+                                    }
+                                    'step 2'
+                                    if (result.bool) { 
+                                        game.log(result.targets, '受到一点火焰伤害');
+                                        for(var i=0;i<result.targets.length;i++){
+                                            result.targets[i].damage('fire');
+                                        }
+                                    }
+
+                                },
+                                ai:{
+                                    order:1,
+                                    fireAttack:true,
+                                    result:{
+                                        target(player,target){
+                                            if(target.hasSkillTag('nofire')) return 0;
+                                            if(player.hasUnknown()) return 0;
+                                            return get.damageEffect(target,player);
+                                        },
+                                    },
+                                },
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -7240,6 +7282,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "z17": "z17",
                             "z21": "z21",
                             "z22": "z22",
+                            kewei: "可畏",
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐舰", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -7292,7 +7335,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "junfu_info": "回合开始时,你可以把至多1/2/3张手牌存于武将牌上，如手牌般使用。<br>其他角色回合开始时，你可以把存储的牌交给ta，然后你摸一张牌。<br>可以强化(目标的手牌数<8才能使用此技能)<br>拥有技能强化和远航强化即可起飞。",
                             manchangzhanyi: "漫长战役", "manchangzhanyi_info": "每轮限一次，你受到锦囊牌的伤害时，你免疫此伤害。你攻击范围内的其他角色的准备阶段，你可以弃置其一张手牌。",
                             manchangzhanyi_1: "漫长战役", "manchangzhanyi_1_info": "",
-                            guzhuyizhi: "孤注一掷", "guzhuyizhi_info": "出牌阶段开始时，你可以摸两张牌并弃置所有手牌，然后摸等量的牌，如此做，你的其他技能失效且你不能使用桃或快修直到你的下回合开始，你计算与其他角色的距离-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。",
+                            guzhuyizhi: "孤注一掷", "guzhuyizhi_info": "出牌阶段开始时，你可以摸两张牌并弃置所有手牌，然后摸等量的牌，如此做，你的其他技能失效直到你的下回合开始，你计算与其他角色的距离-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。",
                             guzhuyizhi2: "孤注一掷", "guzhuyizhi2_info": "",
                             shuileizhandui_1: "水雷战队", "shuileizhandui_1_info": "",
                             shuileizhandui: "水雷战队", "shuileizhandui_info": "你可以交给一名角色任意张牌。若你是本回合第一次发动本技能，你可以从牌堆和弃牌堆获得一张雷杀。",
@@ -7375,6 +7418,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             z21_tuxi: "突袭", z21_tuxi_info: "出牌阶段开始时，你可以选择攻击范围内的一名角色，将其一张牌置于其武将牌上，称为Z。当有Z的武将受到伤害后，你可以令其随机弃置一张牌并弃置所有Z",
                             z22_tuxixiawan: "突袭峡湾", z22_tuxixiawan_info: "出牌阶段开始时，你可以将任意角色一张手牌置于自己的武将牌上，称为Z。其他角色造成伤害后，若你有Z，你可以移去一枚Z，进行一次判定，令当前回合角色不能使用或打出与判定牌花色相同的牌直到回合结束。",
                             cardsDisabled_suit: "不能使用_花色", cardsDisabled_suit_info: "你不能使用或打出对应花色的手牌。",
+                            matapanjiaozhijian: "马塔潘角之箭", matapanjiaozhijian_info: "限定技，你使用锦囊牌指定目标后，你可以弃置任意张牌，令等量目标不可响应此牌。",
+                            zhongbangtuxi: "重磅突袭", zhongbangtuxi_info: "结束阶段，若你本回合未造成伤害，你可以弃置任意张红色牌对等量角色各造成一点火焰伤害。",
+
+
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
