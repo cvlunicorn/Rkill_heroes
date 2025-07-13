@@ -816,9 +816,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         characterSort: {
                             jianrjinji: {
                                 jianrbiaozhun: ["liekexingdun", "qixichicheng", "wufenzhongchicheng", "dumuchenglinqiye", "bisimai", "misuli", "weineituo", "lisailiu", "1913", "changmen", "kunxi", "ougengqi", "qingye", "beianpudun", "jiujinshan", "jiujinshan", "yixian", "tianlangxing", "dadianrendian", "yatelanda", "z31", "xuefeng", "kangfusi", "47project", "guzhuyizhichuixue", "shuileizhanduichuixue", "minsike", "yinghuochong", "u1405", "baiyanjuren", "changchun"],
-                                lishizhanyi_naerweike: ["z1", "z16", /*"z18"*/],
+                                lishizhanyi_naerweike: ["z17", "z18"],
                                 lishizhanyi_matapanjiao: ["", ""],
-                                lishizhanyi_danmaihaixia: ["", ""],
+                                lishizhanyi_danmaihaixia: ["Z1", "Z16"],
                                 lishizhanyi_shanhuhai: ["", ""],
                                 lishizhanyi_haixiafujizhan: ["u47", "u81"],
                                 weijingzhizhi: ["jifu"],
@@ -862,11 +862,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "u81": ["female", "KMS", 3, ["qianting", "u81_conglie", "u81_xunyi"], ["des:U-81号潜艇最著名的战例发生在1941年的地中海。当时皇家方舟号航母从马耳他驶出后，遭到了U-81的雷击，尽管U-81只命中了皇家方舟号一枚鱼雷，但是处置不当导致这艘在追歼俾斯麦中立下功劳的航母最终沉没。此后的U-81在破交作战中击沉了不少商船。1944年1月，U-81遭到空袭沉没。"]],
                             "z1": ["female", "KMS", 3, ["huibi", "quzhudd", "Z", "z1_Zqulingjian"], ["des:1934型舰队驱逐舰首舰。德国突破条约之后开始建造大型驱逐舰，吨位比他国驱逐舰都略大一些，装备5门单装127毫米炮。由于高温锅炉的技术问题，她动力系统稳定性不高。Z1号（莱伯勒希特·马斯号）的服役生涯很短暂，1939年执行了布雷任务，在1940年破交战中遭到己方HE111轰炸机误击沉没。"]],
                             "z16": ["female", "KMS", 3, ["huibi", "quzhudd", "Z", "z16_lianhuanbaopo", "z16_shuileibuzhi"], ["des:1934A型驱逐舰11号舰，1934A是1934的改良型，改进了适航性与动力系统设计。Z16号（弗里德里希·埃科尔特号）开战之后主要执行对英国的布雷任务。在巴伦支海海战中被英国轻巡洋舰谢菲尔德号击沉。"]],
-                            "z18": ["female", "KMS", 3, ["huibi", "quzhudd", "z18_weisebaoxingdong", "z18_shuileibeizhan"], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
-//"z18": ["female", "KMS", 3, ["huibi", "quzhudd", "z18_weisebaoxingdong", "z18_shuileibeizhan"], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
-//"z17": ["female", "KMS", 3, ["huibi", "quzhudd", "", ""], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
-//"z21": ["female", "KMS", 3, ["huibi", "quzhudd", "", ""], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
-//"z22": ["female", "KMS", 3, ["huibi", "quzhudd", "", ""], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
+                            "z18": ["female", "KMS", 3, ["huibi", "quzhudd", "z18_weisebaoxingdong"], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
+                            "z17": ["female", "KMS", 3, ["huibi", "quzhudd", "z17_naerweikejingjie"], ["des:　德国1936型驱逐舰总体上加大了吨位，改善了舰艏设计以提高适航性。Z17（迪特尔·冯·勒德尔）号驱逐舰在纳尔维克海战中击伤了哥萨克人号，最终被英军击沉。"]],
+                            //"z21": ["female", "KMS", 3, ["huibi", "quzhudd", "", ""], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
+                            //"z22": ["female", "KMS", 3, ["huibi", "quzhudd", "", ""], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
 
                             jifu: ["female", "ΒΜΦCCCP", 2, ["quzhudd", "huibi", "jifu_weicheng", "jifu_yuanjing", "jifu_lingwei", "jifu_yuanqin", "jifu_yuanqin"], ["des:基辅是苏联海军大舰队计划中的一环，她的设计吸取了塔什干和列宁格勒等驱逐舰的技术，同时航速和火力也保持了非常强的水平。尽管基辅在战前已经开工，但还是因为战况的影响而停工。在战争末期，未完工的基辅被拖回船厂，并修改了设计准备继续建造，但由于相比战后的新驱逐舰设计优势不大，所以并没有最终建造完成。"]],
 
@@ -1655,19 +1654,19 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     "step 0"
                                     if (player.countMark('jinengup') <= 0) {
                                         player.chooseCardTarget({
-                                            prompt:"弃置两张黑桃或梅花手牌，视为使用【万箭齐发】",
-                                            filterCard:{color:'black'},
-                                            position:'h',
-                                            selectCard:2,
-                                            selectTarget:[1,Infinity],
-                                            filterTarget:function(card,player,target){
-                                                return player.canUse({name:'jinjuzy'},target);
+                                            prompt: "弃置两张黑桃或梅花手牌，视为使用【万箭齐发】",
+                                            filterCard: { color: 'black' },
+                                            position: 'h',
+                                            selectCard: 2,
+                                            selectTarget: [1, Infinity],
+                                            filterTarget: function (card, player, target) {
+                                                return player.canUse({ name: 'jinjuzy' }, target);
                                             },
-                                            ai1:function(card){
-                                                return 4-get.value(card);
+                                            ai1: function (card) {
+                                                return 4 - get.value(card);
                                             },
-                                            ai2:function(target){
-                                                return get.effect(target,{name:'jinjuzy'},player,player);
+                                            ai2: function (target) {
+                                                return get.effect(target, { name: 'jinjuzy' }, player, player);
                                             }
                                         });
                                         /*player.chooseToDiscard(2, "h", function (card) {
@@ -1677,19 +1676,19 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         });*/
                                     } else if (player.countMark('jinengup') == 1) {
                                         player.chooseCardTarget({
-                                            prompt:"弃置两张黑桃或梅花或红桃手牌，视为使用【万箭齐发】",
-                                            filterCard:{suit:['spade','club','heart']},
-                                            position:'h',
-                                            selectCard:2,
-                                            selectTarget:[1,Infinity],
-                                            filterTarget:function(card,player,target){
-                                                return player.canUse({name:'jinjuzy'},target);
+                                            prompt: "弃置两张黑桃或梅花或红桃手牌，视为使用【万箭齐发】",
+                                            filterCard: { suit: ['spade', 'club', 'heart'] },
+                                            position: 'h',
+                                            selectCard: 2,
+                                            selectTarget: [1, Infinity],
+                                            filterTarget: function (card, player, target) {
+                                                return player.canUse({ name: 'jinjuzy' }, target);
                                             },
-                                            ai1:function(card){
-                                                return 4-get.value(card);
+                                            ai1: function (card) {
+                                                return 4 - get.value(card);
                                             },
-                                            ai2:function(target){
-                                                return get.effect(target,{name:'jinjuzy'},player,player);
+                                            ai2: function (target) {
+                                                return get.effect(target, { name: 'jinjuzy' }, player, player);
                                             }
                                         });
                                         /*player.chooseToDiscard(2, "h", function (card) {
@@ -1699,19 +1698,19 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         });*/
                                     } else if (player.countMark('jinengup') >= 2) {
                                         player.chooseCardTarget({
-                                            prompt:"弃置两张手牌，视为使用【万箭齐发】",
-                                            filterCard:true,
-                                            position:'h',
-                                            selectCard:2,
-                                            selectTarget:[1,Infinity],
-                                            filterTarget:function(card,player,target){
-                                                return player.canUse({name:'jinjuzy'},target);
+                                            prompt: "弃置两张手牌，视为使用【万箭齐发】",
+                                            filterCard: true,
+                                            position: 'h',
+                                            selectCard: 2,
+                                            selectTarget: [1, Infinity],
+                                            filterTarget: function (card, player, target) {
+                                                return player.canUse({ name: 'jinjuzy' }, target);
                                             },
-                                            ai1:function(card){
-                                                return 4-get.value(card);
+                                            ai1: function (card) {
+                                                return 4 - get.value(card);
                                             },
-                                            ai2:function(target){
-                                                return get.effect(target,{name:'jinjuzy'},player,player);
+                                            ai2: function (target) {
+                                                return get.effect(target, { name: 'jinjuzy' }, player, player);
                                             }
                                         });
                                         /*player.chooseToDiscard(2, "h", function (card) {
@@ -5776,8 +5775,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             jifu_weicheng: {
-                                mod:{
-                                    maxHandcard:function (player, num) {
+                                mod: {
+                                    maxHandcard: function (player, num) {
                                         return num = (num + 1);
                                     },
                                 },
@@ -6776,6 +6775,194 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.loseToDiscardpile(cards);
                                 },
                             },
+                            z18_weisebaoxingdong: {
+                                global: "Z_control",
+                                usable: 1,
+                                enable: "phaseUse",
+                                filter: function (event, player) {
+                                    return player.countCards('h') > 0;
+                                },
+                                position: "h",
+                                filterCard: true,
+                                selectCard: [1, 2],
+                                filterTarget: true,
+                                selectTarget: function () {
+                                    return ui.selected.cards.length;
+                                },
+                                delay: false,
+                                discard: false,
+                                lose: false,
+                                complexSelect: true,
+                                filterOk: function () {
+                                    return ui.selected.targets.length == ui.selected.cards.length;
+                                },
+                                multitarget: true,
+                                multiline: true,
+                                check: function (card) {
+                                    return 5 - get.value(card);
+                                },
+                                content: function () {
+                                    'step 0'
+                                    for (var i = 0; i < cards.length; i++) {
+                                        targets[i].addToExpansion(cards[i], player, 'give').gaintag.add('Z');
+                                    }
+                                },
+                                ai: {
+                                    result: {
+                                        target: function (player, target) {
+                                            return get.attitude(player, current) <= 0;
+                                        },
+                                    },
+                                },
+                                group: ["z18_weisebaoxingdong_huogong"],
+                                subSkill: {
+                                    huogong: {
+                                        enable: "phaseUse",
+                                        prompt: "你可以移去一张Z，观看一名角色的手牌，然后视为使用一张火攻。",
+                                        filter: function (event, player) {
+                                            return player.getExpansions('Z').length;
+
+                                        },
+                                        direct: true,
+                                        filterTarget: function (card, player, target) {
+                                            return target.countCards('h');
+                                        },
+                                        content: function () {
+                                            'step 0'
+                                            var cards = player.getExpansions('Z'), count = cards.length;
+                                            if (count > 0) {
+                                                player.chooseCardButton('移去一张Z，观看一名角色的手牌，然后视为使用一张火攻。', true, cards).set('ai', function (button) {
+                                                    return 1;
+                                                });
+                                            }
+                                            else event.finish();
+                                            'step 1'
+                                            event.cards = result.links;
+                                            player.loseToDiscardpile(event.cards);
+                                            player.viewHandcards(target);
+                                            'step 2'
+                                            if (player.canUse('huogong', target)) player.useCard({
+                                                name: 'huogong',
+                                                isCard: true,
+                                            }, target);
+                                        },
+                                        ai: {
+                                            threaten: 1.5,
+                                        },
+                                    },
+
+                                },
+                            },
+                            Z_control: {
+                                mod: {
+                                    cardUsable(card, player, num) {
+                                        if (player.getExpansions('Z').length && card.name == 'sha') { return num + 1; }
+                                    },
+                                },
+                                trigger: {
+                                    player: "useCard",
+                                },
+                                forced: true,
+                                filter: function (event, player) {
+                                    if (player.countCards('he') == 0) return false;
+                                    var cards = player.getExpansions('Z');
+                                    for (i = 0; i < player.getExpansions('Z').length; i++) {
+                                        if (get.type(cards[i]) == get.type(event.card)) return true;
+                                    }
+                                    return false;
+                                },
+                                autodelay: true,
+                                content: function () {
+                                    "step 0"
+                                    player.chooseToDiscard('he', true);
+                                    "step 1"
+                                    if (result.cards.length) {
+                                        var list = [];
+                                        var Zcards = player.getExpansions('Z');
+                                        for (var i = 0; i < Zcards.length; i++) {
+                                            game.log("Z的牌名" + get.name(Zcards[i]));
+                                            game.log("弃的牌名" + get.name(result.cards[0]));
+                                            if (get.name(Zcards[i]) == get.name(result.cards[0])) {
+                                                list.push(Zcards[i]);
+                                            }
+                                        }
+                                    }
+                                    game.log(list);
+                                    if (list.length > 0) {
+                                        player.chooseCardButton('移去一张Z', true, list).set('ai', function (button) {
+                                            return 1;
+                                        });
+                                    }
+                                    else event.finish();
+                                    'step 2'
+                                    player.loseToDiscardpile(result.links);
+                                },
+                            },
+                            z17_naerweikejingjie: {
+                                global: "Z_reward",
+                                enable: "phaseUse",
+                                filter: function (event, player) {
+                                    return player.countCards('h') > 0;
+                                },
+                                prompt: "出牌阶段，你可以将任意张手牌置于武将牌上，称为Z，然后将一名角色至多等量张手牌置于其武将牌上，也称为Z。",
+                                check: function (card) {
+                                    var player = _status.event.player;
+                                    if ((36 - player.getExpansions('old_jijun').length) <= player.countCards('h')) return 1;
+                                    return 5 - get.value(card);
+                                },
+                                selectTarget: 1,
+                                filterTarget: true,
+                                content: function () {
+                                    'step 0'
+                                    player.chooseToDiscard(get.prompt('z17_naerweikejingjie', event.target), [1, Infinity], 'he').set('ai', card => {
+                                        if (ui.selected.cards.length >= _status.event.max) return 0;
+                                        if (_status.event.goon) return 4.5 - get.value(card);
+                                        return 0;
+                                    }).set('max', event.target.countDiscardableCards(player, 'he')).set('goon', get.attitude(player, event.target) < 0).set('logSkill', ['z17_naerweikejingjie', event.target]);
+                                    'step 1'
+                                    if (result.bool) {
+                                        var num = result.cards.length;
+                                        player.addToExpansion(result.cards, player, 'give').gaintag.add('Z');
+                                        if (event.target.countDiscardableCards(player, 'he')) player.discardPlayerCard('弃置' + get.translation(event.target) + get.cnNumber(num) + '张牌', num, 'he', event.target, true);
+                                    }
+                                    'step 2'
+                                    if (result.bool) {
+                                        event.target.addToExpansion(result.cards, event.target, 'give').gaintag.add('Z');
+                                    }
+                                },
+                                ai: {
+                                    "unequip_ai": true,
+                                    skillTagFilter: function (player, tag, arg) {
+                                        if (!arg || !arg.name) return false;
+                                        if (!arg.target) return false;
+                                        var card = arg.target.getEquip(2);
+                                        return card && get.value(card) > 0 && player.hasCard(cardx => {
+                                            return lib.filter.cardDiscardable(cardx, player, 'jsrgjuelie_discard') && get.value(cardx) < 5;
+                                        });
+                                    },
+                                },
+                            },
+                            Z_reward: {
+                                direct:true,
+                                charlotte: true,
+                                trigger: {
+                                    player: "damageEnd",
+                                },
+                                filter: function (event, player) {
+                                    return event.source && event.source.isIn()
+                                        && player.getExpansions('Z').length > 0;
+                                },
+                                forced: true,
+                                logTarget: "source",
+                                content: function () {
+                                    'step 0'
+                                    trigger.source.chooseCardButton('选择获得一张“Z”', player.getExpansions('Z'), true);
+                                    'step 1'
+                                    if (result.bool) {
+                                        trigger.source.gain(result.links, player, 'give');
+                                    }
+                                },
+                            }
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -6812,7 +6999,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "u81": "u81",
                             "z1": "z1",
                             "z16": "z16",
-                            //"z18": "z18",
+                            "z18": "z18",
+                            "z17": "z17",
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐舰", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -6939,8 +7127,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             z16_shuileibuzhi: "水雷布置", z16_shuileibuzhi_info: "当你造成伤害时，你可以将牌堆顶的一张牌置于武将牌上，称为Z。出牌阶段，你可以将一张Z当作兵粮寸断使用。(全局)有Z的角色准备阶段，可以弃置一张Z并弃置判定区内所有与此牌花色相同的牌。",
                             z16_shuileibuzhi_bingliang: "兵粮寸断", z16_shuileibuzhi_bingliang_info: "出牌阶段，你可以将一张Z当作兵粮寸断使用。",
 
-                            //z18_weisebaoxingdong: "威瑟堡行动", z18_weisebaoxingdong_info: "你的回合结束时，你可以将至多两张伤害类牌正面向上分别交给任意角色，令其在使用该牌之前不能打出或使用其他基本牌。",
-                            //z18_shuileibeizhan: "水雷备战", z18_shuileibeizhan_info: "准备阶段，你可以选择一项：1.跳过判定阶段和出牌阶段；2.跳过摸牌阶段和弃牌阶段。然后展示牌堆顶上X张牌并获得其中的伤害类牌。X为场上势力数的两倍且最少为4。",
+                            z18_weisebaoxingdong: "威瑟堡行动", z18_weisebaoxingdong_info: "每回合限一次，你可以将至多两张手牌置于等量角色的武将牌上，称为Z。出牌阶段，你可以移去一张Z，观看一名角色的手牌，然后视为使用一张火攻。(全局)武将牌上有Z的角色出牌阶段使用杀的次数+1；使用与Z中包含类型相同的牌时须弃一张牌(没有则不弃)，然后可以弃置一张与使用的牌相同牌名的Z。",
+                            z18_weisebaoxingdong_huogong: "火攻", z18_weisebaoxingdong_huogong_info: "你可以移去一张Z，观看一名角色的手牌，然后视为使用一张火攻。",
+
+                            z17_naerweikejingjie: "纳尔维克警戒", z17_naerweikejingjie_info: "出牌阶段，你可以将任意张手牌置于武将牌上，称为Z，然后将一名角色至多等量张手牌置于其武将牌上，也称为Z。(全局)对有Z的角色造成伤害时，可以获得一张Z。",
 
 
 
