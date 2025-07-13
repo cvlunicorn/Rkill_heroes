@@ -761,7 +761,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lishizhanyi_matapanjiao: ["", ""],
                                 lishizhanyi_danmaihaixia: ["", ""],
                                 lishizhanyi_shanhuhai: ["", ""],
-                                lishizhanyi_haixiafujizhan: ["u47", ""],
+                                lishizhanyi_haixiafujizhan: ["u47", "u81"],
                                 weijingzhizhi: ["jifu"],
                             },
 
@@ -799,6 +799,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             baiyanjuren: ["female", "RN", 3, ["junfu", "hangkongzhanshuguang"], ["des:百眼巨人号航母是世界上第一级全通甲板的航空母舰。在飞机运用到海战中之后，为了加强飞机的运用能力，英国人便改装了一些军舰以搭载飞机，经过经验的积累，英国人改装了百眼巨人号航母，使用了全通的飞行甲板。百眼巨人号没有赶上一战，在二战中主要执行训练任务。"]],
                             changchun: ["female", "PLAN", 3, ["daoqu", "rand", "sidajingang"], ["des:　苏联愤怒级驱逐舰17号舰，苏联建造的愤怒级借鉴了意大利的设计经验。前后背负式布置了4门130毫米舰炮。由于苏联对德国战争中，海战并不是主战场，因此果敢号主要执行护航任务。果敢号参加了二战并幸存下来，战后在1955年被出售给新中国海军，改名为长春号，90年退役后保存在山东乳山市。"]],
                             "u47": ["female", "KMS", 3, ["qianting", "u47_langben", "u47_xinbiao", "u47_huxi"], ["des:U-47号是德军的一艘王牌潜艇，属VIIB型。1939年10月她大胆穿越了斯卡帕湾的封锁线，潜入英国海军的基地内，当晚用鱼雷击沉了英国皇家橡树号战列舰。回到港口后U-47号受到了热烈的欢迎，并被授予了骑士十字勋章。在随后的战斗巡航中，U-47号总共击沉了16万吨的船只。1941年3月7日的第九次战斗巡航中U-47号失踪，至今没有其下落和定论。"]],
+                            "u81": ["female", "KMS", 3, ["qianting", "u81_conglie", "u81_xunyi"], ["des:U-U-81号潜艇最著名的战例发生在1941年的地中海。当时皇家方舟号航母从马耳他驶出后，遭到了U-81的雷击，尽管U-81只命中了皇家方舟号一枚鱼雷，但是处置不当导致这艘在追歼俾斯麦中立下功劳的航母最终沉没。此后的U-81在破交作战中击沉了不少商船。1944年1月，U-81遭到空袭沉没。"]],
+
                             jifu: ["female", "ΒΜΦCCCP", 2, ["quzhudd", "jifu_weicheng", "jifu_yuanjing", "jifu_lingwei", "jifu_yuanqin", "jifu_yuanqin"], ["des:基辅是苏联海军大舰队计划中的一环，她的设计吸取了塔什干和列宁格勒等驱逐舰的技术，同时航速和火力也保持了非常强的水平。尽管基辅在战前已经开工，但还是因为战况的影响而停工。在战争末期，未完工的基辅被拖回船厂，并修改了设计准备继续建造，但由于相比战后的新驱逐舰设计优势不大，所以并没有最终建造完成。"]],
 
                             skilltest: ["male", "OTHER", 9, ["zhanlie", "jifu_weicheng"], ["forbidai", "des:测试用"]],
@@ -5814,14 +5816,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (!event.player.isIn()) return false;
                                     var i = 0;
                                     var allplayers = game.players.sortBySeat(player);
-                                    game.log(allplayers.length);
+                                    //game.log(allplayers.length);
                                     for (i = 0; i < allplayers.length; i++) {
-                                        game.log(allplayers[i], i);
+                                        //game.log(allplayers[i], i);
 
                                         if (allplayers[i].hasSkill("u47_xinbiao_hp")) {
 
-                                            game.log(allplayers[i].group);
-                                            game.log(event.player.group);
+                                            //game.log(allplayers[i].group);
+                                            //game.log(event.player.group);
                                             if (allplayers[i].group == event.player.group) {
                                                 return false;
 
@@ -5835,7 +5837,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     "step 0"
                                     player.chooseToDiscard('he', '是否弃置一张黑色牌并记录' + get.translation(trigger.player) + '状态？', { color: 'black' }).set('ai', function (card, player) {
                                         var player = _status.event.player, target = _status.event.getTrigger().player;
-                                        if (get.attitude(player, target>=0)) {
+                                        if (get.attitude(player, target >= 0)) {
                                             if (target.hp < 3 && target.countCards(h) < 3) return 0;
                                         } else {
                                             if (target.hp > 2 && target.countCards(h) > 2) return 0;
@@ -5848,7 +5850,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger.player.addSkill("u47_xinbiao_cards");
                                         trigger.player.addMark("u47_xinbiao_hp", trigger.player.hp);
                                         trigger.player.addMark("u47_xinbiao_cards", trigger.player.countCards('h'));
-                                        game.log(trigger.player, trigger.player.countMark("u47_xinbiao_hp"));
+                                        //game.log(trigger.player, trigger.player.countMark("u47_xinbiao_hp"));
                                         markAuto('u47_xinbiao', [trigger.player]);
 
                                     }
@@ -5928,10 +5930,88 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         event.finish();
                                     }
                                 },
-                                ai:{
-                                    order:10,
+                                ai: {
+                                    order: 10,
                                 },
                                 "_priority": 0,
+                            },
+                            u81_conglie: {
+                                direct: true,
+                                trigger: {
+                                    source: "damageBegin1",
+                                },
+                                filter(event, player) {
+                                    return player != event.player && event.player.countCards("h") > 0;
+                                },
+                                content() {
+
+                                    'step0'
+                                    game.log(event.player);
+                                    game.log(trigger.player);
+                                    trigger.player.chooseCard('h', '是否交给' + get.translation(player) + '一张手牌免疫此次伤害？').set('ai', (card) => 7 - get.value(card));
+                                    'step1'
+                                    if (result.bool) {
+                                        game.log("给牌免伤");
+                                        trigger.player.give(result.cards, player);
+                                        trigger.cancel();
+                                        if (!trigger.player.hasSkill("u81_conglie_shanghai")) {
+                                            game.log("添加技能");
+                                            trigger.player.addSkill("u81_conglie_shanghai");
+                                        }
+                                        trigger.player.addMark('u81_conglie_shanghai', 1, false);
+                                    } else {
+                                        game.log("不给牌结束");
+                                        event.finish();
+                                    }
+
+                                }
+
+                            },
+                            u81_conglie_shanghai: {
+                                mark: true,
+                                marktext: "从猎",
+                                intro: {
+                                    name: "从猎",
+                                    content: "下次受到的伤害+$",
+                                },
+                                trigger: {
+                                    player: "damageBegin3",
+                                },
+                                forced: true,
+                                direct: true,
+                                onremove: true,
+                                filter: function (event, player) {
+                                    game.log("从猎标记数量" + player.countMark("u81_conglie_shanghai"));
+                                    return player.countMark("u81_conglie_shanghai");
+                                },
+                                content: function () {
+                                    trigger.num += player.countMark('u81_conglie_shanghai');
+                                    game.log(player, '受到的伤害+' + player.countMark('u81_conglie_shanghai'));
+                                    player.removeSkill('u81_conglie_shanghai');
+                                },
+                                "_priority": 0,
+                            },
+                            u81_xunyi: {
+                                trigger: {
+                                    global: "gainAfter",
+                                },
+                                forced: true,
+                                popup: false,
+                                filter: function (event, player) {
+                                    if (player.inRange(event.player)) {
+                                        for (var i in game.players) {
+                                            game.log(i);
+                                            if (event.getl(game.players[i]).cards2.length!=0) {
+                                                game.log(event.getl(game.players[i]).cards2.length);
+                                                return event.getl(game.players[i]).cards2;
+                                            }
+                                        }
+                                    }
+                                },
+                                content: function () {
+                                    trigger.player.damage('thunder');
+                                },
+                                sub: true,
                             }
 
                             //在这里添加新技能。
@@ -5967,6 +6047,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             yinghuochong: "萤火虫",
                             jifu: "基辅",
                             "u47": "u47",
+                            "u81": "u81",
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐舰", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -6079,8 +6160,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             u47_xinbiao: "信标", u47_xinbiao_info: "有角色体力值减少后，你可以弃置一张黑色牌并记录该角色当前的体力值与手牌数。每个势力只能有一名角色被记录。",
                             u47_xinbiao_hp: "信标", u47_xinbiao_hp_info: "信标",
                             u47_xinbiao_cards: "信标", u47_xinbiao_cards_info: "信标",
-
                             u47_huxi: "虎袭", u47_huxi_info: "你使用伤害类牌后若未造成伤害，你可以将一名被记录的角色的体力值和手牌数调整为记录值，然后摸一张牌并移除记录，",
+                            u81_conglie_shanghai: "从猎", u81_conglie_shanghai_info: "",
+                            u81_conglie: "从猎", u81_conglie_info: "你对其他角色造成伤害时，其可以交给你一张手牌，防止此伤害，然后其受到的下次伤害+1。",
+                            u81_xunyi: "巡弋", u81_xunyi_info: "锁定技，你攻击范围内的角色在回合外获得牌时，你对其造成一点雷电伤害。",
+
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
                             lishizhanyi_naerweike: '历史战役-纳尔维克',
