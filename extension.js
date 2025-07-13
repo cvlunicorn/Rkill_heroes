@@ -2827,7 +2827,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     //if(range[1]==-1) return;var a=game.countPlayer(function(current){return get.attitude(player,current)<=0&&current.inRange(player)})-1;
                                     //if(card.name=='sha') range[1]+=Math.min(player.countMark('jinengup'),a);},
                                     attackRange: function (from, distance) {
-                                        return distance + (2 + from.countMark('jinengup').length);
+                                        //game.log(from.getExpansions('jinengup').length);
+                                        return distance + (2 + from.countMark('jinengup').length);//这里只能用getExpansions，其他地方需要countMark。目前暂不清楚原因
                                     },
                                 },
                                 usable: 1,
