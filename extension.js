@@ -3512,26 +3512,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     var i = player.countMark('xiangrui');
                                     player.removeMark('xiangrui', i);
                                     game.log("i" + i);
-                                    if (i > 0) {
-                                        player.chooseTarget(get.prompt2('yumian'), true, function (card, player, target) {
-                                            return 1;
-                                        }).set('ai', function (target) {
-                                            if (get.attitude(_status.event.player, target) < 0) {
-                                                return 1 / Math.sqrt(target.hp + 1);
-                                            }
-                                            return 0;
-                                        });
-                                    } else {
-                                        player.chooseTarget(get.prompt2('yumian'), true, function (card, player, target) {
-                                            //if (i > 0) { return 1; }
-                                            return get.distance(player, target) <= 1;
-                                        }).set('ai', function (target) {
-                                            if (get.attitude(_status.event.player, target) < 0) {
-                                                return 1 / Math.sqrt(target.hp + 1);
-                                            }
-                                            return 0;
-                                        });
-                                    }
+                                    player.chooseTarget(get.prompt2('yumian'), true, function (card, player, target) {
+                                        //if (i > 0) { return 1; }
+                                        return get.distance(player, target) <= 1;
+                                    }).set('ai', function (target) {
+                                        if (get.attitude(_status.event.player, target) < 0) {
+                                            return 1 / Math.sqrt(target.hp + 1);
+                                        }
+                                        return 0;
+                                    });
                                     //}
                                     "step 1"
                                     game.log("result.bool" + result.bool);
@@ -4774,7 +4763,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                     }
                                     "step 1"
-                                    player.give(result.cards, trigger.target, 'give');
+                                    player.give(result.cards, trigger.target);
                                     game.delay();
                                     if (trigger.target.countCards("ej")) {
                                         player.gainPlayerCard(trigger.target, 'ej', true, 'visible').set('ai', function (card) {
@@ -4790,7 +4779,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         if (get.distance(player, target) <= 1) { return 1 }
                                         return 0;
                                     }, "你可以选择一名距离1的角色，其可以交给你一张牌并获得你场上的一张牌。").set('ai', function (ard, player, target) {
-                                        return get.attitude(player, target);
+                                        return get.attitude(player, target)>0;
                                     });
                                     "step 3"
                                     if (result.bool) {
@@ -4804,7 +4793,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         });
                                     }
                                     "step 4"
-                                    event.target.give(result.cards, player, 'give');
+                                    event.target.give(result.cards, player);
                                     game.delay();
                                     if (trigger.target.countCards("ej")) {
                                         event.target.gainPlayerCard(player, 'ej', true, 'visible').set('ai', function (card) {
@@ -6333,6 +6322,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             u47_huxi: {
                                 enable: "phaseUse",
+                                usable:1,
                                 filter: function (event, player) {
                                     return game.countPlayer(function (current) {
                                         return current.hasSkill('u47_xinbiao_hp');
