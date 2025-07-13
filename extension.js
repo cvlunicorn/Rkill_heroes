@@ -6320,7 +6320,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player.draw(1);
                                     }
                                     'step 4'
-                                    logSkill("lingwei");
                                     game.log(player.hasHistory('sourceDamage'));
                                     if (player.isIn() && player.getHistory('sourceDamage', function (evt) {
                                         return evt.getParent(2) == event.parent;
@@ -9489,9 +9488,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         direct: true,
                                         filter(event, player) {
                                             var currentParent = event.getParent();
+                                            //game.log(currentParent.player);
                                             //game.log(currentParent.name);
                                             //game.log(player.storage.pangguanzhe);
-                                            if (currentParent.name == player.storage.pangguanzhe) { return true; }
+                                            if (currentParent.name == player.storage.pangguanzhe&&currentParent.player==player) { return true; }
                                             //if (event.fixedResult && event.fixedResult.suit) return true;
                                             //return get.suit(event.player.judging[0], event.player);
                                             return false;
