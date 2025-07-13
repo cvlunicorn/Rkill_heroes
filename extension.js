@@ -12,12 +12,12 @@ yield需要无名杀版本1.10.10或更高版本的支持
 //注意每个全局技能（前面有下划线的）代码在本文件钟有两个，单机前一个（带lib.的）生效，多人后一个生效。
 //目录：全局技能、武将列表、武将技能、武将和技能翻译、卡牌包与卡牌技能、卡牌翻译、配置（config）、单机武将列表、扩展简介、全局函数模块
 let connect;
-     try {
-       const ws = require("ws");
-       connect = ws.connect;
-     } catch (error) {
-       console.warn("require('ws') failed");
-     }
+try {
+    const ws = require("ws");
+    connect = ws.connect;
+} catch (error) {
+    console.warn("require('ws') failed");
+}
 //const { connect } = require("ws");//突然生成出来的，暂未查明生成原因，且难以复现。require导入属于cjs格式，在手机上会报错，电脑上不会。写为import来导入会产生另一种错误。目前使用try-catch包裹起来。
 //2025.1.19升级至无名杀1.10.12版本，该版本联机允许扩展，不额外需要“一劳永逸”扩展。
 game.import("extension", function (lib, game, ui, get, ai, _status) {
@@ -845,6 +845,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             sp_lafei: ["female", "USN", 3, ["huibi", "quzhudd", "shenfeng", "buju", "qiangyun", "yuanjun"], ["des:艾伦·萨姆纳级拉菲号驱逐舰（DD724）的舰名继承自一艘英雄军舰，前代拉菲号曾经在所罗门海战中勇敢地挑战日军的比睿号战列舰。而这一代拉菲也毫不逊色。在冲绳战役期间，她执行雷达哨舰任务时在短时间内遭到了约五十架神风飞机的攻击，被直接撞击六架，命中四弹。但是拉菲坚持战斗，舰长拒绝弃舰并率舰返回了关岛。这是战争史上的一个奇迹，而这艘坚毅的驱逐舰一直服役到了冷战时期。75年退役后成为了博物馆。"]],
 
                             jifu: ["female", "ΒΜΦCCCP", 2, ["quzhudd", "huibi", "jifu_weicheng", "jifu_yuanjing", "jifu_lingwei", "jifu_yuanqin", "jifu_yuanqin"], ["des:基辅是苏联海军大舰队计划中的一环，她的设计吸取了塔什干和列宁格勒等驱逐舰的技术，同时航速和火力也保持了非常强的水平。尽管基辅在战前已经开工，但还是因为战况的影响而停工。在战争末期，未完工的基辅被拖回船厂，并修改了设计准备继续建造，但由于相比战后的新驱逐舰设计优势不大，所以并没有最终建造完成。"]],
+                            yi25: ["female", "IJN", 3, ["qianting", "liaowangtai"], ["des:　该舰于1939年开工，1941年10月服役，其超过3000吨的大排水量允许携带更多设备，包括一架零式小型水侦，以及一门被广为使用的14cm甲板炮。该舰自太平洋战争起便执行了多次巡航任务，如在战争初期于美国西海岸的军事行动，以及在次年9月大胆地炮击及空袭了美国本土目标。该舰在近3年的巡逻任务中屡次取得瞩目战绩，直至1943年9月在圣埃斯皮里图岛东北侧240km外的海域，被多艘美国驱逐舰围剿战沉。"]],
 
                             shiyu: ["female", "IJN", 3, ["huibi", "quzhudd", "jishiyu"], ["des:她在海军中以幸运而著名，参加过多次激烈海战都能最终幸存下来。在激烈的苏里高海战和维拉湾海战中，她都是编队中唯一的幸存。不过到45年，她还是被一艘潜艇击中沉没。"]],
                             dujiaoshou: ["female", "RN", 3, ["junfu", "xiuqi", "wanbei"], ["des:30年代英国设计了一级飞机修理舰，以修理航母部队载机，由于要求修复的飞机可以直接起飞，索性将她设计成了航母的结构，可当成航母使用。独角兽号于1942年完工，初期主要被当作航母使用，在地中海执行支援任务。1943年年末起，独角兽号加入太平洋战场作为航母支援舰使用，在冲绳战役期间修复了大量飞机。冷战时期独角兽号还参加了朝鲜战争，最终于50年代退役。"]],
@@ -8255,6 +8256,51 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 init: (player, skill) => (player.storage[skill] = false),
                                 "_priority": 0,
                             },
+                            liaowangtai: {
+                                usable: 1,
+                                enable: "phaseUse",
+
+                                filter: function (event, player) {
+                                    return game.hasPlayer(function (current) {
+                                        return current.countCards("h") && player.inRangeOf(current);
+                                    });
+                                },
+                                check: function (event, player) {
+                                    return game.hasPlayer(function (current) {
+                                        return current.countCards("h") && player.inRangeOf(current) && get.attitude(player, current);
+                                    });
+                                },
+                                logTarget: function (event, player) {
+                                    return game.filterPlayer(function (current) {
+                                        return current.countCards("h") && player.inRangeOf(current);
+                                    });
+                                },
+                                check: () => false,
+                                content: function () {
+                                    "step 0";
+                                    event.targets = game
+                                        .filterPlayer(function (current) {
+                                            return current.countCards("h") && player.inRangeOf(current);
+                                        })
+                                        .sortBySeat();
+                                    "step 1";
+                                    var target = event.targets.shift();
+                                    if (target.isIn()) {
+                                        event.target = target;
+                                        player.useCard({ name: "huogong", isCard: true }, target, "liaowangtai");
+                                    } else if (targets.length) event.redo();
+                                    else event.finish();
+                                    "step 2";
+                                    if (targets.length) event.goto(1);
+                                },
+                                ai: {
+                                    threaten: 1.1,
+                                    order: 10,
+                                    expose: 0.2,
+                                },
+                                "_priority": 0,
+
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -8305,6 +8351,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             shenluopujun: "什罗普郡",
                             lafei: "拉菲",
                             sp_lafei: "SP拉菲",
+                            yi25: "伊25",
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -8467,6 +8514,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             yuanjun: "援军", yuanjun_info: "限定技，若你有至少6个“风”标记，你可以移去所有“风”视为使用万箭齐发。",
                             buju_wuxie: "不惧_无懈", buju_wuxie_disable: "无懈_不可用",
                             buju_jiu: "不惧_酒", buju_jiu_disable: "酒_不可用",
+                            liaowangtai: "瞭望台", liaowangtai_info: "出牌阶段限一次，你视为对所有攻击范围包括你的角色依次使用一张【火攻】。",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
