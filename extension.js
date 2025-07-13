@@ -218,13 +218,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         },
                         dietogain: {
                             name: "远航死后给牌", trigger: { player: ["dieAfter"], }, direct: true, forceDie: true,
-                            filter: function (event, player) { if (event.name == 'die') return player.identity != 'fan'; return player.isAlive() && (get.mode() != 'boss' || (get.mode() == 'boss' && !lib.character[player.name][4].contains('boss') && player.identity == 'cai'));; },
+                            filter: function (event, player) { if (event.name == 'die') return get.mode() === "identity" &&player.identity === "zhong"; return player.isAlive() && (get.mode() != 'boss' || (get.mode() == 'boss' && !lib.character[player.name][4].contains('boss') && player.identity == 'cai'));; },
                             content: function () {
                                 'step 0'
                                 event.count = trigger.num || 1;
                                 'step 1'
                                 event.count--;//让优势方有一轮的挑战，因为第二轮对手就因为过牌量下降而失去威胁。
-                                player.chooseTarget(get.prompt2('在离开战斗前，若你的身份：<br>是忠臣，你可令一名角色摸1张牌；<br>内奸，令一名角色获得一张闪。<br>或许会有转机出现。'), function (card, player, target) { return target.maxHp > 0; }).set('ai', function (target) {
+                                player.chooseTarget(get.prompt2('在离开战斗前，若你的身份：<br>是忠臣，你可令一名角色摸1张牌。<br>或许会有转机出现。'), function (card, player, target) { return target.maxHp > 0; }).set('ai', function (target) {
                                     var att = get.attitude(_status.event.player, target); var draw = Math.max(3, player.maxHp + 1);
                                     if (target == trigger.source) att *= 0.35; if (target.hasSkill('zhanliebb')) att *= 1.05;
                                     return att
@@ -897,13 +897,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                     dietogain: {
                                         name: "远航死后给牌", trigger: { player: ["dieAfter"], }, direct: true, forceDie: true,
-                                        filter: function (event, player) { if (event.name == 'die') return true; return player.isAlive() && (get.mode() != 'boss' || (get.mode() == 'boss' && !lib.character[player.name][4].contains('boss') && player.identity == 'cai'));; },
+                                        filter: function (event, player) { if (event.name == 'die') return get.mode() === "identity" &&player.identity === "zhong"; return player.isAlive() && (get.mode() != 'boss' || (get.mode() == 'boss' && !lib.character[player.name][4].contains('boss') && player.identity == 'cai'));; },
                                         content: function () {
                                             'step 0'
                                             event.count = trigger.num || 1;
                                             'step 1'
                                             event.count--;//让优势方有一轮的挑战，因为第二轮对手就因为过牌量下降而失去威胁。
-                                            player.chooseTarget(get.prompt2('在离开战斗前，若你的身份：<br>是忠臣，你可令一名角色摸2张牌；<br>是反贼，令一名角色摸1张牌；<br>内奸，令一名角色获得一张闪。<br>或许会有转机出现。'), function (card, player, target) { return target.maxHp > 0; }).set('ai', function (target) {
+                                            player.chooseTarget(get.prompt2('在离开战斗前，若你的身份：<br>是忠臣，你可令一名角色摸1张牌.<br>或许会有转机出现。'), function (card, player, target) { return target.maxHp > 0; }).set('ai', function (target) {/*<br>是反贼，令一名角色摸1张牌；<br>内奸，令一名角色获得一张闪。*/
                                                 var att = get.attitude(_status.event.player, target); var draw = Math.max(3, player.maxHp + 1);
                                                 if (target == trigger.source) att *= 0.35; if (target.hasSkill('zhanliebb')) att *= 1.05;
                                                 return att
