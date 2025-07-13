@@ -834,6 +834,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             kewei: ["female", "RN", 4, ["hangmucv", "matapanjiaozhijian", "zhongbangtuxi"], ["des:      装甲航母可畏号在地中海战场有着出色的表现，在马塔潘角海战中，可畏出色的航空掩护有力支援了英国舰队的作战，她的鱼雷机击伤了维内托和意大利巡洋舰，直接助攻了厌战等主力舰的战绩。尽管在克里特战役期间可畏号遭到轰炸，但由于防护出色，可畏号并未战沉。在战争末期的太平洋战场，受到神风攻击的可畏号受损程度也明显小于美式航母，证明了自身设计的价值。可畏号在战争胜利后，于47年退役。"]],
                             hude: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "huangjiahaijunderongyao", "huangjiaxunyou", "tianshi"], ["zhu", "des:      英国史上最著名的战列巡洋舰。在20至30年代，胡德号长期作为英国海军的象征，频繁出访世界各地。胡德号在40年参与了针对投降后法国舰队的抛石机行动，重创了法国海军。41年的海战中，胡德号同威尔士亲王号一同拦截俾斯麦号和欧根亲王号。"]],
                             gesakeren: ["female", "RN", 3, ["huibi", "quzhudd", "tiaobangzuozhan"], ["des:部族级驱逐舰的4号舰，该级驱逐舰是最著名的英国驱逐舰。哥萨克人号参加了第二次纳尔维克海战，痛击了德军驱逐舰。41年参与过围歼俾斯麦号的行动。1941年10月哥萨克人号被德军潜艇击沉。"]],
+                            kente: ["female", "RN", 3, ["huokongld", "zhongxunca", "guochuan", "baixiang"], ["des:该舰为肯特级重巡洋舰首舰，由于防护薄弱，经常被戏称为“白象”。肯特号于20年代服役，初期水线装甲带只有25.4毫米。在30年代末期，肯特号和其余重巡都进行了改装，加强了防护。肯特号在二战中参加了围捕斯佩伯爵海军上将号的战斗，1940年在地中海被击伤，回到本土修理时加装了大量雷达设备。1941年年末肯特号搭载外交官前往苏联会见总书记。肯特号平安的度过了战争，于1948年退役。"]],
 
                             jifu: ["female", "ΒΜΦCCCP", 2, ["quzhudd", "huibi", "jifu_weicheng", "jifu_yuanjing", "jifu_lingwei", "jifu_yuanqin", "jifu_yuanqin"], ["des:基辅是苏联海军大舰队计划中的一环，她的设计吸取了塔什干和列宁格勒等驱逐舰的技术，同时航速和火力也保持了非常强的水平。尽管基辅在战前已经开工，但还是因为战况的影响而停工。在战争末期，未完工的基辅被拖回船厂，并修改了设计准备继续建造，但由于相比战后的新驱逐舰设计优势不大，所以并没有最终建造完成。"]],
 
@@ -7644,7 +7645,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         damage: 1,
                                     },
                                 },
-                                group: ["tiaobangzuozhan_self","tiaobangzuozhan_damage"],
+                                group: ["tiaobangzuozhan_self", "tiaobangzuozhan_damage"],
                                 subSkill: {
                                     self: {
                                         trigger: {
@@ -7662,7 +7663,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         sub: true,
                                         "_priority": 0,
                                     },
-                                    damage:{
+                                    damage: {
                                         trigger: {
                                             source: "damageSource",
                                         },
@@ -7673,12 +7674,85 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         content: function () {
                                             //player.viewHandcards(trigger.player);
-                                            player.gainPlayerCard(trigger.player,'hej',true,'visible');
+                                            player.gainPlayerCard(trigger.player, 'hej', true, 'visible');
                                         },
                                         sub: true,
                                         "_priority": 0,
                                     },
                                 },
+                            },
+                            baixiang: {
+                                mod: {
+                                    cardEnabled: function (card, player) {
+                                        if (get.subtype(card) == 'equip2') return false;
+                                    },
+                                },
+                                trigger: {
+                                    player: "damageBegin4",
+                                },
+                                filter: function (event) {
+                                    return event.hasNature('thunder');
+                                },
+                                forced: true,
+                                content: function () {
+                                    trigger.cancel();
+                                },
+                                ai: {
+                                    nofire: true,
+                                    effect: {
+                                        target: function (card, player, target, current) {
+                                            if (get.tag(card, 'fireDamage')) return 'zerotarget';
+                                        },
+                                    },
+                                },
+                                "_priority": 0,
+                            },
+                            guochuan: {
+                                audio: true,
+                                trigger: {
+                                    player: ["damageBegin3"],
+                                },
+                                forced: true,
+                                filter(event, player, name) {
+                                    return event.num > 1;
+                                },
+                                content() {
+                                    "step 0"
+                                    event.num = trigger.num;
+                                    trigger.num = 1;
+                                    "step 1"
+                                    var next = player.chooseCardTarget({
+                                        filterCard: function (card) {
+                                            return get.type(card) == 'equip';
+                                        },
+                                        prompt: get.prompt2('guochuan'),
+                                        current: trigger.player,
+                                        filterTarget: function (card, player, target) {
+                                            return player != target && get.distance(player, target) <= 1 && target != trigger.source;
+                                        },
+                                        ai1: function (card) {
+                                            return card == _status.event.cardx ? 1 : 0;
+                                        },
+                                        ai2: function (target) {
+                                            return target == _status.event.targetx ? 1 : 0;
+                                        },
+                                    });
+                                    "step 2"
+                                    if (result.bool) {
+                                        var target=result.targets[0];
+                                        var cards=result.cards[0];
+                                        player.give(cards, target);
+                                        target.damage(event.num - 1);
+                                    }
+                                },
+                                ai: {
+                                    filterDamage: true,
+                                    skillTagFilter(player, tag, arg) {
+                                        if (arg.player.hasSkillTag('jueqing', false, player)) return false;
+                                        return true;
+                                    },
+                                },
+                                "_priority": 0,
                             },
                             //在这里添加新技能。
 
@@ -7725,6 +7799,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             shiyu: "时雨",
                             dujiaoshou: "独角兽",
                             gesakeren: "哥萨克人",
+                            kente: "肯特",
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -7870,6 +7945,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             wanbei: "完备", wanbei_info: "锁定技，你获得开幕航空，你的开幕航空无法升级。你的手牌上限+X，X为你发动军辅置于武将牌上的牌的数量",
                             xiuqi2: "修葺2", xiuqi2_info: "下一次发动开幕航空的技能等级+1",
                             tiaobangzuozhan: "跳帮作战", tiaobangzuozhan_info: "出牌阶段限一次，你可以视为对一名角色使用决斗。若你以此法造成伤害，你观看其手牌并获得其区域内一张牌；若你因此受到伤害，你令其获得你一张手牌，然后防止此伤害。",
+                            baixiang: "白象", baixiang_info: "锁定技，你无法使用防具牌。当你受到雷属性伤害时，防止之。",
+                            guochuan: "过穿", guochuan_info: "锁定技，你受到大于一的伤害时，你令此伤害数值减为一。然后你可以将一张装备牌交给一名与你相邻的角色(不能是伤害来源)，令其承受此伤害-1。",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
