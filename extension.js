@@ -2383,10 +2383,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qianting: {
                                 audio: "ext:1牌将修改:2",
                                 trigger: {
-                                    global: "phaseZhunbeiBegin",
+                                    player: "phaseZhunbeiBegin",
                                 },
                                 lastDo: true,
-                                round: 1,
+                                //round: 1,
                                 "prompt2": function (event, player) {
                                 },
                                 filter: function (event, player) {//意外发现function应用广泛，然而解决不了自动显示隐藏标记。航母开幕，然后根据舰种判断具体出什么杀game.log();
