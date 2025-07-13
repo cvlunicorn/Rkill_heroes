@@ -818,10 +818,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         characterSort: {
                             jianrjinji: {
                                 jianrbiaozhun: ["liekexingdun", "qixichicheng", "wufenzhongchicheng", "dumuchenglinqiye", "bisimai", "misuli", "weineituo", "lisailiu", "1913", "changmen", "kunxi", "ougengqi", "qingye", "beianpudun", "jiujinshan", "jiujinshan", "yixian", "tianlangxing", "dadianrendian", "yatelanda", "z31", "xuefeng", "kangfusi", "47project", "guzhuyizhichuixue", "shuileizhanduichuixue", "minsike", "yinghuochong", "u1405", "baiyanjuren", "changchun"],
-                                lishizhanyi_naerweike: ["z17", "z18", "Z21", "Z22"],
-                                lishizhanyi_matapanjiao: ["", ""],
-                                lishizhanyi_danmaihaixia: ["Z1", "Z16"],
-                                lishizhanyi_shanhuhai: ["", ""],
+                                lishizhanyi_naerweike: ["z17", "z18", "z21", "z22"],
+                                lishizhanyi_matapanjiao: [],
+                                lishizhanyi_danmaihaixia: ["z1", "z16"],
+                                lishizhanyi_shanhuhai: [],
                                 lishizhanyi_haixiafujizhan: ["u47", "u81"],
                                 weijingzhizhi: ["jifu"],
                             },
@@ -5861,6 +5861,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.awakenSkill('jifu_yuanjing');
                                     'step 1'
                                     player.gainMaxHp(1);
+                                    'step 2'
                                     player.recover(player.maxHp - player.hp);
                                     player.removeSkill('jifu_weicheng');
                                 },
@@ -7343,7 +7344,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jilizhixin: "激励之心", 'jilizhixin_info': "若你的宝物栏为空，你视为装备着'侦察机'。你可以弃一张牌并跳过出牌阶段，令一名角色获得一个额外回合。",
                             hangkongzhanshuguang: "航空战曙光", 'hangkongzhanshuguang_info': "出牌阶段限一次，你可以令一名角色摸一张牌。若目标是航母，改为摸两张牌。",
 
-                            jifu_weicheng: "未成", 'jifu_weicheng_info': "锁定技，准备阶段你进行判定，若结果为红色：你回复一点体力，摸一张牌。若结果为黑色，你流失一点体力。",
+                            jifu_weicheng: "未成", 'jifu_weicheng_info': "锁定技，你的手牌上限+1。准备阶段你进行判定，若结果为红色：你回复一点体力，摸一张牌。若结果为黑色，你流失一点体力。",
                             jifu_yuanjing: "愿景", 'jifu_yuanjing_info': "觉醒技，当你进入濒死时，体力上限+1，将体力恢复至上限，然后失去未成",
                             jifu_lingwei: "领卫", 'jifu_lingwei_info': "当有角色使用伤害类牌指定唯一目标时，你可以弃置一张牌，然后选择一项：1、令此牌伤害+1。2、此牌无法被响应。若此牌的使用者是驱逐或S国船，则你与此牌的使用者各摸一张牌。（若此牌的使用者是你自己，则只摸一张牌）若因“领卫”技能效果造成了伤害，则本轮失去“领卫”。",
                             jifu_yuanqin: "远亲", 'jifu_yuanqin_info': "锁定技，塔什干与I国船使你回复体力时，回复的体力值+1。",
