@@ -796,7 +796,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             bisimai: ["female", "KMS", 4, ["zhuangjiafh", "zhanliebb", "qijianshashou", "yongbuchenmodezhanjian"], ["zhu", "des:德国于30年代建造的俾斯麦级战列舰首舰，建成之后连英国首相也称赞其是出色的设计。服役之后41年俾斯麦号在欧根亲王号的护航下前出大西洋执行破交任务，在战斗中俾斯麦号击沉了前来拦截的英国胡德号、击伤了威尔士亲王号。之后英国集结大规模兵力围歼俾斯麦号，战斗中皇家方舟号航母的剑鱼击伤了俾斯麦号的船舵，大大影响了俾斯麦号的航行，之后俾斯麦号在英国舰队的围攻下沉没。"]],
                             misuli: ["female", "USN", 4, ["zhuangjiafh", "zhanliebb", "jueshengzhibing", "zhanfu"], ["des:密苏里是新锐衣阿华级战列舰的三号舰，衣阿华级沿用了南达级的防护设计，她装备了当时功率最大的动力系统，所以航速甚至比很多战巡还快。密苏里于45年才赶赴战场，并没有参加多少战斗，只是在45年3月被神风撞中一次，受损不大。让密苏里名垂青史的是日本投降签字仪式在她的甲板上举行，这代表了战争的正式结束。在冷战期间密苏里继续活跃，在80年代甚至重启并进行了导弹化改造，以符合现代海战的需要。91的海湾战争也是战列舰最后一次参加实战。在98年，密苏里作为纪念舰退役，她停泊在珍珠港，正前方正是亚利桑那博物馆，她们分别代表了战争的开始和结束。"]],
                             weineituo: ["female", "RM", 3, ["zhuangjiafh", "zhanliebb", "yishisheji", "yishisheji_1"], ["des:维内托级是意大利的新锐战列舰。该级的整体设计十分出色，值得称道的是381mm主炮的部分威力指标可以达到406mm炮水平。防护设计上，船体采用了普列赛水下防护系统，装甲使用倾斜多层的剥被帽设计。二战中，她在41年的马塔潘角海战中被鱼雷击伤，之后因为缺油不再出动。意大利投降后维内托号疏散到了马耳他，途中还曾被德军的制导炸弹击伤。维内托号最终幸存到了战后。"]],
-                            lisailiu: ["female", "MN", 4, ["zhuangjiafh", "zhanliebb", "kaixuan", "changge","xiongjiaqibin"], ["des:黎塞留级是法国在30年代设计的新锐战列舰。该级依然沿袭敦刻尔克级的主炮全前置设计。40年，法国迅速战败，未完工的黎塞留号为了避免落入德军之手，于6月15日启航疏散到达喀尔。因惧怕处于流亡状态的六艘法国战列舰落入德国手中，英国舰队制定了名为“抛石机”的行动计划，对法国舰队进行了攻击。交火中黎塞留号被击伤，在此之后流亡非洲的法国舰队一直对战争局势持观望状态。42年黎塞留号同美国达成协议，加入同盟国作战。在美国进行改装后的黎塞留号参加了对日作战，并见证了二战的胜利。战后黎塞留号于1959年退役。"]],
+                            lisailiu: ["female", "MN", 4, ["zhuangjiafh", "zhanliebb", "kaixuan", "changge", "xiongjiaqibin"], ["des:黎塞留级是法国在30年代设计的新锐战列舰。该级依然沿袭敦刻尔克级的主炮全前置设计。40年，法国迅速战败，未完工的黎塞留号为了避免落入德军之手，于6月15日启航疏散到达喀尔。因惧怕处于流亡状态的六艘法国战列舰落入德国手中，英国舰队制定了名为“抛石机”的行动计划，对法国舰队进行了攻击。交火中黎塞留号被击伤，在此之后流亡非洲的法国舰队一直对战争局势持观望状态。42年黎塞留号同美国达成协议，加入同盟国作战。在美国进行改装后的黎塞留号参加了对日作战，并见证了二战的胜利。战后黎塞留号于1959年退役。"]],
                             changmen: ["female", "IJN", 4, ["zhuangjiafh", "zhanliebb", "zhudaojiandui"], ["des:她与妹妹都是高火力型日本战列舰的代表，被称为海军假日七巨头之一。她建成时就有高大的六脚桅楼，可看做是日式高塔舰桥的开端。二战开始后，太平洋战场的形势变为航空主导。一直到44年的莱特湾海战，她才得到了一线作战的机会：她所在的栗田编队抓到了美军护航航母编队，但是在美军的拼命反抗下日军没能取得多大的战果。回到本土的她在搁置中迎来了日本投降。美军缴获之后将她用作“十字路口计划”核试验的靶船，于1946年7月沉没。"]],
                             "1913": ["female", "ROCN", 4, ["zhuangjiafh", "zhanliebb", "jujianmengxiang"], ["zhu", "des:1913年时，为针对邻国的海军威胁，国民政府参谋部在海军造舰计划书中提出了颇为夸张的海军扩建计划，其中便包括大量的战列巡洋舰。该型战列巡洋所设想的性能参数为：排水量28000吨，装备10门14英寸火炮，航速29节左右。当然在那个穷困动荡的年代，海军意图获取主力舰无非是不切实际的妄想罢了……"]],
                             kunxi: ["female", "USN", 4, ["huokongld", "zhongxunca", "gaosusheji"], ["des:新奥尔良级重巡洋舰6号舰。新奥尔良级是北安普顿级的改良版本，增强了防护。战争爆发后，昆西号先是执行了在大西洋的岛屿巡逻任务，后于42年5月通过巴拿马运河来到太平洋战场。在萨沃岛海战中，昆西号击中了鸟海号的舰桥，但是之后昆西号被日军集火射击，最终不幸被鱼雷击沉。"]],
@@ -2577,6 +2577,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player.logSkill('junfu', trigger.player);
                                         //player.loseToDiscardpile(result.links);player.discoverCard(get.inpile('trick'));target.loseToSpecial(event.cards2,'asara_yingwei',player).visible=true;player.draw(1);player.draw(1);player.loseToSpecial(,'junfu',player).visible=true;
                                         trigger.player.gain(result.links, player);
+                                        //独角兽的技能修葺
                                         if (trigger.player.hasSkill("hangmucv") && player.hasSkill("xiuqi") && (!trigger.player.hasSkill("xiuqi2"))) {
 
                                             game.log(get.translation(trigger.player) + "获得了【修葺】带来的提升！");
@@ -2588,6 +2589,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 trigger.player.storage._qianghuazhuang = [a, b, c, d, e, f, g, h];
                                             }
                                         }
+                                        if (!trigger.player.hasSkill("hangmucv") && player.hasSkill("xiuqi") && (!trigger.player.hasSkill("xiuqi2"))) {
+
+                                            game.log(get.translation(trigger.player) + "获得了【修葺】带来的航空支援！");
+                                            trigger.player.addTempSkill('hangmucv', { player: 'phaseAfter' });
+                                        }
+                                        //
                                         player.draw(1);
                                     } else event.finish();
 
@@ -3502,7 +3509,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.gain(cards2, 'log', 'gain2');
                                 },
                                 ai: {
-                                    threaten: 3,
+                                    threaten: 4,
                                 },
                             },
                             gaosusheji: {
@@ -4711,7 +4718,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
 
                                 ai: {
-                                    threaten: 1.1,
+                                    threaten: 0.8,
                                 },
                                 "_priority": 0,
                             },
@@ -5474,7 +5481,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 logTarget: "target",
                                 content: function () {
                                     "step 0"
-                                    
+
                                     player.chooseToDiscard(1);
                                     "step 1"
                                     if (result.bool) {
@@ -5515,7 +5522,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 force: true,
                                 mod: {
                                     globalFrom(from, to, distance) {
-                                        if (from.getSeatNum()<to.getSeatNum()) return distance - 1;
+                                        if (from.getSeatNum() < to.getSeatNum()) return distance - 1;
                                     },
                                 },
                             },
@@ -7555,6 +7562,25 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         return get.translation(skill + '_info');
                                     },
                                 },
+                                usable:1,
+                                trigger:{
+                                    global:"useCardAfter",
+                                },
+                                forced:true,
+                                filter(event, player) {
+                                    return (event.card.name == "jinjuzy"||event.card.name == "wanjian")  && event.cards.someInD();
+                                },
+                                content() {
+                                    player.gain(trigger.cards.filterInD(), "gain2");
+                                },
+                                ai:{
+                                    effect:{
+                                        target(card) {
+                                            if (card.name == "jinjuzy"||card.name == "wanjian") return [0, 1];
+                                        },
+                                    },
+                                },
+                                "_priority":0,
                             },
                             xiuqi2: {
                                 name: "修葺",
@@ -8018,7 +8044,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             tianshi2: "天使2", tianshi2_info: "拥有“天使”的角色判定牌生效前，E国势力的角色可以打出一张红牌代替之",
                             jishiyu: "及时雨", jishiyu_info: "你的判定牌生效后，你可以获得之。",
                             yongbuchenmodezhanjian: "永不沉没的战舰", yongbuchenmodezhanjian_info: "主公技，每回合限一次，你有护甲值时，你受到的伤害-1。",
-                            xiuqi: "修葺", xiuqi_info: "当你发动军辅将牌交给航母时，其下一次发动开幕航空的技能等级+1",
+                            xiuqi: "修葺", xiuqi_info: "当你发动军辅将牌交给：航母时，其下一次发动开幕航空的技能等级+1；非航母时，其获得开幕航空直到其下回合结束。每名角色回合限一次，万箭齐发或近距支援结算结束后你获得词牌对应的所有实体牌",
                             wanbei: "完备", wanbei_info: "锁定技，你获得开幕航空，你的开幕航空无法升级。你的手牌上限+X，X为你发动军辅置于武将牌上的牌的数量",
                             xiuqi2: "修葺2", xiuqi2_info: "下一次发动开幕航空的技能等级+1",
                             tiaobangzuozhan: "跳帮作战", tiaobangzuozhan_info: "出牌阶段限一次，你可以视为对一名角色使用决斗。若你以此法造成伤害，你观看其手牌并获得其区域内一张牌；若你因此受到伤害，你令其获得你一张手牌，然后防止此伤害。",
