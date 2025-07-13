@@ -847,7 +847,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             kente: ["female", "RN", 3, ["huokongld", "zhongxunca", "guochuan", "baixiang"], ["des:该舰为肯特级重巡洋舰首舰，由于防护薄弱，经常被戏称为“白象”。肯特号于20年代服役，初期水线装甲带只有25.4毫米。在30年代末期，肯特号和其余重巡都进行了改装，加强了防护。肯特号在二战中参加了围捕斯佩伯爵海军上将号的战斗，1940年在地中海被击伤，回到本土修理时加装了大量雷达设备。1941年年末肯特号搭载外交官前往苏联会见总书记。肯特号平安的度过了战争，于1948年退役。"]],
                             shengwang: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "zuihouderongyao", "29jienaerxun"], ["des:声望级战列巡洋舰首舰。声望级追求高航速而防护不足，在30年代的改装中，声望级重点加强了装甲防护。在战争开始前进行了更彻底的改装，更新了舰桥和防空火力。战争爆发后声望号参加挪威战役，在韦斯特湾海战中声望号利用有利条件单舰击退了两艘沙恩霍斯特级。1941年参与了围歼俾斯麦号行动，后长期担任直布罗陀H舰队旗舰，并幸存到战后，也是英国三艘战巡中唯一幸存到战后的。"]],
                             shenluopujun: ["female", "RN", 4, ["huokongld", "zhongxunca", "hongseqiangwei"], ["des:什罗普郡是伦敦级重巡洋舰四号舰。在战争早期，什罗普郡主要执行护航与武装巡逻任务。在萨沃岛海战中，原澳海军堪培拉号重巡洋舰战沉。皇家海军将什罗普郡转交澳海军顶替堪培拉号巡洋舰的战损。什罗普郡参加了太平洋战场诸多战役，在苏里高海战中与盟军一道截击了来袭战列舰。在战争胜利时，什罗普郡参加了签字仪式。"]],
-                            lafei: ["female", "USN", 3, ["dajiaoduguibi", "quzhudd", "bujushenfeng"], ["des:艾伦·萨姆纳级拉菲号驱逐舰（DD724）的舰名继承自一艘英雄军舰，前代拉菲号曾经在所罗门海战中勇敢地挑战日军的比睿号战列舰。而这一代拉菲也毫不逊色。在冲绳战役期间，她执行雷达哨舰任务时在短时间内遭到了约五十架神风飞机的攻击，被直接撞击六架，命中四弹。但是拉菲坚持战斗，舰长拒绝弃舰并率舰返回了关岛。这是战争史上的一个奇迹，而这艘坚毅的驱逐舰一直服役到了冷战时期。75年退役后成为了博物馆。"]],
+                            lafei: ["female", "USN", 4, ["dajiaoduguibi", "quzhudd", "bujushenfeng"], ["des:艾伦·萨姆纳级拉菲号驱逐舰（DD724）的舰名继承自一艘英雄军舰，前代拉菲号曾经在所罗门海战中勇敢地挑战日军的比睿号战列舰。而这一代拉菲也毫不逊色。在冲绳战役期间，她执行雷达哨舰任务时在短时间内遭到了约五十架神风飞机的攻击，被直接撞击六架，命中四弹。但是拉菲坚持战斗，舰长拒绝弃舰并率舰返回了关岛。这是战争史上的一个奇迹，而这艘坚毅的驱逐舰一直服役到了冷战时期。75年退役后成为了博物馆。"]],
                             sp_lafei: ["female", "USN", 3, ["dajiaoduguibi", "quzhudd", "shenfeng", "buju", "qiangyun", "yuanjun"], ["des:艾伦·萨姆纳级拉菲号驱逐舰（DD724）的舰名继承自一艘英雄军舰，前代拉菲号曾经在所罗门海战中勇敢地挑战日军的比睿号战列舰。而这一代拉菲也毫不逊色。在冲绳战役期间，她执行雷达哨舰任务时在短时间内遭到了约五十架神风飞机的攻击，被直接撞击六架，命中四弹。但是拉菲坚持战斗，舰长拒绝弃舰并率舰返回了关岛。这是战争史上的一个奇迹，而这艘坚毅的驱逐舰一直服役到了冷战时期。75年退役后成为了博物馆。"]],
 
                             jifu: ["female", "ΒΜΦCCCP", 2, ["quzhudd", "dajiaoduguibi", "jifu_weicheng", "jifu_yuanjing", "jifu_lingwei", "jifu_yuanqin", "jifu_yuanqin"], ["des:基辅是苏联海军大舰队计划中的一环，她的设计吸取了塔什干和列宁格勒等驱逐舰的技术，同时航速和火力也保持了非常强的水平。尽管基辅在战前已经开工，但还是因为战况的影响而停工。在战争末期，未完工的基辅被拖回船厂，并修改了设计准备继续建造，但由于相比战后的新驱逐舰设计优势不大，所以并没有最终建造完成。"]],
@@ -6556,6 +6556,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     global: "gainAfter",
                                 },
+                                usable:3,
                                 //direct: true,
                                 popup: false,
                                 filter: function (event, player) {
@@ -7826,6 +7827,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jishiyu: {//天妒
                                 nobracket: true,
                                 audio: 2,
+                                usable:3,
                                 trigger: {
                                     player: "judgeEnd",
                                 },
@@ -8638,16 +8640,18 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 trigger: {
                                     player: "damageEnd",
+                                    source: "damageSource",
                                 },
                                 frequent: true,
                                 filter: function (event) {
                                     return event.num > 0;
                                 },
-                                getIndex(event, player, triggername) {
+                                /*getIndex(event, player, triggername) {
                                     return event.num;
-                                },
+                                },*/
                                 content: function () {
-                                    player.addMark('shenfeng', 1);
+                                    event.count = trigger.num;
+                                    player.addMark('shenfeng', event.count);
                                 },
                                 ai: {
                                     maixie: true,
@@ -9171,7 +9175,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             u47_huxi: "虎袭", u47_huxi_info: "出牌阶段限一次，你可以将一名被记录的角色的体力值和手牌数调整为记录值，然后摸一张牌并移除记录，",
                             u81_zonglie_shanghai: "纵猎", u81_zonglie_shanghai_info: "",
                             u81_zonglie: "纵猎", u81_zonglie_info: "每回每名角色限一次，你对其他角色造成伤害时，若其手牌与你不相等，其可以交给你一张手牌并摸一张牌，防止此伤害，如此做，其本回合不能响应你的牌。",
-                            u81_xunyi: "巡弋", u81_xunyi_info: "锁定技，你攻击范围内的角色在回合外获得牌时，你与其各展示一张牌，若类型相同，视为对其使用一张雷杀。",
+                            u81_xunyi: "巡弋", u81_xunyi_info: "锁定技，每回合限三次，你攻击范围内的角色在回合外获得牌时，你与其各展示一张牌，若类型相同，视为对其使用一张雷杀。",
                             z1_Zqulingjian: "Z驱领舰", z1_Zqulingjian_info: "当G国驱逐舰受到/造成伤害后，你可以将造成伤害的牌置于武将牌上称为“Z”。有其他角色受到雷属性伤害时，你可以弃置一张“Z”，令此伤害-1；当你造成雷属性伤害时，你可以弃置一张“Z”，令此伤害+1。准备阶段，你可以移动一张“Z”。(全局)有Z的角色受到伤害时，可以移去所有Z，防止此伤害。",
                             z1_Zqulingjian_source: "Z驱领舰_加伤", z1_Zqulingjian_source_info: "当你造成雷属性伤害时，你可以弃置一张“Z”，令此伤害+1。",
                             z1_Zqulingjian_damage: "Z驱领舰_减伤", z1_Zqulingjian_damage_info: "有其他角色受到雷属性伤害时，你可以弃置一张“Z”，令此伤害-1。",
@@ -9193,7 +9197,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             huangjiaxunyou: "皇家巡游", huangjiaxunyou_info: "锁定技，你计算与其他角色距离-1，其他角色计算与你距离+1。",
                             tianshi: "天使", tianshi_info: "主公技，你的判定牌生效前，E国势力的角色可以打出一张红牌代替之",
                             tianshi2: "天使2", tianshi2_info: "拥有“天使”的角色判定牌生效前，E国势力的角色可以打出一张红牌代替之",
-                            jishiyu: "及时雨", jishiyu_info: "你的判定牌生效后，你可以获得之。",
+                            jishiyu: "及时雨", jishiyu_info: "每回合限三次，你的判定牌生效后，你可以获得之。",
                             jishiyu1: "及时雨", jishiyu1_info: "每回合各限一次，当你需要使用或打出杀时，你可以进行判定，判定结果为黑色则视为你使用或打出了杀。",
                             yongbuchenmodezhanjian: "永不沉没的战舰", yongbuchenmodezhanjian_info: "主公技，每回合限一次，你有护甲值时，你可以弃置一张牌令受到的伤害-1。",
                             xiuqi: "修葺", xiuqi_info: "当你发动军辅将牌交给一名其他角色时，你可以令其获得以下效果：你首次造成伤害时，可以回复一点体力。直到其回合结束。",
@@ -9209,7 +9213,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zuihouderongyao_more: "多摸减距离",
                             hongseqiangwei: "红色蔷薇", hongseqiangwei_info: "你使用伤害类牌后，可以将一张手牌置于武将牌上称为[花]。[花]包含对应座次（点数超出游戏人数则减去游戏人数）的角色受到伤害时，你须弃置一张对应点数的[花]并防止此伤害。",
                             bujushenfeng: "不惧神风", bujushenfeng_info: "当你受到伤害时，你可以获得造成伤害的牌。你的手牌上限基数为你的体力上限。",
-                            shenfeng: "神风", shenfeng_info: "当你受到一点伤害时，你获得一个“风”标记。",
+                            shenfeng: "神风", shenfeng_info: "当你造成或受到一点伤害时，你获得一个“风”标记。",
                             buju: "不惧", buju_info: "每轮各限一次，你可以移去一个“风”视为使用酒或无懈可击。 以此法使用的无懈可击结算后，你重置[援军]。",
                             qiangyun: "强运", qiangyun_info: "觉醒技，当你进入濒死时，恢复一点体力。",
                             yuanjun: "援军", yuanjun_info: "限定技，若你有至少6个“风”标记，你可以移去所有“风”视为使用万箭齐发。",
