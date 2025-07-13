@@ -3660,7 +3660,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     //player.changeZhuanhuanji('gaosusheji');
                                     game.log("2:" + player.storage.gaosusheji);
                                     trigger.effectCount++;
-                                    //game.logskill('gaosusheji');
+                                    //game.logSkill('gaosusheji');
                                 },
                             },
                             qixi_cv: {
@@ -6210,7 +6210,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player.draw(1);
                                     }
                                     'step 4'
-                                    logskill("lingwei");
+                                    logSkill("lingwei");
                                     game.log(player.hasHistory('sourceDamage'));
                                     if (player.isIn() && player.getHistory('sourceDamage', function (evt) {
                                         return evt.getParent(2) == event.parent;
@@ -6342,12 +6342,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     "step 0"
-                                    player.chooseToDiscard('he', '是否弃置一张黑色牌并记录' + get.translation(trigger.player) + '状态？', { color: 'black' }).set('ai', function (card, player) {
+                                    player.chooseToDiscard(1,'he', '是否弃置一张黑色牌并记录' + get.translation(trigger.player) + '状态？', { color: 'black' }).set('ai', function (card, player) {
                                         var player = _status.event.player, target = _status.event.getTrigger().player;
                                         if (get.attitude(player, target >= 0)) {
-                                            if (target.hp < 3 && target.countCards(h) < 3) return 0;
+                                            if (target.hp < 3 && target.countCards("h") < 3) return 0;
                                         } else {
-                                            if (target.hp > 2 && target.countCards(h) > 2) return 0;
+                                            if (target.hp > 2 && target.countCards("h") > 2) return 0;
                                         };
                                         return 12 - get.value(card);
                                     });
@@ -8280,8 +8280,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
                             },
-                            guochuan: {
-                                nobracket: true,
+                            guochuan: {    
+                            nobracket: true,                            
                                 audio: true,
                                 trigger: {
                                     player: ["damageBegin4"],
@@ -8290,39 +8290,46 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter(event, player, name) {
                                     return event.num > 0;
                                 },
-                                content() {
+                                check:function(event,player){
+      return true;          
+                                },                              content: function() {
                                     "step 0"
-                                    player.chooseToDiscard(get.prompt2("guochuan"), { subtype: "equip2" }, "hes");
+                                    player.chooseToDiscard("弃置一张防具牌或点取消失去一点体力", { subtype: "equip2" }, "hes");
                                     "step 1"
                                     if (!result.bool) {
                                         player.loseHp();
                                     }
+                                    game.log("过穿流失体力");
                                     event.num = trigger.num;
                                     trigger.cancel();
                                     "step 2"
-                                    var next = player.chooseTarget(
-                                        "你可以选择一个目标令其承受此伤害并摸牌", function (card, player, target) {
+    player.chooseTarget(get.prompt("guochuan"),"你可以选择一个目标令其承受此伤害并摸牌", function (card, player, target) {
+                                            game.log("过穿选择目标"+target.name+(get.distance(player, target) <= 1)+(target != trigger.source));
                                             return player != target && get.distance(player, target) <= 1 && target != trigger.source;
-                                        })
-                                        .ai1(function (card) {
-                                            return card == _status.event.cardx ? 1 : 0;
-                                        })
-                                        .ai2(function (target) {
-                                            return target == _status.event.targetx ? 1 : 0;
-                                        });
+                                        }).set('ai', function (target) {
+            var att=get.attitude(_status.event.player,target);
+                var trigger=_status.event.getTrigger();
+                var da=0;
+                if(_status.event.player.hp==1){
+                    da=10;
+                }
+                var eff=get.damageEffect(target,trigger.source,target);
+                if(att==0) return 0.1+da;
+                if(eff>=0&&att>0){
+                    return att+da;
+                }
+                if(att>0&&target.hp>1){
+                    if(target.maxHp-target.hp>=3) return att*1.1+da;
+                    if(target.maxHp-target.hp>=2) return att*0.9+da;
+                }
+                return -att+da;
+        })
                                     "step 3"
                                     if (result.bool) {
                                         var target = result.targets[0];
                                         target.damage(event.num);
                                         target.draw(event.num);
                                     }
-                                },
-                                ai: {
-                                    filterDamage: true,
-                                    skillTagFilter(player, tag, arg) {
-                                        if (arg.player.hasSkillTag('jueqing', false, player)) return false;
-                                        return true;
-                                    },
                                 },
                                 "_priority": 0,
                             },
