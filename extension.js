@@ -2558,7 +2558,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     'step 0'
-                                    var goon = (get.attitude(player, trigger.player) > 0); 
+                                    var goon = (get.attitude(player, trigger.player) > 0);
                                     player.chooseCardButton(get.prompt('junfu', trigger.player), player.getCards('s', function (card) { return card.hasGaintag('junfu') }), [1, 3]).set('ai', function () {
                                         if (_status.event.goon) return 1;
                                         return -1;
@@ -2570,7 +2570,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger.player.gain(result.links, player);
                                         if (trigger.player.hasSkill("hangmucv") && player.hasSkill("xiuqi") && (!trigger.player.hasSkill("xiuqi2"))) {
                                             game.log(trigger.player);
-                                            game.log( "获得了【修葺】带来的提升！");
+                                            game.log("获得了【修葺】带来的提升！");
                                             var a = trigger.player.countMark('mopaiup'), b = trigger.player.countMark('jinengup'), c = trigger.player.countMark('wuqiup'), d = trigger.player.countMark('useshaup'), e = trigger.player.countMark('jidongup'), f = trigger.player.countMark('shoupaiup'), g = trigger.player.countMark('songpaiup'), h = trigger.player.countMark('Expup'), k = trigger.player.countMark('_jianzaochuan') + 1;
                                             if (b < 2) {
                                                 b = b + 1;
@@ -4937,7 +4937,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             }
                                         } else {
                                             game.log("AI没有可用的牌了！</br>也许您没有正确安装并启用‘舰r美化’卡牌包？");
-                                            player.getStorage('jujianmengxiang').includes("error");
+                                            player.markAuto('jujianmengxiang',"error");
+                                            //player.getStorage('jujianmengxiang').includes("error");
                                             event.finish();
                                         }
                                     },
@@ -7187,20 +7188,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             matapanjiaozhijian: {
                                 audio: "ext:舰R牌将:true",
-                                unique: true,
-                                mark: true,
-                                skillAnimation: true,
-                                limited: true,
-                                animationColor: "metal",
-                                init: function (player) {
-                                    player.storage.matapanjiaozhijian = false;
-                                },
+
+                                direct: true,
                                 trigger: {
                                     player: "useCardToPlayered",
                                 },
                                 filter: function (event, player) {
                                     if (event.getParent().triggeredTargets3.length > 1) return false;
-                                    if (player.storage.matapanjiaozhijian) return false;
                                     if (get.type(event.card) == 'trick') return true;
 
                                 },
@@ -7224,8 +7218,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     'step 0'
-                                    player.awakenSkill('matapanjiaozhijian');
-                                    player.storage.matapanjiaozhijian = true;
                                     player.chooseToDiscard(get.prompt('matapanjiaozhijian', trigger.target), "弃置任意张牌，然后指定至多等量名角色为目标", [1, Infinity], 'hes').set('ai', card => {
                                         if (ui.selected.cards.length >= _status.event.max) return 0;
                                         if (_status.event.goon) return 4.5 - get.value(card);
@@ -7252,15 +7244,26 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             zhongbangtuxi: {
+                                unique: true,
+                                mark: true,
+                                skillAnimation: true,
+                                limited: true,
+                                animationColor: "metal",
+                                init: function (player) {
+                                    player.storage.zhongbangtuxi = false;
+                                },
                                 trigger: {
                                     player: "phaseJieshuBegin",
                                 },
-                                direct: true,
                                 filter: function (event, player) {
-                                    return !player.getStat('damage');
+                                    if (player.storage.matapanjiaozhijian) return false;
+                                    return true;//!player.getStat('damage');
                                 },
                                 content: function () {
                                     'step 0'
+
+                                    player.awakenSkill('zhongbangtuxi');
+                                    player.storage.zhongbangtuxi = true;
                                     player.chooseToDiscard(get.prompt('zhongbangtuxi'), "弃置任意张牌，然后指定至多等量名角色为目标", [1, Infinity], 'hes', { color: 'red' }).set('ai', card => {
                                         if (ui.selected.cards.length >= _status.event.max) return 0;
                                         if (_status.event.goon) return 4.5 - get.value(card);
@@ -7310,7 +7313,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter(event, player) {
                                     if (!event.source && event.source.isIn()) return false;
                                     var target = (player == event.player) ? event.source : event.player;
-                                    return target.isAlive();
+                                    return event.player.countCards("h")!=0&&target.isAlive();
                                 },
                                 content() {
                                     'step 0'
@@ -7478,9 +7481,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player: "phaseUseEnd",
                                 },
                                 filter: function (event, player) {
-                                    var hangmucv=false;
-                                    player.getHistory('useSkill',evt=>{
-                                        if(evt.skill=='hangmucv') hangmucv=true;
+                                    var hangmucv = false;
+                                    player.getHistory('useSkill', evt => {
+                                        if (evt.skill == 'hangmucv') hangmucv = true;
                                     });
                                     return !hangmucv;
                                 },
@@ -7494,7 +7497,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                     if (player.hasSkill('xiuqi2')) { player.removeSkill('xiuqi2'); player.removeMark('xiuqi2', player.countMark('xiuqi2')); };
                                 },
-                                "_priority":200,
+                                "_priority": 200,
                                 sub: true,
                             },
                             wanbei: {
@@ -7744,8 +7747,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             z21_tuxi: "突袭", z21_tuxi_info: "出牌阶段开始时，你可以选择攻击范围内的一名角色，将其一张牌置于其武将牌上，称为Z。当有Z的武将受到伤害后，你可以令其随机弃置一张牌并弃置所有Z",
                             z22_tuxixiawan: "突袭峡湾", z22_tuxixiawan_info: "出牌阶段开始时，你可以将任意角色一张手牌置于自己的武将牌上，称为Z。其他角色造成伤害后，若你有Z，你可以移去一枚Z，进行一次判定，令当前回合角色不能使用或打出与判定牌花色相同的牌直到回合结束。",
                             cardsDisabled_suit: "不能使用_花色", cardsDisabled_suit_info: "你不能使用或打出对应花色的手牌。",
-                            matapanjiaozhijian: "马塔潘角之箭", matapanjiaozhijian_info: "限定技，你使用锦囊牌指定目标后，你可以弃置任意张牌，令等量目标不可响应此牌。",
-                            zhongbangtuxi: "重磅突袭", zhongbangtuxi_info: "结束阶段，若你本回合未造成伤害，你可以弃置任意张红色牌对等量角色各造成一点火焰伤害。",
+                            matapanjiaozhijian: "马塔潘角之箭", matapanjiaozhijian_info: "你使用锦囊牌指定目标后，你可以弃置任意张牌，令等量目标不可响应此牌。",
+                            zhongbangtuxi: "重磅突袭", zhongbangtuxi_info: "限定技，结束阶段，你可以弃置任意张红色牌对等量角色各造成一点火焰伤害。",
                             huangjiahaijunderongyao: "皇家海军的荣耀", huangjiahaijunderongyao_info: "锁定技，你造成或受到伤害时，展示受伤角色的手牌，然后进行判定，若判定结果点数与展示的点数之一相同，此伤害+1",
                             huangjiaxunyou: "皇家巡游", huangjiaxunyou_info: "锁定技，你计算与其他角色距离-1，其他角色计算与你距离+1。",
                             tianshi: "天使", tianshi_info: "主公技，你的判定牌生效前，E国势力的角色可以打出一张红牌代替之",
@@ -7755,6 +7758,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             xiuqi: "修葺", xiuqi_info: "当你发动军辅将牌交给航母时，其下一次发动开幕航空的技能等级+1",
                             wanbei: "完备", wanbei_info: "锁定技，你获得开幕航空，你的开幕航空无法升级。你的手牌上限+X，X为你发动军辅置于武将牌上的牌的数量",
                             xiuqi2: "修葺2", xiuqi2_info: "下一次发动开幕航空的技能等级+1",
+
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
                             lishizhanyi_naerweike: '历史战役-纳尔维克',
