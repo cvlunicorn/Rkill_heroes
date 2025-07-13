@@ -169,7 +169,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         return (event.name != 'phase' || game.phaseNumber == 0) && (get.mode() != 'boss' || (get.mode() == 'boss' && !lib.character[player.name][4].contains('boss') && player.identity == 'cai'));
                     },
                     content: function () {
-                        if (player.identity == 'zhu') { player.changeHujia(1); game.log() };
+                        if (player.identity == 'zhu') { player.changeHujia(1); };
                     },
                     intro: { content: function () { return get.translation(_yuanhang + '_info'); }, },
                     subSkill: {
@@ -722,7 +722,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             };//选项触发内容，原因见config
 
             lib.skill._DieSound = {//死亡时台词
-                trigger: { global: 'dieBegin', },
+                trigger: { player: 'dieBegin', },
                 //direct:true,
                 priority: 2,
                 forced: true,
@@ -4955,6 +4955,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             zhongzhuangcike: {
+                                audio: "ext:舰R牌将:true",
                                 group: ["wushifangju", "liushitili"],
                                 "_priority": 0,
                             },
@@ -5645,7 +5646,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 animationColor: "gray",
                                 filter: function (event, player) {
                                     if (player.storage.jifu_yuanjing) return false;
-                                    return player.hasSkill["jifu_weicheng"] && player.hp <= 0;
+                                    return player.hasSkill("jifu_weicheng") && player.hp <= 0;
                                 },
                                 content: function () {
                                     'step 0'
@@ -5805,34 +5806,42 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             u47_xinbiao: {
                                 trigger: {
-                                    global: ["damageEnd", "loseHpEnd","dying"],
+                                    global: ["damageEnd", "loseHpEnd", "dying"],
                                 },
                                 direct: true,
                                 filter(event, player) {
-                                    if(player.countCards('he', { color: 'black' }) <= 0)return false;
-                                    if(!event.player.isIn())return false;
+                                    if (player.countCards('he', { color: 'black' }) <= 0) return false;
+                                    if (!event.player.isIn()) return false;
                                     var i = 0;
                                     var allplayers = game.players.sortBySeat(player);
                                     game.log(allplayers.length);
                                     for (i = 0; i < allplayers.length; i++) {
                                         game.log(allplayers[i], i);
-                                        
+
                                         if (allplayers[i].hasSkill("u47_xinbiao_hp")) {
-                                           
+
                                             game.log(allplayers[i].group);
                                             game.log(event.player.group);
                                             if (allplayers[i].group == event.player.group) {
-                                               return false;
-                                                
+                                                return false;
+
                                             }
                                         }
-                                        
+
                                     }
                                     return player.countCards('he', { color: 'black' }) > 0;
                                 },
                                 content: function () {
                                     "step 0"
-                                    player.chooseToDiscard('he', '是否弃置一张黑色牌并记录' + get.translation(trigger.player) + '状态？', { color: 'black' });
+                                    player.chooseToDiscard('he', '是否弃置一张黑色牌并记录' + get.translation(trigger.player) + '状态？', { color: 'black' }).set('ai', function (card, player) {
+                                        var player = _status.event.player, target = _status.event.getTrigger().player;
+                                        if (get.attitude(player, target>=0)) {
+                                            if (target.hp < 3 && target.countCards(h) < 3) return 0;
+                                        } else {
+                                            if (target.hp > 2 && target.countCards(h) > 2) return 0;
+                                        };
+                                        return 12 - get.value(card);
+                                    });;
                                     "step 1"
                                     if (result.bool) {
                                         trigger.player.addSkill("u47_xinbiao_hp");
@@ -5841,7 +5850,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger.player.addMark("u47_xinbiao_cards", trigger.player.countCards('h'));
                                         game.log(trigger.player, trigger.player.countMark("u47_xinbiao_hp"));
                                         markAuto('u47_xinbiao', [trigger.player]);
-                                        
+
                                     }
                                 },
                             },
@@ -5869,55 +5878,58 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter: function (event, player) {
                                     return game.countPlayer(function (current) {
                                         return current.hasSkill('u47_xinbiao_hp');
-                                    })&&get.tag(event.card, 'damage') && !event.player.hasHistory('sourceDamage', function (evt) {
+                                    }) && get.tag(event.card, 'damage') && !event.player.hasHistory('sourceDamage', function (evt) {
                                         return evt.card == event.card;
                                     });
                                 },
                                 content: function () {
                                     "step 0"
-                                    player.chooseTarget(get.prompt2('u47_huxi'),function(card,player,target){
+                                    player.chooseTarget(get.prompt2('u47_huxi'), function (card, player, target) {
                                         return target.hasSkill('u47_xinbiao_hp');
                                     }).set('ai', target => {
-                                        var att=get.attitude(player, target);
-                                        if(att >= 0){
-                                            return (target.countMark('u47_xinbiao_hp')-target.hp)*2+(target.countMark('u47_xinbiao_cards')-target.countCards("h"));     
-                                        }else if(att > 0){
-                                            return (target.hp-target.countMark('u47_xinbiao_hp'))*2+(target.countCards("h")-target.countMark('u47_xinbiao_cards'));
-                                        }else{
-                                        return 1;
+                                        var att = get.attitude(player, target);
+                                        if (att >= 0) {
+                                            return (target.countMark('u47_xinbiao_hp') - target.hp) * 2 + (target.countMark('u47_xinbiao_cards') - target.countCards("h"));
+                                        } else if (att > 0) {
+                                            return (target.hp - target.countMark('u47_xinbiao_hp')) * 2 + (target.countCards("h") - target.countMark('u47_xinbiao_cards'));
+                                        } else {
+                                            return 1;
                                         }
-                                    }); 
+                                    });
                                     'step 1'
-                                    if(result.bool){
-                                    player.logSkill('u47_huxi');
-                                    var target=result.targets[0];
-                                    var i1 = target.countMark('u47_xinbiao_hp');
-                                    target.removeMark('u47_xinbiao_hp', i1);
-                                    var i2 = target.countMark('u47_xinbiao_cards');
-                                    target.removeMark('u47_xinbiao_cards', i2);
-                                    var hp = target.hp - i1;
-                                    var cards = target.countCards("h") - i2;
-                                    game.log("hp",hp,"cards",cards);
-                                    game.log("hp",Math.abs(hp),"cards",Math.abs(cards));
-                                    if (hp > 0) {
-                                        target.loseHp(Math.abs(hp));
+                                    if (result.bool) {
+                                        player.logSkill('u47_huxi');
+                                        var target = result.targets[0];
+                                        var i1 = target.countMark('u47_xinbiao_hp');
+                                        target.removeMark('u47_xinbiao_hp', i1);
+                                        var i2 = target.countMark('u47_xinbiao_cards');
+                                        target.removeMark('u47_xinbiao_cards', i2);
+                                        var hp = target.hp - i1;
+                                        var cards = target.countCards("h") - i2;
+                                        game.log("hp", hp, "cards", cards);
+                                        game.log("hp", Math.abs(hp), "cards", Math.abs(cards));
+                                        if (hp > 0) {
+                                            target.loseHp(Math.abs(hp));
 
-                                    } else if (hp < 0) {
-                                        target.recover(Math.abs(hp));
-                                    }
-                                    if (cards > 0) {
-                                        target.discard(Math.abs(cards));
+                                        } else if (hp < 0) {
+                                            target.recover(Math.abs(hp));
+                                        }
+                                        if (cards > 0) {
+                                            target.discard(Math.abs(cards));
 
-                                    } else if (cards < 0) {
-                                        target.draw(Math.abs(cards));
+                                        } else if (cards < 0) {
+                                            target.draw(Math.abs(cards));
+                                        }
+                                        target.removeSkill('u47_xinbiao_hp');
+                                        target.removeSkill('u47_xinbiao_cards');
+                                        player.draw(1);
+                                    } else {
+                                        game.log("结束结算");
+                                        event.finish();
                                     }
-                                    target.removeSkill('u47_xinbiao_hp');
-                                    target.removeSkill('u47_xinbiao_cards');
-                                    player.draw(1);
-                                }else{
-                                    game.log("结束结算");
-                                    event.finish();
-                                }
+                                },
+                                ai:{
+                                    order:10,
                                 },
                                 "_priority": 0,
                             }
