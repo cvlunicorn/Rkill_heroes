@@ -4278,7 +4278,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     player: "phaseUseBegin",
                                 },
-                                direct: true,
+                                check: function (event, player) {
+                                    if (player.countCards('h') > (player.maxHandcard + 3)) return false;
+                                    if (player.countCards('h', function (card) { if (get.number(card) > 10) return true; })) return true;
+                                    return false;
+                                },
                                 content: function () {
                                     'step 0'
                                     player.chooseTarget(get.prompt2('qijianshashou'), function (card, player, target) {
@@ -4772,7 +4776,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return (event.card.name == 'sha' || event.card.name == 'sheji9') && get.distance(player, event.target) <= 1 && event.target.isIn();
                                 },
                                 check: function (event, player) {
-                                    return get.attitude(player, event.target) >= 0||player==event.target;
+                                    return get.attitude(player, event.target) >= 0 || player == event.target;
                                 },
                                 logTarget: "target",
                                 content: function () {
@@ -4812,12 +4816,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (result.bool) {
                                         event.target = result.targets[0];
                                         event.target.chooseCard('he', '交给' + get.translation(player) + '一张牌，并获得其场上的一张牌').set('ai', function (card) {
-                                            var attitude=get.attitude(event.target, player);
+                                            var attitude = get.attitude(event.target, player);
                                             if (attitude <= 0) return -get.value(card);
                                             if (get.position(card) == 'e') return -1;
                                             if (card.name == 'shan') return 7;
-                                            if (get.type(card) == 'equip') return get.value(card,player)-get.value(card);
-                                            return get.value(card,player);
+                                            if (get.type(card) == 'equip') return get.value(card, player) - get.value(card);
+                                            return get.value(card, player);
                                         });
                                     } else {
                                         event.finish();
@@ -5548,7 +5552,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                     if (list == "") {
                                         game.log('牌堆中没有符合要求的牌');
-                                        player.getStat('skill').duomianshou-=1;
+                                        player.getStat('skill').duomianshou -= 1;
                                         player.storage.duomianshou.push(card);
                                         event.finish();
                                     }
@@ -6342,7 +6346,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     "step 0"
-                                    player.chooseToDiscard(1,'he', '是否弃置一张黑色牌并记录' + get.translation(trigger.player) + '状态？', { color: 'black' }).set('ai', function (card, player) {
+                                    player.chooseToDiscard(1, 'he', '是否弃置一张黑色牌并记录' + get.translation(trigger.player) + '状态？', { color: 'black' }).set('ai', function (card, player) {
                                         var player = _status.event.player, target = _status.event.getTrigger().player;
                                         if (get.attitude(player, target >= 0)) {
                                             if (target.hp < 3 && target.countCards("h") < 3) return 0;
@@ -6744,31 +6748,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 }
                                                 return target.getExpansions('Z').length;
                                             }).set('targetprompt', ['移走Z', '获得Z']).set('multitarget', true).set('ai', target => {
-                                                var aiTargets = get.event('aiTargets');
-                                                if (aiTargets) {
-                                                    return aiTargets[ui.selected.targets.length] == target ? 10 : 0;
+                                                if (player.getExpansions('Z').length > 1 && target.getExpansions('Z').length < 1) {
+                                                    return get.attitude(player, target);
                                                 }
                                                 return 0;
-                                            }).set('aiTargets', (() => {
-                                                var targets = [], eff = 0;
-                                                for (var user of game.filterPlayer()) {
-                                                    for (var target of game.filterPlayer()) {
-                                                        if (user == target) continue;
-                                                        var targetsx = [user, target];
-                                                        if (user == player) effx += 1;
-                                                        if (user.getExpansions('Z').length < 2) effx -= 1;
-                                                        if (get.attitude(player, target) > 0) effx += 5;
-                                                        if (get.attitude(player, target) < 0) effx -= 15;
-                                                        if (target.getExpansions('Z').length < 1) effx += 1;
-                                                        if (effx > eff) {
-                                                            eff = effx;
-                                                            targets = targetsx;
-                                                        }
-                                                    }
-                                                }
-                                                if (targets.length) return targets;
-                                                return null;
-                                            }));
+                                            });
                                             "step 1"
                                             if (result.bool) {
                                                 //game.log(result.targets);
@@ -7681,7 +7665,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player: "phaseJieshuBegin",
                                 },
                                 filter: function (event, player) {
-                                    if (player.storage.matapanjiaozhijian) return false;
+                                    if (player.storage.zhongbangtuxi) return false;
                                     return true;//!player.getStat('damage');
                                 },
                                 content: function () {
@@ -7690,7 +7674,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.awakenSkill('zhongbangtuxi');
                                     player.storage.zhongbangtuxi = true;
                                     player.chooseToDiscard(get.prompt('zhongbangtuxi'), "弃置任意张牌，然后指定至多等量名角色为目标", [1, Infinity], 'hes', { color: 'red' }).set('ai', card => {
-                                        return 7 - get.value(card);
+                                        return 9 - get.value(card);
                                     }).set('max', game.countPlayer(function (current) {
                                         return get.attitude(player, current) < 0;
                                     })).set('goon', 1);
@@ -8280,8 +8264,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
                             },
-                            guochuan: {    
-                            nobracket: true,                            
+                            guochuan: {
+                                nobracket: true,
                                 audio: true,
                                 trigger: {
                                     player: ["damageBegin4"],
@@ -8290,9 +8274,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter(event, player, name) {
                                     return event.num > 0;
                                 },
-                                check:function(event,player){
-      return true;          
-                                },                              content: function() {
+                                check: function (event, player) {
+                                    return true;
+                                }, content: function () {
                                     "step 0"
                                     player.chooseToDiscard("弃置一张防具牌或点取消失去一点体力", { subtype: "equip2" }, "hes");
                                     "step 1"
@@ -8303,27 +8287,27 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     event.num = trigger.num;
                                     trigger.cancel();
                                     "step 2"
-    player.chooseTarget(get.prompt("guochuan"),"你可以选择一个目标令其承受此伤害并摸牌", function (card, player, target) {
-                                            game.log("过穿选择目标"+target.name+(get.distance(player, target) <= 1)+(target != trigger.source));
-                                            return player != target && get.distance(player, target) <= 1 && target != trigger.source;
-                                        }).set('ai', function (target) {
-            var att=get.attitude(_status.event.player,target);
-                var trigger=_status.event.getTrigger();
-                var da=0;
-                if(_status.event.player.hp==1){
-                    da=10;
-                }
-                var eff=get.damageEffect(target,trigger.source,target);
-                if(att==0) return 0.1+da;
-                if(eff>=0&&att>0){
-                    return att+da;
-                }
-                if(att>0&&target.hp>1){
-                    if(target.maxHp-target.hp>=3) return att*1.1+da;
-                    if(target.maxHp-target.hp>=2) return att*0.9+da;
-                }
-                return -att+da;
-        })
+                                    player.chooseTarget(get.prompt("guochuan"), "你可以选择一个目标令其承受此伤害并摸牌", function (card, player, target) {
+                                        game.log("过穿选择目标" + target.name + (get.distance(player, target) <= 1) + (target != trigger.source));
+                                        return player != target && get.distance(player, target) <= 1 && target != trigger.source;
+                                    }).set('ai', function (target) {
+                                        var att = get.attitude(_status.event.player, target);
+                                        var trigger = _status.event.getTrigger();
+                                        var da = 0;
+                                        if (_status.event.player.hp == 1) {
+                                            da = 10;
+                                        }
+                                        var eff = get.damageEffect(target, trigger.source, target);
+                                        if (att == 0) return 0.1 + da;
+                                        if (eff >= 0 && att > 0) {
+                                            return att + da;
+                                        }
+                                        if (att > 0 && target.hp > 1) {
+                                            if (target.maxHp - target.hp >= 3) return att * 1.1 + da;
+                                            if (target.maxHp - target.hp >= 2) return att * 0.9 + da;
+                                        }
+                                        return -att + da;
+                                    })
                                     "step 3"
                                     if (result.bool) {
                                         var target = result.targets[0];
