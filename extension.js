@@ -26,6 +26,7 @@ try {
 }
 //const { connect } = require("ws");//突然生成出来的，暂未查明生成原因，且难以复现。require导入属于cjs格式，在手机上会报错，电脑上不会。写为import来导入会产生另一种错误。目前使用try-catch包裹起来。
 //2025.1.19升级至无名杀1.10.12版本，该版本联机允许扩展，不额外需要“一劳永逸”扩展。
+import {lib,game,ui,get,ai,_status} from '../../noname.js'
 game.import("extension", function (lib, game, ui, get, ai, _status) {
 
     return {
@@ -598,7 +599,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     filter: function (event, player) {//||player.hasSkill('hanbing_gai')
                         return (event.nature == 'ice' || player.hasSkill('hanbing_skill') && event.card && event.card.name == 'sha') && event.notLink() && event.player.getCards('he').length > 0 && (get.mode() != 'boss' || (get.mode() == 'boss' && !lib.character[player.name][4].includes('boss') && player.identity == 'cai'));
                     },
-                    audio: "ext:舰R牌将:true",
+                    audio: "ext:舰R牌将/audio/skill:true",
                     check: function (event, player) {
                         var target = event.player;
                         var eff = get.damageEffect(target, player, player, event.nature);
@@ -766,24 +767,24 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 unique: true,
                 frequent: true,
                 filter: function (event, player) {
-                    game.log("死亡台词判断");
+                    //game.log("死亡台词判断");
                     return true;
                 },
                 content: function () {
-                    game.log("死亡台词触发");
-                    game.playAudio('..', 'extension', '舰R牌将', trigger.player.name + ".mp3");
-                    setTimeout(function () {
+                    //game.log("死亡台词触发");
+                    game.playAudio('..', 'extension', '舰R牌将/audio/die', trigger.player.name + ".mp3");
+                    /*setTimeout(function () {
                         if (player.name2) {
-                            game.playAudio('..', 'extension', '舰R牌将', trigger.player.name + ".mp3");
+                            game.playAudio('..', 'extension', '舰R牌将/audio/die', trigger.player.name + ".mp3");
                         }
-                    }, 1500);
+                    }, 1500);*/
 
                 },
             }
 
             //全局技能写在这上面
-        }, precontent: function (jianrjinji) {
-
+        }, 
+        precontent: function (jianrjinji) {
             if (jianrjinji.enable) {
                 //武将包,"qigong","qingnang"
                 game.import('character', function () {
@@ -1247,7 +1248,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter: function (event, player) {//||player.hasSkill('hanbing_gai')
                                     return (event.nature == 'ice' || player.hasSkill('hanbing_skill') && event.card && event.card.name == 'sha') && event.notLink() && event.player.getCards('he').length > 0 && (get.mode() != 'boss' || (get.mode() == 'boss' && !lib.character[player.name][4].includes('boss') && player.identity == 'cai'));
                                 },
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 check: function (event, player) {
                                     var target = event.player;
                                     var eff = get.damageEffect(target, player, player, event.nature);
@@ -1505,7 +1506,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 equipSkill: true,
                                 firstDo: true,
                                 direct: true,
-                                trigger: { player: ["shaMiss", "eventNeutralized"], }, audio: "ext:舰R牌将:true",
+                                trigger: { player: ["shaMiss", "eventNeutralized"], }, audio: "ext:舰R牌将/audio/skill:true",
                                 filter: function (event, player) {
                                     if (event.type != 'card' || event.card.name != 'sha') return false;
 
@@ -1987,7 +1988,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             "rendeonly2": {
-                                audio: "ext:舰R牌将:2",
+                                audio: "ext:舰R牌将/audio/skill:2",
                                 audioname: ["gz_jun_liubei", "shen_caopi"],
                                 enable: "phaseUse",
                                 filterCard: true,
@@ -2427,7 +2428,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             qianting_xiji: {
-                                audio: "ext:舰R牌将:2",
+                                audio: "ext:舰R牌将/audio/skill:2",
                                 audioname: ["re_ganning", "re_heqi"],
                                 mod: {
                                     attackFrom: function (from, to, distance) { var a = 0; if (from.hasSkill('quzhudd') && to.hasSkill('qianting')) { var a = a - 1 }; return distance = (distance + a) },
@@ -2964,7 +2965,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             huokongld: {
                                 firstDo: true,
                                 direct: true,
-                                trigger: { player: ["shaMiss", "eventNeutralized"], }, audio: "ext:舰R牌将:true",
+                                trigger: { player: ["shaMiss", "eventNeutralized"], }, audio: "ext:舰R牌将/audio/skill:true",
                                 filter: function (event, player) {
                                     if (event.type != 'card' || event.card.name != 'sha') return false;
 
@@ -3034,7 +3035,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             "ganglie_gai": {
-                                audio: "ext:舰R牌将:2",
+                                audio: "ext:舰R牌将/audio/skill:2",
                                 trigger: { player: "damageEnd", },
                                 filter: function (event, player) {
                                     return (event.source != undefined && event.source != player && event.player.hp <= event.player.maxHp / 2);
@@ -3123,7 +3124,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             zhiyangai: {
-                                audio: "ext:舰R牌将:2",
+                                audio: "ext:舰R牌将/audio/skill:2",
                                 audioname: ["gexuan", "re_yufan"],
                                 trigger: {
                                     player: "phaseJieshuBegin",
@@ -3167,7 +3168,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             "fangkong2": {
-                                name: "防空", //audio: "ext:舰R牌将:1", audioname: ["yixian", "reganning", "sunce", "re_sunben", "re_sunce", "ol_sunjian"],
+                                name: "防空", //audio: "ext:舰R牌将/audio/skill:1", audioname: ["yixian", "reganning", "sunce", "re_sunben", "re_sunce", "ol_sunjian"],
                                 unique: true, nodelay: true, lastDo: true,
                                 trigger: { global: "useCardToPlayered", },
                                 filter: function (event, player) {
@@ -3287,7 +3288,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                             guzhuyizhi: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: { player: 'phaseZhunbeiBegin' },
 
                                 check: function (event, player) {
@@ -3366,7 +3367,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }
                                     },
                                 },
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 enable: "phaseUse",
                                 filterCard: true,
                                 position: 'hejs',
@@ -3517,7 +3518,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             dumuchenglin_2: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 mod: {
                                     cardUsable: function (card, player, num) {
                                         if (card.name == 'sha') return num + 1;
@@ -3596,7 +3597,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             xiangrui: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: { player: "damageBegin4", },
                                 usable: 1,
                                 mark: true,
@@ -3617,7 +3618,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             yumian: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
                                     player: "phaseJieshuBegin",
                                 },
@@ -3656,7 +3657,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             hangkongzhanshuxianqu: {
                                 nobracket: true,
-                                //audio: "ext:舰R牌将:true",
+                                //audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
                                     player: "useCardAfter",
                                 },
@@ -3726,7 +3727,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     //game.log(typeof player.storage.gaosusheji);
                                     if (typeof player.storage.gaosusheji === 'undefined') player.storage.gaosusheji = false;
                                 },
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 zhuanhuanji: true,
                                 mark: true,
                                 marktext: "☯",
@@ -3772,7 +3773,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             qixi_cv: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 unique: true,
                                 enable: "phaseUse",
                                 mark: true,
@@ -3966,7 +3967,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             zhudaojiandui: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 enable: "phaseUse",
                                 filter: function (event, player) {
                                     return player.countMark('zhudaojiandui') > 2;
@@ -4010,7 +4011,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             sawohaizhan: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 group: ["sawohaizhan_1", "sawohaizhan_2"],
                                 preHidden: ["sawohaizhan_1", "sawohaizhan_2"],
                                 "_priority": 0,
@@ -4193,7 +4194,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             qingyeqingyeqing: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
                                     target: "useCardToTarget",
                                 },
@@ -4244,7 +4245,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             wufenzhong1: {
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
                                     player: "phaseJudgeBefore",
                                 },
@@ -4283,7 +4284,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             wufenzhong2: {
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
                                     player: "phaseUseBefore",
                                 },
@@ -4341,7 +4342,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             wufenzhong4: {
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
                                     player: "phaseDiscardBefore",
                                 },
@@ -4381,7 +4382,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             qijianshashou: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
                                     player: "phaseUseBegin",
                                 },
@@ -4472,7 +4473,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             zhanxianfangyu: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 usable: 1,
                                 trigger: {
                                     global: "useCardToTarget",
@@ -4548,7 +4549,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             Zqujingying: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 unique: true,
                                 enable: "phaseUse",
                                 skillAnimation: true,
@@ -4958,7 +4959,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             shizhibuyu: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
                                     player: "damageBegin3",
                                 },
@@ -5032,7 +5033,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             shizhibuyu1: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
                                     player: "judgeEnd",
                                 },
@@ -5085,7 +5086,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             qianxingtuxi: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 mod: {
                                     attackFrom: function (from, to, distance) {
                                         return 1
@@ -5123,7 +5124,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             "31jiezhongdui": {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 usable: 1,
                                 direct: true,
                                 trigger: {
@@ -5202,7 +5203,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 init: function (player) {
                                     player.storage.jujianmengxiang = [];
                                 },
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 enable: "phaseUse",
                                 //prompt: "失去一点体力并视为使用一张基本牌或非延时类锦囊牌（每回合每种牌名限一次）。",
                                 filter(event, player) {
@@ -5342,7 +5343,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 group: ["sidajingang_mopai", "sidajingang_pindian"],
                                 subSkill: {
                                     mopai: {
-                                        audio: "ext:舰R牌将:true",
+                                        audio: "ext:舰R牌将/audio/skill:true",
                                         trigger: {
                                             player: "logSkill",
                                         },
@@ -5358,7 +5359,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         "_priority": 0,
                                     },
                                     pindian: {
-                                        audio: "ext:舰R牌将:true",
+                                        audio: "ext:舰R牌将/audio/skill:true",
                                         shaRelated: true,
                                         trigger: {
                                             source: "damageSource",
@@ -5386,7 +5387,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             jiujingzhanzhen: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 count: function () {
                                     var num = 0;
                                     game.countPlayer2(function (current) {
@@ -5488,7 +5489,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             wuweizhuangji: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 unique: true,
                                 enable: "phaseUse",
                                 skillAnimation: true,
@@ -5512,13 +5513,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             zhongzhuangcike: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 group: ["wushifangju", "liushitili"],
                                 "_priority": 0,
                             },
                             wushifangju: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
                                     player: "useCardToPlayered",
                                 },
@@ -5544,7 +5545,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                             liushitili: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
                                     source: "damageBefore",
                                 },
@@ -5602,7 +5603,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },*/
                             duomianshou: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 enable: "phaseUse",
                                 usable: 3,
                                 init: function (player) {
@@ -5782,7 +5783,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             kaixuan: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 shaRelated: true,
                                 trigger: {
                                     player: "useCardToPlayer",
@@ -5845,7 +5846,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             yishisheji: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 mod: {
 
                                     targetInRange(card, player, target) {
@@ -5919,7 +5920,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             jueshengzhibing: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
                                     player: "phaseJieshuBegin",
                                 },
@@ -5934,7 +5935,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 preHidden: ["jueshengzhibing_discard", "jueshengzhibing_draw"],
                                 subSkill: {
                                     discard: {
-                                        audio: "ext:舰R牌将:true",
+                                        audio: "ext:舰R牌将/audio/skill:true",
                                         logTarget: "target",
                                         trigger: {
                                             player: "useCardToPlayered",
@@ -5964,7 +5965,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         "_priority": 0,
                                     },
                                     draw: {
-                                        audio: "ext:舰R牌将:true",
+                                        audio: "ext:舰R牌将/audio/skill:true",
                                         trigger: {
                                             player: "useCard",
                                         },
@@ -7709,7 +7710,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             matapanjiaozhijian: {
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
 
                                 direct: true,
                                 trigger: {
@@ -8801,7 +8802,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             yuanjun: {
                                 nobracket: true,
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 unique: true,
                                 enable: "phaseUse",
                                 skillAnimation: true,
@@ -9119,7 +9120,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 group: ["jingruizhuangbei_mopai", "jingruizhuangbei_fencha"],
                                 subSkill: {
                                     mopai: {
-                                        audio: "ext:舰R牌将:true",
+                                        audio: "ext:舰R牌将/audio/skill:true",
                                         trigger: {
                                             source: "damageSource",
                                         },
@@ -9135,7 +9136,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         sub: true,
                                     },
                                     fencha: {
-                                        audio: "ext:舰R牌将:true",
+                                        audio: "ext:舰R牌将/audio/skill:true",
                                         shaRelated: true,
                                         sub: true,
                                         trigger: {
@@ -9829,9 +9830,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         },
                     };
                     if (lib.device || lib.node) {
-                        for (var i in jianrjinji.character) { jianrjinji.character[i][4].push('ext:舰R牌将/' + i + '.jpg'); }
+                        for (var i in jianrjinji.character) { jianrjinji.character[i][4].push('ext:舰R牌将/image/character/' + i + '.jpg'); }
                     } else {
-                        for (var i in jianrjinji.character) { jianrjinji.character[i][4].push('db:extension-舰R牌将:' + i + '.jpg'); }
+                        for (var i in jianrjinji.character) { jianrjinji.character[i][4].push('db:extension-舰R牌将:image/character/' + i + '.jpg'); }
                     }//由于以此法加入的武将包武将图片是用源文件的，所以要用此法改变路径。可以多指定x个目标数（x技能强化的次数），
                     return jianrjinji;
                 });
@@ -10199,7 +10200,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 fullimage: true,
                             },
                             hangkongzhan: {
-                                audio: "ext:舰R牌将:true",
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 image: 'ext:舰R牌将/hangkongzhan.jpg',
                                 type: "equip",
                                 subtype: "equip4",
