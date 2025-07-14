@@ -865,7 +865,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             getelan: ["female", "OTHER", 3, ["mujizhengren", "pingduzhanhuo", "shixiangquanneng"], ["des:出于海防和海军航空的需求，瑞典设计建造了这一级航空巡洋舰。尽管吨位在5000吨左右，但是哥特兰的装备齐全，载机量也达到了6-8架。哥特兰也是最早的航空巡洋舰，之后的类似军舰或多或少均受其影响。哥特兰漫长的服役期中最著名的事迹是发现了俾斯麦和欧根的编队。而在这之前英海军正在满世界找她们。"]],
                             rangbaer: ["female", "MN", 4, ["zhanliebb", "zhuangjiafh", "pangguanzhe"], ["des:让巴尔号战列舰是黎塞留级2号舰。在陆地战场失利时，黎塞留接近完工并撤退到海外，而让巴尔仅完成了一座炮塔，且具备航行能力，撤退到了达喀尔。在停泊期间，她还受到了马萨诸塞炮击和突击者的轰炸。两舰在后来都加入盟军作战，但由于让巴尔完工程度不高，并未参加战斗。在战争胜利后，考虑到战列舰巨大的象征意义，让巴尔以战列舰状态建造完工。她的电子设备和防空能力比黎塞留更强，船体也修改了设计，有更好的水下防护系统。在运河冲突中，让巴尔也曾开火支援。"]],
 
-                            skilltest: ["male", "OTHER", 9, ["zhanliebb"], ["forbidai", "des:测试用"]],
+                            skilltest: ["male", "OTHER", 9, ["rendeonly2"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
                             _yuanhang: {
@@ -1998,7 +1998,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lose: false,
                                 delay: false,
                                 filterTarget: function (card, player, target) {
-                                    if (player.storage.rerende2 && player.storage.rerende2.includes(target)) return false;
+                                    if (player.getStorage("rerende2").includes(target)) return false;
                                     return player != target && get.distance(player, target, 'pure') <= 2 + player.countMark('shoupaiup');
                                 },
                                 onremove: ["rerende", "rerende2"],
@@ -2007,7 +2007,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (!ui.selected.cards.length && card.name == 'du') return 20;
                                     var player = get.owner(card);
                                     if (ui.selected.cards.length >= Math.max(2, player.countCards('h') - player.hp)) return 0;
-                                    if (player.hp == player.maxHp || player.storage.rerende < 0 || player.countCards('h') <= 1) {
+                                    if (player.hp == player.maxHp || player.getStorage("rerende") < 0 || player.countCards('h') <= 1) {
                                         var players = game.filterPlayer();
                                         for (var i = 0; i < players.length; i++) {
                                             if (players[i].hasSkill('haoshi') &&
@@ -8441,7 +8441,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 intro: {
                                     name: "攻击距离",
                                     content: function (storage, player) {
-                                        var str = "你的攻击距离增加" + get.translation(player.storage.zuihouderongyao + game.dead.length);
+                                        var str = "你的攻击距离增加" + get.translation(player.getStorage("zuihouderongyao") + game.dead.length);
                                         return str;
                                     },
                                 },
