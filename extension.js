@@ -179,18 +179,68 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             style2.innerHTML += "div[data-nature='OTHERmm'],";
             style2.innerHTML += "span[data-nature='OTHERmm'] {text-shadow: black 0 0 1px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0),rgba(0, 0, 0) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
+            
+            // Sueyuki DEV 扩展专用alert对话框（允许自定义样式）
+             game.jianRAlert=(str, options = {}) => {
+                const {
+                    containerStyle = {},
+                    dialogStyle = {},
+                    confirmStyle = {}
+                } = options;
+                let promptContainer = ui.create.div(".popup-container", ui.window, function () {
+                    if (this.clicked) {
+                        this.clicked = false;
+                    }
+                });
+                Object.assign(promptContainer.style, containerStyle);
 
-            //参考全能搜索创建舰r教程指南的按钮与实例
-            const getSystem = setInterval(() => {
-                if (ui.system1 || ui.system2) {
-                    // @ts-ignore
-                    clearInterval(getSystem);
-                    ui.jian_R_readme = ui.create.system('舰r杀机制介绍', function () {
-                        //window.诗笺_manual.show();
-                        game.alert("所有全局技能均可在扩展详情中查看说明和配置开关</br>以下是默认开启的全局技能</br></br>远航</br>你受伤时手牌上限+1；<br>每轮限1/2/3次，失去手牌后，若手牌数少于一半，你可以摸一张牌。<br>当你进入濒死状态时，若你的体力上限大于2，你可以减少一点体力上限，摸两张牌，否则摸一张牌；</br>你死亡后，若你为忠臣，你可以令主公摸一张牌。</br></br>建造</br>若你进行了至少一次强化：<br>1.出牌阶段，<br>你可以弃置3张不同花色的牌，提升一点血量上限，解锁强化中二级效果。。<br>强化</br>出牌阶段限一次，你可以弃置二至四张牌，选择一至两个效果升级。（如摸牌、攻击距离、手牌上限等）</br></br>属性伤害<br>火杀燃烧</br>令目标回合结束后，受到一点火焰伤害，摸两张张牌。</br>冰杀/寒冰剑雷杀减速</br>对有护甲的目标加1伤害；减少1点其他角色计算与目标的距离。</br>雷杀进水</br>有护甲时改为造成目标流失体力；减少目标1点手牌上限。</br>目标回合结束后或濒死时移除进水、减速、燃烧。");
-                    });
-                }
-            }, 500);
+                // 主容器
+                let dialogContainer = ui.create.div(".prompt-container", promptContainer);
+
+                // 内容框
+                let dialog = ui.create.div(".menubg", dialogContainer, function () {
+                    promptContainer.clicked = true;
+                });
+                Object.assign(dialog.style, dialogStyle);
+                ui.create.div("", str || "", dialog);
+                let controls = ui.create.div(dialog);
+                let clickConfirm = function () {
+                    promptContainer.remove();
+                };
+                let confirmButton = ui.create.div(".menubutton.large", "确定", controls, clickConfirm);
+                Object.assign(confirmButton.style, confirmStyle);
+            }
+
+       // 参考全能搜索创建舰r教程指南的按钮与实例
+        const getSystem = setInterval(() => {
+            if (ui.system1 || ui.system2) {
+                // @ts-ignore
+                clearInterval(getSystem);
+                ui.jian_R_readme = ui.create.system('舰r杀机制介绍', function () {
+                    game.jianRAlert(
+                        "所有全局技能均可在扩展详情中查看说明和配置开关</br>" +
+                        "以下是默认开启的全局技能</br></br>" +
+                        "远航</br>你受伤时手牌上限+1；<br>每轮限1/2/3次，失去手牌后，若手牌数少于一半，你可以摸一张牌。<br>" +
+                        "当你进入濒死状态时，若你的体力上限大于2，你可以减少一点体力上限，摸两张牌，否则摸一张牌；</br>" +
+                        "你死亡后，若你为忠臣，你可以令主公摸一张牌。</br></br>" +
+                        "建造</br>若你进行了至少一次强化：<br>1.出牌阶段，<br>" +
+                        "你可以弃置3张不同花色的牌，提升一点血量上限，解锁强化中二级效果。。<br>" +
+                        "强化</br>出牌阶段限一次，你可以弃置二至四张牌，选择一至两个效果升级。（如摸牌、攻击距离、手牌上限等）</br></br>" +
+                        "属性伤害<br>火杀燃烧</br>令目标回合结束后，受到一点火焰伤害，摸两张张牌。</br>" +
+                        "冰杀/寒冰剑雷杀减速</br>对有护甲的目标加1伤害；减少1点其他角色计算与目标的距离。</br>" +
+                        "雷杀进水</br>有护甲时改为造成目标流失体力；减少目标1点手牌上限。</br>" +
+                        "目标回合结束后或濒死时移除进水、减速、燃烧。",
+                        {
+                            containerStyle: {
+                                width: '60%',
+                                // height: '80%',
+                            },
+                        }
+                    );
+                });
+            }
+        }, 500);
+
 
             if (config._yuanhang) {//优化摸牌时牌的质量的技能，全局技能需要下划线作为前缀，才能被无名杀识别。
                 lib.skill._yuanhang = {
