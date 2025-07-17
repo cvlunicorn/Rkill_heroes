@@ -9189,14 +9189,18 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     mopai: {
                                         audio: "ext:舰R牌将/audio/skill:true",
                                         trigger: {
-                                            source: "damageSource",
+                                            source:"damageSource",
                                         },
+                                        direct:true,
                                         filter: function (event, player) {
                                             //if (event._notrigger.includes(event.player)) return false;
-                                            if (!player.hasEmptySlot(5).length) return false;
-                                            return (event.card && (event.card.name == 'sha' || event.card.name == 'sheji9') && (event.getParent().name == 'sha' || event.getParent().name == 'sheji9') && event.player.isIn());
+                                            game.log("salemu1");
+                                            if (!player.getEquip(1)) return false;
+                                            game.log("salemu2");
+                                            return 1||(event.card && (event.card.name == 'sha' || event.card.name == 'sheji9') && event.player.isIn());//&& (event.getParent().name == 'sha' || event.getParent().name == 'sheji9') 
                                         },
                                         content: function () {
+                                            game.log("salemu3");
                                             player.draw(1);
                                         },
                                         "_priority": 0,
@@ -9218,9 +9222,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         direct: true,
                                         async content(event, trigger, player) {
                                             const judgeEvent = player.judge(card => {
-                                                game.log(get.suit(card));
-                                                game.log(get.suit(trigger.card));
-                                                if (get.suit(card) == get.suit(trigger.card)) return 1;
+                                                game.log(get.color(card));
+                                                game.log(get.color(trigger.card));
+                                                if (get.color(card) == get.color(trigger.card)) return 1;
                                                 return 0;
                                             });
                                             judgeEvent.judge2 = result => result.bool;
@@ -9873,7 +9877,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             buju_wuxie: "不惧_无懈", buju_wuxie_disable: "无懈_不可用",
                             buju_jiu: "不惧_酒", buju_jiu_disable: "酒_不可用",
                             liaowangtai: "瞭望台", liaowangtai_info: "出牌阶段限一次，你视为对所有攻击范围包括你的角色依次使用一张【火攻】。",
-                            jingruizhuangbei: "精锐装备", jingruizhuangbei_info: "当你装备宝物时，你使用射击造成伤害时可以摸一张牌；当你使用射击指定目标时，你可以进行一次判定，若与此“射击”花色相同，则你可以额外指定一个目标",
+                            jingruizhuangbei: "精锐装备", jingruizhuangbei_info: "当你装备武器时，你使用射击造成伤害时可以摸一张牌；当你使用射击指定目标时，你可以进行一次判定，若与此“射击”颜色相同，则你可以额外指定一个目标",
                             jingruizhuangbei_mopai: "精锐装备_摸牌",
                             jingruizhuangbei_fencha: "精锐装备_分叉",
                             dananbusi: "大难不死", dananbusi_info: "限定技，当你受到的伤害不小于你当前体力值时，你可以防止之。",
