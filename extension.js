@@ -8475,21 +8475,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }).set('ai', function (target) {
                                         var att = get.attitude(_status.event.player, target);
                                         var trigger = _status.event.getTrigger();
-                                        var da = 0;
-                                        if (_status.event.player.hp == 1) {
-                                            da = 10;
-                                        }
                                         var eff = get.damageEffect(target, trigger.source, target);
-                                        if (att == 0) return 0.1 + da;
-                                        if (eff >= 0 && att > 0) {
-                                            return att + da;
-                                        }
-                                        if (att > 0 && target.hp > 1) {
-                                            if (target.maxHp - target.hp >= 3) return att * 1.1 + da;
-                                            if (target.maxHp - target.hp >= 2) return att * 0.9 + da;
-                                        }
-                                        return -att + da;
-                                    })
+                                        if (att == 0) return 0.1;
+                                        return -att;
+                                    });
                                     "step 3"
                                     if (result.bool) {
                                         var target = result.targets[0];
@@ -9721,7 +9710,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             game.log("chuansuohongzha1");
                                             player
                                                 .chooseTarget(get.prompt("chuansuohongzha_send"), "将" + get.translation(trigger.cards) + "交给一名其他角色", function (card, player, target) {
-                                                    return target != player&&target.hp == target.maxHp;
+                                                    return target != player && target.hp == target.maxHp;
                                                 })
                                                 .set("ai", function (target) {
                                                     if (target.hasJudge("lebu")) return 0;
