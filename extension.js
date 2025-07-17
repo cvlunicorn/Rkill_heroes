@@ -192,7 +192,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         this.clicked = false;
                     }
                 });
-                Object.assign(promptContainer.style, containerStyle);
+                Object.assign(promptContainer.style, {
+                    overflowY: "auto",     // 垂直滚动条
+                    overflowX: "hidden",   // 不允许横向滚动
+                    ...containerStyle
+                });
 
                 // 主容器
                 let dialogContainer = ui.create.div(".prompt-container", promptContainer);
@@ -234,6 +238,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             containerStyle: {
                                 width: '60%',
                                 // height: '80%',
+                                 padding: '5px 20px 5px 20px',
                             },
                         }
                     );
