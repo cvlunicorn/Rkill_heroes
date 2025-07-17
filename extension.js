@@ -179,9 +179,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             style2.innerHTML += "div[data-nature='OTHERmm'],";
             style2.innerHTML += "span[data-nature='OTHERmm'] {text-shadow: black 0 0 1px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0),rgba(0, 0, 0) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
-            
+
             // Sueyuki DEV 扩展专用alert对话框（允许自定义样式）
-             game.jianRAlert=(str, options = {}) => {
+            game.jianRAlert = (str, options = {}) => {
                 const {
                     containerStyle = {},
                     dialogStyle = {},
@@ -215,36 +215,36 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 Object.assign(confirmButton.style, confirmStyle);
             }
 
-       // 参考全能搜索创建舰r教程指南的按钮与实例
-        const getSystem = setInterval(() => {
-            if (ui.system1 || ui.system2) {
-                // @ts-ignore
-                clearInterval(getSystem);
-                ui.jian_R_readme = ui.create.system('舰r杀机制介绍', function () {
-                    game.jianRAlert(
-                        "所有全局技能均可在扩展详情中查看说明和配置开关，" +
-                        "以下是默认开启的全局技能<br><br>" +
-                        "<b>远航:</b>你受伤时手牌上限+1；每轮限1/2/3次，失去手牌后，若手牌数少于一半，你可以摸一张牌。<br>" +
-                        "当你进入濒死状态时，若你的体力上限大于2，你可以减少一点体力上限，摸两张牌，否则摸一张牌；<br>" +
-                        "你死亡后，若你为忠臣，你可以令主公摸一张牌。<br><br>" +
-                        "<b>建造:</b>若你进行了至少一次强化：出牌阶段" +
-                        "你可以弃置3张不同花色的牌，提升一点血量上限，解锁强化二级效果。<br>" +
-                        "<b>强化:</b>出牌阶段限一次，你可以弃置二至四张牌，选择一至两个效果升级。（如摸牌、攻击距离、手牌上限等）<br><br>" +
-                        "<b>属性伤害:</b>火杀燃烧:令目标回合结束后，受到一点火焰伤害，摸两张张牌。<br>" +
-                        "冰杀减速:对有护甲的目标加1伤害；减少1点其他角色计算与目标的距离。<br>" +
-                        "雷杀进水:有护甲时改为造成目标流失体力；减少目标1点手牌上限。<br>" +
-                        "目标回合结束后或濒死时移除进水、减速、燃烧。",
-                        {
-                            containerStyle: {
-                                width: '60%',
-                                // height: '80%',
-                                 padding: '5px 20px 5px 20px',
-                            },
-                        }
-                    );
-                });
-            }
-        }, 500);
+            // 参考全能搜索创建舰r教程指南的按钮与实例
+            const getSystem = setInterval(() => {
+                if (ui.system1 || ui.system2) {
+                    // @ts-ignore
+                    clearInterval(getSystem);
+                    ui.jian_R_readme = ui.create.system('舰r杀机制介绍', function () {
+                        game.jianRAlert(
+                            "所有全局技能均可在扩展详情中查看说明和配置开关，" +
+                            "以下是默认开启的全局技能<br><br>" +
+                            "<b>远航:</b>你受伤时手牌上限+1；每轮限1/2/3次，失去手牌后，若手牌数少于一半，你可以摸一张牌。<br>" +
+                            "当你进入濒死状态时，若你的体力上限大于2，你可以减少一点体力上限，摸两张牌，否则摸一张牌；<br>" +
+                            "你死亡后，若你为忠臣，你可以令主公摸一张牌。<br><br>" +
+                            "<b>建造:</b>若你进行了至少一次强化：出牌阶段" +
+                            "你可以弃置3张不同花色的牌，提升一点血量上限，解锁强化二级效果。<br>" +
+                            "<b>强化:</b>出牌阶段限一次，你可以弃置二至四张牌，选择一至两个效果升级。（如摸牌、攻击距离、手牌上限等）<br><br>" +
+                            "<b>属性伤害:</b>火杀燃烧:令目标回合结束后，受到一点火焰伤害，摸两张张牌。<br>" +
+                            "冰杀减速:对有护甲的目标加1伤害；减少1点其他角色计算与目标的距离。<br>" +
+                            "雷杀进水:有护甲时改为造成目标流失体力；减少目标1点手牌上限。<br>" +
+                            "目标回合结束后或濒死时移除进水、减速、燃烧。",
+                            {
+                                containerStyle: {
+                                    width: '60%',
+                                    // height: '80%',
+                                    padding: '5px 20px 5px 20px',
+                                },
+                            }
+                        );
+                    });
+                }
+            }, 500);
 
 
             if (config._yuanhang) {//优化摸牌时牌的质量的技能，全局技能需要下划线作为前缀，才能被无名杀识别。
@@ -9189,15 +9189,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     mopai: {
                                         audio: "ext:舰R牌将/audio/skill:true",
                                         trigger: {
-                                            source:"damageSource",
+                                            source: "damageSource",
                                         },
-                                        direct:true,
+                                        direct: true,
                                         filter: function (event, player) {
                                             //if (event._notrigger.includes(event.player)) return false;
                                             game.log("salemu1");
                                             if (!player.getEquip(1)) return false;
                                             game.log("salemu2");
-                                            return 1||(event.card && (event.card.name == 'sha' || event.card.name == 'sheji9') && event.player.isIn());//&& (event.getParent().name == 'sha' || event.getParent().name == 'sheji9') 
+                                            return 1 || (event.card && (event.card.name == 'sha' || event.card.name == 'sheji9') && event.player.isIn());//&& (event.getParent().name == 'sha' || event.getParent().name == 'sheji9') 
                                         },
                                         content: function () {
                                             game.log("salemu3");
@@ -9436,25 +9436,30 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             mujizhengren: {
                                 nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                unique: true,
                                 enable: "phaseUse",
-                                usable: 1,
-                                filterCard: true,
-                                selectCard: -1,
+                                skillAnimation: true,
+                                animationColor: "gray",
+                                mark: true,
+                                limited: true,
+                                filterCard:true,
+                                selectCard:3,
                                 filter: function (event, player) {
-                                    return player.countCards("h") > 3;
-                                },
-                                check: function (card) {
-                                    return 8 - get.value(card);
+                                    return player.countCards("h") >= player.maxHp;
                                 },
                                 filterTarget: function (card, player, target) {
-                                    return player != target;
+                                    return true;
                                 },
                                 content: function () {
-                                    player.turnOver();
-                                    player.addSkill("mujizhengren_turnover");
+                                    player.awakenSkill('mujizhengren');
                                     target.turnOver();
-                                    target.addSkill("mujizhengren_turnover");
                                 },
+                                intro: {
+                                    content: "limited",
+                                },
+                                init: (player, skill) => (player.storage[skill] = false),
+                                "_priority": 0,
                                 ai: {
                                     order: 2,
                                     expose: 0.3,
@@ -9467,27 +9472,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                     },
                                 },
-                                subSkill: {
-                                    turnover: {
-                                        mod: {
-                                            globalTo(from, to, distance) {
-                                                return distance + 2;
-                                            },
-                                        },
-                                        force: true,
-                                        direct: true,
-                                        trigger: {
-                                            player: "turnOverEnd",
-                                        },
-                                        filter: function (event, player) {
-                                            return !player.isTurnedOver();
-                                        },
-                                        content() {
-                                            player.removeSkills("mujizhengren_turnover");
-                                        },
-                                    },
-                                },
-                                "_priority": 0,
                             },
                             shixiangquanneng: {
                                 init: function (player) {
@@ -9884,8 +9868,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             houfu: "后福", houfu_info: "出牌阶段限一次，你可以选择一名其他角色，其选择一项:1视为对你使用一张杀(无距离限制)，2令你从牌堆中获得一张基本牌。",
                             zhanliexianfuchou: "战列线复仇", zhanliexianfuchou_info: "你造成的伤害+X，X=你本轮成为其他角色伤害类牌目标的次数",
                             pingduzhanhuo: "平度战火", pingduzhanhuo_info: "结束阶段，若你本回合未造成伤害，你摸一张牌；准备阶段，若你自上个结束阶段起未受到伤害，你摸一张牌",
-                            mujizhengren: "目击证人", mujizhengren_info: "出牌阶段限一次，你可以弃置全部手牌（至少四张），然后令自己与一名角色翻面，其他角色计算与以此法翻面的角色距离+2直到翻回正面。",
-                            mujizhengren_turnover: "翻面", mujizhengren_turnover_info: "其他角色计算与你距离+2",
+                            mujizhengren: "目击证人", mujizhengren_info: "限定技，出牌阶段，你可以弃置3张手牌，然后令一名角色翻面。",
                             shixiangquanneng: "十项全能", shixiangquanneng_info: "锁定技，你的舰种技能无法升级，每轮开始时，你失去以此法获得的技能，然后从以下技能中选择一项获得：1、防空，2、开幕航空，3、军辅",
                             pangguanzhe: "旁观者", pangguanzhe_info: "锁定技，你的回合开始时，失去上回合以此法获得的技能，随机获得在场角色武将牌上的一个技能。若该技能带有判定，你可以选择判定结果。(远航，强化，航母，战列，巡洋，驱逐，潜艇，开幕航空，火控雷达，先制鱼雷，十项全能除外;主公技，限定技，使命技，觉醒技除外)",
 
