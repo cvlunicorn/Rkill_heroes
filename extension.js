@@ -932,6 +932,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jiate: ["female", "USN", 3, ["fangqu", "mb_meibu"], ["des:基林级驱逐舰之一，由于服役太晚没有参加二战的实战。服役之后主要在大西洋活动。在1955年基阿特进行了改装，成为世界上第一艘导弹驱逐舰，其换装了双联防空导弹发射架，76毫米高炮和反潜鱼雷。在1957年为了显示其地位，刷上了DDG-1的编号。这艘划时代的军舰于1968年退役。"]],
                             getelan: ["female", "OTHER", 3, ["mujizhengren", "pingduzhanhuo", "shixiangquanneng"], ["des:出于海防和海军航空的需求，瑞典设计建造了这一级航空巡洋舰。尽管吨位在5000吨左右，但是哥特兰的装备齐全，载机量也达到了6-8架。哥特兰也是最早的航空巡洋舰，之后的类似军舰或多或少均受其影响。哥特兰漫长的服役期中最著名的事迹是发现了俾斯麦和欧根的编队。而在这之前英海军正在满世界找她们。"]],
                             rangbaer: ["female", "MN", 4, ["zhanliebb", "zhuangjiafh", "pangguanzhe"], ["des:让巴尔号战列舰是黎塞留级2号舰。在陆地战场失利时，黎塞留接近完工并撤退到海外，而让巴尔仅完成了一座炮塔，且具备航行能力，撤退到了达喀尔。在停泊期间，她还受到了马萨诸塞炮击和突击者的轰炸。两舰在后来都加入盟军作战，但由于让巴尔完工程度不高，并未参加战斗。在战争胜利后，考虑到战列舰巨大的象征意义，让巴尔以战列舰状态建造完工。她的电子设备和防空能力比黎塞留更强，船体也修改了设计，有更好的水下防护系统。在运河冲突中，让巴尔也曾开火支援。"]],
+                            dafeng: ["female", "IJN", 4, ["hangmucv", "chuansuohongzha", "hangkongyazhi"], ["des:　大凤号是日本设计建造的装甲航空母舰。与其它日本海军航空母舰不同的是，大凤号预备在舰队中承担起支援其他航母作战的功能，因此大凤号将船舰的防护性摆在首位，重点增强装甲。竣工后被编入第三舰队第一航空战队，担任旗舰参加了马里亚纳海战。6月19日，大凤号在飞机起飞作业时，被美国潜艇大青花鱼号发射鱼雷并命中其右舷，最终因损管不当而沉没。"]],
 
                             skilltest: ["male", "OTHER", 9, ["rendeonly2"], ["forbidai", "des:测试用"]],
                         },
@@ -9442,8 +9443,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 animationColor: "gray",
                                 mark: true,
                                 limited: true,
-                                filterCard:true,
-                                selectCard:3,
+                                filterCard: true,
+                                selectCard: 3,
                                 filter: function (event, player) {
                                     return player.countCards("h") >= player.maxHp;
                                 },
@@ -9633,6 +9634,118 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
 
                             },
+                            hangkongyazhi: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                unique: true,
+                                enable: "phaseUse",
+                                skillAnimation: true,
+                                animationColor: "wood",
+                                mark: true,
+                                limited: true,
+                                filter: function (event, player) {
+                                    if (player.storage.wuweizhuangji) return false;
+                                    return player.hasSkill("hangmucv");
+                                },
+                                filterTarget: function (card, player, target) {
+                                    return true;
+                                },
+                                content: function () {
+                                    player.awakenSkill('hangkongyazhi');
+                                    player.removeSkill("hangmucv");
+                                    target.changeHujia(-player.hujia);
+
+                                    target.addTempSkill("hangkongyazhi_fengyin", "roundStart");
+
+                                },
+                                intro: {
+                                    content: "limited",
+                                },
+                                init: (player, skill) => (player.storage[skill] = false),
+                                "_priority": 0,
+                            },
+                            hangkongyazhi_fengyin: {
+                                init: function (player, skill) {
+                                    player.addSkillBlocker(skill);
+                                },
+                                onremove: function (player, skill) {
+                                    player.removeSkillBlocker(skill);
+                                },
+                                charlotte: true,
+                                skillBlocker: function (skill, player) {
+                                    return true;
+                                },
+                                mark: true,
+                                intro: {
+                                    content: function (storage, player, skill) {
+                                        var list = player.getSkills(null, false, false).filter(function (i) {
+                                            return lib.skill.hangkongyazhi_fengyin.skillBlocker(i, player);
+                                        });
+                                        if (list.length) return "失效技能：" + get.translation(list);
+                                        return "无失效技能";
+                                    },
+                                },
+                                "_priority": 0,
+                            },
+                            chuansuohongzha: {
+                                nobracket: true,
+
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                group: ["chuansuohongzha_get", "chuansuohongzha_send"],
+                                subSkill: {
+                                    get: {
+                                        trigger: {
+                                            global: "useCardAfter",
+                                        },
+                                        round: 1,
+                                        filter: function (event, player) {
+                                            return player != event.player && get.tag(event.card, 'damage') && !player.isDamaged();
+                                        },
+                                        content() {
+                                            game.log(trigger.cards);
+                                            player.gain(trigger.cards, "gain2");
+                                        },
+                                    },
+                                    send: {
+                                        trigger: {
+                                            player: "useCardAfter",
+                                        },
+                                        filter: function (event, player) {
+                                            return get.tag(event.card, 'damage') && game.hasPlayer(function (current) {
+                                                return current.hp == current.maxHp;
+                                            });;
+                                        },
+                                        usable: 1,
+                                        content() {
+                                            "step 0";
+                                            game.log("chuansuohongzha1");
+                                            player
+                                                .chooseTarget(get.prompt("chuansuohongzha_send"), "将" + get.translation(trigger.cards) + "交给一名其他角色", function (card, player, target) {
+                                                    return target != player&&target.hp == target.maxHp;
+                                                })
+                                                .set("ai", function (target) {
+                                                    if (target.hasJudge("lebu")) return 0;
+                                                    let att = get.attitude(_status.event.player, target),
+                                                        name = _status.event.cards[0].name;
+                                                    if (att < 3) return 0;
+                                                    if (target.hasSkillTag("nogain")) att /= 10;
+                                                    if (name === "sha" && target.hasSha()) att /= 5;
+                                                    if (name === "wuxie" && target.needsToDiscard(_status.event.cards)) att /= 5;
+                                                    return att / (1 + get.distance(player, target, "absolute"));
+                                                })
+                                                .set("cards", trigger.cards);
+                                            "step 1";
+                                            if (result.bool) {
+                                                //game.log("chuansuohongzha2");
+                                                //game.log(trigger.cards);
+                                                //game.log("chuansuohongzha3");
+                                                //game.log(result.targets);
+                                                result.targets[0].gain(trigger.cards, "gain2");
+                                            }
+                                        },
+                                    },
+                                },
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -9690,6 +9803,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jialifuniya: "加利福尼亚",
                             getelan: "哥特兰",
                             rangbaer: "让巴尔",
+                            dafeng: "大凤",
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -9870,8 +9984,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             mujizhengren: "目击证人", mujizhengren_info: "限定技，出牌阶段，你可以弃置3张手牌，然后令一名角色翻面。",
                             shixiangquanneng: "十项全能", shixiangquanneng_info: "锁定技，你的舰种技能无法升级，每轮开始时，你失去以此法获得的技能，然后从以下技能中选择一项获得：1、防空，2、开幕航空，3、军辅",
                             pangguanzhe: "旁观者", pangguanzhe_info: "锁定技，你的回合开始时，失去上回合以此法获得的技能，随机获得在场角色武将牌上的一个技能。若该技能带有判定，你可以选择判定结果。(远航，强化，航母，战列，巡洋，驱逐，潜艇，开幕航空，火控雷达，先制鱼雷，十项全能除外;主公技，限定技，使命技，觉醒技除外)",
-
-
+                            hangkongyazhi: "航空压制", "hangkongyazhi_info": "限定技，你可以失去开幕航空，令一名角色失去所有护甲且本轮技能失效。",
+                            chuansuohongzha: "穿梭轰炸", "chuansuohongzha_info": "每轮限一次，其他角色使用伤害类牌结算结束后，若你未受伤，你可以获得此牌对应的所有实体牌。每回合限一次，你使用的伤害类牌结算结束后，你可以将其交给一名未受伤角色。",
+                            chuansuohongzha_get: "穿梭轰炸", "chuansuohongzha_get_info": "每轮限一次，其他角色使用伤害类牌结算结束后，若你未受伤，你可以获得此牌对应的所有实体牌。",
+                            chuansuohongzha_send: "穿梭轰炸", "chuansuohongzha_send_info": "每回合限一次，你使用的伤害类牌结算结束后，你可以将其交给一名未受伤角色。",
+                            hangkongyazhi_fengyin: "航空压制_封印",
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
                             lishizhanyi_naerweike: '历史战役-纳尔维克',
