@@ -9308,8 +9308,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (result.targets) {
                                         event.target = result.targets[0];
                                         event.target.chooseControlList([
-                                            '视为对' + player + '使用一张杀',
-                                            '令' + player + '从牌堆中获得一张基本牌',
+                                            '视为对' + player.name + '使用一张杀',
+                                            '令' + player.name + '从牌堆中获得一张基本牌',
                                         ]).set('prompt', get.prompt('houfu', event.target)).setHiddenSkill('houfu').set('ai', function () {
                                             //var player = _status.event.player;
                                             game.log(get.attitude(event.target, player));
@@ -9342,7 +9342,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }
                                     }
                                 },
+                                ai: {
+                                    order: 7.2,
+                                    result: {
+                                        player: 1,
+                                    },
+                                },
                                 "_priority": 0,
+
                             },
                             zhanliexianfuchou: {
                                 nobracket: true,
