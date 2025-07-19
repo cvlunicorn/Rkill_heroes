@@ -934,6 +934,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             rangbaer: ["female", "MN", 4, ["zhanliebb", "zhuangjiafh", "pangguanzhe"], ["des:让巴尔号战列舰是黎塞留级2号舰。在陆地战场失利时，黎塞留接近完工并撤退到海外，而让巴尔仅完成了一座炮塔，且具备航行能力，撤退到了达喀尔。在停泊期间，她还受到了马萨诸塞炮击和突击者的轰炸。两舰在后来都加入盟军作战，但由于让巴尔完工程度不高，并未参加战斗。在战争胜利后，考虑到战列舰巨大的象征意义，让巴尔以战列舰状态建造完工。她的电子设备和防空能力比黎塞留更强，船体也修改了设计，有更好的水下防护系统。在运河冲突中，让巴尔也曾开火支援。"]],
                             dafeng: ["female", "IJN", 4, ["hangmucv", "chuansuohongzha", "hangkongyazhi"], ["des:　大凤号是日本设计建造的装甲航空母舰。与其它日本海军航空母舰不同的是，大凤号预备在舰队中承担起支援其他航母作战的功能，因此大凤号将船舰的防护性摆在首位，重点增强装甲。竣工后被编入第三舰队第一航空战队，担任旗舰参加了马里亚纳海战。6月19日，大凤号在飞机起飞作业时，被美国潜艇大青花鱼号发射鱼雷并命中其右舷，最终因损管不当而沉没。"]],
                             dahuangfeng: ["female", "USN", 4, ["hangmucv", "yuanyangpoxi"], ["des:　　大黄蜂号是约克城级航母3号舰。她服役后第一项作战任务就是搭载B25轰炸机轰炸东京。在4月18日，杜立特带领的B25机群从大黄蜂号上起飞，完成了轰炸任务并在中国迫降。5月中旬，大黄蜂号在内的全部约克级航母作为主力参加了中途岛海战并击溃了日本机动部队，可以说正是她们三位扭转了太平洋的局势。在42年10月的圣克鲁斯海战中，大黄蜂号击伤了翔鹤号和筑摩号，但是自身也被重创，之后被驱逐舰击沉。"]],
+                            biaoqiang: ["female", "RN", 14, ["dajiaoduguibi", "quzhudd", "juejingfengsheng"], ["des:　标枪级驱逐舰首舰。英国于部族级之后建造的驱逐舰，其设计也成为战时应急驱逐舰的范本。二战中标枪号参加了纳尔维克海战，战斗中标枪号被德国驱逐舰击伤了船首。修复之后主要在地中海作战，并于1949年退役。"]],
 
                             skilltest: ["male", "OTHER", 9, ["rendeonly2"], ["forbidai", "des:测试用"]],
                         },
@@ -6867,7 +6868,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             source: "damageBegin4",
                                         },
                                         filter: function (event, player) {
-                                            return event.hasNature("thunder") && player.getExpansions('Z').length&&event.notLink();
+                                            return event.hasNature("thunder") && player.getExpansions('Z').length && event.notLink();
                                         },
                                         content: function () {
                                             'step 0'
@@ -6892,7 +6893,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             global: "damageBegin3",
                                         },
                                         filter: function (event, player) {
-                                            return player.getExpansions('Z').length && event.hasNature("thunder") && event.player != player&&event.notLink();
+                                            return player.getExpansions('Z').length && event.hasNature("thunder") && event.player != player && event.notLink();
                                         },
                                         content: function () {
                                             'step 0'
@@ -7909,7 +7910,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (!(event.source && event.source.isIn())) return false;
                                     var target = (player == event.player) ? event.source : event.player;
                                     game.log(event.player != event.source && target.countCards("h") && target.isAlive());
-                                    return event.player != event.source && target.countCards("h") && target.isAlive()&&event.notlink();
+                                    return event.player != event.source && target.countCards("h") && target.isAlive() && event.notlink();
                                 },
                                 content: function () {
                                     'step 0'
@@ -9766,6 +9767,36 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
                             },
+                            juejingfengsheng: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                unique: true,
+                                juexingji: true,
+                                forced: true,
+                                trigger: {
+                                    player: "damageBefore",
+                                },
+                                skillAnimation: true,
+                                animationColor: "wood",
+                                mark: true,
+                                filter: function (event, player) {
+                                    if (player.storage.juejingfengsheng) return false;
+                                    return player.hp <= event.num;
+                                },
+                                filterTarget: function (card, player, target) {
+                                    return true;
+                                },
+                                content: function () {
+                                    player.awakenSkill('juejingfengsheng');
+                                    trigger.cancel();
+                                    game.log(player, "免疫了一次伤害。");
+                                },
+                                intro: {
+                                    content: "limited",
+                                },
+                                init: (player, skill) => (player.storage[skill] = false),
+                                "_priority": 0,
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -9825,6 +9856,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             rangbaer: "让巴尔",
                             dafeng: "大凤",
                             dahuangfeng: "大黄蜂",
+                            biaoqiang: "标枪",
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -10011,6 +10043,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             chuansuohongzha_send: "穿梭轰炸", "chuansuohongzha_send_info": "每回合限一次，你使用的伤害类牌结算结束后，你可以将其交给一名未受伤角色。",
                             hangkongyazhi_fengyin: "航空压制_封印",
                             yuanyangpoxi: "远洋破袭", "yuanyangpoxi_info": "你使用锦囊牌对攻击范围内的角色造成伤害+1；你出牌阶段使用杀的次数-1.",
+                            juejingfengsheng: "绝境逢生", juejingfengsheng_info: "你的最大耐久增加11。免疫一次致命伤害。",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
