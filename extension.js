@@ -4527,7 +4527,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 forced: true,
                                 filter: function (event, player) {
 
-                                    return event.card && (event.card.name == "sha" || event.card.name == "sheji9") && player.getStorage('qijianshashou_1') && event.player != player;
+                                    return event.card && (event.card.name == "sha" || event.card.name == "sheji9") && player.getStorage('qijianshashou_1') && event.player != player && event.notLink();
                                 },
                                 content: function () {
                                     game.log("目标" + get.translation(trigger.player.name));
@@ -6867,7 +6867,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             source: "damageBegin4",
                                         },
                                         filter: function (event, player) {
-                                            return event.hasNature("thunder") && player.getExpansions('Z').length;
+                                            return event.hasNature("thunder") && player.getExpansions('Z').length&&event.notLink();
                                         },
                                         content: function () {
                                             'step 0'
@@ -6892,7 +6892,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             global: "damageBegin3",
                                         },
                                         filter: function (event, player) {
-                                            return player.getExpansions('Z').length && event.hasNature("thunder") && event.player != player;
+                                            return player.getExpansions('Z').length && event.hasNature("thunder") && event.player != player&&event.notLink();
                                         },
                                         content: function () {
                                             'step 0'
@@ -7909,7 +7909,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (!(event.source && event.source.isIn())) return false;
                                     var target = (player == event.player) ? event.source : event.player;
                                     game.log(event.player != event.source && target.countCards("h") && target.isAlive());
-                                    return event.player != event.source && target.countCards("h") && target.isAlive();
+                                    return event.player != event.source && target.countCards("h") && target.isAlive()&&event.notlink();
                                 },
                                 content: function () {
                                     'step 0'
