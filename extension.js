@@ -179,73 +179,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             style2.innerHTML += "div[data-nature='OTHERmm'],";
             style2.innerHTML += "span[data-nature='OTHERmm'] {text-shadow: black 0 0 1px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0),rgba(0, 0, 0) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
-            
-            // Sueyuki DEV 扩展专用alert对话框（允许自定义样式）
-             game.jianRAlert=(str, options = {}) => {
-                const {
-                    containerStyle = {},
-                    dialogStyle = {},
-                    confirmStyle = {}
-                } = options;
-                let promptContainer = ui.create.div(".popup-container", ui.window, function () {
-                    if (this.clicked) {
-                        this.clicked = false;
-                    }
-                });
-                Object.assign(promptContainer.style, {
-                    overflowY: "auto",     // 垂直滚动条
-                    overflowX: "hidden",   // 不允许横向滚动
-                    ...containerStyle
-                });
-
-                // 主容器
-                let dialogContainer = ui.create.div(".prompt-container", promptContainer);
-
-                // 内容框
-                let dialog = ui.create.div(".menubg", dialogContainer, function () {
-                    promptContainer.clicked = true;
-                });
-                Object.assign(dialog.style, dialogStyle);
-                ui.create.div("", str || "", dialog);
-                let controls = ui.create.div(dialog);
-                let clickConfirm = function () {
-                    promptContainer.remove();
-                };
-                let confirmButton = ui.create.div(".menubutton.large", "确定", controls, clickConfirm);
-                Object.assign(confirmButton.style, confirmStyle);
-            }
-
-       // 参考全能搜索创建舰r教程指南的按钮与实例
-        const getSystem = setInterval(() => {
-            if (ui.system1 || ui.system2) {
-                // @ts-ignore
-                clearInterval(getSystem);
-                ui.jian_R_readme = ui.create.system('舰r杀机制介绍', function () {
-                    game.jianRAlert(
-                        "所有全局技能均可在扩展详情中查看说明和配置开关，" +
-                        "以下是默认开启的全局技能<br><br>" +
-                        "<b>远航:</b>你受伤时手牌上限+1；每轮限1/2/3次，失去手牌后，若手牌数少于一半，你可以摸一张牌。<br>" +
-                        "当你进入濒死状态时，若你的体力上限大于2，你可以减少一点体力上限，摸两张牌，否则摸一张牌；<br>" +
-                        "你死亡后，若你为忠臣，你可以令主公摸一张牌。<br><br>" +
-                        "<b>建造:</b>若你进行了至少一次强化：出牌阶段" +
-                        "你可以弃置3张不同花色的牌，提升一点血量上限，解锁强化二级效果。<br>" +
-                        "<b>强化:</b>出牌阶段限一次，你可以弃置二至四张牌，选择一至两个效果升级。（如摸牌、攻击距离、手牌上限等）<br><br>" +
-                        "<b>属性伤害:</b>火杀燃烧:令目标回合结束后，受到一点火焰伤害，摸两张张牌。<br>" +
-                        "冰杀减速:对有护甲的目标加1伤害；减少1点其他角色计算与目标的距离。<br>" +
-                        "雷杀进水:有护甲时改为造成目标流失体力；减少目标1点手牌上限。<br>" +
-                        "目标回合结束后或濒死时移除进水、减速、燃烧。",
-                        {
-                            containerStyle: {
-                                width: '60%',
-                                // height: '80%',
-                                 padding: '5px 20px 5px 20px',
-                            },
-                        }
-                    );
-                });
-            }
-        }, 500);
-
 
             // Sueyuki DEV 扩展专用alert对话框（允许自定义样式）
             game.jianRAlert = (str, options = {}) => {
@@ -932,7 +865,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lishizhanyi_naerweike: ["shengwang", "z17", "z18", "z21", "z22", "gesakeren"],
                                 lishizhanyi_matapanjiao: ["kewei", "kente"],
                                 lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "z1", "z16"],
-                                lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu"],
+                                lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng"],
                                 lishizhanyi_haixiafujizhan: ["u47", "u81", "u505"],
                                 weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan"],
                             },
@@ -1000,6 +933,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             getelan: ["female", "OTHER", 3, ["mujizhengren", "pingduzhanhuo", "shixiangquanneng"], ["des:出于海防和海军航空的需求，瑞典设计建造了这一级航空巡洋舰。尽管吨位在5000吨左右，但是哥特兰的装备齐全，载机量也达到了6-8架。哥特兰也是最早的航空巡洋舰，之后的类似军舰或多或少均受其影响。哥特兰漫长的服役期中最著名的事迹是发现了俾斯麦和欧根的编队。而在这之前英海军正在满世界找她们。"]],
                             rangbaer: ["female", "MN", 4, ["zhanliebb", "zhuangjiafh", "pangguanzhe"], ["des:让巴尔号战列舰是黎塞留级2号舰。在陆地战场失利时，黎塞留接近完工并撤退到海外，而让巴尔仅完成了一座炮塔，且具备航行能力，撤退到了达喀尔。在停泊期间，她还受到了马萨诸塞炮击和突击者的轰炸。两舰在后来都加入盟军作战，但由于让巴尔完工程度不高，并未参加战斗。在战争胜利后，考虑到战列舰巨大的象征意义，让巴尔以战列舰状态建造完工。她的电子设备和防空能力比黎塞留更强，船体也修改了设计，有更好的水下防护系统。在运河冲突中，让巴尔也曾开火支援。"]],
                             dafeng: ["female", "IJN", 4, ["hangmucv", "chuansuohongzha", "hangkongyazhi"], ["des:　大凤号是日本设计建造的装甲航空母舰。与其它日本海军航空母舰不同的是，大凤号预备在舰队中承担起支援其他航母作战的功能，因此大凤号将船舰的防护性摆在首位，重点增强装甲。竣工后被编入第三舰队第一航空战队，担任旗舰参加了马里亚纳海战。6月19日，大凤号在飞机起飞作业时，被美国潜艇大青花鱼号发射鱼雷并命中其右舷，最终因损管不当而沉没。"]],
+                            dahuangfeng: ["female", "USN", 4, ["hangmucv", "yuanyangpoxi"], ["des:　　大黄蜂号是约克城级航母3号舰。她服役后第一项作战任务就是搭载B25轰炸机轰炸东京。在4月18日，杜立特带领的B25机群从大黄蜂号上起飞，完成了轰炸任务并在中国迫降。5月中旬，大黄蜂号在内的全部约克级航母作为主力参加了中途岛海战并击溃了日本机动部队，可以说正是她们三位扭转了太平洋的局势。在42年10月的圣克鲁斯海战中，大黄蜂号击伤了翔鹤号和筑摩号，但是自身也被重创，之后被驱逐舰击沉。"]],
 
                             skilltest: ["male", "OTHER", 9, ["rendeonly2"], ["forbidai", "des:测试用"]],
                         },
@@ -9809,6 +9743,29 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
+                            yuanyangpoxi: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                mod: {
+                                    cardUsable: function (card, player, num) {
+                                        if (!player.storage.duanwan && card.name == "sha") return num - 1;
+                                    },
+                                },
+                                trigger: {
+                                    source: "damageBegin1",
+                                },
+                                filter(event) {
+                                    return event.card && (event.card.type == "trick") && player.inRange(event.player) && event.notLink();
+                                },
+                                direct: true,
+                                async content(event, trigger, player) {
+                                    trigger.num++;
+                                },
+                                ai: {
+                                    damageBonus: true,
+                                },
+                                "_priority": 0,
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -9867,6 +9824,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             getelan: "哥特兰",
                             rangbaer: "让巴尔",
                             dafeng: "大凤",
+                            dahuangfeng: "大黄蜂",
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -10052,6 +10010,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             chuansuohongzha_get: "穿梭轰炸", "chuansuohongzha_get_info": "每轮限一次，其他角色使用伤害类牌结算结束后，若你未受伤，你可以获得此牌对应的所有实体牌。",
                             chuansuohongzha_send: "穿梭轰炸", "chuansuohongzha_send_info": "每回合限一次，你使用的伤害类牌结算结束后，你可以将其交给一名未受伤角色。",
                             hangkongyazhi_fengyin: "航空压制_封印",
+                            yuanyangpoxi: "远洋破袭", "yuanyangpoxi_info": "你使用锦囊牌对攻击范围内的角色造成伤害+1；你出牌阶段使用杀的次数-1.",
+
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
                             lishizhanyi_naerweike: '历史战役-纳尔维克',
