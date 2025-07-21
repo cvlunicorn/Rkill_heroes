@@ -9755,8 +9755,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     source: "damageBegin1",
                                 },
-                                filter(event) {
-                                    return event.card && (event.card.type == "trick") && player.inRange(event.player) && event.notLink();
+                                filter(event,player) {
+                                    return  event.card&&get.type(event.card) == "trick" && player.inRange(event.player) && event.notLink();
                                 },
                                 direct: true,
                                 async content(event, trigger, player) {
