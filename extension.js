@@ -1736,8 +1736,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhuangjiafh: {
                                 //mod:{maxHandcard:function(player,num){var a=0;if(player.hujia>0){a+=(player.hujia)};return num=(num-a);},},//取消护甲技能减少手牌上限的效果2023.8.7
                                 trigger: { player: ["damageEnd"], },
-                                frequent: true, 
-                                firstDo: true, 
+                                frequent: true,
+                                firstDo: true,
                                 usable: 1,
                                 filter: function (event, player) { return true },
                                 content: function () {
@@ -2261,7 +2261,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         fixed: true,
                                         silent: true,
-                                        charlotte:true,
+                                        charlotte: true,
                                         content: function () {
                                             if (player.hasSkill('diewulimitai_shale')) { player.removeSkill('diewulimitai_shale'); };
                                         },
@@ -3950,7 +3950,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 subSkill: {
                                     block: {
-                                        charlotte:true,
+                                        charlotte: true,
                                         mark: true,
                                         intro: {
                                             content: "不能使用或打出手牌",
@@ -9413,7 +9413,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                     },
                                     zhunbei_disable: {
-                                        charlotte:true,
+                                        charlotte: true,
                                         marktext: "平",
                                         intro: {
                                             name: "平",
@@ -9688,7 +9688,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         round: 1,
                                         filter: function (event, player) {
-                                            return player != event.player && get.tag(event.card, 'damage') && !player.isDamaged();
+                                            if (event.cards.length && player != event.player && get.tag(event.card, 'damage') && !player.isDamaged()) {
+                                                for (var i = 0; i < event.cards.length; i++) {
+                                                    if (get.position(event.cards[i], true) == "o") {
+                                                        return true;
+                                                    }
+                                                }
+                                                return false;
+                                            };
+                                            return false;
                                         },
                                         content() {
                                             game.log(trigger.cards);
@@ -9699,8 +9707,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger: {
                                             player: "useCardAfter",
                                         },
+                                        frequent:true,
                                         filter: function (event, player) {
-                                            return get.tag(event.card, 'damage') && game.hasPlayer(function (current) {
+                                            return event.cards.length && get.tag(event.card, 'damage') && game.hasPlayer(function (current) {
                                                 return current.hp == current.maxHp;
                                             });;
                                         },
