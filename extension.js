@@ -7910,7 +7910,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (!(event.source && event.source.isIn())) return false;
                                     var target = (player == event.player) ? event.source : event.player;
                                     game.log(event.player != event.source && target.countCards("h") && target.isAlive());
-                                    return event.player != event.source && target.countCards("h") && target.isAlive() && event.notlink();
+                                    return event.player != event.source && target.countCards("h") && target.isAlive() && event.notLink();
                                 },
                                 content: function () {
                                     'step 0'
