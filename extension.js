@@ -862,7 +862,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         characterSort: {
                             jianrjinji: {
                                 jianrbiaozhun: ["liekexingdun", "qixichicheng", "wufenzhongchicheng", "qiye", "bisimai", "misuli", "weineituo", "lisailiu", "1913", "changmen", "kunxi", "ougengqi", "qingye", "beianpudun", "jiujinshan", "jiujinshan", "yixian", "tianlangxing", "dadianrendian", "yatelanda", "z31", "xuefeng", "kangfusi", "47project", "guzhuyizhichuixue", "shuileizhanduichuixue", "minsike", "yinghuochong", "u1405", "baiyanjuren", "changchun"],
-                                lishizhanyi_naerweike: ["shengwang", "z17", "z18", "z21", "z22", "gesakeren"],
+                                lishizhanyi_naerweike: ["shengwang", "z17", "z18", "z21", "z22", "gesakeren","biaoqiang"],
                                 lishizhanyi_matapanjiao: ["kewei", "kente"],
                                 lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "z1", "z16"],
                                 lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng"],
