@@ -293,7 +293,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             sub: true,
                         },
                         dietogain: {
-                            name: "远航死后给牌", trigger: { player: ["dieAfter"], }, direct: true, forceDie: true,
+                            name: "远航死后给牌", trigger: { player: ["dieAfter"], },
+                            direct: true,
+                            forceDie: true,
                             filter: function (event, player) { if (event.name == 'die') return get.mode() === "identity" && player.identity === "zhong"; return player.isAlive() && (get.mode() != 'boss' || (get.mode() == 'boss' && !lib.character[player.name][4].includes('boss') && player.identity == 'cai'));; },
                             content: function () {
                                 'step 0'
@@ -415,7 +417,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             var a = 0; if (player.countMark('shoupaiup')) { var a = a + player.countMark('shoupaiup') }; return num = (num + a);
                         },
                     },
-                    direct: true,
                     enable: "phaseUse",
                     usable: 1,
                     init: function (player) {//初始化数组，也可以运行事件再加if后面的内容
@@ -828,7 +829,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
             lib.skill._DieSound = {//死亡时台词
                 trigger: { player: 'dieBegin', },
-                //direct:true,
                 priority: 2,
                 forced: true,
                 unique: true,
@@ -862,7 +862,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         characterSort: {
                             jianrjinji: {
                                 jianrbiaozhun: ["liekexingdun", "qixichicheng", "wufenzhongchicheng", "qiye", "bisimai", "misuli", "weineituo", "lisailiu", "1913", "changmen", "kunxi", "ougengqi", "qingye", "beianpudun", "jiujinshan", "jiujinshan", "yixian", "tianlangxing", "dadianrendian", "yatelanda", "z31", "xuefeng", "kangfusi", "47project", "guzhuyizhichuixue", "shuileizhanduichuixue", "minsike", "yinghuochong", "u1405", "baiyanjuren", "changchun"],
-                                lishizhanyi_naerweike: ["shengwang", "z17", "z18", "z21", "z22", "gesakeren","biaoqiang"],
+                                lishizhanyi_naerweike: ["shengwang", "z17", "z18", "z21", "z22", "gesakeren", "biaoqiang"],
                                 lishizhanyi_matapanjiao: ["kewei", "kente"],
                                 lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "z1", "z16"],
                                 lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng"],
@@ -982,7 +982,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         sub: true,
                                     },
                                     dietogain: {
-                                        name: "远航死后给牌", trigger: { player: ["dieAfter"], }, direct: true, forceDie: true,
+                                        name: "远航死后给牌",
+                                        trigger: { player: ["dieAfter"], },
+                                        direct: true,
+                                        forceDie: true,
                                         filter: function (event, player) { if (event.name == 'die') return get.mode() === "identity" && player.identity === "zhong"; return player.isAlive() && (get.mode() != 'boss' || (get.mode() == 'boss' && !lib.character[player.name][4].includes('boss') && player.identity == 'cai'));; },
                                         content: function () {
                                             'step 0'
@@ -1097,7 +1100,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         var a = 0; if (player.countMark('shoupaiup')) { var a = a + player.countMark('shoupaiup') }; return num = (num + a);
                                     },
                                 },
-                                direct: true,
                                 enable: "phaseUse",
                                 usable: 1,
                                 init: function (player) {//初始化数组，也可以运行事件再加if后面的内容
@@ -1734,7 +1736,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhuangjiafh: {
                                 //mod:{maxHandcard:function(player,num){var a=0;if(player.hujia>0){a+=(player.hujia)};return num=(num-a);},},//取消护甲技能减少手牌上限的效果2023.8.7
                                 trigger: { player: ["damageEnd"], },
-                                direct: true, firstDo: true, usable: 1,
+                                frequent: true, 
+                                firstDo: true, 
+                                usable: 1,
                                 filter: function (event, player) { return true },
                                 content: function () {
                                     //  game.log(event.triggername,!trigger.hujia);//灵血&&!player.countCards('h',{color:'red'})
@@ -1798,7 +1802,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 check: function (card) {
                                     return 17 - get.value(card);
                                 },
-                                direct: true,
+                                frequent: true,
                                 content: function () {
                                     "step 0"
                                     if (player.countMark('jinengup') <= 0) {
@@ -2257,6 +2261,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         fixed: true,
                                         silent: true,
+                                        charlotte:true,
                                         content: function () {
                                             if (player.hasSkill('diewulimitai_shale')) { player.removeSkill('diewulimitai_shale'); };
                                         },
@@ -2725,10 +2730,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     global: ["phaseZhunbeiBegin"],
                                 },
-                                direct: true,
                                 lastDo: true,
                                 frequent: true,
-                                preHidden: true,
+                                //preHidden: true,
                                 locked: false,
                                 filter: function (event, player, name) {//输粮改
                                     var a = (event.name == 'phase');
@@ -2779,7 +2783,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             var zongshu = 1 + player.countMark('jinengup'), cunpaishu = player.getExpansions('junfu').length + player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length;
                                             return zongshu > cunpaishu && player.countCards('h');
                                         },
-                                        charlotte: true,
                                         content: function () {
                                             'step 0'
                                             var nh = Math.min(player.countCards('h'), Math.ceil(player.getHandcardLimit()));
@@ -2834,8 +2837,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player: "phaseZhunbeiBegin",
                                     global: "gameStart",
                                 },
-                                direct: true,
-                                popup: false,
+                                frequent: true,
                                 firstDo: true,
                                 filter: function (event, player) {
                                     var zongshu = 1 + player.countMark('jinengup'), cunpaishu = player.getExpansions('daodan').length + player.getCards('s', function (card) { return card.hasGaintag('daodan') }).length;
@@ -3033,7 +3035,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                             huokongld: {
                                 firstDo: true,
-                                direct: true,
+                                frequent: true,
                                 trigger: { player: ["shaMiss", "eventNeutralized"], }, audio: "ext:舰R牌将/audio/skill:true",
                                 filter: function (event, player) {
                                     if (event.type != 'card' || event.card.name != 'sha') return false;
@@ -3198,7 +3200,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     player: "phaseJieshuBegin",
                                 },
-                                direct: true,
+                                frequent: true,
                                 content: function () {
                                     "step 0"
                                     event.num1 = player.countMark('jinengup') + 1; event.num2 = 0;
@@ -3248,7 +3250,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (event.targets.length < 2) return false;
                                     return true;
                                 },
-                                direct: true,
+                                frequent: true,
                                 content: function () {
                                     'step 0'
                                     var next = player.chooseCardTarget({
@@ -3490,7 +3492,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                             shuileizhandui_1: {
                                 /*trigger: { player: "gainEnd" }, // 当你获得牌时触发
-                                direct: true,
+                                //direct: true,
                                 filter: function (event, player) {
                                     return !player.hasMark('shuileizhandui_1');
                                 },
@@ -3574,6 +3576,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player: "phaseZhunbeiBegin",
                                 },
                                 forced: true,
+                                popup: false,
                                 content: function () {
                                     var num = game.countPlayer(function (current) {
                                         return current.hasSkill('hangmucv');
@@ -3692,7 +3695,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player: "phaseJieshuBegin",
                                 },
                                 forced: true,
-                                direct: true,
                                 /*filterTarget: function (card, player, target) {
                                     return get.distance(player, target) <= 1 && target.isAlive;
                                 },*/
@@ -3730,7 +3732,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     player: "useCardAfter",
                                 },
-                                direct: true,
                                 frequent: true,
                                 filter: function (event, player) {
                                     //if (event.getParent().triggeredTargets3.length > 1) return false;
@@ -3949,6 +3950,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 subSkill: {
                                     block: {
+                                        charlotte:true,
                                         mark: true,
                                         intro: {
                                             content: "不能使用或打出手牌",
@@ -4082,7 +4084,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 group: ["sawohaizhan_1", "sawohaizhan_2"],
-                                preHidden: ["sawohaizhan_1", "sawohaizhan_2"],
+                                //preHidden: ["sawohaizhan_1", "sawohaizhan_2"],
                                 "_priority": 0,
                             },
                             sawohaizhan_1: {
@@ -4773,7 +4775,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return player.getExpansions('Z').length;
 
                                 },
-                                direct: true,
                                 content: function () {
                                     'step 0'
                                     var cards = player.getExpansions('Z'), count = cards.length;
@@ -5035,8 +5036,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter: function (event, player) {
                                     return event.num > 0;
                                 },
-                                direct: true,
-                                preHidden: true,
+                                frequent: true,
+                                //preHidden: true,
                                 content: function () {
                                     'step 0'
                                     var check = (player.countCards('h', { color: 'red' }) > 1 || player.countCards('h', { color: 'black' }) > 1);
@@ -5113,7 +5114,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     //return event.result.card.name=='sha'||event.result.card.name=='juedou';
                                 },
                                 frequent: true,
-                                preHidden: true,
+                                //preHidden: true,
                                 content: function () {
                                     'step 0'
                                     //player.gain(trigger.result.card, 'gain2');
@@ -5195,7 +5196,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 usable: 1,
-                                direct: true,
+                                frequent: true,
                                 trigger: {
                                     global: "useCardToPlayered",
                                 },
@@ -5477,7 +5478,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     })*/
                                     return num;
                                 },
-                                direct: true,
+                                frequent: true,
                                 filter: function (event, player) {
                                     return lib.skill.jiujingzhanzhen.count() > 0;
                                     /*return player.hasHistory('lose', function (evt) {
@@ -5597,7 +5598,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return (event.card.name == 'sha' || event.card.name == 'sheji9');
                                 },
                                 forced: true,
-                                direct: true,
                                 logTarget: "target",
                                 content: function () {
                                     game.log("重装刺客1执行代码");
@@ -5822,7 +5822,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     player: "useCardToPlayer",
                                 },
-                                direct: true,
                                 frequent: true,
                                 logTarget: "target",
                                 check: function (event, player) {
@@ -5886,7 +5885,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             changge: {
                                 nobracket: true,
                                 force: true,
-                                direct: true,
                                 trigger: {
                                     player: "useCardToPlayered",
                                 },
@@ -6001,7 +5999,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.addTempSkill('zhiyu', { player: 'phaseBegin' });
                                 },
                                 group: ["jueshengzhibing_discard", "jueshengzhibing_draw"],
-                                preHidden: ["jueshengzhibing_discard", "jueshengzhibing_draw"],
+                                //preHidden: ["jueshengzhibing_discard", "jueshengzhibing_draw"],
                                 subSkill: {
                                     discard: {
                                         audio: "ext:舰R牌将/audio/skill:true",
@@ -6183,8 +6181,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter: function (event, player) {
                                     return player.countCards('h') > 0 && !player.hasSkill('jilizhixin3');
                                 },
-                                direct: true,
-                                preHidden: true,
+                                frequent: true,
+                                //preHidden: true,
                                 content: function () {
                                     "step 0"
                                     var fang = player.countMark('jilizhixin2') == 0 && player.hp >= 2 && player.countCards('h') <= player.maxHandcard + 1;
@@ -6646,7 +6644,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             u81_zonglie: {
                                 usable: 1,
                                 nobracket: true,
-                                direct: true,
+                                frequent: true,
                                 trigger: {
                                     source: "damageBegin",
                                 },
@@ -6721,7 +6719,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player: "damageBegin3",
                                 },
                                 forced: true,
-                                direct: true,
+                                //direct: true,
                                 onremove: true,
                                 filter: function (event, player) {
                                     game.log("纵猎标记数量" + player.countMark("u81_zonglie_shanghai"));
@@ -6740,8 +6738,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     global: "gainAfter",
                                 },
                                 usable: 3,
-                                //direct: true,
-                                popup: false,
                                 filter: function (event, player) {
                                     if (player.inRange(event.player)) {
                                         /*for (var i in game.players) {
@@ -6840,7 +6836,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             z1_Zqulingjian: {
                                 nobracket: true,
                                 global: 'Z_damage',
-                                direct: true,
+                                frequent: true,
                                 trigger: {
                                     global: "damageEnd",
                                 },
@@ -6998,7 +6994,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             Z_gain: {//准备阶段获得一张Z，Z驱测试用。
-                                direct: true,
+                                frequent: true,
                                 trigger: {
                                     player: "phaseZhunbeiBegin",
                                 },
@@ -7311,7 +7307,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             z16_shuileibuzhi: {
                                 nobracket: true,
                                 global: "Z_judge",
-                                direct: true,
+                                frequent: true,
                                 trigger: {
                                     source: "damageSource",
                                 },
@@ -7331,7 +7327,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         filter: function (event, player) {
                                             return player.getExpansions('Z').length;
                                         },
-                                        direct: true,
                                         content: function () {
                                             'step 0'
                                             var cards = player.getExpansions('Z'), count = cards.length;
@@ -7439,7 +7434,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return player.getExpansions('Z').length;
 
                                         },
-                                        direct: true,
                                         filterTarget: function (card, player, target) {
                                             return target.countCards('h');
                                         },
@@ -7587,7 +7581,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     player: "phaseUseBegin",
                                 },
-                                direct: true,
+                                frequent: true,
                                 filter: function (event, player) {
                                     return game.hasPlayer(current => player.inRange(current));
                                 },
@@ -7667,7 +7661,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     player: "phaseUseBegin",
                                 },
-                                direct: true,
+                                frequent: true,
                                 filter: function (event, player) {
                                     return true;
                                 },
@@ -7781,7 +7775,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             matapanjiaozhijian: {
                                 audio: "ext:舰R牌将/audio/skill:true",
 
-                                direct: true,
+                                frequent: true,
                                 trigger: {
                                     player: "useCardToPlayered",
                                 },
@@ -7905,7 +7899,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     source: "damageBegin1",
                                 },
                                 force: true,
-                                direct: true,
                                 filter(event, player) {
                                     if (!(event.source && event.source.isIn())) return false;
                                     var target = (player == event.player) ? event.source : event.player;
@@ -7949,8 +7942,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     global: "judge",
                                 },
-                                direct: true,
-                                preHidden: true,
+                                frequent: true,
+                                //preHidden: true,
                                 filter(event, player) {
                                     if (player.group != 'RN') return false;
                                     if (!event.player.hasSkill("tianshi")) return false;
@@ -8012,7 +8005,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     player: "judgeEnd",
                                 },
-                                preHidden: true,
+                                //preHidden: true,
                                 frequent(event) {
                                     //if(get.mode()=='guozhan') return false;
                                     return event.result.card.name !== 'du';
@@ -8226,7 +8219,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     content: function (player) { return ('您的舰种技能【航空】临时提升了一级！在您发动【航空】后该效果消失。'); },
                                 },
                                 force: true,
-                                direct: true,
                                 trigger: {
                                     player: "phaseUseEnd",
                                 },
@@ -8265,7 +8257,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 check: function (card) {
                                     return 17 - get.value(card);
                                 },
-                                direct: true,
+                                frequent: true,
                                 content: function () {//hangmucv
                                     "step 0"
                                     player.chooseCardTarget({
@@ -8388,6 +8380,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 group: ["tiaobangzuozhan_self", "tiaobangzuozhan_damage"],
                                 subSkill: {
                                     self: {
+                                        popup: false,
                                         trigger: {
                                             player: "damageBegin2",
                                         },
@@ -8404,6 +8397,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         "_priority": 0,
                                     },
                                     damage: {
+                                        popup: false,
                                         trigger: {
                                             source: "damageSource",
                                         },
@@ -8520,7 +8514,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter: function (event, player) {
                                     return !event.numFixed;
                                 },
-                                direct: true,
+                                force: true,
                                 content: function () {
                                     "step 0";
                                     player.chooseControl("zuihouderongyao_less", "zuihouderongyao_more", "cancel2", function () {
@@ -8602,7 +8596,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 subSkill: {
                                     damage: {
                                         force: true,
-                                        direct: true,
                                         trigger: {
                                             global: "damageBegin3",
                                         },
@@ -8650,7 +8643,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         return player.maxHp;
                                     },
                                 },
-                                preHidden: true,
+                                //preHidden: true,
                                 trigger: {
                                     player: "damageEnd",
                                 },
@@ -9182,7 +9175,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger: {
                                             source: "damageSource",
                                         },
-                                        direct: true,
+                                        frequent: true,
                                         filter: function (event, player) {
                                             //if (event._notrigger.includes(event.player)) return false;
                                             game.log("salemu1");
@@ -9210,7 +9203,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 return !event.targets.includes(current) && player.canUse(event.card, current);
                                             });
                                         },
-                                        direct: true,
+                                        frequent: true,
                                         async content(event, trigger, player) {
                                             const judgeEvent = player.judge(card => {
                                                 game.log(get.color(card));
@@ -9382,7 +9375,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 subSkill: {
                                     jieshu: {
                                         trigger: { player: "phaseJieshuBegin", },
-                                        direct: true,
+                                        frequent: true,
                                         filter: function (event, player) {
 
                                             return player.getHistory("sourceDamage").length == 0;
@@ -9395,7 +9388,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                     zhunbei: {
                                         trigger: { player: "phaseZhunbeiBegin", },
-                                        direct: true,
+                                        frequent: true,
                                         filter: function (event, player) {
                                             return !player.hasSkill("pingduzhanhuo_zhunbei_disable");
                                             //return player.getRoundHistory("damage").length == 0;
@@ -9406,7 +9399,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                     zhunbei_damage: {
                                         force: true,
-                                        direct: true,
                                         popup: false,
                                         charlotte: true,
                                         trigger: {
@@ -9421,6 +9413,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                     },
                                     zhunbei_disable: {
+                                        charlotte:true,
                                         marktext: "平",
                                         intro: {
                                             name: "平",
@@ -9478,7 +9471,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 nobracket: true,
                                 trigger: { global: "roundStart", },
                                 forced: true,
-                                direct: true,
                                 content() {
                                     "step 0"
                                     if (player.storage.shixiangquanneng.length) {
@@ -9509,7 +9501,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player: "phaseBegin",
                                 },
                                 force: true,
-                                direct: true,
                                 filter(event, player) {
                                     //if (player.storage.pangguanzhe.length) return false;
                                     return true;
@@ -9571,7 +9562,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger: {
                                             global: "judge",
                                         },
-                                        direct: true,
+                                        frequent: true,
                                         filter(event, player) {
                                             var currentParent = event.getParent();
                                             //game.log(currentParent.player);
@@ -9671,7 +9662,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 charlotte: true,
                                 skillBlocker: function (skill, player) {
-                                    return true;
+                                    return !lib.skill[skill].charlotte;
                                 },
                                 mark: true,
                                 intro: {
@@ -9755,10 +9746,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     source: "damageBegin1",
                                 },
-                                filter(event,player) {
-                                    return  event.card&&get.type(event.card) == "trick" && player.inRange(event.player) && event.notLink();
+                                filter(event, player) {
+                                    return event.card && get.type(event.card) == "trick" && player.inRange(event.player) && event.notLink();
                                 },
-                                direct: true,
+                                force: true,
                                 async content(event, trigger, player) {
                                     trigger.num++;
                                 },
@@ -10042,8 +10033,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             chuansuohongzha_get: "穿梭轰炸", "chuansuohongzha_get_info": "每轮限一次，其他角色使用伤害类牌结算结束后，若你未受伤，你可以获得此牌对应的所有实体牌。",
                             chuansuohongzha_send: "穿梭轰炸", "chuansuohongzha_send_info": "每回合限一次，你使用的伤害类牌结算结束后，你可以将其交给一名未受伤角色。",
                             hangkongyazhi_fengyin: "航空压制_封印",
-                            yuanyangpoxi: "远洋破袭", "yuanyangpoxi_info": "你使用锦囊牌对攻击范围内的角色造成伤害+1；你出牌阶段使用杀的次数-1.",
-                            juejingfengsheng: "绝境逢生", juejingfengsheng_info: "你的最大耐久增加11。免疫一次致命伤害。",
+                            yuanyangpoxi: "远洋破袭", "yuanyangpoxi_info": "锁定技，你使用锦囊牌对攻击范围内的角色造成伤害+1；你出牌阶段使用杀的次数-1.",
+                            juejingfengsheng: "绝境逢生", juejingfengsheng_info: "锁定技，你的最大耐久增加11。免疫一次致命伤害。",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
