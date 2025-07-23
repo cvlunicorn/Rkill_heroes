@@ -6748,7 +6748,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 return event.getl(game.players[i]).cards2;
                                             }
                                         }*///是否从其他角色处获得牌
-                                        return _status.currentPhase != event.player;
+                                        return _status.currentPhase != event.player&&!event.player.hp>0;
                                     }
                                     return false;
                                 },
@@ -9984,7 +9984,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             u47_huxi: "虎袭", u47_huxi_info: "出牌阶段限一次，你可以将一名被记录的角色的体力值和手牌数调整为记录值，然后摸一张牌并移除记录，",
                             u81_zonglie_shanghai: "纵猎", u81_zonglie_shanghai_info: "",
                             u81_zonglie: "纵猎", u81_zonglie_info: "每回每名角色限一次，你对其他角色造成伤害时，若其手牌与你不相等，其可以交给你一张手牌并摸一张牌，防止此伤害，如此做，其本回合不能响应你的牌。",
-                            u81_xunyi: "巡弋", u81_xunyi_info: "锁定技，每回合限三次，你攻击范围内的角色在回合外获得牌时，你与其各展示一张牌，若类型相同，视为对其使用一张雷杀。",
+                            u81_xunyi: "巡弋", u81_xunyi_info: "锁定技，每回合限三次，你攻击范围内的角色在回合外获得牌时，若其不处于濒死状态，你与其各展示一张牌，若类型相同，视为对其使用一张雷杀。",
                             z1_Zqulingjian: "Z驱领舰", z1_Zqulingjian_info: "当G国驱逐舰受到/造成伤害后，你可以将造成伤害的牌置于武将牌上称为“Z”。有其他角色受到雷属性伤害时，你可以弃置一张“Z”，令此伤害-1；当你造成雷属性伤害时，你可以弃置一张“Z”，令此伤害+1。准备阶段，你可以移动一张“Z”。(全局)有Z的角色受到伤害时，可以移去所有Z，防止此伤害。",
                             z1_Zqulingjian_source: "Z驱领舰_加伤", z1_Zqulingjian_source_info: "当你造成雷属性伤害时，你可以弃置一张“Z”，令此伤害+1。",
                             z1_Zqulingjian_damage: "Z驱领舰_减伤", z1_Zqulingjian_damage_info: "有其他角色受到雷属性伤害时，你可以弃置一张“Z”，令此伤害-1。",
