@@ -8580,11 +8580,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter: function (event, player) {
                                     return get.tag(event.card, 'damage');
                                 },
+ frequent:true,
                                 content: function () {
                                     'step 0'
                                     player.chooseCard(get.prompt('hongseqiangwei', event.target), 1, 'h').set('ai', card => {
-                                        if (!game.players[get.number(card) % game.countPlayer() - 1].isAlive()) { return 0; }
-                                        if (get.attitude(game.players[get.number(card) % game.countPlayer() - 1] < 0)) { return 0; }
+                                        if (!game.players[(get.number(card) -1)% game.countPlayer()].isAlive()) { return 0; }
+                                        if (get.attitude(game.players[(get.number(card) -1)% game.countPlayer() ] < 0)) { return 0; }
                                         return 9 - get.value(card);
                                     });
                                     'step 1'
@@ -10019,7 +10020,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             '29jienaerxun': "29节纳尔逊", '29jienaerxun_info': "当你本回合内第一次使用“杀”指定目标时，若你的攻击范围大于等于3，此杀不可响应，若你的体力为全场最高时，此杀伤害+1。",
                             zuihouderongyao_less: "少摸加距离",
                             zuihouderongyao_more: "多摸减距离",
-                            hongseqiangwei: "红色蔷薇", hongseqiangwei_info: "你使用伤害类牌后，可以将一张手牌置于武将牌上称为[花]。[花]包含对应座次（点数超出游戏人数则减去游戏人数）的角色受到伤害时，你须弃置一张对应点数的[花]并防止此伤害。",
+                            hongseqiangwei: "红色蔷薇", hongseqiangwei_info: "你使用伤害类牌后，可以将一张手牌置于武将牌上称为[花]。[花]包含对应座次（点数超出游戏人数则减去游戏人数）的角色受到伤害时，你可以弃置一张对应点数的[花]并防止此伤害。",
                             bujushenfeng: "不惧神风", bujushenfeng_info: "当你受到伤害时，你可以获得造成伤害的牌。你的手牌上限基数为你的体力上限。",
                             shenfeng: "神风", shenfeng_info: "当你造成或受到一点伤害时，你获得一个“风”标记。",
                             buju: "不惧", buju_info: "每轮各限一次，你可以移去一个“风”视为使用酒或无懈可击。 以此法使用的无懈可击结算后，你重置[援军]。",
