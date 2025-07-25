@@ -3686,7 +3686,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         if (get.suit(card) == 'spade') {
                                             trigger.cancel();
                                             player.addMark('xiangrui', 1);
-                                        }
+           return 1;                             }
+           return 0;
                                     });
                                 },
                                 marktext: "祥瑞",
@@ -3715,7 +3716,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         //if (i > 0) { return 1; }
                                         return get.distance(player, target) <= 1;
                                     }).set('ai', function (target) {
-                                        return 1;//(2-get.effect(target, {name:"lossHp"}, player, target));
+                                        return 2-get.effect(target, {name:"lossHp"}, player, target);
                                     });
                                     //}
                                     "step 1"
@@ -5196,7 +5197,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.judge(function (card) {
                                         if (get.suit(card) == 'spade') {
                                             trigger.num--;
-                                        }
+            return 1;                            }
+            return 0;
                                     });
                                 },
                             },
@@ -5942,7 +5944,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 logTarget: "target",
                                 content: function () {
                                     "step 0"
-                                    player.judge(function () { return 0 });
+                                    player.judge(function (card) {
+                if (get.suit(card) != "heart") return 1;
+                return -1;
+            });
                                     "step 1"
                                     game.log("此杀伤害基数" + trigger.getParent().baseDamage);
                                     game.log(get.suit(result));
@@ -6312,7 +6317,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 forced: true,
                                 content: function () {
                                     "step 0"
-                                    player.judge();
+                                    player.judge(function (card) {
+                if (get.color(card) == "red") return 1;
+                return -1;
+            });
                                     "step 1"
                                     if (result.color == 'red') {
                                         player.recover(1);
