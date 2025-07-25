@@ -1973,7 +1973,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 popup: false,
                                 ai: {
                                     expose: 0.3,
-                                    threaten: 8.8,
+                                    threaten: 1.8,
                                     order: 5,
                                     result: {
                                         player: 1,
@@ -2341,7 +2341,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             golbal: "phaseJieshuBegin",
                                             player: "phaseJieshuBegin",
                                         },
-                                        force: true,
+                                        forced: true,
                                         silent: true,
                                         content: function () {//,player.countMark('diewulimitai_2_shale')player.removeSkill('kanpolimitai_wuxiele');
                                             // if(player.hasMark('kanpolimitai_wuxiele')){
@@ -3474,7 +3474,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 }, ai: {
                                     expose: 0.1,
                                     order: 5,
-                                    result: {
+    
+                                    noh:true,
+        skillTagFilter(player,tag){
+            if(tag=='noh'){
+                if(player.countCards('h')!=1) return false;
+            }
+        },                                result: {
                                         target: function (player, target) {
                                             if (!ui.selected.cards.length) return 0;
                                             if (get.value(ui.selected.cards[0], false, 'raw') < 0) return -1;
@@ -3709,10 +3715,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         //if (i > 0) { return 1; }
                                         return get.distance(player, target) <= 1;
                                     }).set('ai', function (target) {
-                                        if (get.attitude(_status.event.player, target) < 0) {
-                                            return 1 / Math.sqrt(target.hp + 1);
-                                        }
-                                        return 0;
+                                        return 1;//(2-get.effect(target, {name:"lossHp"}, player, target));
                                     });
                                     //}
                                     "step 1"
@@ -4295,7 +4298,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             '无效，或袖手旁观', function (card) {
                                                 return get.type(card) != 'basic';
                                             }).set('ai', function (card) {
-                                                return get.attitude(target, player) >= 0 ? 1 : -1;
+    
+                //game.log(get.attitude(target, player));                                
+                //game.log(get.effect(player, trigger.card, trigger.player, player));                       
+                //game.log(card.name+get.value(card));                     
+                return (get.effect(player, trigger.card, trigger.player, player))-get.value(card);
                                             });
                                         game.delay();
                                     }
@@ -5183,7 +5190,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     source: "damageBegin1",
                                 },
-                                force: true,
+                                forced: true,
                                 content: function () {
                                     "step 0"
                                     player.judge(function (card) {
@@ -5885,7 +5892,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             changge: {
                                 nobracket: true,
-                                force: true,
+                                forced: true,
                                 trigger: {
                                     player: "useCardToPlayered",
                                 },
@@ -5905,7 +5912,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             xiongjiaqibin: {
                                 nobracket: true,
-                                force: true,
+                                forced: true,
                                 mod: {
                                     globalFrom(from, to, distance) {
                                         if (from.getSeatNum() < to.getSeatNum()) return distance - 1;
@@ -7899,7 +7906,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player: "damageBegin3",
                                     source: "damageBegin1",
                                 },
-                                force: true,
+                                forced: true,
                                 filter(event, player) {
                                     if (!(event.source && event.source.isIn())) return false;
                                     var target = (player == event.player) ? event.source : event.player;
@@ -8219,7 +8226,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     marktext: "修葺",
                                     content: function (player) { return ('您的舰种技能【航空】临时提升了一级！在您发动【航空】后该效果消失。'); },
                                 },
-                                force: true,
+                                forced: true,
                                 trigger: {
                                     player: "phaseUseEnd",
                                 },
@@ -8245,7 +8252,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },*/
                             wanbei: {
                                 nobracket: true,
-                                force: true,
+                                forced: true,
                                 mod: {
                                     maxHandcard: function (player, num) {
                                         return num = (num + player.countCards("s"));
@@ -8515,7 +8522,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter: function (event, player) {
                                     return !event.numFixed;
                                 },
-                                force: true,
+                                forced: true,
                                 content: function () {
                                     "step 0";
                                     player.chooseControl("zuihouderongyao_less", "zuihouderongyao_more", "cancel2", function () {
@@ -8597,7 +8604,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 group: ["hongseqiangwei_damage"],
                                 subSkill: {
                                     damage: {
-                                        force: true,
+                                        forced: true,
                                         trigger: {
                                             global: "damageBegin3",
                                         },
@@ -9400,7 +9407,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                     },
                                     zhunbei_damage: {
-                                        force: true,
+                                        forced: true,
                                         popup: false,
                                         charlotte: true,
                                         trigger: {
@@ -9456,7 +9463,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 ai: {
                                     order: 2,
                                     expose: 0.3,
-                                    threaten: 3.2,
+                                    threaten: 1.2,
                                     result: {
                                         target: function (player, target) {
                                             if (target.hasSkillTag("noturn")) return 0;
@@ -9502,7 +9509,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     player: "phaseBegin",
                                 },
-                                force: true,
+                                forced: true,
                                 filter(event, player) {
                                     //if (player.storage.pangguanzhe.length) return false;
                                     return true;
@@ -9617,7 +9624,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             tag: {
                                                 rejudge: 0.4,
                                             },
-                                            expose: 0.5,
+                                            expose: 0.1,
                                         },
                                         "_priority": 0,
                                     },
@@ -9760,7 +9767,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter(event, player) {
                                     return event.card && get.type(event.card) == "trick" && player.inRange(event.player) && event.notLink();
                                 },
-                                force: true,
+                                forced: true,
                                 async content(event, trigger, player) {
                                     trigger.num++;
                                 },
