@@ -864,7 +864,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lishizhanyi_naerweike: ["shengwang", "z17", "z18", "z21", "z22", "gesakeren", "biaoqiang"],
                                 lishizhanyi_matapanjiao: ["kewei", "kente"],
                                 lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "z1", "z16"],
-                                lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng"],
+                                lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng"],
                                 lishizhanyi_haixiafujizhan: ["u47", "u81", "u505"],
                                 weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan"],
                             },
@@ -934,6 +934,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             dafeng: ["female", "IJN", 4, ["hangmucv", "chuansuohongzha", "hangkongyazhi"], ["des:　大凤号是日本设计建造的装甲航空母舰。与其它日本海军航空母舰不同的是，大凤号预备在舰队中承担起支援其他航母作战的功能，因此大凤号将船舰的防护性摆在首位，重点增强装甲。竣工后被编入第三舰队第一航空战队，担任旗舰参加了马里亚纳海战。6月19日，大凤号在飞机起飞作业时，被美国潜艇大青花鱼号发射鱼雷并命中其右舷，最终因损管不当而沉没。"]],
                             dahuangfeng: ["female", "USN", 4, ["hangmucv", "yuanyangpoxi"], ["des:　　大黄蜂号是约克城级航母3号舰。她服役后第一项作战任务就是搭载B25轰炸机轰炸东京。在4月18日，杜立特带领的B25机群从大黄蜂号上起飞，完成了轰炸任务并在中国迫降。5月中旬，大黄蜂号在内的全部约克级航母作为主力参加了中途岛海战并击溃了日本机动部队，可以说正是她们三位扭转了太平洋的局势。在42年10月的圣克鲁斯海战中，大黄蜂号击伤了翔鹤号和筑摩号，但是自身也被重创，之后被驱逐舰击沉。"]],
                             biaoqiang: ["female", "RN", 14, ["dajiaoduguibi", "quzhudd", "juejingfengsheng"], ["des:　标枪级驱逐舰首舰。英国于部族级之后建造的驱逐舰，其设计也成为战时应急驱逐舰的范本。二战中标枪号参加了纳尔维克海战，战斗中标枪号被德国驱逐舰击伤了船首。修复之后主要在地中海作战，并于1949年退役。"]],
+                            yuekecheng: ["female", "USN", 4, ["hangmucv", "saqijian"], ["des:　　约克城级是美国二战前期的主力航母，她的设计吸取了之前级别的经验，布局更加合理。约克城号同列克星敦号一起参加了珊瑚海海战，在海战中被击伤。因为前线急需航母应对中途岛战事，在短短72小时内她就修复完毕。中途岛战役中，三艘约克城级航母联手将日军最精锐的航母部队歼灭，但约克城号自己也被飞龙号两波攻击击伤，最后被I168号潜艇击沉。值得一提的是著名的萨奇少校当时就在约克城号上，他发明的萨奇剪战术使得美军战机可以发挥优势对付零战。"]],
 
                             skilltest: ["male", "OTHER", 9, ["rendeonly2"], ["forbidai", "des:测试用"]],
                         },
@@ -1796,15 +1797,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             hangmucv: {
                                 trigger: { player: "phaseUseBegin" },
                                 filter: function (event, player) {
-        return player.countCards('h') > 0;
+                                    return player.countCards('h') > 0;
                                 },
-                                check: function (event,player) {
+                                check: function (event, player) {
                                     return 1;
                                 },
                                 frequent: true,
-                            content: function () {
+                                content: function () {
                                     "step 0"
-    if (player.countMark('jinengup') <= 0) {
+                                    if (player.countMark('jinengup') <= 0) {
                                         player.chooseCardTarget({
                                             prompt: "弃置两张黑桃或梅花手牌，视为使用【万箭齐发】",
                                             filterCard: { color: 'black' },
@@ -1821,7 +1822,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 return get.effect(target, { name: 'wanjian' }, player, player);
                                             }
 
-    });
+                                        });
                                         /*player.chooseToDiscard(2, "h", function (card) {
                                             return get.color(card) === 'black';
                                         }, "弃置两张黑桃或梅花手牌，视为使用【万箭齐发】").set("ai", function (card) {
@@ -2736,7 +2737,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 locked: false,
                                 filter: function (event, player, name) {//输粮改
                                     //var a = (event.name == 'phase');
-                                    return player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length > 0 && event.player.countCards('h') < 8 && event.player.isAlive() && event.player != player ;//&& a == true
+                                    return player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length > 0 && event.player.countCards('h') < 8 && event.player.isAlive() && event.player != player;//&& a == true
                                 },
                                 content: function () {
                                     'step 0'
@@ -3473,13 +3474,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 }, ai: {
                                     expose: 0.1,
                                     order: 5,
-    
-                                    noh:true,
-        skillTagFilter(player,tag){
-            if(tag=='noh'){
-                if(player.countCards('h')!=1) return false;
-            }
-        },                                result: {
+
+                                    noh: true,
+                                    skillTagFilter(player, tag) {
+                                        if (tag == 'noh') {
+                                            if (player.countCards('h') != 1) return false;
+                                        }
+                                    }, result: {
                                         target: function (player, target) {
                                             if (!ui.selected.cards.length) return 0;
                                             if (get.value(ui.selected.cards[0], false, 'raw') < 0) return -1;
@@ -3685,8 +3686,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         if (get.suit(card) == 'spade') {
                                             trigger.cancel();
                                             player.addMark('xiangrui', 1);
-           return 1;                             }
-           return 0;
+                                            return 1;
+                                        }
+                                        return 0;
                                     });
                                 },
                                 marktext: "祥瑞",
@@ -3715,7 +3717,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         //if (i > 0) { return 1; }
                                         return get.distance(player, target) <= 1;
                                     }).set('ai', function (target) {
-                                        return 2-get.effect(target, {name:"lossHp"}, player, target);
+                                        return 2 - get.effect(target, { name: "lossHp" }, player, target);
                                     });
                                     //}
                                     "step 1"
@@ -4298,11 +4300,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             '无效，或袖手旁观', function (card) {
                                                 return get.type(card) != 'basic';
                                             }).set('ai', function (card) {
-    
-                //game.log(get.attitude(target, player));                                
-                //game.log(get.effect(player, trigger.card, trigger.player, player));                       
-                //game.log(card.name+get.value(card));                     
-                return (get.effect(player, trigger.card, trigger.player, player))-get.value(card);
+
+                                                //game.log(get.attitude(target, player));                                
+                                                //game.log(get.effect(player, trigger.card, trigger.player, player));                       
+                                                //game.log(card.name+get.value(card));                     
+                                                return (get.effect(player, trigger.card, trigger.player, player)) - get.value(card);
                                             });
                                         game.delay();
                                     }
@@ -5196,8 +5198,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.judge(function (card) {
                                         if (get.suit(card) == 'spade') {
                                             trigger.num--;
-            return 1;                            }
-            return 0;
+                                            return 1;
+                                        }
+                                        return 0;
                                     });
                                 },
                             },
@@ -5944,9 +5947,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 content: function () {
                                     "step 0"
                                     player.judge(function (card) {
-                if (get.suit(card) != "heart") return 1;
-                return -1;
-            });
+                                        if (get.suit(card) != "heart") return 1;
+                                        return -1;
+                                    });
                                     "step 1"
                                     game.log("此杀伤害基数" + trigger.getParent().baseDamage);
                                     game.log(get.suit(result));
@@ -6317,9 +6320,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 content: function () {
                                     "step 0"
                                     player.judge(function (card) {
-                if (get.color(card) == "red") return 1;
-                return -1;
-            });
+                                        if (get.color(card) == "red") return 1;
+                                        return -1;
+                                    });
                                     "step 1"
                                     if (result.color == 'red') {
                                         player.recover(1);
@@ -6762,7 +6765,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 return event.getl(game.players[i]).cards2;
                                             }
                                         }*///是否从其他角色处获得牌
-                                        return _status.currentPhase != event.player&&!event.player.hp>0;
+                                        return _status.currentPhase != event.player && !event.player.hp > 0;
                                     }
                                     return false;
                                 },
@@ -8594,12 +8597,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter: function (event, player) {
                                     return get.tag(event.card, 'damage');
                                 },
- frequent:true,
+                                frequent: true,
                                 content: function () {
                                     'step 0'
                                     player.chooseCard(get.prompt('hongseqiangwei', event.target), 1, 'h').set('ai', card => {
-                                        if (!game.players[(get.number(card) -1)% game.countPlayer()].isAlive()) { return 0; }
-                                        if (get.attitude(game.players[(get.number(card) -1)% game.countPlayer() ] < 0)) { return 0; }
+                                        if (!game.players[(get.number(card) - 1) % game.countPlayer()].isAlive()) { return 0; }
+                                        if (get.attitude(game.players[(get.number(card) - 1) % game.countPlayer()] < 0)) { return 0; }
                                         return 9 - get.value(card);
                                     });
                                     'step 1'
@@ -9723,7 +9726,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger: {
                                             player: "useCardAfter",
                                         },
-                                        frequent:true,
+                                        frequent: true,
                                         filter: function (event, player) {
                                             return event.cards.length && get.tag(event.card, 'damage') && game.hasPlayer(function (current) {
                                                 return current.hp == current.maxHp;
@@ -9813,6 +9816,63 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 init: (player, skill) => (player.storage[skill] = false),
                                 "_priority": 0,
                             },
+                            saqijian: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                mod: {
+                                    aiValue(player, card, num) {
+                                        if (get.name(card) != "wuxie" && get.color(card) != "black") return;
+                                        var cards = player.getCards("hes", function (card) {
+                                            return get.name(card) == "wuxie" || get.color(card) == "black";
+                                        });
+                                        cards.sort(function (a, b) {
+                                            return (get.name(b) == "wuxie" ? 1 : 2) - (get.name(a) == "wuxie" ? 1 : 2);
+                                        });
+                                        var geti = function () {
+                                            if (cards.includes(card)) {
+                                                return cards.indexOf(card);
+                                            }
+                                            return cards.length;
+                                        };
+                                        if (get.name(card) == "wuxie") return Math.min(num, [6, 4, 3][Math.min(geti(), 2)]) * 0.6;
+                                        return Math.max(num, [6, 4, 3][Math.min(geti(), 2)]);
+                                    },
+                                    aiUseful() {
+                                        return lib.skill.kanpo.mod.aiValue.apply(this, arguments);
+                                    },
+                                },
+                                locked: false,
+                                audio: 2,
+                                enable: "chooseToUse",
+                                filterCard(card) {
+                                    return get.color(card) == "black";
+                                },
+                                viewAsFilter(player) {
+                                    return player.countCards("hes", { color: "black" }) > 0;
+                                },
+                                viewAs: {
+                                    name: "wuxie",
+                                },
+                                position: "hes",
+                                prompt: "将一张黑色牌当无懈可击使用",
+                                check(card) {
+                                    var tri = _status.event.getTrigger();
+                                    if (tri && tri.card && tri.card.name == "chiling") return -1;
+                                    return 8 - get.value(card);
+                                },
+                                threaten: 1.2,
+                                ai: {
+                                    basic: {
+                                        useful: [6, 4, 3],
+                                        value: [6, 4, 3],
+                                    },
+                                    result: {
+                                        player: 1,
+                                    },
+                                    expose: 0.2,
+                                },
+                                "_priority": 0,
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -9873,6 +9933,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             dafeng: "大凤",
                             dahuangfeng: "大黄蜂",
                             biaoqiang: "标枪",
+                            yuekecheng: "约克城",
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -10060,6 +10121,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             hangkongyazhi_fengyin: "航空压制_封印",
                             yuanyangpoxi: "远洋破袭", "yuanyangpoxi_info": "锁定技，你使用锦囊牌对攻击范围内的角色造成伤害+1；你出牌阶段使用杀的次数-1.",
                             juejingfengsheng: "绝境逢生", juejingfengsheng_info: "锁定技，你的最大耐久增加11。免疫一次致命伤害。",
+                            saqijian: "萨奇剪", "saqijian_info": "你可以将一张黑色牌当无懈可击使用",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
