@@ -864,7 +864,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lishizhanyi_naerweike: ["shengwang", "z17", "z18", "z21", "z22", "gesakeren", "biaoqiang"],
                                 lishizhanyi_matapanjiao: ["kewei", "kente"],
                                 lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "weiershiqinwang", "z1", "z16"],
-                                lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng"],
+                                lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng", "qiuyue"],
                                 lishizhanyi_haixiafujizhan: ["u47", "u81", "u505"],
                                 weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan"],
                             },
@@ -935,6 +935,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             yuekecheng: ["female", "USN", 4, ["hangmucv", "saqijian"], ["des:　　约克城级是美国二战前期的主力航母，她的设计吸取了之前级别的经验，布局更加合理。约克城号同列克星敦号一起参加了珊瑚海海战，在海战中被击伤。因为前线急需航母应对中途岛战事，在短短72小时内她就修复完毕。中途岛战役中，三艘约克城级航母联手将日军最精锐的航母部队歼灭，但约克城号自己也被飞龙号两波攻击击伤，最后被I168号潜艇击沉。值得一提的是著名的萨奇少校当时就在约克城号上，他发明的萨奇剪战术使得美军战机可以发挥优势对付零战。"]],
                             shengqiaozhi: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "jupaohuoli"], ["des:针对日德兰和之前经验设计的皇家海军新式战列舰N3型。和之前战舰不同，该级战列舰在设计上有很多创新，圣乔治采用了独特的前中置主炮塔布局。优点是可以缩短主装甲带，集中更多的防护在武器系统。圣乔治的主炮也远大于之前的战列舰，达到了18英寸。由于华盛顿条约的签订，明显超出规格的N3型战列舰受到限制，圣乔治从未完工。"]],
                             weiershiqinwang: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "guanjianyiji"], ["des:英王乔治五世级2号舰。服役之后同胡德号一同参与了截击俾斯麦号的战斗，在战斗中被击伤撤退，不过她也击伤了俾斯麦号的油舱。修复之后威尔士亲王号搭载英国首相与美国总统进行了会晤，之后双方发表了著名的《大西洋宪章》。41年年末，威尔士亲王号编入Z舰队被派往远东对日本作战，在海战中包括反击号与威尔士亲王号在内的Z舰队被日本空袭击沉。"]],
+                            qiuyue: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "duikongzhiwei",], ["des:　秋月型是日本少有的以护卫和对空为任务的驱逐舰，为了区别雷击用的甲驱而被称做乙驱，主炮使用100毫米双联高炮。秋月号建成后主要伴随航母提供防空掩护，经历了马里亚纳海战，目睹了日本航母部队的失败。同年10月在恩加诺海战中被美军飞机炸沉。"]],
 
 
 
@@ -9955,7 +9956,73 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
-
+                            duikongzhiwei: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                lastDo: true,
+                                trigger: {
+                                    global: "useCardToPlayered",
+                                },
+                                filter: function (event, player) {
+                                    if (event.getParent().triggeredTargets3.length > 1) return false;//万箭要作用七个目标,而你不想跟着遍历七次技能。
+                                    if (get.type(event.card) != 'trick') return false;
+                                    if (get.info(event.card).multitarget) return false;
+                                    if (!player.countCards('he')) return false;
+                                    if (event.targets.length < 2) return false;
+                                    return true;
+                                },
+                                frequent: true,
+                                round:1,
+                                content: function () {
+                                    'step 0'
+                                    var next = player.chooseCardTarget({
+                                        prompt: get.prompt('对空直卫保护对象'),
+                                        prompt2: ('当一名角色使用的锦囊牌指定了至少两名角色为目标时，<br>你可弃置一张牌令此牌对距离你一以内的角色无效。'),
+                                        position: 'hejs',
+                                        selectCard: function () {
+                                            return 1;
+                                        },
+                                        selectTarget: function () {
+                                            return -1;
+                                        },
+                                        filterCard: function (card, player) {
+                                            return lib.filter.cardDiscardable(card, player);
+                                        },
+                                        filterTarget: function (card, player, target) {
+                                            if (_status.event.targets.includes(target) && !target.hasSkill('duikongzhiwei_aibiexuan')) {
+                                                return get.distance(player, target) <= 1;
+                                            }
+                                        },//选择事件包含的目标，同trigger的目标。有其他同技能的角色时，ai不要重复选择目标。
+                                        ai1: function (card) {
+                                            return 7 - get.useful(card);
+                                        },//建议卡牌以7为标准就行，怕ai不救队友，所以调高了。同时ai顺次选择卡牌时不要选太多卡牌，要形成持续的牵制。
+                                        /* ai2: function (target) {
+                                            var trigger = _status.event.getTrigger();
+                                            return -get.effect(target, trigger.card, trigger.player, _status.event.player);
+                                        },  */
+                                        targets: trigger.targets,//这个代码不能照搬到content以外的地方。贯石斧、朱雀羽扇有类似代码。还有recover版的。
+                                    });
+                                    'step 1'
+                                    if (result.bool) {//只能判断你有没有选择，然后给你true与false，没其他文本。
+                                        player.discard(result.cards);//前面有卡牌card，可以返回card，不同于仁德主动技能直接写card。
+                                        event.target = result.targets;//前面有目标target，可以返回target。
+                                        if (event.target != undefined) { for (var i = 0; i < trigger.targets.length; i += (1)) { if (event.target.includes(trigger.targets[i])) { trigger.getParent().excluded.add(trigger.targets[i]); trigger.targets[i].addSkill('duikongzhiwei_aibiexuan'); game.log('取消卡牌目标', trigger.targets[i], '编号', i) } } };//三级选择，集合target是否包含trigger.target。同时测试是否选到了目标。
+                                        player.logSkill('duikongzhiwei', event.target);
+                                    }//让技能发语音，发历史记录。
+                                },
+                                subSkill: {
+                                    d: {
+                                        trigger: {
+                                            global: "useCardEnd",
+                                        },
+                                        forced: true,
+                                        content: function () { game.log('保护结束'); player.removeSkill('duikongzhiwei_aibiexuan'); },
+                                        sub: true,
+                                        "_priority": 0,
+                                    },
+                                },
+                                "_priority": 0,
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -10019,6 +10086,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             yuekecheng: "约克城",
                             shengqiaozhi: "圣乔治",
                             weiershiqinwang: "威尔士亲王",
+                            qiuyue: "秋月",
 
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐", "quzhudd_info": "",
@@ -10210,6 +10278,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             saqijian: "萨奇剪", "saqijian_info": "你可以将一张黑色牌当无懈可击使用",
                             jupaohuoli: "巨炮火力", "jupaohuoli_info": "你使用杀造成伤害时，若你手牌数大于目标手牌数，此伤害+1。",
                             guanjianyiji: "关键一击", "guanjianyiji_info": "每轮限一次，有牌指定目标后，你可以扣置目标的一张牌于武将牌上，此回合结束后再获得之。若此时是你的回合内且指定战列舰为目标，不计入发动次数限制。",
+                            duikongzhiwei: "对空直卫", "duikongzhiwei_info": "每轮限一次，当一名角色使用锦囊牌指定至少两名角色为目标时，你可以弃置一张牌，令此牌对你和距离1的角色无效。",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
