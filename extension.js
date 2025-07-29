@@ -3720,7 +3720,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         //if (i > 0) { return 1; }
                                         return get.distance(player, target) <= 1;
                                     }).set('ai', function (target) {
-                                        return 2 - get.effect(target, { name: "lossHp" }, player, target);
+                                        return  get.effect(target, { name:'loseHp' }, player, target);
                                     });
                                     //}
                                     "step 1"
