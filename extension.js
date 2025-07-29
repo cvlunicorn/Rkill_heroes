@@ -862,7 +862,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jianrjinji: {
                                 jianrbiaozhun: ["liekexingdun", "qixichicheng", "wufenzhongchicheng", "qiye", "bisimai", "misuli", "weineituo", "lisailiu", "1913", "changmen", "kunxi", "ougengqi", "qingye", "beianpudun", "jiujinshan", "jiujinshan", "yixian", "tianlangxing", "dadianrendian", "yatelanda", "z31", "xuefeng", "kangfusi", "47project", "guzhuyizhichuixue", "shuileizhanduichuixue", "minsike", "yinghuochong", "u1405", "baiyanjuren", "changchun"],
                                 lishizhanyi_naerweike: ["shengwang", "z17", "z18", "z21", "z22", "gesakeren", "biaoqiang"],
-                                lishizhanyi_matapanjiao: ["kewei", "kente"],
+                                lishizhanyi_matapanjiao: ["kewei", "kente", "luodeni"],
                                 lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "weiershiqinwang", "z1", "z16"],
                                 lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng", "qiuyue"],
                                 lishizhanyi_haixiafujizhan: ["u47", "u81", "u505"],
@@ -936,6 +936,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             shengqiaozhi: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "jupaohuoli"], ["des:针对日德兰和之前经验设计的皇家海军新式战列舰N3型。和之前战舰不同，该级战列舰在设计上有很多创新，圣乔治采用了独特的前中置主炮塔布局。优点是可以缩短主装甲带，集中更多的防护在武器系统。圣乔治的主炮也远大于之前的战列舰，达到了18英寸。由于华盛顿条约的签订，明显超出规格的N3型战列舰受到限制，圣乔治从未完工。"]],
                             weiershiqinwang: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "guanjianyiji"], ["des:英王乔治五世级2号舰。服役之后同胡德号一同参与了截击俾斯麦号的战斗，在战斗中被击伤撤退，不过她也击伤了俾斯麦号的油舱。修复之后威尔士亲王号搭载英国首相与美国总统进行了会晤，之后双方发表了著名的《大西洋宪章》。41年年末，威尔士亲王号编入Z舰队被派往远东对日本作战，在海战中包括反击号与威尔士亲王号在内的Z舰队被日本空袭击沉。"]],
                             qiuyue: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "duikongzhiwei",], ["des:　秋月型是日本少有的以护卫和对空为任务的驱逐舰，为了区别雷击用的甲驱而被称做乙驱，主炮使用100毫米双联高炮。秋月号建成后主要伴随航母提供防空掩护，经历了马里亚纳海战，目睹了日本航母部队的失败。同年10月在恩加诺海战中被美军飞机炸沉。"]],
+                            luodeni: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "bigseven"], ["des:　纳尔逊级2号舰，于1927年服役。罗德尼号同纳尔逊号、科罗拉多级、长门级一起被称为海军假日七巨头。二战爆发后罗德尼号参与了围歼击沉俾斯麦号的最后战斗，之后由于航速较慢，主要执行护航和支援任务。43年参与了在地中海的一系列作战，44年罗德尼号参与了支援诺曼底的行动，战后退役拆解。"]],
 
 
 
@@ -3720,7 +3721,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         //if (i > 0) { return 1; }
                                         return get.distance(player, target) <= 1;
                                     }).set('ai', function (target) {
-                                        return  get.effect(target, { name:'loseHp' }, player, target);
+                                        return get.effect(target, { name: 'loseHp' }, player, target);
                                     });
                                     //}
                                     "step 1"
@@ -9972,7 +9973,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return true;
                                 },
                                 frequent: true,
-                                round:1,
+                                round: 1,
                                 content: function () {
                                     'step 0'
                                     var next = player.chooseCardTarget({
@@ -10022,6 +10023,54 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                                 "_priority": 0,
+                            },
+                            bigseven: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                frequent: true,
+                                trigger: {
+                                    player: "useCardToPlayered",
+                                },
+                                filter: function (event, player) {
+                                    return event.targets.length == 1&&(get.type(event.card) == "basic" || get.type(event.card) == "trick");
+                                },
+                                async content(event, trigger, player) {
+                                    let cardtype = get.type(trigger.card);
+                                    //game.log(trigger.card);
+                                    //game.log(cardtype);
+                                    const judgeEvent = player.judge(card => {
+                                        return get.type(card) == cardtype ? 1 : 0;
+                                    });
+                                    judgeEvent.judge2 = result => result.bool;
+                                    const {
+                                        result: { judge },
+                                    } = await judgeEvent;
+                                    game.log("1"+judge);
+                                    if (judge != 1) return;
+                                    
+                                    let count = game.hasPlayer(function (current) {
+                                        return current.hasSkill("bigseven");
+                                    });
+                                    //game.log(count);
+                                    const {
+                                        result: { bool, targets },
+                                    } = await player
+                                        .chooseTarget([1,count],get.prompt("bigseven"), "为" + get.translation(trigger.card) + "增加目标", (card, player, target) => {
+                                            const trigger = get.event().getTrigger();
+                                            return !trigger.targets.includes(target) && player.canUse(trigger.card, target);
+                                        })
+                                        .set("card", trigger.card)
+                                        .set("ai", target => {
+                                            const player = get.event("player"),
+                                                trigger = get.event().getTrigger();
+                                            return get.effect(target, trigger.card, player, player);
+                                        });
+                                    if (bool) {
+                                        player.logSkill("bigseven", targets);
+                                        trigger.targets.addArray(targets);
+                                    }
+
+                                },
                             },
                             //在这里添加新技能。
 
@@ -10087,6 +10136,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             shengqiaozhi: "圣乔治",
                             weiershiqinwang: "威尔士亲王",
                             qiuyue: "秋月",
+                            luodeni: "罗德尼",
 
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐", "quzhudd_info": "",
@@ -10279,6 +10329,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jupaohuoli: "巨炮火力", "jupaohuoli_info": "你使用杀造成伤害时，若你手牌数大于目标手牌数，此伤害+1。",
                             guanjianyiji: "关键一击", "guanjianyiji_info": "每轮限一次，有牌指定目标后，你可以扣置目标的一张牌于武将牌上，此回合结束后再获得之。若此时是你的回合内且指定战列舰为目标，不计入发动次数限制。",
                             duikongzhiwei: "对空直卫", "duikongzhiwei_info": "每轮限一次，当一名角色使用锦囊牌指定至少两名角色为目标时，你可以弃置一张牌，令此牌对你和距离1的角色无效。",
+                            bigseven: "BIGSEVEN", "bigseven_info": "你使用基本牌和非延时锦囊牌指定唯一目标后，可以进行判定。若结果与使用的牌类型相同，你可以额外指一名角色为目标。(场上每有一名自己以外拥有bigseven的角色，目标+1)",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
