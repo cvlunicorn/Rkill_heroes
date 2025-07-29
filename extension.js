@@ -863,7 +863,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 jianrbiaozhun: ["liekexingdun", "qixichicheng", "wufenzhongchicheng", "qiye", "bisimai", "misuli", "weineituo", "lisailiu", "1913", "changmen", "kunxi", "ougengqi", "qingye", "beianpudun", "jiujinshan", "jiujinshan", "yixian", "tianlangxing", "dadianrendian", "yatelanda", "z31", "xuefeng", "kangfusi", "47project", "guzhuyizhichuixue", "shuileizhanduichuixue", "minsike", "yinghuochong", "u1405", "baiyanjuren", "changchun"],
                                 lishizhanyi_naerweike: ["shengwang", "z17", "z18", "z21", "z22", "gesakeren", "biaoqiang"],
                                 lishizhanyi_matapanjiao: ["kewei", "kente"],
-                                lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "z1", "z16"],
+                                lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "weiershiqinwang", "z1", "z16"],
                                 lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng"],
                                 lishizhanyi_haixiafujizhan: ["u47", "u81", "u505"],
                                 weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan"],
@@ -934,6 +934,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             biaoqiang: ["female", "RN", 14, ["dajiaoduguibi", "quzhudd", "juejingfengsheng"], ["des:　标枪级驱逐舰首舰。英国于部族级之后建造的驱逐舰，其设计也成为战时应急驱逐舰的范本。二战中标枪号参加了纳尔维克海战，战斗中标枪号被德国驱逐舰击伤了船首。修复之后主要在地中海作战，并于1949年退役。"]],
                             yuekecheng: ["female", "USN", 4, ["hangmucv", "saqijian"], ["des:　　约克城级是美国二战前期的主力航母，她的设计吸取了之前级别的经验，布局更加合理。约克城号同列克星敦号一起参加了珊瑚海海战，在海战中被击伤。因为前线急需航母应对中途岛战事，在短短72小时内她就修复完毕。中途岛战役中，三艘约克城级航母联手将日军最精锐的航母部队歼灭，但约克城号自己也被飞龙号两波攻击击伤，最后被I168号潜艇击沉。值得一提的是著名的萨奇少校当时就在约克城号上，他发明的萨奇剪战术使得美军战机可以发挥优势对付零战。"]],
                             shengqiaozhi: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "jupaohuoli"], ["des:针对日德兰和之前经验设计的皇家海军新式战列舰N3型。和之前战舰不同，该级战列舰在设计上有很多创新，圣乔治采用了独特的前中置主炮塔布局。优点是可以缩短主装甲带，集中更多的防护在武器系统。圣乔治的主炮也远大于之前的战列舰，达到了18英寸。由于华盛顿条约的签订，明显超出规格的N3型战列舰受到限制，圣乔治从未完工。"]],
+                            weiershiqinwang: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "guanjianyiji"], ["des:英王乔治五世级2号舰。服役之后同胡德号一同参与了截击俾斯麦号的战斗，在战斗中被击伤撤退，不过她也击伤了俾斯麦号的油舱。修复之后威尔士亲王号搭载英国首相与美国总统进行了会晤，之后双方发表了著名的《大西洋宪章》。41年年末，威尔士亲王号编入Z舰队被派往远东对日本作战，在海战中包括反击号与威尔士亲王号在内的Z舰队被日本空袭击沉。"]],
 
 
 
@@ -9880,14 +9881,81 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     source: "damageBegin4",
                                 },
-                                frequent:true,
+                                frequent: true,
                                 filter: function (event, player) {
-                                    return player.countCards("h")>event.player.countCards("h")&&event.notLink();
+                                    return player.countCards("h") > event.player.countCards("h") && event.notLink();
                                 },
                                 content: function () {
                                     trigger.num += 1;
                                 },
                             },
+                            guanjianyiji: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: {
+                                    global: "useCardToPlayered",
+                                },
+                                filter: function (event, player) {
+                                    return !player.hasSkill("guanjianyiji_disable");
+                                },
+                                content: function () {
+                                    "step 0";
+                                    player.choosePlayerCard(trigger.target, "he", 1, get.prompt("guanjianyiji", trigger.target)).set("forceAuto", true);
+                                    "step 1";
+                                    if (result.bool && result.links.length) {
+                                        var target = trigger.target;
+                                        player.logSkill("guanjianyiji", target);
+                                        target.addToExpansion(result.cards, "giveAuto", target).gaintag.add("guanjianyiji_pojun");
+                                        target.addSkill("guanjianyiji_pojun");
+                                    }
+                                    "step 2";
+                                    game.log(_status.event.player);
+                                    if (!trigger.target.hasSkill("zhanliebb") || !player == _status.event.player) {
+                                        player.addTempSkill('guanjianyiji_disable', 'roundStart');
+                                    }
+                                },
+                                mark: false,
+                                sub: true,
+                                subSkill: {
+                                    disable: {
+                                        mark: true,
+                                        intro: {
+                                            content: "本轮已发动",
+                                        },
+                                        sub: true,
+                                        "_priority": 0,
+                                    },
+                                    pojun: {
+                                        trigger: {
+                                            global: "phaseEnd",
+                                        },
+                                        forced: true,
+                                        popup: false,
+                                        charlotte: true,
+                                        filter: function (event, player) {
+                                            return player.getExpansions("guanjianyiji_pojun").length > 0;
+                                        },
+                                        content: function () {
+                                            "step 0";
+                                            var cards = player.getExpansions("guanjianyiji_pojun");
+                                            player.gain(cards, "draw");
+                                            game.log(player, "收回了" + get.cnNumber(cards.length) + "张牌");
+                                            "step 1";
+                                            player.removeSkill("guanjianyiji_pojun");
+                                        },
+                                        intro: {
+                                            markcount: "expansion",
+                                            mark: function (dialog, storage, player) {
+                                                var cards = player.getExpansions("guanjianyiji_pojun");
+                                                if (player.isUnderControl(true)) dialog.addAuto(cards);
+                                                else return "共有" + get.cnNumber(cards.length) + "张牌";
+                                            },
+                                        },
+                                        "_priority": 0,
+                                    },
+                                },
+                            },
+
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -9950,6 +10018,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             biaoqiang: "标枪",
                             yuekecheng: "约克城",
                             shengqiaozhi: "圣乔治",
+                            weiershiqinwang: "威尔士亲王",
+
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -10043,7 +10113,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             shizhibuyu1_eff: "矢志不渝", "shizhibuyu1_eff_info": "直到回合结束，手牌上限+1，出杀次数+1",
                             qianxingtuxi: "潜行突袭", "qianxingtuxi_info": "你使用牌无视距离限制；若你在出牌阶段以外造成伤害，你于此轮获得规避且受到伤害的角色下个回合第一次造成伤害时须进行一次判定，如果为黑桃，此次伤害-1。",
                             qianxingtuxi_debuff: "被袭", "qianxingtuxi_debuff_info": "锁定技，你第一次造成伤害时须进行一次判定，如果为黑桃，此次伤害-1。",
-                            "31jiezhongdui": "31节中队", "31jiezhongdui_info": "每每回合限一次，有角色使用杀指定目标后，若其体力值小于等于目标，你可以选择一项:1令此杀不可响应;2令此杀伤害+1;3令此杀使用者摸一张牌。",
+                            "31jiezhongdui": "31节中队", "31jiezhongdui_info": "每每回合限一次，有角色使用杀指定目标后，若其体力值小于等于目标，你可以选择一项:1令此杀不可响应;2令此杀伤害+1;3令当前回合角色摸一张牌。",
                             jujianmengxiang: "巨舰梦想", "jujianmengxiang_info": "出牌阶段，你可以失去一点体力，视为使用一张基本牌或非延时锦囊牌（每回合每种牌名限一次）。",
                             sidajingang: "四大金刚", "sidajingang_info": "你使用杀造成伤害后，你可以与目标拼点，若你赢你获得其一张牌。你发动[远航摸牌]后可以摸一张牌。",
                             jiujingzhanzhen: "久经战阵", "jiujingzhanzhen_info": "出牌阶段限两次，你可以重铸一张红牌。结束阶段，你可以选择X名角色，其各选择一项:1摸一张牌，2令你获得一点护甲(至多为一)。X为你本回合弃置的红牌数。",
@@ -10139,6 +10209,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             juejingfengsheng: "绝境逢生", juejingfengsheng_info: "锁定技，你的最大耐久增加11。免疫一次致命伤害。",
                             saqijian: "萨奇剪", "saqijian_info": "你可以将一张黑色牌当无懈可击使用",
                             jupaohuoli: "巨炮火力", "jupaohuoli_info": "你使用杀造成伤害时，若你手牌数大于目标手牌数，此伤害+1。",
+                            guanjianyiji: "关键一击", "guanjianyiji_info": "每轮限一次，有牌指定目标后，你可以扣置目标的一张牌于武将牌上，此回合结束后再获得之。若此时是你的回合内且指定战列舰为目标，不计入发动次数限制。",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
