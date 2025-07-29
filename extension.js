@@ -9900,6 +9900,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter: function (event, player) {
                                     return !player.hasSkill("guanjianyiji_disable");
                                 },
+                                check: function (event, player) {
+                                    if (_status.currentPhase == player && event.target == player) {
+                                        return 1;
+                                    }
+                                    return -get.attitude(player,event.target);
+                                },
                                 content: function () {
                                     "step 0";
                                     player.choosePlayerCard(trigger.target, "he", 1, get.prompt("guanjianyiji", trigger.target)).set("forceAuto", true);
@@ -10032,7 +10038,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player: "useCardToPlayered",
                                 },
                                 filter: function (event, player) {
-                                    return event.targets.length == 1&&(get.type(event.card) == "basic" || get.type(event.card) == "trick");
+                                    return event.targets.length == 1 && (get.type(event.card) == "basic" || get.type(event.card) == "trick");
                                 },
                                 async content(event, trigger, player) {
                                     let cardtype = get.type(trigger.card);
@@ -10045,9 +10051,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     const {
                                         result: { judge },
                                     } = await judgeEvent;
-                                    game.log("1"+judge);
+                                    game.log("1" + judge);
                                     if (judge != 1) return;
-                                    
+
                                     let count = game.hasPlayer(function (current) {
                                         return current.hasSkill("bigseven");
                                     });
@@ -10055,7 +10061,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     const {
                                         result: { bool, targets },
                                     } = await player
-                                        .chooseTarget([1,count],get.prompt("bigseven"), "为" + get.translation(trigger.card) + "增加目标", (card, player, target) => {
+                                        .chooseTarget([1, count], get.prompt("bigseven"), "为" + get.translation(trigger.card) + "增加目标", (card, player, target) => {
                                             const trigger = get.event().getTrigger();
                                             return !trigger.targets.includes(target) && player.canUse(trigger.card, target);
                                         })
