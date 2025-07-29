@@ -922,10 +922,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             salemu: ["female", "USN", 4, ["huokongld", "zhongxunca", "jingruizhuangbei"], ["des:新奥尔良级重巡洋舰6号舰。新奥尔良级是北安普顿级的改良版本，增强了防护。战争爆发后，昆西号先是执行了在大西洋的岛屿巡逻任务，后于42年5月通过巴拿马运河来到太平洋战场。在萨沃岛海战中，昆西号击中了鸟海号的舰桥，但是之后昆西号被日军集火射击，最终不幸被鱼雷击沉。"]],
                             "u505": ["female", "KMS", 3, ["qianting", "dananbusi", "houfu"], ["des:该艇属IX-C型潜艇，于42年建成，她在德军服役生涯中一共击沉了8艘总计4万吨的盟军船只。让U-505成名的事件发生在44年6月。当时U-505被美军的反潜编队发现并击伤，鉴于形势，艇员浮出水面并弃艇。这艘潜艇之后被美军俘获并进行了抢修运回本土，上面的一些发报机和密码本被盟军获得。至今这个特别的战利品依然在美国的博物馆中对外展出，这也是唯一存世的IX-C型潜艇。"]],
                             jialifuniya: ["female", "USN", 4, ["zhanliebb", "zhuangjiafh", "zhanliexianfuchou"], ["des:田纳西级2号舰，在20年代的年度大演习中，她表现优秀。1940年成为美军最早装备CXAM雷达的几艘军舰之一。在日军偷袭珍珠港中加利福尼亚号被重创，一直到1944年才修复完毕重返战场，修复的同时加利福尼亚号也进行了性能上的改装。苏里高海战中，加利福尼亚号同其余在珍珠港受难的姐妹一道，用战舰的方式完成了对日军的复仇。"]],
-
                             jifu: ["female", "ΒΜΦCCCP", 2, ["quzhudd", "dajiaoduguibi", "jifu_weicheng", "jifu_yuanjing", "jifu_lingwei", "jifu_yuanqin", "jifu_yuanqin"], ["des:基辅是苏联海军大舰队计划中的一环，她的设计吸取了塔什干和列宁格勒等驱逐舰的技术，同时航速和火力也保持了非常强的水平。尽管基辅在战前已经开工，但还是因为战况的影响而停工。在战争末期，未完工的基辅被拖回船厂，并修改了设计准备继续建造，但由于相比战后的新驱逐舰设计优势不大，所以并没有最终建造完成。"]],
                             yi25: ["female", "IJN", 3, ["qianting", "liaowangtai"], ["des:　该舰于1939年开工，1941年10月服役，其超过3000吨的大排水量允许携带更多设备，包括一架零式小型水侦，以及一门被广为使用的14cm甲板炮。该舰自太平洋战争起便执行了多次巡航任务，如在战争初期于美国西海岸的军事行动，以及在次年9月大胆地炮击及空袭了美国本土目标。该舰在近3年的巡逻任务中屡次取得瞩目战绩，直至1943年9月在圣埃斯皮里图岛东北侧240km外的海域，被多艘美国驱逐舰围剿战沉。"]],
-
                             shiyu: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "jishiyu", "jishiyu1"], ["des:她在海军中以幸运而著名，参加过多次激烈海战都能最终幸存下来。在激烈的苏里高海战和维拉湾海战中，她都是编队中唯一的幸存。不过到45年，她还是被一艘潜艇击中沉没。"]],
                             dujiaoshou: ["female", "RN", 3, ["junfu", "xiuqi", "wanbei"], ["des:30年代英国设计了一级飞机修理舰，以修理航母部队载机，由于要求修复的飞机可以直接起飞，索性将她设计成了航母的结构，可当成航母使用。独角兽号于1942年完工，初期主要被当作航母使用，在地中海执行支援任务。1943年年末起，独角兽号加入太平洋战场作为航母支援舰使用，在冲绳战役期间修复了大量飞机。冷战时期独角兽号还参加了朝鲜战争，最终于50年代退役。"]],
                             jiate: ["female", "USN", 3, ["fangqu", "mbmeibu"], ["des:基林级驱逐舰之一，由于服役太晚没有参加二战的实战。服役之后主要在大西洋活动。在1955年基阿特进行了改装，成为世界上第一艘导弹驱逐舰，其换装了双联防空导弹发射架，76毫米高炮和反潜鱼雷。在1957年为了显示其地位，刷上了DDG-1的编号。这艘划时代的军舰于1968年退役。"]],
@@ -935,6 +933,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             dahuangfeng: ["female", "USN", 4, ["hangmucv", "yuanyangpoxi"], ["des:　　大黄蜂号是约克城级航母3号舰。她服役后第一项作战任务就是搭载B25轰炸机轰炸东京。在4月18日，杜立特带领的B25机群从大黄蜂号上起飞，完成了轰炸任务并在中国迫降。5月中旬，大黄蜂号在内的全部约克级航母作为主力参加了中途岛海战并击溃了日本机动部队，可以说正是她们三位扭转了太平洋的局势。在42年10月的圣克鲁斯海战中，大黄蜂号击伤了翔鹤号和筑摩号，但是自身也被重创，之后被驱逐舰击沉。"]],
                             biaoqiang: ["female", "RN", 14, ["dajiaoduguibi", "quzhudd", "juejingfengsheng"], ["des:　标枪级驱逐舰首舰。英国于部族级之后建造的驱逐舰，其设计也成为战时应急驱逐舰的范本。二战中标枪号参加了纳尔维克海战，战斗中标枪号被德国驱逐舰击伤了船首。修复之后主要在地中海作战，并于1949年退役。"]],
                             yuekecheng: ["female", "USN", 4, ["hangmucv", "saqijian"], ["des:　　约克城级是美国二战前期的主力航母，她的设计吸取了之前级别的经验，布局更加合理。约克城号同列克星敦号一起参加了珊瑚海海战，在海战中被击伤。因为前线急需航母应对中途岛战事，在短短72小时内她就修复完毕。中途岛战役中，三艘约克城级航母联手将日军最精锐的航母部队歼灭，但约克城号自己也被飞龙号两波攻击击伤，最后被I168号潜艇击沉。值得一提的是著名的萨奇少校当时就在约克城号上，他发明的萨奇剪战术使得美军战机可以发挥优势对付零战。"]],
+                            shengqiaozhi: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "jupaohuoli"], ["des:针对日德兰和之前经验设计的皇家海军新式战列舰N3型。和之前战舰不同，该级战列舰在设计上有很多创新，圣乔治采用了独特的前中置主炮塔布局。优点是可以缩短主装甲带，集中更多的防护在武器系统。圣乔治的主炮也远大于之前的战列舰，达到了18英寸。由于华盛顿条约的签订，明显超出规格的N3型战列舰受到限制，圣乔治从未完工。"]],
+
+
 
                             skilltest: ["male", "OTHER", 9, ["rendeonly2"], ["forbidai", "des:测试用"]],
                         },
@@ -9873,6 +9874,20 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
                             },
+                            jupaohuoli: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: {
+                                    source: "damageBegin4",
+                                },
+                                frequent:true,
+                                filter: function (event, player) {
+                                    return player.countCards("h")>event.player.countCards("h")&&event.notLink();
+                                },
+                                content: function () {
+                                    trigger.num += 1;
+                                },
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -9934,6 +9949,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             dahuangfeng: "大黄蜂",
                             biaoqiang: "标枪",
                             yuekecheng: "约克城",
+                            shengqiaozhi: "圣乔治",
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -10122,6 +10138,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             yuanyangpoxi: "远洋破袭", "yuanyangpoxi_info": "锁定技，你使用锦囊牌对攻击范围内的角色造成伤害+1；你出牌阶段使用杀的次数-1.",
                             juejingfengsheng: "绝境逢生", juejingfengsheng_info: "锁定技，你的最大耐久增加11。免疫一次致命伤害。",
                             saqijian: "萨奇剪", "saqijian_info": "你可以将一张黑色牌当无懈可击使用",
+                            jupaohuoli: "巨炮火力", "jupaohuoli_info": "你使用杀造成伤害时，若你手牌数大于目标手牌数，此伤害+1。",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
