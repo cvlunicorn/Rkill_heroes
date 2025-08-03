@@ -882,7 +882,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             changmen: ["female", "IJN", 4, ["zhuangjiafh", "zhanliebb", "zhudaojiandui"], ["des:她与妹妹都是高火力型日本战列舰的代表，被称为海军假日七巨头之一。她建成时就有高大的六脚桅楼，可看做是日式高塔舰桥的开端。二战开始后，太平洋战场的形势变为航空主导。一直到44年的莱特湾海战，她才得到了一线作战的机会：她所在的栗田编队抓到了美军护航航母编队，但是在美军的拼命反抗下日军没能取得多大的战果。回到本土的她在搁置中迎来了日本投降。美军缴获之后将她用作“十字路口计划”核试验的靶船，于1946年7月沉没。"]],
                             "1913": ["female", "ROCN", 4, ["zhuangjiafh", "zhanliebb", "jujianmengxiang"], ["zhu", "des:1913年时，为针对邻国的海军威胁，国民政府参谋部在海军造舰计划书中提出了颇为夸张的海军扩建计划，其中便包括大量的战列巡洋舰。该型战列巡洋所设想的性能参数为：排水量28000吨，装备10门14英寸火炮，航速29节左右。当然在那个穷困动荡的年代，海军意图获取主力舰无非是不切实际的妄想罢了……"]],
                             kunxi: ["female", "USN", 4, ["huokongld", "zhongxunca", "gaosusheji"], ["des:新奥尔良级重巡洋舰6号舰。新奥尔良级是北安普顿级的改良版本，增强了防护。战争爆发后，昆西号先是执行了在大西洋的岛屿巡逻任务，后于42年5月通过巴拿马运河来到太平洋战场。在萨沃岛海战中，昆西号击中了鸟海号的舰桥，但是之后昆西号被日军集火射击，最终不幸被鱼雷击沉。"]],
-                            ougengqi: ["female", "KMS", 4, ["huokongld", "zhongxunca", "zhanxianfangyu", "zhanxianfangyu1"], ["des:希佩尔海军上将级重巡3号舰，有着不死鸟的绰号。相比前两艘，她的外形设计进行了一些改进。服役之后她同俾斯麦号一起行动参加了丹麦海峡海战，战斗结束后，她和俾斯麦号分头行动。俾斯麦号最终被击沉，而欧根亲王号则安全抵达法国。42年欧根亲王号同两艘沙恩霍斯特级执行了瑟布鲁斯行动，44年欧根亲王号在德军沿岸提供火力支援。战败后，欧根亲王号被赔偿给美国，在经历核试验和海洋风暴后，于拖拽过程中沉没。"]],
+                            ougengqi: ["female", "KMS", 4, ["huokongld", "zhongxunca", "zhanxianfangyu"], ["des:希佩尔海军上将级重巡3号舰，有着不死鸟的绰号。相比前两艘，她的外形设计进行了一些改进。服役之后她同俾斯麦号一起行动参加了丹麦海峡海战，战斗结束后，她和俾斯麦号分头行动。俾斯麦号最终被击沉，而欧根亲王号则安全抵达法国。42年欧根亲王号同两艘沙恩霍斯特级执行了瑟布鲁斯行动，44年欧根亲王号在德军沿岸提供火力支援。战败后，欧根亲王号被赔偿给美国，在经历核试验和海洋风暴后，于拖拽过程中沉没。"]],
                             qingye: ["female", "IJN", 4, ["huokongld", "zhongxunca", "sawohaizhan", "qingyeqingyeqing"], ["des:青叶型本属古鹰型的后续，但是由于修改了设计，所以这二艘被单独列为青叶型。在37年，青叶型进行了大规模改装。战争中青叶型和古鹰型编入同一部队作战，42年10月的海战中，青叶号将美军误认为友军，对美军打出“我是青叶”的信号，遭到了美军射击，在友舰的掩护下青叶号幸运逃脱，然而古鹰号却因此沉没。青叶号在44年遭到了潜艇袭击，返回日本修理之后不再出动，在坐沉中迎来了日本战败。"]],
                             beianpudun: ["female", "USN", 4, ["huokongld", "zhongxunca", "huhangyuanhu"], ["des:北安普顿级是美国最早重巡彭萨科拉号的改进版本。在战争爆发后，北安普顿号参加了针对日军的报复性反击，这些反击行动极大鼓舞了美国的士气。北安普顿号主要被用于航母护航，在圣克鲁斯海战中，北安普顿号一度试图拖带受创的大黄蜂号，但由于日军不断的攻击而被迫放弃。在塔萨法隆加海战中北安普顿号被日军鱼雷击中沉没，由于损管和撤退有序，大部分舰员得以幸存。"]],
                             jiujinshan: ["female", "USN", 4, ["huokongld", "zhongxunca", "jiujingzhanzhen"], ["des:旧金山号重巡洋舰属新奥尔良级重巡洋舰，和昆西等舰同级。旧金山号重巡洋舰作为旗舰参加了埃斯佩恩斯角海战。在第一次瓜岛海战中，旧金山依然担任舰队旗舰，尽管舰队指挥官牺牲，舰队损失较大，但是依然完成了拦截日军编队的任务，并重创比叡，导致其最终沉没。旧金山打满了战争全程，并获得了总统集体嘉奖。她17颗战役之星的获得数量仅次于企业和圣地亚哥。"]],
@@ -4560,8 +4560,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhanxianfangyu: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
-                                usable: 1,
-                                trigger: {
+ prompt:"你可以弃置一张牌代替其成为杀的目标。",                               
+ usable: 1,
+ group:["zhanxianfangyu1"],
+ trigger: {
                                     global: "useCardToTarget",
                                 },
                                 //direct:true,//自动发动
@@ -4619,7 +4621,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     target: "shaBefore",
                                 },
-                                popup: false,
+                               
                                 direct: true,
                                 filter: function (event, player) {
                                     if (!player.hasEmptySlot(2)) return false;
@@ -10282,7 +10284,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 wufenzhong4: "命运的五分钟", "wufenzhong4_info": "你可以跳过弃牌阶段并翻面，视为使用一张雷杀或火杀。",
                                 qijianshashou: "旗舰杀手", "qijianshashou_info": "出牌阶段开始时，你可以与一名角色进行拼点，若你赢，本回合你与该角色距离视为1，你对该目标使用杀伤害+1，若你没赢，你跳过出牌阶段和弃牌阶段。",
                                 qijianshashou_1: "旗舰杀手", "qijianshashou_1_info": "",
-                                zhanxianfangyu: "战线防御", "zhanxianfangyu_info": "每名角色回合回合限一次，若你没有装备防具，你成为黑色杀的目标时，取消之。每回合限一次，距你为1的角色成为杀的目标时，你可以弃置一张牌并代替该名角色成为此杀的目标。",
+                                zhanxianfangyu: "战线防御", "zhanxianfangyu_info": "每名角色回合限一次，若你没有装备防具，你成为黑色杀的目标时，取消之。每回合限一次，距你为1的角色成为杀的目标时，你可以弃置一张牌并代替该名角色成为此杀的目标。",
                                 zhanxianfangyu1: "战线防御", "zhanxianfangyu1_info": "",
                                 Zqujingying: "Z驱菁英", "Zqujingying_info": "限定技，出牌阶段，你可以把任意张牌交给等量名角色，获得牌的角色依次选择:其交给你一张牌作为Z或令你获得其两张牌。",
                                 Z_qianghua: "Z强化", "Z_qianghua_info": "出牌阶段，你可以移去一张Z,强化一项。",
