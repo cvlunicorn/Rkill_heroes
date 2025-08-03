@@ -877,7 +877,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qiye: ["female", "USN", 4, ["hangmucv", "dajiaoduguibi", "dumuchenglin", "bigE"], ["des:　企业号是美国获得战斗之星最多的军舰，在42年的中途岛战役中，正是企业号的轰炸机摧毁了赤城、加贺以及飞龙。随后的圣克鲁斯海战中企业号被击伤，但企业号边修边走，放出的飞机空袭了比睿。在这次海战后，美军在太平洋上只剩下了企业号一艘舰队航母。这时期企业号挂起了一条史诗般的标语：企业单挑日本（Enterprise VS Japan）。在43年，企业号改造为最早搭载全天候战机的航母。莱特湾海战中，企业号是唯一对全部日本舰队都空袭过的航母。在击沉武藏号跟大和号的战斗中也有企业号的身影。"]],
                             bisimai: ["female", "KMS", 4, ["zhuangjiafh", "zhanliebb", "qijianshashou", "yongbuchenmodezhanjian"], ["zhu", "des:德国于30年代建造的俾斯麦级战列舰首舰，建成之后连英国首相也称赞其是出色的设计。服役之后41年俾斯麦号在欧根亲王号的护航下前出大西洋执行破交任务，在战斗中俾斯麦号击沉了前来拦截的英国胡德号、击伤了威尔士亲王号。之后英国集结大规模兵力围歼俾斯麦号，战斗中皇家方舟号航母的剑鱼击伤了俾斯麦号的船舵，大大影响了俾斯麦号的航行，之后俾斯麦号在英国舰队的围攻下沉没。"]],
                             misuli: ["female", "USN", 4, ["zhuangjiafh", "zhanliebb", "jueshengzhibing", "zhanfu"], ["des:密苏里是新锐衣阿华级战列舰的三号舰，衣阿华级沿用了南达级的防护设计，她装备了当时功率最大的动力系统，所以航速甚至比很多战巡还快。密苏里于45年才赶赴战场，并没有参加多少战斗，只是在45年3月被神风撞中一次，受损不大。让密苏里名垂青史的是日本投降签字仪式在她的甲板上举行，这代表了战争的正式结束。在冷战期间密苏里继续活跃，在80年代甚至重启并进行了导弹化改造，以符合现代海战的需要。91的海湾战争也是战列舰最后一次参加实战。在98年，密苏里作为纪念舰退役，她停泊在珍珠港，正前方正是亚利桑那博物馆，她们分别代表了战争的开始和结束。"]],
-                            weineituo: ["female", "RM", 3, ["zhuangjiafh", "zhanliebb", "yishisheji", "yishisheji_1"], ["des:维内托级是意大利的新锐战列舰。该级的整体设计十分出色，值得称道的是381mm主炮的部分威力指标可以达到406mm炮水平。防护设计上，船体采用了普列赛水下防护系统，装甲使用倾斜多层的剥被帽设计。二战中，她在41年的马塔潘角海战中被鱼雷击伤，之后因为缺油不再出动。意大利投降后维内托号疏散到了马耳他，途中还曾被德军的制导炸弹击伤。维内托号最终幸存到了战后。"]],
+                            weineituo: ["female", "RM", 3, ["zhuangjiafh", "zhanliebb", "yishisheji"], ["des:维内托级是意大利的新锐战列舰。该级的整体设计十分出色，值得称道的是381mm主炮的部分威力指标可以达到406mm炮水平。防护设计上，船体采用了普列赛水下防护系统，装甲使用倾斜多层的剥被帽设计。二战中，她在41年的马塔潘角海战中被鱼雷击伤，之后因为缺油不再出动。意大利投降后维内托号疏散到了马耳他，途中还曾被德军的制导炸弹击伤。维内托号最终幸存到了战后。"]],
                             lisailiu: ["female", "MN", 4, ["zhuangjiafh", "zhanliebb", "kaixuan", "changge", "xiongjiaqibin"], ["des:黎塞留级是法国在30年代设计的新锐战列舰。该级依然沿袭敦刻尔克级的主炮全前置设计。40年，法国迅速战败，未完工的黎塞留号为了避免落入德军之手，于6月15日启航疏散到达喀尔。因惧怕处于流亡状态的六艘法国战列舰落入德国手中，英国舰队制定了名为“抛石机”的行动计划，对法国舰队进行了攻击。交火中黎塞留号被击伤，在此之后流亡非洲的法国舰队一直对战争局势持观望状态。42年黎塞留号同美国达成协议，加入同盟国作战。在美国进行改装后的黎塞留号参加了对日作战，并见证了二战的胜利。战后黎塞留号于1959年退役。"]],
                             changmen: ["female", "IJN", 4, ["zhuangjiafh", "zhanliebb", "zhudaojiandui"], ["des:她与妹妹都是高火力型日本战列舰的代表，被称为海军假日七巨头之一。她建成时就有高大的六脚桅楼，可看做是日式高塔舰桥的开端。二战开始后，太平洋战场的形势变为航空主导。一直到44年的莱特湾海战，她才得到了一线作战的机会：她所在的栗田编队抓到了美军护航航母编队，但是在美军的拼命反抗下日军没能取得多大的战果。回到本土的她在搁置中迎来了日本投降。美军缴获之后将她用作“十字路口计划”核试验的靶船，于1946年7月沉没。"]],
                             "1913": ["female", "ROCN", 4, ["zhuangjiafh", "zhanliebb", "jujianmengxiang"], ["zhu", "des:1913年时，为针对邻国的海军威胁，国民政府参谋部在海军造舰计划书中提出了颇为夸张的海军扩建计划，其中便包括大量的战列巡洋舰。该型战列巡洋所设想的性能参数为：排水量28000吨，装备10门14英寸火炮，航速29节左右。当然在那个穷困动荡的年代，海军意图获取主力舰无非是不切实际的妄想罢了……"]],
@@ -5974,10 +5974,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     threaten: 1.3,
                                 },
                                 "_priority": 0,
-                            },
-                            yishisheji_1: {
-                                nobracket: true,
-                                group: ["yishisheji_1_mianyi"],
+                                group: ["yishisheji_mianyi"],
                                 subSkill: {
                                     mianyi: {
                                         trigger:
@@ -5986,23 +5983,16 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             //source: "damageSource",
 
                                         },
-                                        filter: function (event, player) { return !player.hasSkill('yishisheji_1_disable') && event.card },
+        round:1,                                filter: function (event, player) { return event.card },
                                         forced: true,
                                         content: function () {
                                             trigger.cancel();
                                             game.log(player, "免疫了一次伤害。");
-                                            player.addTempSkill('yishisheji_1_disable', 'roundStart');
                                         },
                                         mark: false,
                                         sub: true,
                                     },
-                                    disable: {
-                                        mark: true,
-                                        intro: {
-                                            content: "本轮已发动",
-                                        },
-                                        sub: true,
-                                    },
+                                   
                                 },
                             },
                             jueshengzhibing: {
@@ -10314,11 +10304,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 changge: "长歌", "changge_info": "锁定技，你使用杀即将造成的伤害≥2时，或你的体力值≤2时，你的杀无视防具。",
                                 xiongjiaqibin: "胸甲骑兵", "xiongjiaqibin_info": "锁定技，你计算与座次比你靠后的角色距离-1。",
                                 yishisheji: "意式设计", "yishisheji_info": "每轮限一次，你可以免疫一次伤害。你使用杀指定唯一目标时可以进行判定，若判定结果不为红桃，此杀基础伤害+1，否则此杀无效。出牌阶段你使用或打出的第一张杀无距离限制。",
-                                yishisheji_1: "意式设计", "yishisheji_1_info": "",
                                 jueshengzhibing: "决胜之兵", "jueshengzhibing_info": "你使用杀指定有护甲的目标时，你可以弃置其一张牌；你使用锦囊牌时，你可以摸一张牌。若你以此法摸或弃置了总计两张牌，你结束出牌阶段，反之，回合结束时你获得[智愚]直到下回合开始。",
                                 zhanfu: "战斧", "zhanfu_info": "你手牌数为场上最多时，你使用杀无视距离",
                                 xinqidian: "新起点", "xinqidian_info": "出牌阶段限一次，你可以选择至多3名角色，你与这些角色各展示一张牌:若展示的牌花色均不相同，每人摸1张牌;否则，参与展示牌的角色计算与其他角色距离-1直至其的下个回合结束。",
-                                //xinqidian_1:"新起点",xinqidian_1_info:"",
                                 jilizhixin: "激励之心", 'jilizhixin_info': "若你的宝物栏为空，你视为装备着'侦察机'。你可以弃一张牌并跳过出牌阶段，令一名角色获得一个额外回合。",
                                 hangkongzhanshuguang: "航空战曙光", "hangkongzhanshuguang_info": "出牌阶段限一次，你可以令一名角色摸一张牌。若目标是航母，改为摸两张牌。",
 
