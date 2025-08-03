@@ -886,7 +886,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qingye: ["female", "IJN", 4, ["huokongld", "zhongxunca", "sawohaizhan", "qingyeqingyeqing"], ["des:青叶型本属古鹰型的后续，但是由于修改了设计，所以这二艘被单独列为青叶型。在37年，青叶型进行了大规模改装。战争中青叶型和古鹰型编入同一部队作战，42年10月的海战中，青叶号将美军误认为友军，对美军打出“我是青叶”的信号，遭到了美军射击，在友舰的掩护下青叶号幸运逃脱，然而古鹰号却因此沉没。青叶号在44年遭到了潜艇袭击，返回日本修理之后不再出动，在坐沉中迎来了日本战败。"]],
                             beianpudun: ["female", "USN", 4, ["huokongld", "zhongxunca", "huhangyuanhu"], ["des:北安普顿级是美国最早重巡彭萨科拉号的改进版本。在战争爆发后，北安普顿号参加了针对日军的报复性反击，这些反击行动极大鼓舞了美国的士气。北安普顿号主要被用于航母护航，在圣克鲁斯海战中，北安普顿号一度试图拖带受创的大黄蜂号，但由于日军不断的攻击而被迫放弃。在塔萨法隆加海战中北安普顿号被日军鱼雷击中沉没，由于损管和撤退有序，大部分舰员得以幸存。"]],
                             jiujinshan: ["female", "USN", 4, ["huokongld", "zhongxunca", "jiujingzhanzhen"], ["des:旧金山号重巡洋舰属新奥尔良级重巡洋舰，和昆西等舰同级。旧金山号重巡洋舰作为旗舰参加了埃斯佩恩斯角海战。在第一次瓜岛海战中，旧金山依然担任舰队旗舰，尽管舰队指挥官牺牲，舰队损失较大，但是依然完成了拦截日军编队的任务，并重创比叡，导致其最终沉没。旧金山打满了战争全程，并获得了总统集体嘉奖。她17颗战役之星的获得数量仅次于企业和圣地亚哥。"]],
-                            yixian: ["female", "ROCN", 3, ["fangkong2", "qingxuncl", "shizhibuyu", "shizhibuyu1"], ["des:逸仙号是30年代中国自行设计建造的一艘巡洋舰。该舰从规格上讲只相当于列强的大型炮舰。抗战中，在宁海级相继殉国后逸仙号接替担任旗舰，在缺乏高射弹药的情况下，她曾经用前部150毫米主炮击落日本飞机。逸仙号最终不幸殉国，然而日本将其打捞修理使用，并一直幸存到了1945年。在抗战胜利后，这艘军舰又回归了中国，一直使用到了60年代。"]],
+                            yixian: ["female", "ROCN", 3, ["fangkong2", "qingxuncl", "shizhibuyu"], ["des:逸仙号是30年代中国自行设计建造的一艘巡洋舰。该舰从规格上讲只相当于列强的大型炮舰。抗战中，在宁海级相继殉国后逸仙号接替担任旗舰，在缺乏高射弹药的情况下，她曾经用前部150毫米主炮击落日本飞机。逸仙号最终不幸殉国，然而日本将其打捞修理使用，并一直幸存到了1945年。在抗战胜利后，这艘军舰又回归了中国，一直使用到了60年代。"]],
                             tianlangxing: ["female", "RN", 3, ["fangkong2", "qingxuncl", "duomianshou"], ["des:属于黛朵级防空巡洋舰第二批，相比四座主炮的黛朵级第一批，第二批加强到了五座高平两用主炮，防空能力有所提升。天狼星完工后加入地中海舰队，参与了火炬行动，并见证了轴心国在北非投降，之后在地中海执行封锁任务。44年参与了诺曼底的支援行动，天狼星号在战后继续服役到了56年。"]],
                             dadianrendian: ["female", "IJN", 3, ["fangkong2", "qingxuncl", "jilizhixin"], ["des:丙型巡洋舰设计要求有着很强的侦察和通讯能力。在早期的设计中，巡洋舰W105搭载有两座弹射器，全部集中在后部。舰载机除了机库外，两架系留于弹射器上。在W105阶段，丙型巡洋舰也并未强调对海火力，主要武器以127高炮为主。虽然一度考虑过鱼雷装备，但最终取消这个要求。W105案提交后，又增加了对海火力要求，安装之前巡洋舰拆下来的三联155主炮，这个设计最终演变为正式的丙型巡洋舰。"]],
                             //degelasi: ["female", "MN", 3, ["fangkong2", "qingxuncl"], ["des:。"]],
@@ -5047,7 +5047,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             shizhibuyu: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
-                                trigger: {
+  group:["shizhibuyu1"],  
+                              trigger: {
                                     player: "damageBegin3",
                                 },
                                 filter: function (event, player) {
@@ -5094,7 +5095,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             game.hasPlayer(function (current) {
                                                 return current.countDiscardableCards(player, "hej") > 0;
                                             })
-                                        )
+                                        ){
                                             player
                                                 .chooseTarget(
                                                     "弃置一名角色区域内的一张牌",
@@ -5112,9 +5113,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                         att = Math.sqrt(att);
                                                     }
                                                     return att * lib.card.guohe.ai.result.target(player, target);
-                                                });
+                                            });                                        
+                                            }
                                         else event.finish();
                                     }
+                                    'step 3'
+      if (result.bool) {
+      player.discardPlayerCard(result.targets[0], 1, 'hej', true);
+        }
                                 },
                                 "_priority": 0,
                             },
