@@ -860,7 +860,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         //全局技能"_yuanhang","_jianzaochuan","_qianghuazhuang",
                         characterSort: {
                             jianrjinji: {
-                                jianrbiaozhun: ["liekexingdun", "qixichicheng", "wufenzhongchicheng", "qiye", "bisimai", "misuli", "weineituo", "lisailiu", "1913", "changmen", "kunxi", "ougengqi", "qingye", "beianpudun", "jiujinshan", "jiujinshan", "yixian", "tianlangxing", "dadianrendian", "yatelanda", "z31", "xuefeng", "kangfusi", "47project", "guzhuyizhichuixue", "shuileizhanduichuixue", "minsike", "yinghuochong", "u1405", "baiyanjuren", "changchun"],
+                                jianrbiaozhun: ["liekexingdun", "qixichicheng", "wufenzhongchicheng", "qiye", "bisimai", "misuli", "weineituo", "lisailiu", "1913", "changmen", "kunxi", "ougengqi", "qingye", "beianpudun", "jiujinshan", "jiujinshan", "yixian", "tianlangxing", "dadianrendian", "yatelanda", "z31", "xuefeng", "kangfusi", "47project", "guzhuyizhichuixue", "shuileizhanduichuixue", "mingsike", "yinghuochong", "u1405", "baiyanjuren", "changchun"],
                                 lishizhanyi_naerweike: ["shengwang", "z17", "z18", "z21", "z22", "gesakeren", "biaoqiang"],
                                 lishizhanyi_matapanjiao: ["kewei", "kente", "luodeni"],
                                 lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "weiershiqinwang", "z1", "z16"],
@@ -897,7 +897,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "47project": ["female", "ΒΜΦCCCP", 3, ["dajiaoduguibi", "quzhudd", "xinqidian"], ["des:　海军计划的一级大型驱逐舰，与传统驱逐舰不同的是她设计有装甲带与舰载机，由于工业不足与设计指标过高，47工程修改设计后才具备可行性，但战争爆发打断了建造。战后47工程修改了设计，并且延续到41型驱逐舰不惧号上。"]],
                             guzhuyizhichuixue: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "guzhuyizhi"], ["des:吹雪型特型驱逐舰首舰，相比之前的老式驱逐舰，该型是一种新式设计，采用艏楼船型和连装主炮，特型驱逐舰也奠定了之后日本驱逐舰特征基础。吹雪号在第四舰队事件后进行了改装，以克服重心和强度问题。战争开始后在马来海域作战，42年1月海战中协同击沉了英国驱逐舰珊耐特号。1942年10月的萨沃岛海战中被美军击沉。"]],
                             shuileizhanduichuixue: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "shuileizhandui",], ["des:吹雪型特型驱逐舰首舰，相比之前的老式驱逐舰，该型是一种新式设计，采用艏楼船型和连装主炮，特型驱逐舰也奠定了之后日本驱逐舰特征基础。吹雪号在第四舰队事件后进行了改装，以克服重心和强度问题。战争开始后在马来海域作战，42年1月海战中协同击沉了英国驱逐舰珊耐特号。1942年10月的萨沃岛海战中被美军击沉。"]],
-                            minsike: ["female", "ΒΜΦCCCP", 3, ["dajiaoduguibi", "quzhudd", "manchangzhanyi", "manchangzhanyi_1"], ["des:明斯克级驱逐舰是之前列宁格勒级的完善型，除了稳定质量和设计外，基本保留了列宁格勒级的设计。明斯克号驱逐舰在战争期间主要执行对岸火力支援任务，曾经被敌机炸沉，但是在之后又浮起并修复。战争胜利后明斯克改为训练舰使用。"]],
+                            mingsike: ["female", "ΒΜΦCCCP", 3, ["dajiaoduguibi", "quzhudd", "manchangzhanyi", "manchangzhanyi_1"], ["des:明斯克级驱逐舰是之前列宁格勒级的完善型，除了稳定质量和设计外，基本保留了列宁格勒级的设计。明斯克号驱逐舰在战争期间主要执行对岸火力支援任务，曾经被敌机炸沉，但是在之后又浮起并修复。战争胜利后明斯克改为训练舰使用。"]],
                             yinghuochong: ["female", "RN", 3, ["dajiaoduguibi", "quzhudd", "zhongzhuangcike", "wuweizhuangji"], ["des:G级驱逐舰之一，G级于30年代后期建造了24艘，主炮为四座单装主炮。40年她参加了挪威战役，4月8日萤火虫号与德军希佩尔海军上将号重巡洋舰遭遇，在激烈的战斗中萤火虫号释放烟雾并发射鱼雷，最终借助烟雾掩护猛烈撞击了希佩尔海军上将号，造成希佩尔海军上将号500吨进水，而萤火虫号也因为这次英勇的战斗而沉没。"]],
                             "u1405": ["female", "KMS", 3, ["qianting", "qianxingtuxi"], ["des:由于普通潜艇水下动力受电池性能限制，德国海军考虑研发一种不依赖空气的高效水下动力系统。U-1405的动力系统采用使用过氧化氢的瓦尔特发动机，这种动力可以在水下运行，并且能让潜艇在水下达到超过20节的高速。不过发动机的缺陷是自带燃料用光后，潜艇就失去动力。U-1405是作为实战目的建造的瓦尔特潜艇，其吨位只有400吨左右。虽然是实战型号，但是她只参与了训练和实验。"]],
                             baiyanjuren: ["female", "RN", 3, ["junfu", "hangkongzhanshuguang"], ["des:百眼巨人号航母是世界上第一级全通甲板的航空母舰。在飞机运用到海战中之后，为了加强飞机的运用能力，英国人便改装了一些军舰以搭载飞机，经过经验的积累，英国人改装了百眼巨人号航母，使用了全通的飞行甲板。百眼巨人号没有赶上一战，在二战中主要执行训练任务。"]],
@@ -10168,7 +10168,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "47project": "47工程", xuefeng: "雪风",
                                 shuileizhanduichuixue: "水雷战队吹雪",
                                 guzhuyizhichuixue: "孤注一掷吹雪",
-                                minsike: "明斯克",
+                                mingsike: "明斯克",
                                 baiyanjuren: "百眼巨人",
                                 "u1405": "u1405",
                                 changchun: "长春",
@@ -11782,7 +11782,7 @@ lib.config.all.cards.push('jianrjinjibao');
             "47project": ["female", "USN", 3, ["dajiaoduguibi", "quzhudd"], ["des:这是个依赖科技的舰船，有着科幻的舰装，与兼备温柔体贴与意气风发的表现。"]],
             guzhuyizhichuixue: ["female", "shu", 3, ["dajiaoduguibi", "quzhudd", "guzhuyizhi"], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
             shuileizhanduichuixue: ["female", "shu", 3, ["dajiaoduguibi", "quzhudd", "shuileizhandui",], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
-            minsike: ["female", "qun", 3, ["dajiaoduguibi", "quzhudd", "manchangzhanyi", "manchangzhanyi_1"], ["des:跑得快，看得多。"]],
+            mingsike: ["female", "qun", 3, ["dajiaoduguibi", "quzhudd", "manchangzhanyi", "manchangzhanyi_1"], ["des:跑得快，看得多。"]],
             "u1405": ["female", "wu", 2, ["qianting", "baiyin_skill"], ["des:无需隐匿的偷袭大师，马上就让对手的后勤捉襟见肘。"]],
             baiyanjuren: ["female", "wu", 3, ["junfu"], ["des:需要武器支援，伙计倒下了。"]],
             changchun: ["female", "wu", 3, ["daoqu", "tianyi"], ["des:尚处于正能量之时。"]],*/
