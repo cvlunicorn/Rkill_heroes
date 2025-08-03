@@ -218,30 +218,30 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 if (ui.system1 || ui.system2) {
                     // @ts-ignore
                     clearInterval(getSystem);
-                    ui.jian_R_readme = ui.create.system('舰r杀机制介绍', function () {
-                        game.jianRAlert(
-                            "所有全局技能均可在扩展详情中查看说明和配置开关，" +
-                            "以下是默认开启的全局技能<br><br>" +
-                            "<b>远航:</b>你受伤时手牌上限+1；每轮限1/2/3次，失去手牌后，若手牌数少于一半，你可以摸一张牌。<br>" +
-                            "当你进入濒死状态时，若你的体力上限大于2，你可以减少一点体力上限，摸两张牌，否则摸一张牌；<br>" +
-                            "你死亡后，若你为忠臣，你可以令主公摸一张牌。<br><br>" +
-                            "<b>建造:</b>若你进行了至少一次强化：出牌阶段" +
-                            "你可以弃置3张不同花色的牌，提升一点血量上限，解锁强化二级效果。<br>" +
-                            "<b>强化:</b>出牌阶段限一次，你可以弃置二至四张牌，选择一至两个效果升级。（如摸牌、攻击距离、手牌上限等）<br><br>" +
-                            "<b>属性伤害:</b>火杀燃烧:令目标回合结束后，受到一点火焰伤害，摸两张张牌。<br>" +
-                            "冰杀减速:对有护甲的目标加1伤害；减少1点其他角色计算与目标的距离。<br>" +
-                            "雷杀进水:有护甲时改为造成目标流失体力；减少目标1点手牌上限。<br>" +
-                            "目标回合结束后或濒死时移除进水、减速、燃烧。",
-                            {
-                                containerStyle: {
-                                    width: '60%',
-                                    // height: '80%',
-                                    padding: '5px 20px 5px 20px',
-                                },
-                            }
-                        );
-                    });
-                }
+                        ui.jian_R_readme = ui.create.system('舰r杀机制介绍', function () {
+                            game.jianRAlert(
+                                "所有全局技能均可在扩展详情中查看说明和配置开关，" +
+                                "以下是默认开启的全局技能<br><br>" +
+                                "<b>远航:</b>你受伤时手牌上限+1；每轮限1/2/3次，失去手牌后，若手牌数少于一半，你可以摸一张牌。<br>" +
+                                "当你进入濒死状态时，若你的体力上限大于2，你可以减少一点体力上限，摸两张牌，否则摸一张牌；<br>" +
+                                "你死亡后，若你为忠臣，你可以令主公摸一张牌。<br><br>" +
+                                "<b>建造:</b>若你进行了至少一次强化：出牌阶段" +
+                                "你可以弃置3张不同花色的牌，提升一点血量上限，解锁强化二级效果。<br>" +
+                                "<b>强化:</b>出牌阶段限一次，你可以弃置二至四张牌，选择一至两个效果升级。（如摸牌、攻击距离、手牌上限等）<br><br>" +
+                                "<b>属性伤害:</b>火杀燃烧:令目标回合结束后，受到一点火焰伤害，摸两张张牌。<br>" +
+                                "冰杀减速:对有护甲的目标加1伤害；减少1点其他角色计算与目标的距离。<br>" +
+                                "雷杀进水:有护甲时改为造成目标流失体力；减少目标1点手牌上限。<br>" +
+                                "目标回合结束后或濒死时移除进水、减速、燃烧。",
+                                {
+                                    containerStyle: {
+                                        width: '60%',
+                                        // height: '80%',
+                                        padding: '5px 20px 5px 20px',
+                                    },
+                                }
+                            );
+                        });
+                    }
             }, 500);
 
 
@@ -10413,7 +10413,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         name: 'jianrjinjibao',//卡包命名
                         connect: true,//卡包是否可以联机
                         card: {
-                            jinjuzy: {
+                            /* jinjuzy: {
                                 audio: true,
                                 image: 'ext:舰R牌将/jinjuzy.jpg',
                                 type: "trick",
@@ -10893,9 +10893,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 toself: true,
                                 fullskin: true,
-                            },
+                            }, */
                             xingyun: {
-                                image: 'ext:舰R牌将/xingyun.png',
+                                image: 'ext:舰R牌将/image/card/xingyun.png',
                                 type: "equip",
                                 subtype: "equip3",
                                 ai: {
@@ -10953,7 +10953,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 toself: false,
                                 fullskin: true,
                             },
-                            lianxugongji: {
+                            /* lianxugongji: {
                                 image: 'ext:舰R牌将/yishichuanjiadan.jpg',
                                 type: "basic",
                                 enable: true,
@@ -10962,29 +10962,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filterTarget: function (card, player, target) { return target != player && player.canUse('sha', target); },
                                 content: function () {
                                     'step 0'
-                                    /*event.num = 0;
-                                    'step 1'
-                                    game.log("event.num" + event.num);
-                                    event.num++;*/
-                                    /*var choice = 'liutouge';
-                                    player.chooseVCardButton('选择一张牌视为使用之', ['sha', 'sha', 'sha']).set('ai', function (button) {
-                                        if (button.link[2] == _status.event.choice) return 2;
-                                        return Math.random();
-                                    }).set('choice', choice).set('filterButton', function (button) {
-                                        return _status.event.player.hasUseTarget(button.link[2]);
-                                    });*/
                                     player.useCard({ name: 'sha' }, target, true);
                                     player.useCard({ name: 'sha' }, target, true);
-                                    /*player.chooseUseTarget({
-                                        name: 'sha',
-                                        isCard: true,
-                                    }, '请选择【杀】的目标（' + (event.num == 2 ? '2' : event.num) + '/2）', false);*/
-
-                                    /*'step 2'
-                                    if (result.bool && event.num < 2) event.goto(1);
-                                    else {
-                                        event.finish();
-                                    }*/
                                 },
                                 ai: {
                                     order: 5,
@@ -10993,9 +10972,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                                 fullimage: true,
-                            },
+                            }, */
                             "quzhupao3": {
-                                image: 'ext:舰R牌将/quzhupao3.png',
+                                image: 'ext:舰R牌将/image/card/quzhupao3.png',
                                 fullskin: true,
                                 type: "equip",
                                 subtype: "equip1",
@@ -11057,7 +11036,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 toself: true,
                             },
                             "qingxunpao3": {
-                                image: 'ext:舰R牌将/qingxunpao3.png',
+                                image: 'ext:舰R牌将/image/card//qingxunpao3.png',
                                 fullskin: true,
                                 type: "equip",
                                 subtype: "equip1",
@@ -11119,7 +11098,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 toself: true,
                             },
                             "zhongxunpao3": {
-                                image: 'ext:舰R牌将/zhongxunpao3.png',
+                                image: 'ext:舰R牌将/image/card/zhongxunpao3.png',
                                 fullskin: true,
                                 type: "equip",
                                 subtype: "equip1",
@@ -11181,7 +11160,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 toself: true,
                             },
                             "zhanliepao3": {
-                                image: 'ext:舰R牌将/zhanliepao3.png',
+                                image: 'ext:舰R牌将/image/card/zhanliepao3.png',
                                 fullskin: true,
                                 type: "equip",
                                 subtype: "equip1",
@@ -11243,7 +11222,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 toself: true,
                             },
                             "zhandouji3": {
-                                image: 'ext:舰R牌将/zhandouji3.png',
+                                image: 'ext:舰R牌将/image/card/zhandouji3.png',
                                 fullskin: true,
                                 type: "equip",
                                 subtype: "equip1",
@@ -11305,7 +11284,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 toself: true,
                             },
                             huokongld_equip: {
-                                image: 'ext:舰R牌将/huokongld_equip.png',
+                                image: 'ext:舰R牌将/image/card/huokongld_equip.png',
                                 fullskin: true,
                                 type: "equip",
                                 subtype: "equip4",
@@ -11367,7 +11346,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 toself: true,
                             },
                             "yuleiqianting3": {
-                                image: 'ext:舰R牌将/yuleiqianting3.png',
+                                image: 'ext:舰R牌将/image/card/yuleiqianting3.png',
                                 fullskin: true,
                                 type: "equip",
                                 subtype: "equip1",
@@ -11429,7 +11408,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 toself: true,
                             },
                             "jianzaidaodan3": {
-                                image: 'ext:舰R牌将/jianzaidaodan3.png',
+                                image: 'ext:舰R牌将/image/card/jianzaidaodan3.png',
                                 fullskin: true,
                                 type: "equip",
                                 subtype: "equip1",
@@ -11491,7 +11470,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 toself: true,
                             },
                             "yuleiji3": {
-                                image: 'ext:舰R牌将/yuleiji3.png',
+                                image: 'ext:舰R牌将/image/card/yuleiji3.png',
                                 fullskin: true,
                                 type: "equip",
                                 subtype: "equip1",
@@ -11553,7 +11532,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 toself: true,
                             },
                             "tansheqi3": {
-                                image: 'ext:舰R牌将/tansheqi3.png',
+                                image: 'ext:舰R牌将/image/card/tansheqi3.png',
                                 type: "equip",
                                 subtype: "equip4",
                                 ai: {
@@ -11612,7 +11591,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 fullskin: true,
                             },
                             "fasheqi3": {
-                                image: 'ext:舰R牌将/fasheqi3.png',
+                                image: 'ext:舰R牌将/image/card/fasheqi3.png',
                                 fullskin: true,
                                 type: "equip",
                                 subtype: "equip4",
