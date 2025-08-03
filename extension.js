@@ -7361,7 +7361,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             else event.finish();
                                             'step 1'
                                             event.cards = result.links;
-                                            player.chooseTarget('选择兵粮寸断的目标', true, function (card, player, target) {
+                                            player.chooseTarget('选择兵粮寸断的目标', false, function (card, player, target) {
                                                 return target != player && (get.distance(player, target) == 1);
                                             }).set('ai', function (target) {
                                                 return -get.attitude(player, target);
@@ -7408,8 +7408,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.loseToDiscardpile(cards);
                                 },
                             },
-                            z18_weisebaoxingdong: {
-                                nobracket: true,
+                            z18_weisebaoxingdong: {                              nobracket: true,
                                 global: "Z_control",
                                 usable: 1,
                                 enable: "phaseUse",
@@ -7448,7 +7447,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                     },
                                 },
-                                group: ["z18_weisebaoxingdong_huogong"],
+  prompt:"你可以将至多两张手牌置于等量角色武将牌上，称为Z。",                              group: ["z18_weisebaoxingdong_huogong"],
                                 subSkill: {
                                     huogong: {
                                         enable: "phaseUse",
@@ -7645,7 +7644,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                     threaten: 1.1,
                                 },
-                                group: ["z21_tuxi_discard"],
+    prompt:"你可以选择一名攻击范围内的角色，将其一张牌置于你的武将牌上，称为Z。",                            group: ["z21_tuxi_discard"],
                                 subSkill: {
                                     discard: {
                                         trigger: {
@@ -7723,7 +7722,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                     threaten: 1.1,
                                 },
-                                group: ["z22_tuxixiawan_discard"],
+  prompt:"你可以将任意角色一张牌置于自己武将牌上称为Z",                              group: ["z22_tuxixiawan_discard"],
                                 subSkill: {
                                     discard: {
                                         trigger: {
@@ -11804,7 +11803,7 @@ lib.config.all.cards.push('jianrjinjibao');
 
         },
     },
-    intro: "制作组群，730255133，#(滑稽)。<br>长按或右键下方全局技能的选项简介查看技能详情<br><br>建议：1.十周年UI对新版本无名杀兼容不佳，不建议开启。技能标记卡顿时，可以关闭获得技能提示，提高体验感。<br>2.点击透明时钟-选项-武将>将其他武将包设为点将才能用，体验丰富而简洁的卡牌对战。<br>3.选项-降低字体缩放，提升视野，玩16人扩展也好操作。<br>玩法：本扩展增加了与队友互给关键牌、用装备强化自己的玩法，间接让牌的质量有所提高，可以在下方选项设置。 <br>特殊规则：雷杀对有护甲或者有失血反击技能的目标流失体力（穿甲），冰杀对有护甲的目标加1伤，火杀会让对手于其自己的出牌阶段结束后扣一血。<br>卡牌里也有作者尝试的身影，可以编辑牌堆尝试哦。<br>扩展设置：附带增强原版体验的全局技能，可根据需要开关。",
+    intro: "制作组群，730255133。<br>长按或右键下方全局技能的选项简介查看技能详情，可根据需要开关",
         author: "※人杰地灵游戏中",
             diskURL: "https://pan.baidu.com/s/1VPMQuAUgucpRRbef9Dmy3g?pwd=gfmv",
                 forumURL: "",
