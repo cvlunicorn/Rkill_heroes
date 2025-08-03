@@ -3312,7 +3312,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                             manchangzhanyi: {
                                 nobracket: true,
-  group:["manchangzhanyi_mianyi"],                              trigger: { global: "phaseZhunbeiBegin" }, // 触发时机：其他角色的准备阶段
+                                group: ["manchangzhanyi_mianyi"], trigger: { global: "phaseZhunbeiBegin" }, // 触发时机：其他角色的准备阶段
                                 filter: function (event, player) {
                                     return player.inRange(event.player) && event.player.countCards("h"); // 在你的攻击范围内
                                 },
@@ -3330,21 +3330,21 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             manchangzhanyi_mianyi: {
                                 nobracket: true,
-       round:1,                                 trigger:
-                                        {
-                                            player: "damageBefore",
-                                            source: "damageSource",
+                                round: 1, trigger:
+                                {
+                                    player: "damageBefore",
+                                    source: "damageSource",
 
-                                        },
-                                        filter: function (event, player) { return event.card && event.card.name != 'sha' && event.card.name != 'sheji9' },
-                                        forced: true,
-                                        content: function () {
+                                },
+                                filter: function (event, player) { return event.card && event.card.name != 'sha' && event.card.name != 'sheji9' },
+                                forced: true,
+                                content: function () {
 
-                                            trigger.cancel();
-                                            game.log(get.translation(player), "免疫了一次锦囊牌造成的伤害。");
-                                        },
-                                        mark: false,
-                                        sub: true,
+                                    trigger.cancel();
+                                    game.log(get.translation(player), "免疫了一次锦囊牌造成的伤害。");
+                                },
+                                mark: false,
+                                sub: true,
                             },
 
 
@@ -4547,10 +4547,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhanxianfangyu: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
- prompt:"你可以弃置一张牌代替其成为杀的目标。",                               
- usable: 1,
- group:["zhanxianfangyu1"],
- trigger: {
+                                prompt: "你可以弃置一张牌代替其成为杀的目标。",
+                                usable: 1,
+                                group: ["zhanxianfangyu1"],
+                                trigger: {
                                     global: "useCardToTarget",
                                 },
                                 //direct:true,//自动发动
@@ -4608,7 +4608,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     target: "shaBefore",
                                 },
-                               
+
                                 direct: true,
                                 filter: function (event, player) {
                                     if (!player.hasEmptySlot(2)) return false;
@@ -5034,8 +5034,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             shizhibuyu: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
-  group:["shizhibuyu1"],  
-                              trigger: {
+                                group: ["shizhibuyu1"],
+                                trigger: {
                                     player: "damageBegin3",
                                 },
                                 filter: function (event, player) {
@@ -5082,7 +5082,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             game.hasPlayer(function (current) {
                                                 return current.countDiscardableCards(player, "hej") > 0;
                                             })
-                                        ){
+                                        ) {
                                             player
                                                 .chooseTarget(
                                                     "弃置一名角色区域内的一张牌",
@@ -5100,14 +5100,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                         att = Math.sqrt(att);
                                                     }
                                                     return att * lib.card.guohe.ai.result.target(player, target);
-                                            });                                        
-                                            }
+                                                });
+                                        }
                                         else event.finish();
                                     }
                                     'step 3'
-      if (result.bool) {
-      player.discardPlayerCard(result.targets[0], 1, 'hej', true);
-        }
+                                    if (result.bool) {
+                                        player.discardPlayerCard(result.targets[0], 1, 'hej', true);
+                                    }
                                 },
                                 "_priority": 0,
                             },
@@ -5978,7 +5978,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             //source: "damageSource",
 
                                         },
-        round:1,                                filter: function (event, player) { return event.card },
+                                        round: 1, filter: function (event, player) { return event.card },
                                         forced: true,
                                         content: function () {
                                             trigger.cancel();
@@ -5987,7 +5987,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         mark: false,
                                         sub: true,
                                     },
-                                   
+
                                 },
                             },
                             jueshengzhibing: {
@@ -7393,7 +7393,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.loseToDiscardpile(cards);
                                 },
                             },
-                            z18_weisebaoxingdong: {                              nobracket: true,
+                            z18_weisebaoxingdong: {
+                                nobracket: true,
                                 global: "Z_control",
                                 usable: 1,
                                 enable: "phaseUse",
@@ -7432,7 +7433,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                     },
                                 },
-  prompt:"你可以将至多两张手牌置于等量角色武将牌上，称为Z。",                              group: ["z18_weisebaoxingdong_huogong"],
+                                prompt: "你可以将至多两张手牌置于等量角色武将牌上，称为Z。", group: ["z18_weisebaoxingdong_huogong"],
                                 subSkill: {
                                     huogong: {
                                         enable: "phaseUse",
@@ -7629,7 +7630,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                     threaten: 1.1,
                                 },
-    prompt:"你可以选择一名攻击范围内的角色，将其一张牌置于你的武将牌上，称为Z。",                            group: ["z21_tuxi_discard"],
+                                prompt: "你可以选择一名攻击范围内的角色，将其一张牌置于你的武将牌上，称为Z。", //group: ["z21_tuxi_discard"],
                                 subSkill: {
                                     discard: {
                                         trigger: {
@@ -7707,7 +7708,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                     threaten: 1.1,
                                 },
-  prompt:"你可以将任意角色一张牌置于自己武将牌上称为Z",                              group: ["z22_tuxixiawan_discard"],
+                                prompt: "你可以将任意角色一张牌置于自己武将牌上称为Z", //group: ["z22_tuxixiawan_discard"],
                                 subSkill: {
                                     discard: {
                                         trigger: {
@@ -7719,7 +7720,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         check: function (event, player) {
                                             return get.attitude(player, event.source) < 0;
                                         },
-                                        prompt: "你可以令其进行一次判定，本回合无法使用或打出与判定牌相同花色的牌",
+                                        prompt: "你可以令其进行一次判定，本回合无法使用或打出与判定牌相同颜色的牌",
                                         content: function () {
                                             'step 0'
                                             var cards = player.getExpansions('Z'), count = cards.length;
@@ -7735,17 +7736,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             'step 2'
                                             player.judge(function (card) {
 
-                                                if (!trigger.source.hasSkill('cardsDisabled_suit')) {
-                                                    trigger.source.addTempSkill('cardsDisabled_suit', { player: 'phaseAfter' });
+                                                if (!trigger.source.hasSkill('cardsDisabled_color')) {
+                                                    trigger.source.addTempSkill('cardsDisabled_color', { player: 'phaseAfter' });
                                                 }
-                                                trigger.source.markAuto('cardsDisabled_suit', [get.suit(card)]);
+                                                trigger.source.markAuto('cardsDisabled_color', [get.suit(card)]);
                                             });
                                             event.finish();
                                         },
                                     },
                                 },
                             },
-                            cardsDisabled_suit: {
+                            cardsDisabled_color: {
                                 nobracket: true,
                                 charlotte: true,
                                 direct: true,
@@ -7753,29 +7754,29 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player: 'phaseEnd',
                                 },
                                 intro: {
-                                    content: "不可使用的花色：$",
+                                    content: "不可使用的颜色：$",
                                     onunmark: true,
                                 },
                                 mod: {
                                     cardEnabled: function (card, player) {
-                                        var suit = get.suit(card);
-                                        if (player.storage.cardsDisabled_suit.includes(suit)) return false;
+                                        var color = get.color(card);
+                                        if (player.storage.cardsDisabled_color.includes(color)) return false;
                                     },
                                     cardUsable: function (card, player) {
-                                        var suit = get.suit(card);
-                                        if (player.storage.cardsDisabled_suit.includes(suit)) return false;
+                                        var color = get.color(card);
+                                        if (player.storage.cardsDisabled_color.includes(color)) return false;
                                     },
                                     cardRespondable: function (card, player) {
-                                        var suit = get.suit(card);
-                                        if (player.storage.cardsDisabled_suit.includes(suit)) return false;
+                                        var color = get.color(card);
+                                        if (player.storage.cardsDisabled_color.includes(color)) return false;
                                     },
                                     cardSavable: function (card, player) {
-                                        var suit = get.suit(card);
-                                        if (player.storage.cardsDisabled_suit.includes(suit)) return false;
+                                        var color = get.color(card);
+                                        if (player.storage.cardsDisabled_color.includes(color)) return false;
                                     },
                                 },
                                 content: function () {
-                                    player.unmarkSkill('cardsDisabled_suit');
+                                    player.unmarkSkill('cardsDisabled_color');
                                 },
                                 "_priority": 0,
                             },
@@ -10104,7 +10105,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 firstDo: true,
                                 filter: function (event, player) { return true },
                                 content: function () {
-                                    if (trigger.card && (trigger.card.name == "wanjian" || trigger.card.name == "jinjuzy"||trigger.card.name == "zhiyuangj9") && trigger.source && event.triggername == 'damageEnd') {
+                                    if (trigger.card && (trigger.card.name == "wanjian" || trigger.card.name == "jinjuzy" || trigger.card.name == "zhiyuangj9") && trigger.source && event.triggername == 'damageEnd') {
                                         player.changeHujia(1);
                                         game.log(get.translation(player), '发动了技能【哨戒】，增加了 1 点护甲值！');
                                     }
@@ -10116,7 +10117,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             global: "useCard1",
                                         },
                                         filter: function (event, player) {
-                                            return event.card.name == "wanjian" || event.card.name == "jinjuzy"||event.card.name == "zhiyuangj9";
+                                            return event.card.name == "wanjian" || event.card.name == "jinjuzy" || event.card.name == "zhiyuangj9";
                                         },
                                         forced: true,
                                         locked: false,
@@ -10127,1670 +10128,1670 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
-                                //在这里添加新技能。
+                            //在这里添加新技能。
 
-                                //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
+                            //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
 
 
-                            },
-                            translate: {
-                                addskilltest: "addskilltest",
-                                liekexingdun: "列克星敦",
-                                qixichicheng: "奇袭赤城",
-                                wufenzhongchicheng: "五分钟赤城",
-                                qiye: "企业",
-                                bisimai: "俾斯麦", misuli: "密苏里",
-                                changmen: "长门", weineituo: "维内托",
-                                lisailiu: "黎塞留",
-                                kunxi: "昆西", ougengqi: "欧根",
-                                qingye: "青叶", beianpudun: "北安普顿",
-                                jiujinshan: "旧金山",
-                                tianlangxing: "天狼星", yixian: "逸仙",
-                                degelasi: "德格拉斯", yatelanda: "亚特兰大",
-                                dadianrendian: "大淀仁淀",
-                                kangfusi: "康弗斯", "z31": "z31",
-                                "47project": "47工程", xuefeng: "雪风",
-                                shuileizhanduichuixue: "水雷战队吹雪",
-                                guzhuyizhichuixue: "孤注一掷吹雪",
-                                mingsike: "明斯克",
-                                baiyanjuren: "百眼巨人",
-                                "u1405": "u1405",
-                                changchun: "长春",
-                                "1913": "1913战巡",
-                                yinghuochong: "萤火虫",
-                                jifu: "基辅",
-                                "u47": "u47",
-                                "u81": "u81",
-                                "z1": "z1",
-                                "z16": "z16",
-                                "z18": "z18",
-                                "z17": "z17",
-                                "z21": "z21",
-                                "z22": "z22",
-                                kewei: "可畏",
-                                hude: "胡德",
-                                shiyu: "时雨",
-                                dujiaoshou: "独角兽",
-                                gesakeren: "哥萨克人",
-                                kente: "肯特",
-                                shengwang: "声望",
-                                shenluopujun: "什罗普郡",
-                                lafei: "拉菲",
-                                sp_lafei: "SP拉菲",
-                                yi25: "伊25",
-                                jiate: "基阿特",
-                                salemu: "萨勒姆",
-                                "u505": "u505",
-                                jialifuniya: "加利福尼亚",
-                                getelan: "哥特兰",
-                                rangbaer: "让巴尔",
-                                dafeng: "大凤",
-                                dahuangfeng: "大黄蜂",
-                                biaoqiang: "标枪",
-                                yuekecheng: "约克城",
-                                shengqiaozhi: "圣乔治",
-                                weiershiqinwang: "威尔士亲王",
-                                qiuyue: "秋月",
-                                luodeni: "罗德尼",
-                                weilianDbote: "威廉D波特",
-
-                                skilltest: "skill测试武将test",
-                                quzhudd: "驱逐", "quzhudd_info": "",
-                                qingxuncl: "轻巡", "qingxuncl_info": "",
-                                zhongxunca: "重巡", "zhongxunca_info": "",
-                                zhanliebb: "战列", "zhanliebb_info": "",
-                                daoqu: "导驱", "daoqu_info": "你的攻击范围增加2+X(x为技能强化次数),出牌阶段限一次，你可以弃置一张武器/武器或防具/装备牌，对一名角色造成一点伤害。",
-                                fangqu: "防驱",
-                                daodan: "防空导弹",
-                                "fangqu_info": "游戏开始时/出牌阶段开始时，将至多1/2/3张手牌放到武将牌上.你可以将武将牌上的牌当作无懈使用.",
-                                hangmucv: "航母", "hangmucv_info": "(可强化)你的出牌阶段开始时，<br>你可以将2张：零级强化，黑桃或梅花手牌；一级强化，黑桃或梅花或红桃手牌；二级强化，任意手牌。当作万箭齐发对你选择的任意个目标使用",
-                                qianting_xiji: "袭击", "qianting_xiji_info": "每回合限两次，将♦/♥牌当做顺手牵羊，♣/♠牌当做兵粮寸断使用<br>你使用的锦囊牌可以对距离你2以内的角色使用。",
-                                qianting: "潜艇", "qianting_info": "（可强化）准备阶段，你可以弃置一张红桃或黑桃/红桃或黑桃或方片/牌，视为对一个目标使用一张雷杀。",
-                                qianting_jiezi: "截辎", "qianting_jiezi_info": "其他角色跳过阶段时，你摸一张牌",
-                                "_yuanhang": "远航", "_yuanhang_info": "受伤时手牌上限+1<br>当你失去手牌后，且手牌数<手牌上限值时，你摸一张牌。使用次数上限0/1/2次，处于自己的回合时+1，每回合回复一次使用次数。<br>当你进入濒死状态时，你摸一张牌，体力上限大于二时需减少一点体力上限，额外摸一张牌；死亡后，你可以按自己的身份，令一名角色摸-/2/1/1（主/忠/反/内）张牌。",
-                                kaishimopao: "开始摸牌", "kaishimopao_info": "<br>，判定阶段你可以减少一次摸牌阶段的摸牌，然后在回合结束时摸一张牌。",
-                                "_jianzaochuan": "建造", "_jianzaochuan_info": "限一次，当你进行了至少一次强化后<br>1.出牌阶段<br>你可以弃置3张不同花色的牌，提升一点血量上限与强化上限。<br>2.当你濒死时，<br>你可以弃置4张不同花色的牌，回复一点体力。<br>（未开启强化，则无需强化即可使用建造。未开启建造，则强化上限仅为1级。）",
-                                "_qianghuazhuang": "强化装备",
-                                "_qianghuazhuang_info": "你可以消耗经验，或弃置二至四张牌，选择一至两个永久效果升级。<br>（摸牌、技能、攻击范围、防御距离、手牌上限）每回合限一次。<br>一级强化消耗两点经验，二级强化消耗三点经验",//装备牌代表两张牌
-                                diewulimitai: "递杀", "diewulimitai_info": "给实际距离为1的队友递一张杀或装备牌，可以立即使用（杀只能用一次），一回合限2次。可强化",
-                                "_wulidebuff": "属性伤害效果",
-                                "_wulidebuff_info": "火杀：令目标回合结束后，受到一点火焰伤害，摸两张牌。</br>冰杀：护甲加1伤；减少对手1点防御距离。</br>雷杀：自动判断是否流失对手体力；减少对手1点手牌上限；。</br>此角色回合结束后移除所有的进水、减速、燃烧。",
-                                "_hanbing_gai": "寒冰-改",
-                                "_hanbing_gai_info": "1.开启“属性伤害效果”的情况下，你对拥有护甲的目标造成雷属性伤害前，+1伤害值。<br>2.在你造成伤害前，若你拥有寒冰剑_技能/造成的伤害为冰属性，你可以防止此伤害并弃置目标2*X张牌，x为伤害值。与伤害效果技能配合时",
-                                _yidong: "移动座位", "_yidong_info": "",
-                                tiaozhanzhuanbei: "挑战装备",
-                                "tiaozhanzhuanbei_info": "挑战锁定技，游戏开始时，你将一张【回避】【此舰种的武器】和一张【望远镜】置入你的装备区。你装备区内的武器牌和宝物牌不能被其他角色弃置。",
-                                danzong: "增强杀",
-                                "danzong_info": "每使用六张杀，你便可以在造成无属性伤害附加属性：<br>潜艇、驱逐：获得雷属性的效果，<br>战列、航母：获得雷属性与改进型冰杀的效果。<br>其他舰种时：获得火属性,点燃目标。<br>效果持续到伤害结算完成时（打不穿藤甲的高爆弹与暴击藤甲的决斗）",
-                                "paohuozb_skill": "炮火准备1", "paohuozb_skill_info": "装备技能",
-                                dajiaoduguibi: "规避",
-                                "dajiaoduguibi_info": "（可强化）你需要打出闪时可以进行一次判定，判定结果为：零级强化，方块/一级强化，桃、闪、方块/二级强化，红桃或方块，视为你打出了一张闪。",
-                                "rendeonly2": "仁德界改",
-                                "rendeonly2_info": "给实际距离为2的队友最多两张牌，一回合限2次，给出第二张牌时，你视为使用一张基本牌。可强化",
-                                zhiyangai: "直言",
-                                "zhiyangai_info": "令一名目标角色摸一张牌并展示之。<br>若为装备牌，则其可以选择是否装备。<br>可强化(每强化一次技能，便+1技能的目标数)",
-                                "fangkong2": "防空",
-                                "fangkong2_info": "当一名角色使用的锦囊牌指定了至少两名角色为目标时，<br>你可弃置两张牌令此牌对距离你为1/2/3的任意名角色无效,可强化",
-                                huokongld: "火控雷达",
-                                "huokongld_info": "（可强化）当你使用的【杀】被目标角色使用的【闪】抵消时，你可以弃置：零级，一张杀/一级，一张黑色牌/二级，一张牌，令此【杀】依然对其造成伤害。",
-                                "ganglie_gai": "刚烈弱化",
-                                "ganglie_gai_info": "每当你受到1点伤害后，若你的体力不大于2，你可以弃置x张牌并进行判定。<br>若结果不为红桃，则伤害来源选择执行一项：1.弃置x+1张手牌，2.选择交给你一张牌;3.失去一点体力(无视护甲)。<br>若你先弃置了两张牌，则判定失败时随机获得目标的一张牌;判定成功后，目标不选择弃牌时会额外失去一张牌。可强化",
-                                "zhongpaoduijue": "对决",
-                                "zhongpaoduijue_info": "当你无法使用杀时，你可以指定一个目标，弃置最多（2/3/4）张相同花色的牌，并与目标摸等量的牌,<br>然后你与目标轮流视为对对方使用一张决斗,<br>直到双方的决斗次数超过2n，n为你弃置的牌数。强化以-1对方摸的牌",
-                                "zhuangjiafh": "装甲防护",
-                                "zhuangjiafh_info": "（可强化）每回合限一次，当你受到：零级强化，杀的伤害/一级强化，杀和锦囊牌的伤害/二级强化，任意伤害时,若你没有用护甲承受过此次伤害，你可以获得1点护甲。",
-                                "misscoversha": "回出杀数", "misscoversha_info": "杀被回避会回复当回合出杀次数",
-                                "xianjinld": "先进雷达",
-                                "xianjinld_info": "可以选择一个增益：1.攻击，实际距离此角色为1的队友：武器攻击距离+1;但防御杀的距离-1，队友的摸牌阶段多摸一张牌。或：2.防御距离+1，但是攻击距离-1，自己的摸牌阶段少抽一张牌。",
-                                "kanpolimitai": "制空权",
-                                "kanpolimitai_info": "每轮限一次，你可以将一张黑色手牌当无懈可击使用。可强化",
-                                kaifa: "开发装备",
-                                "kaifa_info": "出牌阶段，你可以展示一张未强化过的【诸葛连弩】或标准包/军争包/SP包中的防具牌，然后对其进行强化。当你处于濒死状态时，你可以重铸一张防具牌，然后将体力回复至1点。",
-                                huijiahuihe: "额外回合",
-                                "huijiahuihe_info": "当你有护甲时，你可以移除所有护甲并进行一个额外的回合；额外回合的摸牌数等于护甲数。此回合没有输出时，摸一张牌。",
-                                junfu: "军辅船",
-                                "junfu_info": "准备阶段,你可以把至多1/2/3张手牌存于武将牌上，如手牌般使用。<br>其他角色回合开始时，你可以把存储的牌交给ta，然后你摸一张牌。<br>可以强化(目标的手牌数<8才能使用此技能)<br>拥有技能强化和远航强化即可起飞。",
-                                manchangzhanyi: "漫长战役", "manchangzhanyi_info": "每轮限一次，你受到锦囊牌的伤害时，你免疫此伤害。你攻击范围内的其他角色的准备阶段，你可以弃置其一张手牌。",
-                                manchangzhanyi_mianyi: "漫长战役", "manchangzhanyi_mianyi_info": "",
-                                guzhuyizhi: "孤注一掷", "guzhuyizhi_info": "准备阶段，你可以摸两张牌并弃置所有手牌，然后摸等量的牌，如此做，你的其他技能失效直到你的下回合开始，你计算与其他角色的距离-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。",
-                                guzhuyizhi2: "孤注一掷", "guzhuyizhi2_info": "",
-                                shuileizhandui_1: "水雷战队", "shuileizhandui_1_info": "",
-                                shuileizhandui: "水雷战队", "shuileizhandui_info": "你可以交给一名角色任意张牌。若你是本回合第一次发动本技能，你可以从牌堆和弃牌堆获得一张雷杀。你没有手牌时，不能成为杀的目标。",
-                                dumuchenglin: "独木成林", "dumuchenglin_info": "你获得【规避】。当场上没有其他航母时，杀使用次数+1，你于你的回合对其他角色造成的第一次伤害时此伤害+1。",
-                                dumuchenglin_2: "独木成林2", "dumuchenglin_2_info": "杀使用次数+1",
-                                bigE: "大E", bigE_info: "你使用的第一张杀不能被响应。受到你使用杀造成的伤害的角色手牌上限-1直到其回合结束",
-                                xiangrui: "祥瑞", "xiangrui_info": "每名玩家的回合限一次，当你受到伤害前，你可以进行判定，判定结果为黑桃，免疫此次伤害，然后获得[祥瑞]标记。",
-                                yumian: "御免", "yumian_info": "锁定技，结束阶段，你移除所有[祥瑞]标记。你可以选择距你1以内的目标，让其失去一点体力并摸两张牌。若你失去了一个或以上的祥瑞标记，你可以选择的目标不受距离限制",
-                                hangkongzhanshuxianqu: "航空战术先驱", "hangkongzhanshuxianqu_info": "你使用转化的锦囊牌结算后，你可以展示牌堆顶的x张牌，获取其中花色各不相同的牌(x为你指定的目标数，至多为4)",
-                                gaosusheji: "高速射击", "gaosusheji_info": "转换技，出牌阶段你使用的第一张牌为：阳：基本牌时；阴：普通锦囊牌时。你可以令此牌额外结算一次。",
-                                qixi_cv: "奇袭", "qixi_cv_info": "限定技，出牌阶段，你可以令所有其他角色依次选择一项:1你弃置其区域内的两张牌，2本回合不能使用或打出手牌，3翻面。然后你可以视为使用【近距支援】。",
-                                rand: "随机数", "rand_info": "遇事不决？扔一个骰子吧。该技能可以生成1~6的随机数",
-                                duikongfangyu: "对空防御", "duikongfangyu_info": "锁定技，你发动防空时技能等级视为满级。你在回合外发动[防空]后，你摸2张牌",
-                                zhudaojiandui: "柱岛舰队", "zhudaojiandui_info": "锁定技，每当你使用或打出一张非虚拟非转化的基本牌，你获得一个[柱]标记。你可以移去三个柱标记视为使用一张不计入次数限制的杀。",
-                                sawohaizhan: "萨沃海战", "sawohaizhan_info": "出牌阶段各限一次。你可以将一张红牌当做当作洞烛先机使用,你可以将一张黑牌当作雷杀使用。",
-                                sawohaizhan_1: "雷杀", "sawohaizhan_1_info": "你可以将一张黑牌当作雷杀使用。",
-                                sawohaizhan_2: "洞烛先机", "sawohaizhan_2_info": "你可以将一张红牌当作洞烛先机使用（洞烛先机：观星2，然后摸两张牌）。",
-                                qingyeqingyeqing: "青叶青叶青", "qingyeqingyeqing_info": "当你成为牌的唯一目标时，你可以指定一名其他角色，其可以选择弃置一张非基本牌令此牌对你无效。",
-                                mingyundewufenzhong: "命运的五分钟", "mingyundewufenzhong_info": "你可以跳过判定和摸牌阶段，视为使用一张雷杀或火杀，你可以弃置一张装备牌并跳过出牌阶段，视为使用一张雷杀或火杀，你可以跳过弃牌阶段并翻面，视为使用一张雷杀或火杀。",
-                                wufenzhong1: "命运的五分钟", "wufenzhong1_info": "你可以跳过判定和摸牌阶段，视为使用一张雷杀或火杀",
-                                wufenzhong2: "命运的五分钟", "wufenzhong2_info": "你可以弃置一张装备牌并跳过出牌阶段，视为使用一张雷杀或火杀",
-                                wufenzhong4: "命运的五分钟", "wufenzhong4_info": "你可以跳过弃牌阶段并翻面，视为使用一张雷杀或火杀。",
-                                qijianshashou: "旗舰杀手", "qijianshashou_info": "出牌阶段开始时，你可以与一名角色进行拼点，若你赢，本回合你与该角色距离视为1，你对该目标使用杀伤害+1，若你没赢，你跳过出牌阶段和弃牌阶段。",
-                                qijianshashou_1: "旗舰杀手", "qijianshashou_1_info": "",
-                                zhanxianfangyu: "战线防御", "zhanxianfangyu_info": "每名角色回合限一次，若你没有装备防具，你成为黑色杀的目标时，取消之。每回合限一次，距你为1的角色成为杀的目标时，你可以弃置一张牌并代替该名角色成为此杀的目标。",
-                                zhanxianfangyu1: "战线防御", "zhanxianfangyu1_info": "",
-                                Zqujingying: "Z驱菁英", "Zqujingying_info": "限定技，出牌阶段，你可以把任意张牌交给等量名角色，获得牌的角色依次选择:其交给你一张牌作为Z或令你获得其两张牌。",
-                                Z_qianghua: "Z强化", "Z_qianghua_info": "出牌阶段，你可以移去一张Z,强化一项。",
-                                huhangyuanhu: "护航援护", "huhangyuanhu_info": "与你距离为1的其他角色成为杀的唯一目标时，你可以交给其一张牌并获得其区域内的一张牌；当你成为杀的唯一目标时，你可以选择一名目标，其可以选择交给你一张牌并获得你区域内的一张牌",
-                                shizhibuyu: "矢志不渝", "shizhibuyu_info": "当你受到伤害时，你可以弃置两张颜色相同的牌令此伤害-1。你受到伤害时进行判定，若结果为红色，你摸一张牌，黑色，你弃置一名角色的一张牌。 当你的判定牌生效后，你可以令一名角色使用杀次数+1和手牌上限+1直到你的下回合开始。",
-                                shizhibuyu1: "矢志不渝", "shizhibuyu1_info": "",
-                                shizhibuyu1_eff: "矢志不渝", "shizhibuyu1_eff_info": "直到回合结束，手牌上限+1，出杀次数+1",
-                                qianxingtuxi: "潜行突袭", "qianxingtuxi_info": "你使用牌无视距离限制；若你在出牌阶段以外造成伤害，你于此轮获得规避且受到伤害的角色下个回合第一次造成伤害时须进行一次判定，如果为黑桃，此次伤害-1。",
-                                qianxingtuxi_debuff: "被袭", "qianxingtuxi_debuff_info": "锁定技，你第一次造成伤害时须进行一次判定，如果为黑桃，此次伤害-1。",
-                                "31jiezhongdui": "31节中队", "31jiezhongdui_info": "每每回合限一次，有角色使用杀指定目标后，若其体力值小于等于目标，你可以选择一项:1令此杀不可响应;2令此杀伤害+1;3令当前回合角色摸一张牌。",
-                                jujianmengxiang: "巨舰梦想", "jujianmengxiang_info": "出牌阶段，你可以失去一点体力，视为使用一张基本牌或非延时锦囊牌（每回合每种牌名限一次）。",
-                                sidajingang: "四大金刚", "sidajingang_info": "你使用杀造成伤害后，你可以与目标拼点，若你赢你获得其一张牌。你发动[远航摸牌]后可以摸一张牌。",
-                                jiujingzhanzhen: "久经战阵", "jiujingzhanzhen_info": "出牌阶段限两次，你可以重铸一张红牌。结束阶段，你可以选择X名角色，其各选择一项:1摸一张牌，2令你获得一点护甲(至多为一)。X为你本回合弃置的红牌数。",
-                                wuweizhuangji: "无畏撞击", "wuweizhuangji_info": "限定技，出牌阶段，若你的体力值最少，你可以失去所有体力，然后对一名角色造成x点伤害(x为你当前的体力上限)",
-                                zhongzhuangcike: "重装刺客", "zhongzhuangcike_info": "你装备区内有牌时，你使用的杀无视防具；你即将造成的伤害视为体力流失",
-                                duomianshou: "多面手", "duomianshou_info": "出牌阶段限三次，你可以弃置一张手牌，视为使用一张牌堆中点数相同的不同类型的牌(不受次数限制），若牌堆中没有相同点数的牌名，重置该技能发动次数，且本回合不能再使用该点数发动技能.",/*每回合限一次，你对其他中小型船使用转化牌时，其选择弃置一张牌或令你摸一张牌。*/
-                                duomianshou_1: "多面手", "duomianshou_1_info": "每回合限一次，你对其他中小型船使用转化后的牌时其选择一项：1弃置一张牌，2令你摸一张牌。",
-                                kaixuan: "凯旋", "kaixuan_info": "你使用杀指定唯一目标时，你可弃置一张牌，令此杀伤害+1。",
-                                changge: "长歌", "changge_info": "锁定技，你使用杀即将造成的伤害≥2时，或你的体力值≤2时，你的杀无视防具。",
-                                xiongjiaqibin: "胸甲骑兵", "xiongjiaqibin_info": "锁定技，你计算与座次比你靠后的角色距离-1。",
-                                yishisheji: "意式设计", "yishisheji_info": "每轮限一次，你可以免疫一次伤害。你使用杀指定唯一目标时可以进行判定，若判定结果不为红桃，此杀基础伤害+1，否则此杀无效。出牌阶段你使用或打出的第一张杀无距离限制。",
-                                jueshengzhibing: "决胜之兵", "jueshengzhibing_info": "你使用杀指定有护甲的目标时，你可以弃置其一张牌；你使用锦囊牌时，你可以摸一张牌。若你以此法摸或弃置了总计两张牌，你结束出牌阶段，反之，回合结束时你获得[智愚]直到下回合开始。",
-                                zhanfu: "战斧", "zhanfu_info": "你手牌数为场上最多时，你使用杀无视距离",
-                                xinqidian: "新起点", "xinqidian_info": "出牌阶段限一次，你可以选择至多3名角色，你与这些角色各展示一张牌:若展示的牌花色均不相同，每人摸1张牌;否则，参与展示牌的角色计算与其他角色距离-1直至其的下个回合结束。",
-                                jilizhixin: "激励之心", 'jilizhixin_info': "若你的宝物栏为空，你视为装备着'侦察机'。你可以弃一张牌并跳过出牌阶段，令一名角色获得一个额外回合。",
-                                hangkongzhanshuguang: "航空战曙光", "hangkongzhanshuguang_info": "出牌阶段限一次，你可以令一名角色摸一张牌。若目标是航母，改为摸两张牌。",
-
-                                jifu_weicheng: "未成", 'jifu_weicheng_info': "锁定技，你的手牌上限+1。准备阶段你进行判定，若结果为红色：你回复一点体力，摸一张牌。若结果为黑色，你流失一点体力。",
-                                jifu_yuanjing: "愿景", 'jifu_yuanjing_info': "觉醒技，当你进入濒死时，体力上限+1，将体力恢复至上限，然后失去未成",
-                                jifu_lingwei: "领卫", 'jifu_lingwei_info': "当有角色使用伤害类牌指定唯一目标时，你可以弃置一张牌，然后选择一项：1、令此牌伤害+1。2、此牌无法被响应。若此牌的使用者是驱逐或S国船，则你与此牌的使用者各摸一张牌。（若此牌的使用者是你自己，则只摸一张牌）若因“领卫”技能效果造成了伤害，则本轮失去“领卫”。",
-                                jifu_yuanqin: "远亲", 'jifu_yuanqin_info': "锁定技，塔什干与I国船使你回复体力时，回复的体力值+1。",
-                                u81_langben: "狼奔", u81_langben_info: "你可以将一张非基本牌交给本回合未以此法选择过的角色，令其他角色计算与其的距离为1直到其下个回合开始时。",
-                                u81_langben_target: "狼奔目标", u81_langben_target_info: "其他角色计算与你距离为1。",
-                                u47_xinbiao: "信标", u47_xinbiao_info: "有角色体力值减少后，你可以弃置一张黑色牌并记录该角色当前的体力值与手牌数。每个势力只能有一名角色被记录。",
-                                u47_xinbiao_hp: "信标", u47_xinbiao_hp_info: "信标",
-                                u47_xinbiao_cards: "信标", u47_xinbiao_cards_info: "信标",
-                                u47_huxi: "虎袭", u47_huxi_info: "出牌阶段限一次，你可以将一名被记录的角色的体力值和手牌数调整为记录值，然后摸一张牌并移除记录，",
-                                u81_zonglie_shanghai: "纵猎", u81_zonglie_shanghai_info: "",
-                                u81_zonglie: "纵猎", u81_zonglie_info: "每回每名角色限一次，你对其他角色造成伤害时，若其手牌与你不相等，其可以交给你一张手牌并摸一张牌，防止此伤害，如此做，其本回合不能响应你的牌。",
-                                u81_xunyi: "巡弋", u81_xunyi_info: "锁定技，每回合限三次，你攻击范围内的角色在回合外获得牌时，若其不处于濒死状态，你与其各展示一张牌，若类型相同，视为对其使用一张雷杀。",
-                                z1_Zqulingjian: "Z驱领舰", z1_Zqulingjian_info: "当G国驱逐舰受到/造成伤害后，你可以将造成伤害的牌置于武将牌上称为“Z”。有其他角色受到雷属性伤害时，你可以弃置一张“Z”，令此伤害-1；当你造成雷属性伤害时，你可以弃置一张“Z”，令此伤害+1。准备阶段，你可以移动一张“Z”。(全局)有Z的角色受到伤害时，可以移去所有Z，防止此伤害。",
-                                z1_Zqulingjian_source: "Z驱领舰_加伤", z1_Zqulingjian_source_info: "当你造成雷属性伤害时，你可以弃置一张“Z”，令此伤害+1。",
-                                z1_Zqulingjian_damage: "Z驱领舰_减伤", z1_Zqulingjian_damage_info: "有其他角色受到雷属性伤害时，你可以弃置一张“Z”，令此伤害-1。",
-                                z1_Zqulingjian_move: "Z驱领舰_移动Z", z1_Zqulingjian_move_info: "准备阶段，你可以移动一张“Z”。",
-
-                                z16_lianhuanbaopo: "连环爆破", z16_lianhuanbaopo_info: "你的黑色【杀】可以当做【雷杀】使用，你的其他黑色牌可以当做【杀】使用或打出，你使用【雷杀】时无距离次数限制防具。",
-                                z16_lianhuanbaopo_sha: "黑牌当杀", z16_lianhuanbaopo_sha_info: "你的黑色牌可以当做【杀】使用或打出",
-                                z16_shuileibuzhi: "水雷布置", z16_shuileibuzhi_info: "当你造成伤害时，你可以将牌堆顶的一张牌置于武将牌上，称为Z。出牌阶段，你可以将一张Z当作兵粮寸断使用。(全局)有Z的角色准备阶段，可以弃置一张Z并弃置判定区内所有与此牌花色相同的牌。",
-                                z16_shuileibuzhi_bingliang: "兵粮寸断", z16_shuileibuzhi_bingliang_info: "出牌阶段，你可以将一张Z当作兵粮寸断使用。",
-                                z18_weisebaoxingdong: "威瑟堡行动", z18_weisebaoxingdong_info: "每回合限一次，你可以将至多两张手牌置于等量角色的武将牌上，称为Z。出牌阶段，你可以移去一张Z，观看一名角色的手牌，然后视为使用一张火攻。(全局)武将牌上有Z的角色出牌阶段使用杀的次数+1；使用与Z中包含类型相同的牌时须弃一张牌(没有则不弃)，然后可以弃置一张与使用的牌相同牌名的Z。",
-                                z18_weisebaoxingdong_huogong: "火攻", z18_weisebaoxingdong_huogong_info: "你可以移去一张Z，观看一名角色的手牌，然后视为使用一张火攻。",
-                                z17_naerweikejingjie: "纳尔维克警戒", z17_naerweikejingjie_info: "出牌阶段，你可以将任意张手牌置于武将牌上，称为Z，然后将一名角色至多等量张手牌置于其武将牌上，也称为Z。(全局)对有Z的角色造成伤害时，可以摸一张牌。",
-                                z21_tuxi: "突袭", z21_tuxi_info: "出牌阶段开始时，你可以选择攻击范围内的一名角色，将其一张牌置于你的武将牌上，称为Z。（全局）若你有Z，你使用牌指定其他角色为目标后，你可以令其随机弃置一张牌，然后移去一张Z",
-                                z22_tuxixiawan: "突袭峡湾", z22_tuxixiawan_info: "出牌阶段开始时，你可以将任意角色一张牌置于自己的武将牌上，称为Z。(全局）其他角色造成伤害后，若你有Z，你可以移去一枚Z，进行一次判定，令当前回合角色不能使用或打出与判定牌花色相同的牌直到回合结束。",
-                                cardsDisabled_suit: "不能使用_花色", cardsDisabled_suit_info: "你不能使用或打出对应花色的手牌。",
-                                matapanjiaozhijian: "马塔潘角之箭", matapanjiaozhijian_info: "你使用锦囊牌指定目标后，你可以弃置任意张牌，令等量目标不可响应此牌。",
-                                zhongbangtuxi: "重磅突袭", zhongbangtuxi_info: "限定技，出牌阶段，你可以弃置任意张红色牌对等量角色各造成一点火焰伤害。",
-                                huangjiahaijunderongyao: "皇家海军的荣耀", huangjiahaijunderongyao_info: "锁定技，你对其他角色造成伤害或受到其他角色的伤害时，你弃置对方的一张牌，若此牌点数小于等于受伤角色的手牌数，此伤害+1",
-                                huangjiaxunyou: "皇家巡游", huangjiaxunyou_info: "锁定技，你计算与其他角色距离-1.",
-                                tianshi: "天使", tianshi_info: "主公技，你的判定牌生效前，E国势力的角色可以打出一张红牌代替之",
-                                tianshi2: "天使2", tianshi2_info: "拥有“天使”的角色判定牌生效前，E国势力的角色可以打出一张红牌代替之",
-                                jishiyu: "及时雨", jishiyu_info: "每回合限三次，若你的体力值全场最少，你的判定牌生效后，你可以获得之。",
-                                jishiyu1: "及时雨", jishiyu1_info: "每回合各限一次，当你需要使用或打出杀时，你可以进行判定，判定结果为黑色则视为你使用或打出了杀。",
-                                yongbuchenmodezhanjian: "永不沉没的战舰", yongbuchenmodezhanjian_info: "主公技，每回合限一次，你有护甲值时，你可以弃置一张牌令受到的伤害-1。",
-                                xiuqi: "修葺", xiuqi_info: "当你发动军辅将牌交给一名其他角色时，你可以令其获得以下效果：你首次造成伤害时，可以回复一点体力。直到其回合结束。",
-                                xiuqi2: "修葺", xiuqi2_info: "每回合限一次，你造成伤害时可以回复一点体力。",
-                                wanbei: "完备", wanbei_info: "锁定技，你获得开幕航空，你的开幕航空无法升级。你的手牌上限+X，X为你发动军辅置于武将牌上的牌的数量",
-                                //iuqi2: "修葺2", xiuqi2_info: "下一次发动开幕航空的技能等级+1",
-                                tiaobangzuozhan: "跳帮作战", tiaobangzuozhan_info: "出牌阶段限一次，你可以视为对一名角色使用决斗。若你以此法造成伤害，你观看其手牌并获得其区域内一张牌；若你因此受到伤害，你令其获得你一张手牌，然后防止此伤害。",
-                                baixiang: "白象", baixiang_info: "锁定技，你无法使用防具牌。当你受到雷属性伤害时，防止之。",
-                                guochuan: "过穿", guochuan_info: "锁定技，你受到伤害时，你可以弃置一张防具牌或失去一点体力防止此伤害。然后你可以选择一名与你距离为一的角色(不能是伤害来源)，令其承受此伤害并摸伤害值张牌。",
-                                zuihouderongyao: "最后的荣耀", zuihouderongyao_info: "锁定技，摸牌阶段开始时，你选择以下一项：1，多摸一张牌且你的攻击范围-1。2，少摸一张牌且你的攻击范围+1。你的攻击范围与手牌上限+X。(X已阵亡角色数)",
-                                '29jienaerxun': "29节纳尔逊", '29jienaerxun_info': "当你本回合内第一次使用“杀”指定目标时，若你的攻击范围大于等于3，此杀不可响应，若你的体力为全场最高时，此杀伤害+1。",
-                                zuihouderongyao_less: "少摸加距离",
-                                zuihouderongyao_more: "多摸减距离",
-                                hongseqiangwei: "红色蔷薇", hongseqiangwei_info: "你使用伤害类牌后，可以将一张手牌置于武将牌上称为[花]。[花]包含对应座次（点数超出游戏人数则减去游戏人数）的角色受到伤害时，你可以弃置一张对应点数的[花]并防止此伤害。",
-                                bujushenfeng: "不惧神风", bujushenfeng_info: "当你受到伤害时，你可以获得造成伤害的牌。你的手牌上限基数为你的体力上限。",
-                                shenfeng: "神风", shenfeng_info: "当你造成或受到一点伤害时，你获得一个“风”标记。",
-                                buju: "不惧", buju_info: "每轮各限一次，你可以移去一个“风”视为使用酒或无懈可击。 以此法使用的无懈可击结算后，你重置[援军]。",
-                                qiangyun: "强运", qiangyun_info: "觉醒技，当你进入濒死时，恢复一点体力。",
-                                yuanjun: "援军", yuanjun_info: "限定技，若你有至少6个“风”标记，你可以移去所有“风”视为使用万箭齐发。",
-                                buju_wuxie: "不惧_无懈", buju_wuxie_disable: "无懈_不可用",
-                                buju_jiu: "不惧_酒", buju_jiu_disable: "酒_不可用",
-                                liaowangtai: "瞭望台", liaowangtai_info: "出牌阶段限一次，你视为对所有攻击范围包括你的角色依次使用一张【火攻】。",
-                                jingruizhuangbei: "精锐装备", jingruizhuangbei_info: "当你装备武器时，你使用射击造成伤害时可以摸一张牌；当你使用射击指定目标时，你可以进行一次判定，若与此“射击”颜色相同，则你可以额外指定一个目标",
-                                jingruizhuangbei_mopai: "精锐装备_摸牌",
-                                jingruizhuangbei_fencha: "精锐装备_分叉",
-                                dananbusi: "大难不死", dananbusi_info: "限定技，当你受到的伤害不小于你当前体力值时，你可以防止之。",
-                                houfu: "后福", houfu_info: "出牌阶段限一次，你可以选择一名其他角色，其选择一项:1视为对你使用一张杀(无距离限制)，2令你从牌堆中获得一张基本牌。",
-                                zhanliexianfuchou: "战列线复仇", zhanliexianfuchou_info: "你造成的伤害+X，X=你本轮成为其他角色伤害类牌目标的次数",
-                                pingduzhanhuo: "平度战火", pingduzhanhuo_info: "结束阶段，若你本回合未造成伤害，你摸一张牌；准备阶段，若你自上个结束阶段起未受到伤害，你摸一张牌",
-                                mujizhengren: "目击证人", mujizhengren_info: "限定技，出牌阶段，你可以弃置3张手牌，然后令一名角色翻面。",
-                                shixiangquanneng: "十项全能", shixiangquanneng_info: "锁定技，你的舰种技能无法升级，每轮开始时，你失去以此法获得的技能，然后从以下技能中选择一项获得：1、防空，2、开幕航空，3、军辅",
-                                pangguanzhe: "旁观者", pangguanzhe_info: "锁定技，你的回合开始时，失去上回合以此法获得的技能，随机获得在场角色武将牌上的一个技能。若该技能带有判定，你可以选择判定结果。(远航，强化，航母，战列，巡洋，驱逐，潜艇，开幕航空，火控雷达，先制鱼雷，十项全能除外;主公技，限定技，使命技，觉醒技除外)",
-                                hangkongyazhi: "航空压制", "hangkongyazhi_info": "限定技，你可以失去开幕航空，令一名角色失去所有护甲且本轮技能失效。",
-                                chuansuohongzha: "穿梭轰炸", "chuansuohongzha_info": "每轮限一次，其他角色使用伤害类牌结算结束后，若你未受伤，你可以获得此牌对应的所有实体牌。每回合限一次，你使用的伤害类牌结算结束后，你可以将其交给一名未受伤角色。",
-                                chuansuohongzha_get: "穿梭轰炸", "chuansuohongzha_get_info": "每轮限一次，其他角色使用伤害类牌结算结束后，若你未受伤，你可以获得此牌对应的所有实体牌。",
-                                chuansuohongzha_send: "穿梭轰炸", "chuansuohongzha_send_info": "每回合限一次，你使用的伤害类牌结算结束后，你可以将其交给一名未受伤角色。",
-                                hangkongyazhi_fengyin: "航空压制_封印",
-                                yuanyangpoxi: "远洋破袭", "yuanyangpoxi_info": "锁定技，你使用锦囊牌对攻击范围内的角色造成伤害+1；你出牌阶段使用杀的次数-1.",
-                                juejingfengsheng: "绝境逢生", juejingfengsheng_info: "锁定技，你的最大耐久增加11。免疫一次致命伤害。",
-                                saqijian: "萨奇剪", "saqijian_info": "你可以将一张黑色牌当无懈可击使用",
-                                jupaohuoli: "巨炮火力", "jupaohuoli_info": "你使用杀造成伤害时，若你手牌数大于目标手牌数，此伤害+1。",
-                                guanjianyiji: "关键一击", "guanjianyiji_info": "每轮限一次，有牌指定目标后，你可以扣置目标的一张牌于武将牌上，此回合结束后再获得之。若此时是你的回合内且指定战列舰为目标，不计入发动次数限制。",
-                                duikongzhiwei: "对空直卫", "duikongzhiwei_info": "每轮限一次，当一名角色使用锦囊牌指定至少两名角色为目标时，你可以弃置一张牌，令此牌对你和距离1的角色无效。",
-                                bigseven: "BIGSEVEN", "bigseven_info": "你使用基本牌和非延时锦囊牌指定唯一目标后，可以进行判定。若结果与使用的牌类型相同，你可以额外指一名角色为目标。(场上每有一名自己以外拥有bigseven的角色，目标+1)",
-                                saobaxing: "扫把星", "saobaxing_info": "锁定技，每回合限一次，当一名角色的判定牌生效前，若判定结果为红色，你须令其重新判定。",
-                                shaojie: "哨戒", "shaojie_info": "锁定技，你无法打出闪响应万箭齐发/近距支援。当你受到万箭齐发/近距支援伤害时，你获得一点护甲。",
-
-                                jianrbiaozhun: "舰r标准",
-                                lishizhanyi: '历史战役',
-                                lishizhanyi_naerweike: '历史战役-纳尔维克',
-                                lishizhanyi_matapanjiao: '历史战役-马塔潘角',
-                                lishizhanyi_danmaihaixia: '历史战役-丹麦海峡',
-                                lishizhanyi_shanhuhai: '历史战役-珊瑚海',
-                                lishizhanyi_haixiafujizhan: '历史战役-海峡伏击战',
-                                weijingzhizhi: '未竟之志',
-                            },
-                        };
-                        if(lib.device || lib.node) {
-                    for (var i in jianrjinji.character) { jianrjinji.character[i][4].push('ext:舰R牌将/image/character/' + i + '.jpg'); }
-                } else {
-                for (var i in jianrjinji.character) { jianrjinji.character[i][4].push('db:extension-舰R牌将:image/character/' + i + '.jpg'); }
-            }//由于以此法加入的武将包武将图片是用源文件的，所以要用此法改变路径。可以多指定x个目标数（x技能强化的次数），
-            return jianrjinji;
-        });
-//lib.config.all.characters.push('jianrjinji');//无名杀新版本已弃用。如要兼容旧版本可以重新使用
-//if (!lib.config.characters.includes('jianrjinji')) lib.config.characters.push('jianrjinji');
-lib.translate['jianrjinji_character_config'] = '舰R武将';// 包名翻译
-//卡包（手牌）
-game.import('card', function () {
-    var jianrjinjibao = {
-        name: 'jianrjinjibao',//卡包命名
-        connect: true,//卡包是否可以联机
-        card: {
-            jinjuzy: {
-                audio: true,
-                image: 'ext:舰R牌将/jinjuzy.jpg',
-                type: "trick",
-                enable: true,
-                //selectTarget: -1,
-                selectTarget: [1, Infinity],
-                reverseOrder: true,
-                "yingbian_prompt": "当你使用此牌选择目标后，你可为此牌减少一个目标",
-                "yingbian_tags": ["remove"],
-                yingbian: function (event) {
-                    event.yingbian_removeTarget = true;
-                },
-                filterTarget: function (card, player, target) {
-                    return player != target;
-                },
-                content: function () {
-                    "step 0"
-                    if (typeof event.baseDamage != 'number') event.baseDamage = 1;
-                    if (event.directHit) event._result = { bool: false };
-                    else {
-                        var next = target.chooseToRespond({ name: 'shan' || 'huibi9' });
-                        next.set('ai', function (card) {
-                            var evt = _status.event.getParent();
-                            if (get.damageEffect(evt.target, evt.player, evt.target) >= 0) return 0;
-                            if (evt.player.hasSkillTag('notricksource')) return 0;
-                            if (evt.target.hasSkillTag('notrick')) return 0;
-                            if (evt.target.hasSkillTag('noShan')) {
-                                return -1;
-                            }
-                            return get.order(card);
-                        });
-                        next.autochoose = lib.filter.autoRespondShan;
-                    }
-                    "step 1"
-                    if (result.bool == false) {
-                        if (target.getEquip(2) != 'tengjia') target.damage(event.baseDamage);
-                    }
-                },
-                ai: {
-
-                    wuxie: function (target, card, player, viewer) {
-                        if (get.attitude(viewer, target) > 0 && target.countCards('h', 'shan')) {
-                            if (!target.countCards('h') || target.hp == 1 || Math.random() < 0.7) return 0;
-                        }
-                    },
-                    basic: {
-                        order: 9,
-                        useful: 1,
-                        value: 7,
-                    },
-                    result: {
-                        player(player, target) {
-                            var att = get.attitude(player, target);
-                            if (att > 0) return 0;
-                            return 1;
                         },
-                        "target_use": function (player, target) {
-                            if (player.hasUnknown(2) && get.mode() != 'guozhan') return 0;
-                            var nh = target.countCards('h');
-                            if (get.mode() == 'identity') {
-                                if (target.isZhu && nh <= 2 && target.hp <= 1) return -100;
-                            }
-                            if (nh == 0) return -2;
-                            if (nh == 1) return -1.7
-                            return -1.5;
-                        },
-                        target: function (player, target) {
-                            var nh = target.countCards('h');
-                            if (get.mode() == 'identity') {
-                                if (target.isZhu && nh <= 2 && target.hp <= 1) return -100;
-                            }
-                            if (nh == 0) return -2;
-                            if (nh == 1) return -1.7
-                            return -1.5;
-                        },
-                    },
-                    tag: {
-                        respond: 1,
-                        respondShan: 1,
-                        damage: 1,
-                        multitarget: 1,
-                        multineg: 1,
-                    },
-                },
-                fullimage: true,
-            },
-            jiakongls: {
-                image: 'ext:舰R牌将/jiakongls.jpg',
-                audio: true,
-                type: "trick",
-                enable: true,
-                cardcolor: "red",
-                selectTarget: -1,
-                filterTarget: true,
-                contentBefore: function () {
-                    "step 0"
-                    if (!targets.length) {
-                        event.finish();
-                        return;
-                    }
-                    if (get.is.versus()) {
-                        player.chooseControl('顺时针', '逆时针', function (event, player) {
-                            if (player.next.side == player.side) return '逆时针';
-                            return '顺时针';
-                        }).set('prompt', '选择' + get.translation(card) + '的结算方向');
-                    }
-                    else {
-                        event.goto(2);
-                    }
-                    "step 1"
-                    if (result && result.control == '顺时针') {
-                        var evt = event.getParent(), sorter = (_status.currentPhase || player);
-                        evt.fixedSeat = true;
-                        evt.targets.sortBySeat(sorter);
-                        evt.targets.reverse();
-                        if (evt.targets[evt.targets.length - 1] == sorter) {
-                            evt.targets.unshift(evt.targets.pop());
-                        }
-                    }
-                    "step 2"
-                    ui.clear();
-                    var num;
-                    if (event.targets) {
-                        num = Math.floor(event.targets.length * 1.5);
-                    }
-                    else {
-                        num = game.countPlayer() * 2;
-                    }
-                    var cards = get.cards(num);
-                    game.cardsGotoOrdering(cards).relatedEvent = event.getParent();
-                    var dialog = ui.create.dialog('五谷丰登', cards, true);
-                    _status.dieClose.push(dialog);
-                    dialog.videoId = lib.status.videoId++;
-                    game.addVideo('cardDialog', null, ['五谷丰登', get.cardsInfo(cards), dialog.videoId]);
-                    event.getParent().preResult = dialog.videoId;
-                    game.broadcast(function (cards, id) {
-                        var dialog = ui.create.dialog('五谷丰登', cards, true);
-                        _status.dieClose.push(dialog);
-                        dialog.videoId = id;
-                    }, cards, dialog.videoId);
-                    game.log(event.card, '亮出了', cards);
-                },
-                content: function () {
-                    "step 0"
-                    for (var i = 0; i < ui.dialogs.length; i++) {
-                        if (ui.dialogs[i].videoId == event.preResult) {
-                            event.dialog = ui.dialogs[i]; break;
-                        }
-                    }
-                    if (!event.dialog) {
-                        event.finish();
-                        return;
-                    }
-                    if (event.dialog.buttons.length > 1) {
-                        var next = target.chooseButton(true, function (button) {
-                            return get.value(button.link, _status.event.player);
-                        });
-                        next.set('dialog', event.preResult);
-                        next.set('closeDialog', false);
-                        next.set('dialogdisplay', true);
-                    }
-                    else {
-                        event.directButton = event.dialog.buttons[0];
-                    }
-                    "step 1"
-                    var dialog = event.dialog;
-                    var card;
-                    if (event.directButton) {
-                        card = event.directButton.link;
-                    }
-                    else {
-                        for (var i of dialog.buttons) {
-                            if (i.link == result.links[0]) {
-                                card = i.link;
-                                break;
-                            }
-                        }
-                        if (!card) card = event.dialog.buttons[0].link;
-                    }
+                        translate: {
+                            addskilltest: "addskilltest",
+                            liekexingdun: "列克星敦",
+                            qixichicheng: "奇袭赤城",
+                            wufenzhongchicheng: "五分钟赤城",
+                            qiye: "企业",
+                            bisimai: "俾斯麦", misuli: "密苏里",
+                            changmen: "长门", weineituo: "维内托",
+                            lisailiu: "黎塞留",
+                            kunxi: "昆西", ougengqi: "欧根",
+                            qingye: "青叶", beianpudun: "北安普顿",
+                            jiujinshan: "旧金山",
+                            tianlangxing: "天狼星", yixian: "逸仙",
+                            degelasi: "德格拉斯", yatelanda: "亚特兰大",
+                            dadianrendian: "大淀仁淀",
+                            kangfusi: "康弗斯", "z31": "z31",
+                            "47project": "47工程", xuefeng: "雪风",
+                            shuileizhanduichuixue: "水雷战队吹雪",
+                            guzhuyizhichuixue: "孤注一掷吹雪",
+                            mingsike: "明斯克",
+                            baiyanjuren: "百眼巨人",
+                            "u1405": "u1405",
+                            changchun: "长春",
+                            "1913": "1913战巡",
+                            yinghuochong: "萤火虫",
+                            jifu: "基辅",
+                            "u47": "u47",
+                            "u81": "u81",
+                            "z1": "z1",
+                            "z16": "z16",
+                            "z18": "z18",
+                            "z17": "z17",
+                            "z21": "z21",
+                            "z22": "z22",
+                            kewei: "可畏",
+                            hude: "胡德",
+                            shiyu: "时雨",
+                            dujiaoshou: "独角兽",
+                            gesakeren: "哥萨克人",
+                            kente: "肯特",
+                            shengwang: "声望",
+                            shenluopujun: "什罗普郡",
+                            lafei: "拉菲",
+                            sp_lafei: "SP拉菲",
+                            yi25: "伊25",
+                            jiate: "基阿特",
+                            salemu: "萨勒姆",
+                            "u505": "u505",
+                            jialifuniya: "加利福尼亚",
+                            getelan: "哥特兰",
+                            rangbaer: "让巴尔",
+                            dafeng: "大凤",
+                            dahuangfeng: "大黄蜂",
+                            biaoqiang: "标枪",
+                            yuekecheng: "约克城",
+                            shengqiaozhi: "圣乔治",
+                            weiershiqinwang: "威尔士亲王",
+                            qiuyue: "秋月",
+                            luodeni: "罗德尼",
+                            weilianDbote: "威廉D波特",
 
-                    var button;
-                    for (var i = 0; i < dialog.buttons.length; i++) {
-                        if (dialog.buttons[i].link == card) {
-                            button = dialog.buttons[i];
-                            button.querySelector('.info').innerHTML = function (target) {
-                                if (target._tempTranslate) return target._tempTranslate;
-                                var name = target.name;
-                                if (lib.translate[name + '_ab']) return lib.translate[name + '_ab'];
-                                return get.translation(name);
-                            }(target);
-                            dialog.buttons.remove(button);
-                            break;
-                        }
-                    }
-                    var capt = get.translation(target) + '选择了' + get.translation(button.link);
-                    if (card) {
-                        target.gain(card, 'visible');
-                        target.$gain2(card);
-                        game.broadcast(function (card, id, name, capt) {
-                            var dialog = get.idDialog(id);
-                            if (dialog) {
-                                dialog.content.firstChild.innerHTML = capt;
-                                for (var i = 0; i < dialog.buttons.length; i++) {
-                                    if (dialog.buttons[i].link == card) {
-                                        dialog.buttons[i].querySelector('.info').innerHTML = name;
-                                        dialog.buttons.splice(i--, 1);
-                                        break;
+                            skilltest: "skill测试武将test",
+                            quzhudd: "驱逐", "quzhudd_info": "",
+                            qingxuncl: "轻巡", "qingxuncl_info": "",
+                            zhongxunca: "重巡", "zhongxunca_info": "",
+                            zhanliebb: "战列", "zhanliebb_info": "",
+                            daoqu: "导驱", "daoqu_info": "你的攻击范围增加2+X(x为技能强化次数),出牌阶段限一次，你可以弃置一张武器/武器或防具/装备牌，对一名角色造成一点伤害。",
+                            fangqu: "防驱",
+                            daodan: "防空导弹",
+                            "fangqu_info": "游戏开始时/出牌阶段开始时，将至多1/2/3张手牌放到武将牌上.你可以将武将牌上的牌当作无懈使用.",
+                            hangmucv: "航母", "hangmucv_info": "(可强化)你的出牌阶段开始时，<br>你可以将2张：零级强化，黑桃或梅花手牌；一级强化，黑桃或梅花或红桃手牌；二级强化，任意手牌。当作万箭齐发对你选择的任意个目标使用",
+                            qianting_xiji: "袭击", "qianting_xiji_info": "每回合限两次，将♦/♥牌当做顺手牵羊，♣/♠牌当做兵粮寸断使用<br>你使用的锦囊牌可以对距离你2以内的角色使用。",
+                            qianting: "潜艇", "qianting_info": "（可强化）准备阶段，你可以弃置一张红桃或黑桃/红桃或黑桃或方片/牌，视为对一个目标使用一张雷杀。",
+                            qianting_jiezi: "截辎", "qianting_jiezi_info": "其他角色跳过阶段时，你摸一张牌",
+                            "_yuanhang": "远航", "_yuanhang_info": "受伤时手牌上限+1<br>当你失去手牌后，且手牌数<手牌上限值时，你摸一张牌。使用次数上限0/1/2次，处于自己的回合时+1，每回合回复一次使用次数。<br>当你进入濒死状态时，你摸一张牌，体力上限大于二时需减少一点体力上限，额外摸一张牌；死亡后，你可以按自己的身份，令一名角色摸-/2/1/1（主/忠/反/内）张牌。",
+                            kaishimopao: "开始摸牌", "kaishimopao_info": "<br>，判定阶段你可以减少一次摸牌阶段的摸牌，然后在回合结束时摸一张牌。",
+                            "_jianzaochuan": "建造", "_jianzaochuan_info": "限一次，当你进行了至少一次强化后<br>1.出牌阶段<br>你可以弃置3张不同花色的牌，提升一点血量上限与强化上限。<br>2.当你濒死时，<br>你可以弃置4张不同花色的牌，回复一点体力。<br>（未开启强化，则无需强化即可使用建造。未开启建造，则强化上限仅为1级。）",
+                            "_qianghuazhuang": "强化装备",
+                            "_qianghuazhuang_info": "你可以消耗经验，或弃置二至四张牌，选择一至两个永久效果升级。<br>（摸牌、技能、攻击范围、防御距离、手牌上限）每回合限一次。<br>一级强化消耗两点经验，二级强化消耗三点经验",//装备牌代表两张牌
+                            diewulimitai: "递杀", "diewulimitai_info": "给实际距离为1的队友递一张杀或装备牌，可以立即使用（杀只能用一次），一回合限2次。可强化",
+                            "_wulidebuff": "属性伤害效果",
+                            "_wulidebuff_info": "火杀：令目标回合结束后，受到一点火焰伤害，摸两张牌。</br>冰杀：护甲加1伤；减少对手1点防御距离。</br>雷杀：自动判断是否流失对手体力；减少对手1点手牌上限；。</br>此角色回合结束后移除所有的进水、减速、燃烧。",
+                            "_hanbing_gai": "寒冰-改",
+                            "_hanbing_gai_info": "1.开启“属性伤害效果”的情况下，你对拥有护甲的目标造成雷属性伤害前，+1伤害值。<br>2.在你造成伤害前，若你拥有寒冰剑_技能/造成的伤害为冰属性，你可以防止此伤害并弃置目标2*X张牌，x为伤害值。与伤害效果技能配合时",
+                            _yidong: "移动座位", "_yidong_info": "",
+                            tiaozhanzhuanbei: "挑战装备",
+                            "tiaozhanzhuanbei_info": "挑战锁定技，游戏开始时，你将一张【回避】【此舰种的武器】和一张【望远镜】置入你的装备区。你装备区内的武器牌和宝物牌不能被其他角色弃置。",
+                            danzong: "增强杀",
+                            "danzong_info": "每使用六张杀，你便可以在造成无属性伤害附加属性：<br>潜艇、驱逐：获得雷属性的效果，<br>战列、航母：获得雷属性与改进型冰杀的效果。<br>其他舰种时：获得火属性,点燃目标。<br>效果持续到伤害结算完成时（打不穿藤甲的高爆弹与暴击藤甲的决斗）",
+                            "paohuozb_skill": "炮火准备1", "paohuozb_skill_info": "装备技能",
+                            dajiaoduguibi: "规避",
+                            "dajiaoduguibi_info": "（可强化）你需要打出闪时可以进行一次判定，判定结果为：零级强化，方块/一级强化，桃、闪、方块/二级强化，红桃或方块，视为你打出了一张闪。",
+                            "rendeonly2": "仁德界改",
+                            "rendeonly2_info": "给实际距离为2的队友最多两张牌，一回合限2次，给出第二张牌时，你视为使用一张基本牌。可强化",
+                            zhiyangai: "直言",
+                            "zhiyangai_info": "令一名目标角色摸一张牌并展示之。<br>若为装备牌，则其可以选择是否装备。<br>可强化(每强化一次技能，便+1技能的目标数)",
+                            "fangkong2": "防空",
+                            "fangkong2_info": "当一名角色使用的锦囊牌指定了至少两名角色为目标时，<br>你可弃置两张牌令此牌对距离你为1/2/3的任意名角色无效,可强化",
+                            huokongld: "火控雷达",
+                            "huokongld_info": "（可强化）当你使用的【杀】被目标角色使用的【闪】抵消时，你可以弃置：零级，一张杀/一级，一张黑色牌/二级，一张牌，令此【杀】依然对其造成伤害。",
+                            "ganglie_gai": "刚烈弱化",
+                            "ganglie_gai_info": "每当你受到1点伤害后，若你的体力不大于2，你可以弃置x张牌并进行判定。<br>若结果不为红桃，则伤害来源选择执行一项：1.弃置x+1张手牌，2.选择交给你一张牌;3.失去一点体力(无视护甲)。<br>若你先弃置了两张牌，则判定失败时随机获得目标的一张牌;判定成功后，目标不选择弃牌时会额外失去一张牌。可强化",
+                            "zhongpaoduijue": "对决",
+                            "zhongpaoduijue_info": "当你无法使用杀时，你可以指定一个目标，弃置最多（2/3/4）张相同花色的牌，并与目标摸等量的牌,<br>然后你与目标轮流视为对对方使用一张决斗,<br>直到双方的决斗次数超过2n，n为你弃置的牌数。强化以-1对方摸的牌",
+                            "zhuangjiafh": "装甲防护",
+                            "zhuangjiafh_info": "（可强化）每回合限一次，当你受到：零级强化，杀的伤害/一级强化，杀和锦囊牌的伤害/二级强化，任意伤害时,若你没有用护甲承受过此次伤害，你可以获得1点护甲。",
+                            "misscoversha": "回出杀数", "misscoversha_info": "杀被回避会回复当回合出杀次数",
+                            "xianjinld": "先进雷达",
+                            "xianjinld_info": "可以选择一个增益：1.攻击，实际距离此角色为1的队友：武器攻击距离+1;但防御杀的距离-1，队友的摸牌阶段多摸一张牌。或：2.防御距离+1，但是攻击距离-1，自己的摸牌阶段少抽一张牌。",
+                            "kanpolimitai": "制空权",
+                            "kanpolimitai_info": "每轮限一次，你可以将一张黑色手牌当无懈可击使用。可强化",
+                            kaifa: "开发装备",
+                            "kaifa_info": "出牌阶段，你可以展示一张未强化过的【诸葛连弩】或标准包/军争包/SP包中的防具牌，然后对其进行强化。当你处于濒死状态时，你可以重铸一张防具牌，然后将体力回复至1点。",
+                            huijiahuihe: "额外回合",
+                            "huijiahuihe_info": "当你有护甲时，你可以移除所有护甲并进行一个额外的回合；额外回合的摸牌数等于护甲数。此回合没有输出时，摸一张牌。",
+                            junfu: "军辅船",
+                            "junfu_info": "准备阶段,你可以把至多1/2/3张手牌存于武将牌上，如手牌般使用。<br>其他角色回合开始时，你可以把存储的牌交给ta，然后你摸一张牌。<br>可以强化(目标的手牌数<8才能使用此技能)<br>拥有技能强化和远航强化即可起飞。",
+                            manchangzhanyi: "漫长战役", "manchangzhanyi_info": "每轮限一次，你受到锦囊牌的伤害时，你免疫此伤害。你攻击范围内的其他角色的准备阶段，你可以弃置其一张手牌。",
+                            manchangzhanyi_mianyi: "漫长战役", "manchangzhanyi_mianyi_info": "",
+                            guzhuyizhi: "孤注一掷", "guzhuyizhi_info": "准备阶段，你可以摸两张牌并弃置所有手牌，然后摸等量的牌，如此做，你的其他技能失效直到你的下回合开始，你计算与其他角色的距离-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。",
+                            guzhuyizhi2: "孤注一掷", "guzhuyizhi2_info": "",
+                            shuileizhandui_1: "水雷战队", "shuileizhandui_1_info": "",
+                            shuileizhandui: "水雷战队", "shuileizhandui_info": "你可以交给一名角色任意张牌。若你是本回合第一次发动本技能，你可以从牌堆和弃牌堆获得一张雷杀。你没有手牌时，不能成为杀的目标。",
+                            dumuchenglin: "独木成林", "dumuchenglin_info": "你获得【规避】。当场上没有其他航母时，杀使用次数+1，你于你的回合对其他角色造成的第一次伤害时此伤害+1。",
+                            dumuchenglin_2: "独木成林2", "dumuchenglin_2_info": "杀使用次数+1",
+                            bigE: "大E", bigE_info: "你使用的第一张杀不能被响应。受到你使用杀造成的伤害的角色手牌上限-1直到其回合结束",
+                            xiangrui: "祥瑞", "xiangrui_info": "每名玩家的回合限一次，当你受到伤害前，你可以进行判定，判定结果为黑桃，免疫此次伤害，然后获得[祥瑞]标记。",
+                            yumian: "御免", "yumian_info": "锁定技，结束阶段，你移除所有[祥瑞]标记。你可以选择距你1以内的目标，让其失去一点体力并摸两张牌。若你失去了一个或以上的祥瑞标记，你可以选择的目标不受距离限制",
+                            hangkongzhanshuxianqu: "航空战术先驱", "hangkongzhanshuxianqu_info": "你使用转化的锦囊牌结算后，你可以展示牌堆顶的x张牌，获取其中花色各不相同的牌(x为你指定的目标数，至多为4)",
+                            gaosusheji: "高速射击", "gaosusheji_info": "转换技，出牌阶段你使用的第一张牌为：阳：基本牌时；阴：普通锦囊牌时。你可以令此牌额外结算一次。",
+                            qixi_cv: "奇袭", "qixi_cv_info": "限定技，出牌阶段，你可以令所有其他角色依次选择一项:1你弃置其区域内的两张牌，2本回合不能使用或打出手牌，3翻面。然后你可以视为使用【近距支援】。",
+                            rand: "随机数", "rand_info": "遇事不决？扔一个骰子吧。该技能可以生成1~6的随机数",
+                            duikongfangyu: "对空防御", "duikongfangyu_info": "锁定技，你发动防空时技能等级视为满级。你在回合外发动[防空]后，你摸2张牌",
+                            zhudaojiandui: "柱岛舰队", "zhudaojiandui_info": "锁定技，每当你使用或打出一张非虚拟非转化的基本牌，你获得一个[柱]标记。你可以移去三个柱标记视为使用一张不计入次数限制的杀。",
+                            sawohaizhan: "萨沃海战", "sawohaizhan_info": "出牌阶段各限一次。你可以将一张红牌当做当作洞烛先机使用,你可以将一张黑牌当作雷杀使用。",
+                            sawohaizhan_1: "雷杀", "sawohaizhan_1_info": "你可以将一张黑牌当作雷杀使用。",
+                            sawohaizhan_2: "洞烛先机", "sawohaizhan_2_info": "你可以将一张红牌当作洞烛先机使用（洞烛先机：观星2，然后摸两张牌）。",
+                            qingyeqingyeqing: "青叶青叶青", "qingyeqingyeqing_info": "当你成为牌的唯一目标时，你可以指定一名其他角色，其可以选择弃置一张非基本牌令此牌对你无效。",
+                            mingyundewufenzhong: "命运的五分钟", "mingyundewufenzhong_info": "你可以跳过判定和摸牌阶段，视为使用一张雷杀或火杀，你可以弃置一张装备牌并跳过出牌阶段，视为使用一张雷杀或火杀，你可以跳过弃牌阶段并翻面，视为使用一张雷杀或火杀。",
+                            wufenzhong1: "命运的五分钟", "wufenzhong1_info": "你可以跳过判定和摸牌阶段，视为使用一张雷杀或火杀",
+                            wufenzhong2: "命运的五分钟", "wufenzhong2_info": "你可以弃置一张装备牌并跳过出牌阶段，视为使用一张雷杀或火杀",
+                            wufenzhong4: "命运的五分钟", "wufenzhong4_info": "你可以跳过弃牌阶段并翻面，视为使用一张雷杀或火杀。",
+                            qijianshashou: "旗舰杀手", "qijianshashou_info": "出牌阶段开始时，你可以与一名角色进行拼点，若你赢，本回合你与该角色距离视为1，你对该目标使用杀伤害+1，若你没赢，你跳过出牌阶段和弃牌阶段。",
+                            qijianshashou_1: "旗舰杀手", "qijianshashou_1_info": "",
+                            zhanxianfangyu: "战线防御", "zhanxianfangyu_info": "每名角色回合限一次，若你没有装备防具，你成为黑色杀的目标时，取消之。每回合限一次，距你为1的角色成为杀的目标时，你可以弃置一张牌并代替该名角色成为此杀的目标。",
+                            zhanxianfangyu1: "战线防御", "zhanxianfangyu1_info": "",
+                            Zqujingying: "Z驱菁英", "Zqujingying_info": "限定技，出牌阶段，你可以把任意张牌交给等量名角色，获得牌的角色依次选择:其交给你一张牌作为Z或令你获得其两张牌。",
+                            Z_qianghua: "Z强化", "Z_qianghua_info": "出牌阶段，你可以移去一张Z,强化一项。",
+                            huhangyuanhu: "护航援护", "huhangyuanhu_info": "与你距离为1的其他角色成为杀的唯一目标时，你可以交给其一张牌并获得其区域内的一张牌；当你成为杀的唯一目标时，你可以选择一名目标，其可以选择交给你一张牌并获得你区域内的一张牌",
+                            shizhibuyu: "矢志不渝", "shizhibuyu_info": "当你受到伤害时，你可以弃置两张颜色相同的牌令此伤害-1。你受到伤害时进行判定，若结果为红色，你摸一张牌，黑色，你弃置一名角色的一张牌。 当你的判定牌生效后，你可以令一名角色使用杀次数+1和手牌上限+1直到你的下回合开始。",
+                            shizhibuyu1: "矢志不渝", "shizhibuyu1_info": "",
+                            shizhibuyu1_eff: "矢志不渝", "shizhibuyu1_eff_info": "直到回合结束，手牌上限+1，出杀次数+1",
+                            qianxingtuxi: "潜行突袭", "qianxingtuxi_info": "你使用牌无视距离限制；若你在出牌阶段以外造成伤害，你于此轮获得规避且受到伤害的角色下个回合第一次造成伤害时须进行一次判定，如果为黑桃，此次伤害-1。",
+                            qianxingtuxi_debuff: "被袭", "qianxingtuxi_debuff_info": "锁定技，你第一次造成伤害时须进行一次判定，如果为黑桃，此次伤害-1。",
+                            "31jiezhongdui": "31节中队", "31jiezhongdui_info": "每每回合限一次，有角色使用杀指定目标后，若其体力值小于等于目标，你可以选择一项:1令此杀不可响应;2令此杀伤害+1;3令当前回合角色摸一张牌。",
+                            jujianmengxiang: "巨舰梦想", "jujianmengxiang_info": "出牌阶段，你可以失去一点体力，视为使用一张基本牌或非延时锦囊牌（每回合每种牌名限一次）。",
+                            sidajingang: "四大金刚", "sidajingang_info": "你使用杀造成伤害后，你可以与目标拼点，若你赢你获得其一张牌。你发动[远航摸牌]后可以摸一张牌。",
+                            jiujingzhanzhen: "久经战阵", "jiujingzhanzhen_info": "出牌阶段限两次，你可以重铸一张红牌。结束阶段，你可以选择X名角色，其各选择一项:1摸一张牌，2令你获得一点护甲(至多为一)。X为你本回合弃置的红牌数。",
+                            wuweizhuangji: "无畏撞击", "wuweizhuangji_info": "限定技，出牌阶段，若你的体力值最少，你可以失去所有体力，然后对一名角色造成x点伤害(x为你当前的体力上限)",
+                            zhongzhuangcike: "重装刺客", "zhongzhuangcike_info": "你装备区内有牌时，你使用的杀无视防具；你即将造成的伤害视为体力流失",
+                            duomianshou: "多面手", "duomianshou_info": "出牌阶段限三次，你可以弃置一张手牌，视为使用一张牌堆中点数相同的不同类型的牌(不受次数限制），若牌堆中没有相同点数的牌名，重置该技能发动次数，且本回合不能再使用该点数发动技能.",/*每回合限一次，你对其他中小型船使用转化牌时，其选择弃置一张牌或令你摸一张牌。*/
+                            duomianshou_1: "多面手", "duomianshou_1_info": "每回合限一次，你对其他中小型船使用转化后的牌时其选择一项：1弃置一张牌，2令你摸一张牌。",
+                            kaixuan: "凯旋", "kaixuan_info": "你使用杀指定唯一目标时，你可弃置一张牌，令此杀伤害+1。",
+                            changge: "长歌", "changge_info": "锁定技，你使用杀即将造成的伤害≥2时，或你的体力值≤2时，你的杀无视防具。",
+                            xiongjiaqibin: "胸甲骑兵", "xiongjiaqibin_info": "锁定技，你计算与座次比你靠后的角色距离-1。",
+                            yishisheji: "意式设计", "yishisheji_info": "每轮限一次，你可以免疫一次伤害。你使用杀指定唯一目标时可以进行判定，若判定结果不为红桃，此杀基础伤害+1，否则此杀无效。出牌阶段你使用或打出的第一张杀无距离限制。",
+                            jueshengzhibing: "决胜之兵", "jueshengzhibing_info": "你使用杀指定有护甲的目标时，你可以弃置其一张牌；你使用锦囊牌时，你可以摸一张牌。若你以此法摸或弃置了总计两张牌，你结束出牌阶段，反之，回合结束时你获得[智愚]直到下回合开始。",
+                            zhanfu: "战斧", "zhanfu_info": "你手牌数为场上最多时，你使用杀无视距离",
+                            xinqidian: "新起点", "xinqidian_info": "出牌阶段限一次，你可以选择至多3名角色，你与这些角色各展示一张牌:若展示的牌花色均不相同，每人摸1张牌;否则，参与展示牌的角色计算与其他角色距离-1直至其的下个回合结束。",
+                            jilizhixin: "激励之心", 'jilizhixin_info': "若你的宝物栏为空，你视为装备着'侦察机'。你可以弃一张牌并跳过出牌阶段，令一名角色获得一个额外回合。",
+                            hangkongzhanshuguang: "航空战曙光", "hangkongzhanshuguang_info": "出牌阶段限一次，你可以令一名角色摸一张牌。若目标是航母，改为摸两张牌。",
+
+                            jifu_weicheng: "未成", 'jifu_weicheng_info': "锁定技，你的手牌上限+1。准备阶段你进行判定，若结果为红色：你回复一点体力，摸一张牌。若结果为黑色，你流失一点体力。",
+                            jifu_yuanjing: "愿景", 'jifu_yuanjing_info': "觉醒技，当你进入濒死时，体力上限+1，将体力恢复至上限，然后失去未成",
+                            jifu_lingwei: "领卫", 'jifu_lingwei_info': "当有角色使用伤害类牌指定唯一目标时，你可以弃置一张牌，然后选择一项：1、令此牌伤害+1。2、此牌无法被响应。若此牌的使用者是驱逐或S国船，则你与此牌的使用者各摸一张牌。（若此牌的使用者是你自己，则只摸一张牌）若因“领卫”技能效果造成了伤害，则本轮失去“领卫”。",
+                            jifu_yuanqin: "远亲", 'jifu_yuanqin_info': "锁定技，塔什干与I国船使你回复体力时，回复的体力值+1。",
+                            u81_langben: "狼奔", u81_langben_info: "你可以将一张非基本牌交给本回合未以此法选择过的角色，令其他角色计算与其的距离为1直到其下个回合开始时。",
+                            u81_langben_target: "狼奔目标", u81_langben_target_info: "其他角色计算与你距离为1。",
+                            u47_xinbiao: "信标", u47_xinbiao_info: "有角色体力值减少后，你可以弃置一张黑色牌并记录该角色当前的体力值与手牌数。每个势力只能有一名角色被记录。",
+                            u47_xinbiao_hp: "信标", u47_xinbiao_hp_info: "信标",
+                            u47_xinbiao_cards: "信标", u47_xinbiao_cards_info: "信标",
+                            u47_huxi: "虎袭", u47_huxi_info: "出牌阶段限一次，你可以将一名被记录的角色的体力值和手牌数调整为记录值，然后摸一张牌并移除记录，",
+                            u81_zonglie_shanghai: "纵猎", u81_zonglie_shanghai_info: "",
+                            u81_zonglie: "纵猎", u81_zonglie_info: "每回每名角色限一次，你对其他角色造成伤害时，若其手牌与你不相等，其可以交给你一张手牌并摸一张牌，防止此伤害，如此做，其本回合不能响应你的牌。",
+                            u81_xunyi: "巡弋", u81_xunyi_info: "锁定技，每回合限三次，你攻击范围内的角色在回合外获得牌时，若其不处于濒死状态，你与其各展示一张牌，若类型相同，视为对其使用一张雷杀。",
+                            z1_Zqulingjian: "Z驱领舰", z1_Zqulingjian_info: "当G国驱逐舰受到/造成伤害后，你可以将造成伤害的牌置于武将牌上称为“Z”。有其他角色受到雷属性伤害时，你可以弃置一张“Z”，令此伤害-1；当你造成雷属性伤害时，你可以弃置一张“Z”，令此伤害+1。准备阶段，你可以移动一张“Z”。(全局)有Z的角色受到伤害时，可以移去所有Z，防止此伤害。",
+                            z1_Zqulingjian_source: "Z驱领舰_加伤", z1_Zqulingjian_source_info: "当你造成雷属性伤害时，你可以弃置一张“Z”，令此伤害+1。",
+                            z1_Zqulingjian_damage: "Z驱领舰_减伤", z1_Zqulingjian_damage_info: "有其他角色受到雷属性伤害时，你可以弃置一张“Z”，令此伤害-1。",
+                            z1_Zqulingjian_move: "Z驱领舰_移动Z", z1_Zqulingjian_move_info: "准备阶段，你可以移动一张“Z”。",
+
+                            z16_lianhuanbaopo: "连环爆破", z16_lianhuanbaopo_info: "你的黑色【杀】可以当做【雷杀】使用，你的其他黑色牌可以当做【杀】使用或打出，你使用【雷杀】时无距离次数限制防具。",
+                            z16_lianhuanbaopo_sha: "黑牌当杀", z16_lianhuanbaopo_sha_info: "你的黑色牌可以当做【杀】使用或打出",
+                            z16_shuileibuzhi: "水雷布置", z16_shuileibuzhi_info: "当你造成伤害时，你可以将牌堆顶的一张牌置于武将牌上，称为Z。出牌阶段，你可以将一张Z当作兵粮寸断使用。(全局)有Z的角色准备阶段，可以弃置一张Z并弃置判定区内所有与此牌花色相同的牌。",
+                            z16_shuileibuzhi_bingliang: "兵粮寸断", z16_shuileibuzhi_bingliang_info: "出牌阶段，你可以将一张Z当作兵粮寸断使用。",
+                            z18_weisebaoxingdong: "威瑟堡行动", z18_weisebaoxingdong_info: "每回合限一次，你可以将至多两张手牌置于等量角色的武将牌上，称为Z。出牌阶段，你可以移去一张Z，观看一名角色的手牌，然后视为使用一张火攻。(全局)武将牌上有Z的角色出牌阶段使用杀的次数+1；使用与Z中包含类型相同的牌时须弃一张牌(没有则不弃)，然后可以弃置一张与使用的牌相同牌名的Z。",
+                            z18_weisebaoxingdong_huogong: "火攻", z18_weisebaoxingdong_huogong_info: "你可以移去一张Z，观看一名角色的手牌，然后视为使用一张火攻。",
+                            z17_naerweikejingjie: "纳尔维克警戒", z17_naerweikejingjie_info: "出牌阶段，你可以将任意张手牌置于武将牌上，称为Z，然后将一名角色至多等量张手牌置于其武将牌上，也称为Z。(全局)对有Z的角色造成伤害时，可以摸一张牌。",
+                            z21_tuxi: "突袭", z21_tuxi_info: "出牌阶段开始时，你可以选择攻击范围内的一名角色，将其一张牌置于你的武将牌上，称为Z。（全局）若你有Z，你使用牌指定其他角色为目标后，你可以令其随机弃置一张牌，然后移去一张Z",
+                            z22_tuxixiawan: "突袭峡湾", z22_tuxixiawan_info: "出牌阶段开始时，你可以将任意角色一张牌置于自己的武将牌上，称为Z。(全局）其他角色造成伤害后，若你有Z，你可以移去一枚Z，进行一次判定，令当前回合角色不能使用或打出与判定牌花色相同的牌直到回合结束。",
+                            cardsDisabled_color: "不能使用_颜色", cardsDisabled_color_info: "你不能使用或打出对应颜色的手牌。",
+                            matapanjiaozhijian: "马塔潘角之箭", matapanjiaozhijian_info: "你使用锦囊牌指定目标后，你可以弃置任意张牌，令等量目标不可响应此牌。",
+                            zhongbangtuxi: "重磅突袭", zhongbangtuxi_info: "限定技，出牌阶段，你可以弃置任意张红色牌对等量角色各造成一点火焰伤害。",
+                            huangjiahaijunderongyao: "皇家海军的荣耀", huangjiahaijunderongyao_info: "锁定技，你对其他角色造成伤害或受到其他角色的伤害时，你弃置对方的一张牌，若此牌点数小于等于受伤角色的手牌数，此伤害+1",
+                            huangjiaxunyou: "皇家巡游", huangjiaxunyou_info: "锁定技，你计算与其他角色距离-1.",
+                            tianshi: "天使", tianshi_info: "主公技，你的判定牌生效前，E国势力的角色可以打出一张红牌代替之",
+                            tianshi2: "天使2", tianshi2_info: "拥有“天使”的角色判定牌生效前，E国势力的角色可以打出一张红牌代替之",
+                            jishiyu: "及时雨", jishiyu_info: "每回合限三次，若你的体力值全场最少，你的判定牌生效后，你可以获得之。",
+                            jishiyu1: "及时雨", jishiyu1_info: "每回合各限一次，当你需要使用或打出杀时，你可以进行判定，判定结果为黑色则视为你使用或打出了杀。",
+                            yongbuchenmodezhanjian: "永不沉没的战舰", yongbuchenmodezhanjian_info: "主公技，每回合限一次，你有护甲值时，你可以弃置一张牌令受到的伤害-1。",
+                            xiuqi: "修葺", xiuqi_info: "当你发动军辅将牌交给一名其他角色时，你可以令其获得以下效果：你首次造成伤害时，可以回复一点体力。直到其回合结束。",
+                            xiuqi2: "修葺", xiuqi2_info: "每回合限一次，你造成伤害时可以回复一点体力。",
+                            wanbei: "完备", wanbei_info: "锁定技，你获得开幕航空，你的开幕航空无法升级。你的手牌上限+X，X为你发动军辅置于武将牌上的牌的数量",
+                            //iuqi2: "修葺2", xiuqi2_info: "下一次发动开幕航空的技能等级+1",
+                            tiaobangzuozhan: "跳帮作战", tiaobangzuozhan_info: "出牌阶段限一次，你可以视为对一名角色使用决斗。若你以此法造成伤害，你观看其手牌并获得其区域内一张牌；若你因此受到伤害，你令其获得你一张手牌，然后防止此伤害。",
+                            baixiang: "白象", baixiang_info: "锁定技，你无法使用防具牌。当你受到雷属性伤害时，防止之。",
+                            guochuan: "过穿", guochuan_info: "锁定技，你受到伤害时，你可以弃置一张防具牌或失去一点体力防止此伤害。然后你可以选择一名与你距离为一的角色(不能是伤害来源)，令其承受此伤害并摸伤害值张牌。",
+                            zuihouderongyao: "最后的荣耀", zuihouderongyao_info: "锁定技，摸牌阶段开始时，你选择以下一项：1，多摸一张牌且你的攻击范围-1。2，少摸一张牌且你的攻击范围+1。你的攻击范围与手牌上限+X。(X已阵亡角色数)",
+                            '29jienaerxun': "29节纳尔逊", '29jienaerxun_info': "当你本回合内第一次使用“杀”指定目标时，若你的攻击范围大于等于3，此杀不可响应，若你的体力为全场最高时，此杀伤害+1。",
+                            zuihouderongyao_less: "少摸加距离",
+                            zuihouderongyao_more: "多摸减距离",
+                            hongseqiangwei: "红色蔷薇", hongseqiangwei_info: "你使用伤害类牌后，可以将一张手牌置于武将牌上称为[花]。[花]包含对应座次（点数超出游戏人数则减去游戏人数）的角色受到伤害时，你可以弃置一张对应点数的[花]并防止此伤害。",
+                            bujushenfeng: "不惧神风", bujushenfeng_info: "当你受到伤害时，你可以获得造成伤害的牌。你的手牌上限基数为你的体力上限。",
+                            shenfeng: "神风", shenfeng_info: "当你造成或受到一点伤害时，你获得一个“风”标记。",
+                            buju: "不惧", buju_info: "每轮各限一次，你可以移去一个“风”视为使用酒或无懈可击。 以此法使用的无懈可击结算后，你重置[援军]。",
+                            qiangyun: "强运", qiangyun_info: "觉醒技，当你进入濒死时，恢复一点体力。",
+                            yuanjun: "援军", yuanjun_info: "限定技，若你有至少6个“风”标记，你可以移去所有“风”视为使用万箭齐发。",
+                            buju_wuxie: "不惧_无懈", buju_wuxie_disable: "无懈_不可用",
+                            buju_jiu: "不惧_酒", buju_jiu_disable: "酒_不可用",
+                            liaowangtai: "瞭望台", liaowangtai_info: "出牌阶段限一次，你视为对所有攻击范围包括你的角色依次使用一张【火攻】。",
+                            jingruizhuangbei: "精锐装备", jingruizhuangbei_info: "当你装备武器时，你使用射击造成伤害时可以摸一张牌；当你使用射击指定目标时，你可以进行一次判定，若与此“射击”颜色相同，则你可以额外指定一个目标",
+                            jingruizhuangbei_mopai: "精锐装备_摸牌",
+                            jingruizhuangbei_fencha: "精锐装备_分叉",
+                            dananbusi: "大难不死", dananbusi_info: "限定技，当你受到的伤害不小于你当前体力值时，你可以防止之。",
+                            houfu: "后福", houfu_info: "出牌阶段限一次，你可以选择一名其他角色，其选择一项:1视为对你使用一张杀(无距离限制)，2令你从牌堆中获得一张基本牌。",
+                            zhanliexianfuchou: "战列线复仇", zhanliexianfuchou_info: "你造成的伤害+X，X=你本轮成为其他角色伤害类牌目标的次数",
+                            pingduzhanhuo: "平度战火", pingduzhanhuo_info: "结束阶段，若你本回合未造成伤害，你摸一张牌；准备阶段，若你自上个结束阶段起未受到伤害，你摸一张牌",
+                            mujizhengren: "目击证人", mujizhengren_info: "限定技，出牌阶段，你可以弃置3张手牌，然后令一名角色翻面。",
+                            shixiangquanneng: "十项全能", shixiangquanneng_info: "锁定技，你的舰种技能无法升级，每轮开始时，你失去以此法获得的技能，然后从以下技能中选择一项获得：1、防空，2、开幕航空，3、军辅",
+                            pangguanzhe: "旁观者", pangguanzhe_info: "锁定技，你的回合开始时，失去上回合以此法获得的技能，随机获得在场角色武将牌上的一个技能。若该技能带有判定，你可以选择判定结果。(远航，强化，航母，战列，巡洋，驱逐，潜艇，开幕航空，火控雷达，先制鱼雷，十项全能除外;主公技，限定技，使命技，觉醒技除外)",
+                            hangkongyazhi: "航空压制", "hangkongyazhi_info": "限定技，你可以失去开幕航空，令一名角色失去所有护甲且本轮技能失效。",
+                            chuansuohongzha: "穿梭轰炸", "chuansuohongzha_info": "每轮限一次，其他角色使用伤害类牌结算结束后，若你未受伤，你可以获得此牌对应的所有实体牌。每回合限一次，你使用的伤害类牌结算结束后，你可以将其交给一名未受伤角色。",
+                            chuansuohongzha_get: "穿梭轰炸", "chuansuohongzha_get_info": "每轮限一次，其他角色使用伤害类牌结算结束后，若你未受伤，你可以获得此牌对应的所有实体牌。",
+                            chuansuohongzha_send: "穿梭轰炸", "chuansuohongzha_send_info": "每回合限一次，你使用的伤害类牌结算结束后，你可以将其交给一名未受伤角色。",
+                            hangkongyazhi_fengyin: "航空压制_封印",
+                            yuanyangpoxi: "远洋破袭", "yuanyangpoxi_info": "锁定技，你使用锦囊牌对攻击范围内的角色造成伤害+1；你出牌阶段使用杀的次数-1.",
+                            juejingfengsheng: "绝境逢生", juejingfengsheng_info: "锁定技，你的最大耐久增加11。免疫一次致命伤害。",
+                            saqijian: "萨奇剪", "saqijian_info": "你可以将一张黑色牌当无懈可击使用",
+                            jupaohuoli: "巨炮火力", "jupaohuoli_info": "你使用杀造成伤害时，若你手牌数大于目标手牌数，此伤害+1。",
+                            guanjianyiji: "关键一击", "guanjianyiji_info": "每轮限一次，有牌指定目标后，你可以扣置目标的一张牌于武将牌上，此回合结束后再获得之。若此时是你的回合内且指定战列舰为目标，不计入发动次数限制。",
+                            duikongzhiwei: "对空直卫", "duikongzhiwei_info": "每轮限一次，当一名角色使用锦囊牌指定至少两名角色为目标时，你可以弃置一张牌，令此牌对你和距离1的角色无效。",
+                            bigseven: "BIGSEVEN", "bigseven_info": "你使用基本牌和非延时锦囊牌指定唯一目标后，可以进行判定。若结果与使用的牌类型相同，你可以额外指一名角色为目标。(场上每有一名自己以外拥有bigseven的角色，目标+1)",
+                            saobaxing: "扫把星", "saobaxing_info": "锁定技，每回合限一次，当一名角色的判定牌生效前，若判定结果为红色，你须令其重新判定。",
+                            shaojie: "哨戒", "shaojie_info": "锁定技，你无法打出闪响应万箭齐发/近距支援。当你受到万箭齐发/近距支援伤害时，你获得一点护甲。",
+
+                            jianrbiaozhun: "舰r标准",
+                            lishizhanyi: '历史战役',
+                            lishizhanyi_naerweike: '历史战役-纳尔维克',
+                            lishizhanyi_matapanjiao: '历史战役-马塔潘角',
+                            lishizhanyi_danmaihaixia: '历史战役-丹麦海峡',
+                            lishizhanyi_shanhuhai: '历史战役-珊瑚海',
+                            lishizhanyi_haixiafujizhan: '历史战役-海峡伏击战',
+                            weijingzhizhi: '未竟之志',
+                        },
+                    };
+                    if (lib.device || lib.node) {
+                        for (var i in jianrjinji.character) { jianrjinji.character[i][4].push('ext:舰R牌将/image/character/' + i + '.jpg'); }
+                    } else {
+                        for (var i in jianrjinji.character) { jianrjinji.character[i][4].push('db:extension-舰R牌将:image/character/' + i + '.jpg'); }
+                    }//由于以此法加入的武将包武将图片是用源文件的，所以要用此法改变路径。可以多指定x个目标数（x技能强化的次数），
+                    return jianrjinji;
+                });
+                //lib.config.all.characters.push('jianrjinji');//无名杀新版本已弃用。如要兼容旧版本可以重新使用
+                //if (!lib.config.characters.includes('jianrjinji')) lib.config.characters.push('jianrjinji');
+                lib.translate['jianrjinji_character_config'] = '舰R武将';// 包名翻译
+                //卡包（手牌）
+                game.import('card', function () {
+                    var jianrjinjibao = {
+                        name: 'jianrjinjibao',//卡包命名
+                        connect: true,//卡包是否可以联机
+                        card: {
+                            jinjuzy: {
+                                audio: true,
+                                image: 'ext:舰R牌将/jinjuzy.jpg',
+                                type: "trick",
+                                enable: true,
+                                //selectTarget: -1,
+                                selectTarget: [1, Infinity],
+                                reverseOrder: true,
+                                "yingbian_prompt": "当你使用此牌选择目标后，你可为此牌减少一个目标",
+                                "yingbian_tags": ["remove"],
+                                yingbian: function (event) {
+                                    event.yingbian_removeTarget = true;
+                                },
+                                filterTarget: function (card, player, target) {
+                                    return player != target;
+                                },
+                                content: function () {
+                                    "step 0"
+                                    if (typeof event.baseDamage != 'number') event.baseDamage = 1;
+                                    if (event.directHit) event._result = { bool: false };
+                                    else {
+                                        var next = target.chooseToRespond({ name: 'shan' || 'huibi9' });
+                                        next.set('ai', function (card) {
+                                            var evt = _status.event.getParent();
+                                            if (get.damageEffect(evt.target, evt.player, evt.target) >= 0) return 0;
+                                            if (evt.player.hasSkillTag('notricksource')) return 0;
+                                            if (evt.target.hasSkillTag('notrick')) return 0;
+                                            if (evt.target.hasSkillTag('noShan')) {
+                                                return -1;
+                                            }
+                                            return get.order(card);
+                                        });
+                                        next.autochoose = lib.filter.autoRespondShan;
                                     }
-                                }
-                            }
-                        }, card, dialog.videoId, function (target) {
-                            if (target._tempTranslate) return target._tempTranslate;
-                            var name = target.name;
-                            if (lib.translate[name + '_ab']) return lib.translate[name + '_ab'];
-                            return get.translation(name);
-                        }(target), capt);
-                    }
-                    dialog.content.firstChild.innerHTML = capt;
-                    game.addVideo('dialogCapt', null, [dialog.videoId, dialog.content.firstChild.innerHTML]);
-                    game.log(target, '选择了', button.link);
-                    game.delay();
-                },
-                contentAfter: function () {
-                    for (var i = 0; i < ui.dialogs.length; i++) {
-                        if (ui.dialogs[i].videoId == event.preResult) {
-                            var dialog = ui.dialogs[i];
-                            dialog.close();
-                            _status.dieClose.remove(dialog);
-                            if (dialog.buttons.length) {
-                                event.remained = [];
-                                for (var i = 0; i < dialog.buttons.length; i++) {
-                                    event.remained.push(dialog.buttons[i].link);
-                                }
-                                event.trigger('wuguRemained');
-                            }
-                            break;
-                        }
-                    }
-                    game.broadcast(function (id) {
-                        var dialog = get.idDialog(id);
-                        if (dialog) {
-                            dialog.close();
-                            _status.dieClose.remove(dialog);
-                        }
-                    }, event.preResult);
-                    game.addVideo('cardDialog', null, event.preResult); if (!player.countMark('jiakongls')) { player.addMark('jiakongls'); player.chooseUseTarget(true, 'jiakongls') };
-                },
-                ai: {
-                    wuxie: function () {
-                        if (Math.random() < 0.5) return 0;
-                    },
-                    basic: {
-                        order: 10,
-                        useful: 0.5,
-                    },
-                    result: {
-                        target: function (player, target) {
-                            var sorter = (_status.currentPhase || player);
-                            if (get.is.versus()) {
-                                if (target == sorter) return 1.5;
-                                return 1;
-                            }
-                            if (player.hasUnknown(2)) {
-                                return 0;
-                            }
-                            return (3 - get.distance(sorter, target, 'absolute') / game.countPlayer()) * get.attitude(player, target) > 0 ? 0.5 : 0.7;
-                        },
-                    },
-                    tag: {
-                        draw: 1,
-                        multitarget: 1,
-                    },
-                },
-                fullimage: true,
-            },
-            mingzuyq: {
-                image: 'ext:舰R牌将/mingzuyq.jpg',
-                audio: true,
-                mode: ["guozhan"],
-                type: "equip",
-                subtype: "equip5",
-                distance: {
-                    attackFrom: -1,
-                },
-                nomod: true,
-                nopower: true,
-                unique: true,
-                global: "g_dinglanyemingzhu_ai",
-                skills: ["dinglanyemingzhu_skill"],
-                ai: {
-                    equipValue: function (card, player) {
-                        if (player.hasSkill('jubao')) return 8;
-                        if (player.hasSkill('gzzhiheng')) return 6;
-                        if (game.hasPlayer(function (current) {
-                            return current.hasSkill('jubao') && get.attitude(player, current) <= 0;
-                        })) {
-                            return 0;
-                        }
-                        return 7;
-                    },
-                    basic: {
-                        equipValue: 6.5,
-                        order: function (card, player) {
-                            if (player && player.hasSkillTag('reverseEquip')) {
-                                return 8.5 - get.equipValue(card, player) / 20;
-                            }
-                            else {
-                                return 8 + get.equipValue(card, player) / 20;
-                            }
-                        },
-                        useful: 2,
-                        value: function (card, player, index, method) {
-                            if (player.isDisabled(get.subtype(card))) return 0.01;
-                            var value = 0;
-                            var info = get.info(card);
-                            var current = player.getEquip(info.subtype);
-                            if (current && card != current) {
-                                value = get.value(current, player);
-                            }
-                            var equipValue = info.ai.equipValue;
-                            if (equipValue == undefined) {
-                                equipValue = info.ai.basic.equipValue;
-                            }
-                            if (typeof equipValue == 'function') {
-                                if (method == 'raw') return equipValue(card, player);
-                                if (method == 'raw2') return equipValue(card, player) - value;
-                                return Math.max(0.1, equipValue(card, player) - value);
-                            }
-                            if (typeof equipValue != 'number') equipValue = 0;
-                            if (method == 'raw') return equipValue;
-                            if (method == 'raw2') return equipValue - value;
-                            return Math.max(0.1, equipValue - value);
-                        },
-                    },
-                    result: {
-                        target: function (player, target, card) {
-                            return get.equipResult(player, target, card.name);
-                        },
-                    },
-                },
-                enable: true,
-                selectTarget: -1,
-                filterTarget: function (card, player, target) {
-                    return target == player;
-                },
-                modTarget: true,
-                allowMultiple: false,
-                content: function () {
-                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
-                },
-                toself: true,
-                fullimage: true,
-            },
-            hangkongzhan: {
-                audio: "ext:舰R牌将/audio/skill:true",
-                image: 'ext:舰R牌将/hangkongzhan.jpg',
-                type: "equip",
-                subtype: "equip4",
-                distance: {
-                    attackFrom: -1,
-                },
-                ai: {
-                    basic: {
-                        equipValue: 7.5,
-                        order: function (card, player) {
-                            if (player && player.hasSkillTag('reverseEquip')) {
-                                return 8.5 - get.equipValue(card, player) / 20;
-                            }
-                            else {
-                                return 8 + get.equipValue(card, player) / 20;
-                            }
-                        },
-                        useful: 2,
-                        value: function (card, player, index, method) {
-                            if (player.isDisabled(get.subtype(card))) return 0.01;
-                            var value = 0;
-                            var info = get.info(card);
-                            var current = player.getEquip(info.subtype);
-                            if (current && card != current) {
-                                value = get.value(current, player);
-                            }
-                            var equipValue = info.ai.equipValue;
-                            if (equipValue == undefined) {
-                                equipValue = info.ai.basic.equipValue;
-                            }
-                            if (typeof equipValue == 'function') {
-                                if (method == 'raw') return equipValue(card, player);
-                                if (method == 'raw2') return equipValue(card, player) - value;
-                                return Math.max(0.1, equipValue(card, player) - value);
-                            }
-                            if (typeof equipValue != 'number') equipValue = 0;
-                            if (method == 'raw') return equipValue;
-                            if (method == 'raw2') return equipValue - value;
-                            return Math.max(0.1, equipValue - value);
-                        },
-                    },
-                    result: {
-                        target: function (player, target, card) {
-                            return get.equipResult(player, target, card.name);
-                        },
-                    },
-                },
-                skills: ["hangmucv"],
-                enable: true,
-                selectTarget: -1,
-                filterTarget: function (card, player, target) {
-                    return target == player;
-                },
-                modTarget: true,
-                allowMultiple: false,
-                content: function () {
-                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
-                },
-                toself: true,
-                fullimage: true,
-            },
-            paohuozb: {
-                image: 'ext:舰R牌将/paohuozb.png',
-                type: "equip",
-                subtype: "equip1",
-                distance: {
-                    attackFrom: -2,
-                },
-                ai: {
-                    basic: {
-                        equipValue: 2,
-                        order: function (card, player) {
-                            if (player.hp > 2) return true
-                            if (player && player.hasSkillTag('reverseEquip')) {
-                                return 2.5 - get.equipValue(card, player) / 20;
-                            }
-                            else {
-                                return 0 + get.equipValue(card, player) / 20;
-                            }
-                        },
-                        useful: 2,
-                        value: function (card, player, index, method) {
-                            if (player.hp < 2 || player.countCards('h', 'sha') < 1 || !player.canUse('sha', player)) return 0.01
-                            if (player.isDisabled(get.subtype(card))) return 0.01;
-                            var value = 0;
-                            var info = get.info(card);
-                            var current = player.getEquip(info.subtype);
-                            if (current && card != current) {
-                                value = get.value(current, player);
-                            }
-                            var equipValue = info.ai.equipValue;
-                            if (equipValue == undefined) {
-                                equipValue = info.ai.basic.equipValue;
-                            }
-                            if (typeof equipValue == 'function') {
-                                if (method == 'raw') return equipValue(card, player);
-                                if (method == 'raw2') return equipValue(card, player) - value;
-                                return Math.max(0.1, equipValue(card, player) - value);
-                            }
-                            if (typeof equipValue != 'number') equipValue = 0;
-                            if (method == 'raw') return equipValue;
-                            if (method == 'raw2') return equipValue - value;
-                            return Math.max(0.1, equipValue - value);
-                        },
-                    },
-                    result: {
-                        target: function (player, target, card) {
-                            return get.equipResult(player, target, card.name);
-                        },
-                    },
-                },
-                skills: ["paohuozb_skill", "danzong"],
-                enable: true,
-                selectTarget: -1,
-                filterTarget: function (card, player, target) {
-                    return target == player;
-                },
-                modTarget: false,
-                allowMultiple: false,
-                content: function () {
-                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
-                },
-                toself: true,
-                fullskin: true,
-            },
-            xingyun: {
-                image: 'ext:舰R牌将/xingyun.png',
-                type: "equip",
-                subtype: "equip3",
-                ai: {
-                    basic: {
-                        equipValue: 7.5,
-                        order: function (card, player) {
-                            if (player && player.hasSkillTag('reverseEquip')) {
-                                return 8.5 - get.equipValue(card, player) / 20;
-                            }
-                            else {
-                                return 8 + get.equipValue(card, player) / 20;
-                            }
-                        },
-                        useful: 2,
-                        value: function (card, player, index, method) {
-                            if (player.isDisabled(get.subtype(card))) return 0.01;
-                            var value = 0;
-                            var info = get.info(card);
-                            var current = player.getEquip(info.subtype);
-                            if (current && card != current) {
-                                value = get.value(current, player);
-                            }
-                            var equipValue = info.ai.equipValue;
-                            if (equipValue == undefined) {
-                                equipValue = info.ai.basic.equipValue;
-                            }
-                            if (typeof equipValue == 'function') {
-                                if (method == 'raw') return equipValue(card, player);
-                                if (method == 'raw2') return equipValue(card, player) - value;
-                                return Math.max(0.1, equipValue(card, player) - value);
-                            }
-                            if (typeof equipValue != 'number') equipValue = 0;
-                            if (method == 'raw') return equipValue;
-                            if (method == 'raw2') return equipValue - value;
-                            return Math.max(0.1, equipValue - value);
-                        },
-                    },
-                    result: {
-                        target: function (player, target, card) {
-                            return get.equipResult(player, target, card.name);
-                        },
-                    },
-                },
-                skills: ["dajiaoduguibi"],
-                enable: true,
-                selectTarget: -1,
-                filterTarget: function (card, player, target) {
-                    return target == player;
-                },
-                modTarget: false,
-                allowMultiple: false,
-                content: function () {
-                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
-                },
-                toself: false,
-                fullskin: true,
-            },
-            lianxugongji: {
-                image: 'ext:舰R牌将/yishichuanjiadan.jpg',
-                type: "basic",
-                enable: true,
-                selectTarget: 1,
-                filter: function (event, player) { return player.canUse('sha'); },
-                filterTarget: function (card, player, target) { return target != player && player.canUse('sha', target); },
-                content: function () {
-                    'step 0'
-                    /*event.num = 0;
-                    'step 1'
-                    game.log("event.num" + event.num);
-                    event.num++;*/
-                    /*var choice = 'liutouge';
-                    player.chooseVCardButton('选择一张牌视为使用之', ['sha', 'sha', 'sha']).set('ai', function (button) {
-                        if (button.link[2] == _status.event.choice) return 2;
-                        return Math.random();
-                    }).set('choice', choice).set('filterButton', function (button) {
-                        return _status.event.player.hasUseTarget(button.link[2]);
-                    });*/
-                    player.useCard({ name: 'sha' }, target, true);
-                    player.useCard({ name: 'sha' }, target, true);
-                    /*player.chooseUseTarget({
-                        name: 'sha',
-                        isCard: true,
-                    }, '请选择【杀】的目标（' + (event.num == 2 ? '2' : event.num) + '/2）', false);*/
+                                    "step 1"
+                                    if (result.bool == false) {
+                                        if (target.getEquip(2) != 'tengjia') target.damage(event.baseDamage);
+                                    }
+                                },
+                                ai: {
 
-                    /*'step 2'
-                    if (result.bool && event.num < 2) event.goto(1);
-                    else {
-                        event.finish();
-                    }*/
-                },
-                ai: {
-                    order: 5,
-                    result: {
-                        player: 1,
-                    },
-                },
-                fullimage: true,
-            },
-            "quzhupao3": {
-                image: 'ext:舰R牌将/quzhupao3.png',
-                fullskin: true,
-                type: "equip",
-                subtype: "equip1",
-                distance: {
-                    attackFrom: -1,
-                },
-                ai: {
-                    basic: {
-                        equipValue: 2.5,
-                        order: function (card, player) {
-                            if (player && player.hasSkillTag('reverseEquip')) {
-                                return 8.5 - get.equipValue(card, player) / 20;
-                            }
-                            else {
-                                return 8 + get.equipValue(card, player) / 20;
-                            }
+                                    wuxie: function (target, card, player, viewer) {
+                                        if (get.attitude(viewer, target) > 0 && target.countCards('h', 'shan')) {
+                                            if (!target.countCards('h') || target.hp == 1 || Math.random() < 0.7) return 0;
+                                        }
+                                    },
+                                    basic: {
+                                        order: 9,
+                                        useful: 1,
+                                        value: 7,
+                                    },
+                                    result: {
+                                        player(player, target) {
+                                            var att = get.attitude(player, target);
+                                            if (att > 0) return 0;
+                                            return 1;
+                                        },
+                                        "target_use": function (player, target) {
+                                            if (player.hasUnknown(2) && get.mode() != 'guozhan') return 0;
+                                            var nh = target.countCards('h');
+                                            if (get.mode() == 'identity') {
+                                                if (target.isZhu && nh <= 2 && target.hp <= 1) return -100;
+                                            }
+                                            if (nh == 0) return -2;
+                                            if (nh == 1) return -1.7
+                                            return -1.5;
+                                        },
+                                        target: function (player, target) {
+                                            var nh = target.countCards('h');
+                                            if (get.mode() == 'identity') {
+                                                if (target.isZhu && nh <= 2 && target.hp <= 1) return -100;
+                                            }
+                                            if (nh == 0) return -2;
+                                            if (nh == 1) return -1.7
+                                            return -1.5;
+                                        },
+                                    },
+                                    tag: {
+                                        respond: 1,
+                                        respondShan: 1,
+                                        damage: 1,
+                                        multitarget: 1,
+                                        multineg: 1,
+                                    },
+                                },
+                                fullimage: true,
+                            },
+                            jiakongls: {
+                                image: 'ext:舰R牌将/jiakongls.jpg',
+                                audio: true,
+                                type: "trick",
+                                enable: true,
+                                cardcolor: "red",
+                                selectTarget: -1,
+                                filterTarget: true,
+                                contentBefore: function () {
+                                    "step 0"
+                                    if (!targets.length) {
+                                        event.finish();
+                                        return;
+                                    }
+                                    if (get.is.versus()) {
+                                        player.chooseControl('顺时针', '逆时针', function (event, player) {
+                                            if (player.next.side == player.side) return '逆时针';
+                                            return '顺时针';
+                                        }).set('prompt', '选择' + get.translation(card) + '的结算方向');
+                                    }
+                                    else {
+                                        event.goto(2);
+                                    }
+                                    "step 1"
+                                    if (result && result.control == '顺时针') {
+                                        var evt = event.getParent(), sorter = (_status.currentPhase || player);
+                                        evt.fixedSeat = true;
+                                        evt.targets.sortBySeat(sorter);
+                                        evt.targets.reverse();
+                                        if (evt.targets[evt.targets.length - 1] == sorter) {
+                                            evt.targets.unshift(evt.targets.pop());
+                                        }
+                                    }
+                                    "step 2"
+                                    ui.clear();
+                                    var num;
+                                    if (event.targets) {
+                                        num = Math.floor(event.targets.length * 1.5);
+                                    }
+                                    else {
+                                        num = game.countPlayer() * 2;
+                                    }
+                                    var cards = get.cards(num);
+                                    game.cardsGotoOrdering(cards).relatedEvent = event.getParent();
+                                    var dialog = ui.create.dialog('五谷丰登', cards, true);
+                                    _status.dieClose.push(dialog);
+                                    dialog.videoId = lib.status.videoId++;
+                                    game.addVideo('cardDialog', null, ['五谷丰登', get.cardsInfo(cards), dialog.videoId]);
+                                    event.getParent().preResult = dialog.videoId;
+                                    game.broadcast(function (cards, id) {
+                                        var dialog = ui.create.dialog('五谷丰登', cards, true);
+                                        _status.dieClose.push(dialog);
+                                        dialog.videoId = id;
+                                    }, cards, dialog.videoId);
+                                    game.log(event.card, '亮出了', cards);
+                                },
+                                content: function () {
+                                    "step 0"
+                                    for (var i = 0; i < ui.dialogs.length; i++) {
+                                        if (ui.dialogs[i].videoId == event.preResult) {
+                                            event.dialog = ui.dialogs[i]; break;
+                                        }
+                                    }
+                                    if (!event.dialog) {
+                                        event.finish();
+                                        return;
+                                    }
+                                    if (event.dialog.buttons.length > 1) {
+                                        var next = target.chooseButton(true, function (button) {
+                                            return get.value(button.link, _status.event.player);
+                                        });
+                                        next.set('dialog', event.preResult);
+                                        next.set('closeDialog', false);
+                                        next.set('dialogdisplay', true);
+                                    }
+                                    else {
+                                        event.directButton = event.dialog.buttons[0];
+                                    }
+                                    "step 1"
+                                    var dialog = event.dialog;
+                                    var card;
+                                    if (event.directButton) {
+                                        card = event.directButton.link;
+                                    }
+                                    else {
+                                        for (var i of dialog.buttons) {
+                                            if (i.link == result.links[0]) {
+                                                card = i.link;
+                                                break;
+                                            }
+                                        }
+                                        if (!card) card = event.dialog.buttons[0].link;
+                                    }
+
+                                    var button;
+                                    for (var i = 0; i < dialog.buttons.length; i++) {
+                                        if (dialog.buttons[i].link == card) {
+                                            button = dialog.buttons[i];
+                                            button.querySelector('.info').innerHTML = function (target) {
+                                                if (target._tempTranslate) return target._tempTranslate;
+                                                var name = target.name;
+                                                if (lib.translate[name + '_ab']) return lib.translate[name + '_ab'];
+                                                return get.translation(name);
+                                            }(target);
+                                            dialog.buttons.remove(button);
+                                            break;
+                                        }
+                                    }
+                                    var capt = get.translation(target) + '选择了' + get.translation(button.link);
+                                    if (card) {
+                                        target.gain(card, 'visible');
+                                        target.$gain2(card);
+                                        game.broadcast(function (card, id, name, capt) {
+                                            var dialog = get.idDialog(id);
+                                            if (dialog) {
+                                                dialog.content.firstChild.innerHTML = capt;
+                                                for (var i = 0; i < dialog.buttons.length; i++) {
+                                                    if (dialog.buttons[i].link == card) {
+                                                        dialog.buttons[i].querySelector('.info').innerHTML = name;
+                                                        dialog.buttons.splice(i--, 1);
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }, card, dialog.videoId, function (target) {
+                                            if (target._tempTranslate) return target._tempTranslate;
+                                            var name = target.name;
+                                            if (lib.translate[name + '_ab']) return lib.translate[name + '_ab'];
+                                            return get.translation(name);
+                                        }(target), capt);
+                                    }
+                                    dialog.content.firstChild.innerHTML = capt;
+                                    game.addVideo('dialogCapt', null, [dialog.videoId, dialog.content.firstChild.innerHTML]);
+                                    game.log(target, '选择了', button.link);
+                                    game.delay();
+                                },
+                                contentAfter: function () {
+                                    for (var i = 0; i < ui.dialogs.length; i++) {
+                                        if (ui.dialogs[i].videoId == event.preResult) {
+                                            var dialog = ui.dialogs[i];
+                                            dialog.close();
+                                            _status.dieClose.remove(dialog);
+                                            if (dialog.buttons.length) {
+                                                event.remained = [];
+                                                for (var i = 0; i < dialog.buttons.length; i++) {
+                                                    event.remained.push(dialog.buttons[i].link);
+                                                }
+                                                event.trigger('wuguRemained');
+                                            }
+                                            break;
+                                        }
+                                    }
+                                    game.broadcast(function (id) {
+                                        var dialog = get.idDialog(id);
+                                        if (dialog) {
+                                            dialog.close();
+                                            _status.dieClose.remove(dialog);
+                                        }
+                                    }, event.preResult);
+                                    game.addVideo('cardDialog', null, event.preResult); if (!player.countMark('jiakongls')) { player.addMark('jiakongls'); player.chooseUseTarget(true, 'jiakongls') };
+                                },
+                                ai: {
+                                    wuxie: function () {
+                                        if (Math.random() < 0.5) return 0;
+                                    },
+                                    basic: {
+                                        order: 10,
+                                        useful: 0.5,
+                                    },
+                                    result: {
+                                        target: function (player, target) {
+                                            var sorter = (_status.currentPhase || player);
+                                            if (get.is.versus()) {
+                                                if (target == sorter) return 1.5;
+                                                return 1;
+                                            }
+                                            if (player.hasUnknown(2)) {
+                                                return 0;
+                                            }
+                                            return (3 - get.distance(sorter, target, 'absolute') / game.countPlayer()) * get.attitude(player, target) > 0 ? 0.5 : 0.7;
+                                        },
+                                    },
+                                    tag: {
+                                        draw: 1,
+                                        multitarget: 1,
+                                    },
+                                },
+                                fullimage: true,
+                            },
+                            mingzuyq: {
+                                image: 'ext:舰R牌将/mingzuyq.jpg',
+                                audio: true,
+                                mode: ["guozhan"],
+                                type: "equip",
+                                subtype: "equip5",
+                                distance: {
+                                    attackFrom: -1,
+                                },
+                                nomod: true,
+                                nopower: true,
+                                unique: true,
+                                global: "g_dinglanyemingzhu_ai",
+                                skills: ["dinglanyemingzhu_skill"],
+                                ai: {
+                                    equipValue: function (card, player) {
+                                        if (player.hasSkill('jubao')) return 8;
+                                        if (player.hasSkill('gzzhiheng')) return 6;
+                                        if (game.hasPlayer(function (current) {
+                                            return current.hasSkill('jubao') && get.attitude(player, current) <= 0;
+                                        })) {
+                                            return 0;
+                                        }
+                                        return 7;
+                                    },
+                                    basic: {
+                                        equipValue: 6.5,
+                                        order: function (card, player) {
+                                            if (player && player.hasSkillTag('reverseEquip')) {
+                                                return 8.5 - get.equipValue(card, player) / 20;
+                                            }
+                                            else {
+                                                return 8 + get.equipValue(card, player) / 20;
+                                            }
+                                        },
+                                        useful: 2,
+                                        value: function (card, player, index, method) {
+                                            if (player.isDisabled(get.subtype(card))) return 0.01;
+                                            var value = 0;
+                                            var info = get.info(card);
+                                            var current = player.getEquip(info.subtype);
+                                            if (current && card != current) {
+                                                value = get.value(current, player);
+                                            }
+                                            var equipValue = info.ai.equipValue;
+                                            if (equipValue == undefined) {
+                                                equipValue = info.ai.basic.equipValue;
+                                            }
+                                            if (typeof equipValue == 'function') {
+                                                if (method == 'raw') return equipValue(card, player);
+                                                if (method == 'raw2') return equipValue(card, player) - value;
+                                                return Math.max(0.1, equipValue(card, player) - value);
+                                            }
+                                            if (typeof equipValue != 'number') equipValue = 0;
+                                            if (method == 'raw') return equipValue;
+                                            if (method == 'raw2') return equipValue - value;
+                                            return Math.max(0.1, equipValue - value);
+                                        },
+                                    },
+                                    result: {
+                                        target: function (player, target, card) {
+                                            return get.equipResult(player, target, card.name);
+                                        },
+                                    },
+                                },
+                                enable: true,
+                                selectTarget: -1,
+                                filterTarget: function (card, player, target) {
+                                    return target == player;
+                                },
+                                modTarget: true,
+                                allowMultiple: false,
+                                content: function () {
+                                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
+                                },
+                                toself: true,
+                                fullimage: true,
+                            },
+                            hangkongzhan: {
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                image: 'ext:舰R牌将/hangkongzhan.jpg',
+                                type: "equip",
+                                subtype: "equip4",
+                                distance: {
+                                    attackFrom: -1,
+                                },
+                                ai: {
+                                    basic: {
+                                        equipValue: 7.5,
+                                        order: function (card, player) {
+                                            if (player && player.hasSkillTag('reverseEquip')) {
+                                                return 8.5 - get.equipValue(card, player) / 20;
+                                            }
+                                            else {
+                                                return 8 + get.equipValue(card, player) / 20;
+                                            }
+                                        },
+                                        useful: 2,
+                                        value: function (card, player, index, method) {
+                                            if (player.isDisabled(get.subtype(card))) return 0.01;
+                                            var value = 0;
+                                            var info = get.info(card);
+                                            var current = player.getEquip(info.subtype);
+                                            if (current && card != current) {
+                                                value = get.value(current, player);
+                                            }
+                                            var equipValue = info.ai.equipValue;
+                                            if (equipValue == undefined) {
+                                                equipValue = info.ai.basic.equipValue;
+                                            }
+                                            if (typeof equipValue == 'function') {
+                                                if (method == 'raw') return equipValue(card, player);
+                                                if (method == 'raw2') return equipValue(card, player) - value;
+                                                return Math.max(0.1, equipValue(card, player) - value);
+                                            }
+                                            if (typeof equipValue != 'number') equipValue = 0;
+                                            if (method == 'raw') return equipValue;
+                                            if (method == 'raw2') return equipValue - value;
+                                            return Math.max(0.1, equipValue - value);
+                                        },
+                                    },
+                                    result: {
+                                        target: function (player, target, card) {
+                                            return get.equipResult(player, target, card.name);
+                                        },
+                                    },
+                                },
+                                skills: ["hangmucv"],
+                                enable: true,
+                                selectTarget: -1,
+                                filterTarget: function (card, player, target) {
+                                    return target == player;
+                                },
+                                modTarget: true,
+                                allowMultiple: false,
+                                content: function () {
+                                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
+                                },
+                                toself: true,
+                                fullimage: true,
+                            },
+                            paohuozb: {
+                                image: 'ext:舰R牌将/paohuozb.png',
+                                type: "equip",
+                                subtype: "equip1",
+                                distance: {
+                                    attackFrom: -2,
+                                },
+                                ai: {
+                                    basic: {
+                                        equipValue: 2,
+                                        order: function (card, player) {
+                                            if (player.hp > 2) return true
+                                            if (player && player.hasSkillTag('reverseEquip')) {
+                                                return 2.5 - get.equipValue(card, player) / 20;
+                                            }
+                                            else {
+                                                return 0 + get.equipValue(card, player) / 20;
+                                            }
+                                        },
+                                        useful: 2,
+                                        value: function (card, player, index, method) {
+                                            if (player.hp < 2 || player.countCards('h', 'sha') < 1 || !player.canUse('sha', player)) return 0.01
+                                            if (player.isDisabled(get.subtype(card))) return 0.01;
+                                            var value = 0;
+                                            var info = get.info(card);
+                                            var current = player.getEquip(info.subtype);
+                                            if (current && card != current) {
+                                                value = get.value(current, player);
+                                            }
+                                            var equipValue = info.ai.equipValue;
+                                            if (equipValue == undefined) {
+                                                equipValue = info.ai.basic.equipValue;
+                                            }
+                                            if (typeof equipValue == 'function') {
+                                                if (method == 'raw') return equipValue(card, player);
+                                                if (method == 'raw2') return equipValue(card, player) - value;
+                                                return Math.max(0.1, equipValue(card, player) - value);
+                                            }
+                                            if (typeof equipValue != 'number') equipValue = 0;
+                                            if (method == 'raw') return equipValue;
+                                            if (method == 'raw2') return equipValue - value;
+                                            return Math.max(0.1, equipValue - value);
+                                        },
+                                    },
+                                    result: {
+                                        target: function (player, target, card) {
+                                            return get.equipResult(player, target, card.name);
+                                        },
+                                    },
+                                },
+                                skills: ["paohuozb_skill", "danzong"],
+                                enable: true,
+                                selectTarget: -1,
+                                filterTarget: function (card, player, target) {
+                                    return target == player;
+                                },
+                                modTarget: false,
+                                allowMultiple: false,
+                                content: function () {
+                                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
+                                },
+                                toself: true,
+                                fullskin: true,
+                            },
+                            xingyun: {
+                                image: 'ext:舰R牌将/xingyun.png',
+                                type: "equip",
+                                subtype: "equip3",
+                                ai: {
+                                    basic: {
+                                        equipValue: 7.5,
+                                        order: function (card, player) {
+                                            if (player && player.hasSkillTag('reverseEquip')) {
+                                                return 8.5 - get.equipValue(card, player) / 20;
+                                            }
+                                            else {
+                                                return 8 + get.equipValue(card, player) / 20;
+                                            }
+                                        },
+                                        useful: 2,
+                                        value: function (card, player, index, method) {
+                                            if (player.isDisabled(get.subtype(card))) return 0.01;
+                                            var value = 0;
+                                            var info = get.info(card);
+                                            var current = player.getEquip(info.subtype);
+                                            if (current && card != current) {
+                                                value = get.value(current, player);
+                                            }
+                                            var equipValue = info.ai.equipValue;
+                                            if (equipValue == undefined) {
+                                                equipValue = info.ai.basic.equipValue;
+                                            }
+                                            if (typeof equipValue == 'function') {
+                                                if (method == 'raw') return equipValue(card, player);
+                                                if (method == 'raw2') return equipValue(card, player) - value;
+                                                return Math.max(0.1, equipValue(card, player) - value);
+                                            }
+                                            if (typeof equipValue != 'number') equipValue = 0;
+                                            if (method == 'raw') return equipValue;
+                                            if (method == 'raw2') return equipValue - value;
+                                            return Math.max(0.1, equipValue - value);
+                                        },
+                                    },
+                                    result: {
+                                        target: function (player, target, card) {
+                                            return get.equipResult(player, target, card.name);
+                                        },
+                                    },
+                                },
+                                skills: ["dajiaoduguibi"],
+                                enable: true,
+                                selectTarget: -1,
+                                filterTarget: function (card, player, target) {
+                                    return target == player;
+                                },
+                                modTarget: false,
+                                allowMultiple: false,
+                                content: function () {
+                                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
+                                },
+                                toself: false,
+                                fullskin: true,
+                            },
+                            lianxugongji: {
+                                image: 'ext:舰R牌将/yishichuanjiadan.jpg',
+                                type: "basic",
+                                enable: true,
+                                selectTarget: 1,
+                                filter: function (event, player) { return player.canUse('sha'); },
+                                filterTarget: function (card, player, target) { return target != player && player.canUse('sha', target); },
+                                content: function () {
+                                    'step 0'
+                                    /*event.num = 0;
+                                    'step 1'
+                                    game.log("event.num" + event.num);
+                                    event.num++;*/
+                                    /*var choice = 'liutouge';
+                                    player.chooseVCardButton('选择一张牌视为使用之', ['sha', 'sha', 'sha']).set('ai', function (button) {
+                                        if (button.link[2] == _status.event.choice) return 2;
+                                        return Math.random();
+                                    }).set('choice', choice).set('filterButton', function (button) {
+                                        return _status.event.player.hasUseTarget(button.link[2]);
+                                    });*/
+                                    player.useCard({ name: 'sha' }, target, true);
+                                    player.useCard({ name: 'sha' }, target, true);
+                                    /*player.chooseUseTarget({
+                                        name: 'sha',
+                                        isCard: true,
+                                    }, '请选择【杀】的目标（' + (event.num == 2 ? '2' : event.num) + '/2）', false);*/
+
+                                    /*'step 2'
+                                    if (result.bool && event.num < 2) event.goto(1);
+                                    else {
+                                        event.finish();
+                                    }*/
+                                },
+                                ai: {
+                                    order: 5,
+                                    result: {
+                                        player: 1,
+                                    },
+                                },
+                                fullimage: true,
+                            },
+                            "quzhupao3": {
+                                image: 'ext:舰R牌将/quzhupao3.png',
+                                fullskin: true,
+                                type: "equip",
+                                subtype: "equip1",
+                                distance: {
+                                    attackFrom: -1,
+                                },
+                                ai: {
+                                    basic: {
+                                        equipValue: 2.5,
+                                        order: function (card, player) {
+                                            if (player && player.hasSkillTag('reverseEquip')) {
+                                                return 8.5 - get.equipValue(card, player) / 20;
+                                            }
+                                            else {
+                                                return 8 + get.equipValue(card, player) / 20;
+                                            }
+                                        },
+                                        useful: 2,
+                                        value: function (card, player, index, method) {
+                                            if (player.isDisabled(get.subtype(card))) return 0.01;
+                                            var value = 0;
+                                            var info = get.info(card);
+                                            var current = player.getEquip(info.subtype);
+                                            if (current && card != current) {
+                                                value = get.value(current, player);
+                                            }
+                                            var equipValue = info.ai.equipValue;
+                                            if (equipValue == undefined) {
+                                                equipValue = info.ai.basic.equipValue;
+                                            }
+                                            if (typeof equipValue == 'function') {
+                                                if (method == 'raw') return equipValue(card, player);
+                                                if (method == 'raw2') return equipValue(card, player) - value;
+                                                return Math.max(0.1, equipValue(card, player) - value);
+                                            }
+                                            if (typeof equipValue != 'number') equipValue = 0;
+                                            if (method == 'raw') return equipValue;
+                                            if (method == 'raw2') return equipValue - value;
+                                            return Math.max(0.1, equipValue - value);
+                                        },
+                                    },
+                                    result: {
+                                        target: function (player, target, card) {
+                                            return get.equipResult(player, target, card.name);
+                                        },
+                                    },
+                                },
+                                skills: [],
+                                enable: true,
+                                selectTarget: -1,
+                                filterTarget: function (card, player, target) {
+                                    return target == player;
+                                },
+                                modTarget: true,
+                                allowMultiple: false,
+                                content: function () {
+                                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
+                                },
+                                toself: true,
+                            },
+                            "qingxunpao3": {
+                                image: 'ext:舰R牌将/qingxunpao3.png',
+                                fullskin: true,
+                                type: "equip",
+                                subtype: "equip1",
+                                distance: {
+                                    attackFrom: -1,
+                                },
+                                ai: {
+                                    basic: {
+                                        equipValue: 2.5,
+                                        order: function (card, player) {
+                                            if (player && player.hasSkillTag('reverseEquip')) {
+                                                return 8.5 - get.equipValue(card, player) / 20;
+                                            }
+                                            else {
+                                                return 8 + get.equipValue(card, player) / 20;
+                                            }
+                                        },
+                                        useful: 2,
+                                        value: function (card, player, index, method) {
+                                            if (player.isDisabled(get.subtype(card))) return 0.01;
+                                            var value = 0;
+                                            var info = get.info(card);
+                                            var current = player.getEquip(info.subtype);
+                                            if (current && card != current) {
+                                                value = get.value(current, player);
+                                            }
+                                            var equipValue = info.ai.equipValue;
+                                            if (equipValue == undefined) {
+                                                equipValue = info.ai.basic.equipValue;
+                                            }
+                                            if (typeof equipValue == 'function') {
+                                                if (method == 'raw') return equipValue(card, player);
+                                                if (method == 'raw2') return equipValue(card, player) - value;
+                                                return Math.max(0.1, equipValue(card, player) - value);
+                                            }
+                                            if (typeof equipValue != 'number') equipValue = 0;
+                                            if (method == 'raw') return equipValue;
+                                            if (method == 'raw2') return equipValue - value;
+                                            return Math.max(0.1, equipValue - value);
+                                        },
+                                    },
+                                    result: {
+                                        target: function (player, target, card) {
+                                            return get.equipResult(player, target, card.name);
+                                        },
+                                    },
+                                },
+                                skills: [],
+                                enable: true,
+                                selectTarget: -1,
+                                filterTarget: function (card, player, target) {
+                                    return target == player;
+                                },
+                                modTarget: true,
+                                allowMultiple: false,
+                                content: function () {
+                                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
+                                },
+                                toself: true,
+                            },
+                            "zhongxunpao3": {
+                                image: 'ext:舰R牌将/zhongxunpao3.png',
+                                fullskin: true,
+                                type: "equip",
+                                subtype: "equip1",
+                                distance: {
+                                    attackFrom: -1,
+                                },
+                                ai: {
+                                    basic: {
+                                        equipValue: 2.5,
+                                        order: function (card, player) {
+                                            if (player && player.hasSkillTag('reverseEquip')) {
+                                                return 8.5 - get.equipValue(card, player) / 20;
+                                            }
+                                            else {
+                                                return 8 + get.equipValue(card, player) / 20;
+                                            }
+                                        },
+                                        useful: 2,
+                                        value: function (card, player, index, method) {
+                                            if (player.isDisabled(get.subtype(card))) return 0.01;
+                                            var value = 0;
+                                            var info = get.info(card);
+                                            var current = player.getEquip(info.subtype);
+                                            if (current && card != current) {
+                                                value = get.value(current, player);
+                                            }
+                                            var equipValue = info.ai.equipValue;
+                                            if (equipValue == undefined) {
+                                                equipValue = info.ai.basic.equipValue;
+                                            }
+                                            if (typeof equipValue == 'function') {
+                                                if (method == 'raw') return equipValue(card, player);
+                                                if (method == 'raw2') return equipValue(card, player) - value;
+                                                return Math.max(0.1, equipValue(card, player) - value);
+                                            }
+                                            if (typeof equipValue != 'number') equipValue = 0;
+                                            if (method == 'raw') return equipValue;
+                                            if (method == 'raw2') return equipValue - value;
+                                            return Math.max(0.1, equipValue - value);
+                                        },
+                                    },
+                                    result: {
+                                        target: function (player, target, card) {
+                                            return get.equipResult(player, target, card.name);
+                                        },
+                                    },
+                                },
+                                skills: [],
+                                enable: true,
+                                selectTarget: -1,
+                                filterTarget: function (card, player, target) {
+                                    return target == player;
+                                },
+                                modTarget: true,
+                                allowMultiple: false,
+                                content: function () {
+                                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
+                                },
+                                toself: true,
+                            },
+                            "zhanliepao3": {
+                                image: 'ext:舰R牌将/zhanliepao3.png',
+                                fullskin: true,
+                                type: "equip",
+                                subtype: "equip1",
+                                distance: {
+                                    attackFrom: -1,
+                                },
+                                ai: {
+                                    basic: {
+                                        equipValue: 2.5,
+                                        order: function (card, player) {
+                                            if (player && player.hasSkillTag('reverseEquip')) {
+                                                return 8.5 - get.equipValue(card, player) / 20;
+                                            }
+                                            else {
+                                                return 8 + get.equipValue(card, player) / 20;
+                                            }
+                                        },
+                                        useful: 2,
+                                        value: function (card, player, index, method) {
+                                            if (player.isDisabled(get.subtype(card))) return 0.01;
+                                            var value = 0;
+                                            var info = get.info(card);
+                                            var current = player.getEquip(info.subtype);
+                                            if (current && card != current) {
+                                                value = get.value(current, player);
+                                            }
+                                            var equipValue = info.ai.equipValue;
+                                            if (equipValue == undefined) {
+                                                equipValue = info.ai.basic.equipValue;
+                                            }
+                                            if (typeof equipValue == 'function') {
+                                                if (method == 'raw') return equipValue(card, player);
+                                                if (method == 'raw2') return equipValue(card, player) - value;
+                                                return Math.max(0.1, equipValue(card, player) - value);
+                                            }
+                                            if (typeof equipValue != 'number') equipValue = 0;
+                                            if (method == 'raw') return equipValue;
+                                            if (method == 'raw2') return equipValue - value;
+                                            return Math.max(0.1, equipValue - value);
+                                        },
+                                    },
+                                    result: {
+                                        target: function (player, target, card) {
+                                            return get.equipResult(player, target, card.name);
+                                        },
+                                    },
+                                },
+                                skills: [],
+                                enable: true,
+                                selectTarget: -1,
+                                filterTarget: function (card, player, target) {
+                                    return target == player;
+                                },
+                                modTarget: true,
+                                allowMultiple: false,
+                                content: function () {
+                                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
+                                },
+                                toself: true,
+                            },
+                            "zhandouji3": {
+                                image: 'ext:舰R牌将/zhandouji3.png',
+                                fullskin: true,
+                                type: "equip",
+                                subtype: "equip1",
+                                distance: {
+                                    attackFrom: -1,
+                                },
+                                ai: {
+                                    basic: {
+                                        equipValue: 2.5,
+                                        order: function (card, player) {
+                                            if (player && player.hasSkillTag('reverseEquip')) {
+                                                return 8.5 - get.equipValue(card, player) / 20;
+                                            }
+                                            else {
+                                                return 8 + get.equipValue(card, player) / 20;
+                                            }
+                                        },
+                                        useful: 2,
+                                        value: function (card, player, index, method) {
+                                            if (player.isDisabled(get.subtype(card))) return 0.01;
+                                            var value = 0;
+                                            var info = get.info(card);
+                                            var current = player.getEquip(info.subtype);
+                                            if (current && card != current) {
+                                                value = get.value(current, player);
+                                            }
+                                            var equipValue = info.ai.equipValue;
+                                            if (equipValue == undefined) {
+                                                equipValue = info.ai.basic.equipValue;
+                                            }
+                                            if (typeof equipValue == 'function') {
+                                                if (method == 'raw') return equipValue(card, player);
+                                                if (method == 'raw2') return equipValue(card, player) - value;
+                                                return Math.max(0.1, equipValue(card, player) - value);
+                                            }
+                                            if (typeof equipValue != 'number') equipValue = 0;
+                                            if (method == 'raw') return equipValue;
+                                            if (method == 'raw2') return equipValue - value;
+                                            return Math.max(0.1, equipValue - value);
+                                        },
+                                    },
+                                    result: {
+                                        target: function (player, target, card) {
+                                            return get.equipResult(player, target, card.name);
+                                        },
+                                    },
+                                },
+                                skills: [],
+                                enable: true,
+                                selectTarget: -1,
+                                filterTarget: function (card, player, target) {
+                                    return target == player;
+                                },
+                                modTarget: true,
+                                allowMultiple: false,
+                                content: function () {
+                                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
+                                },
+                                toself: true,
+                            },
+                            huokongld_equip: {
+                                image: 'ext:舰R牌将/huokongld_equip.png',
+                                fullskin: true,
+                                type: "equip",
+                                subtype: "equip4",
+                                distance: {
+                                    attackFrom: -1,
+                                },
+                                ai: {
+                                    basic: {
+                                        equipValue: 2.5,
+                                        order: function (card, player) {
+                                            if (player && player.hasSkillTag('reverseEquip')) {
+                                                return 8.5 - get.equipValue(card, player) / 20;
+                                            }
+                                            else {
+                                                return 8 + get.equipValue(card, player) / 20;
+                                            }
+                                        },
+                                        useful: 2,
+                                        value: function (card, player, index, method) {
+                                            if (player.isDisabled(get.subtype(card))) return 0.01;
+                                            var value = 0;
+                                            var info = get.info(card);
+                                            var current = player.getEquip(info.subtype);
+                                            if (current && card != current) {
+                                                value = get.value(current, player);
+                                            }
+                                            var equipValue = info.ai.equipValue;
+                                            if (equipValue == undefined) {
+                                                equipValue = info.ai.basic.equipValue;
+                                            }
+                                            if (typeof equipValue == 'function') {
+                                                if (method == 'raw') return equipValue(card, player);
+                                                if (method == 'raw2') return equipValue(card, player) - value;
+                                                return Math.max(0.1, equipValue(card, player) - value);
+                                            }
+                                            if (typeof equipValue != 'number') equipValue = 0;
+                                            if (method == 'raw') return equipValue;
+                                            if (method == 'raw2') return equipValue - value;
+                                            return Math.max(0.1, equipValue - value);
+                                        },
+                                    },
+                                    result: {
+                                        target: function (player, target, card) {
+                                            return get.equipResult(player, target, card.name);
+                                        },
+                                    },
+                                },
+                                skills: [""],
+                                enable: true,
+                                selectTarget: -1,
+                                filterTarget: function (card, player, target) {
+                                    return target == player;
+                                },
+                                modTarget: true,
+                                allowMultiple: false,
+                                content: function () {
+                                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
+                                },
+                                toself: true,
+                            },
+                            "yuleiqianting3": {
+                                image: 'ext:舰R牌将/yuleiqianting3.png',
+                                fullskin: true,
+                                type: "equip",
+                                subtype: "equip1",
+                                distance: {
+                                    attackFrom: -1,
+                                },
+                                ai: {
+                                    basic: {
+                                        equipValue: 2.5,
+                                        order: function (card, player) {
+                                            if (player && player.hasSkillTag('reverseEquip')) {
+                                                return 8.5 - get.equipValue(card, player) / 20;
+                                            }
+                                            else {
+                                                return 8 + get.equipValue(card, player) / 20;
+                                            }
+                                        },
+                                        useful: 2,
+                                        value: function (card, player, index, method) {
+                                            if (player.isDisabled(get.subtype(card))) return 0.01;
+                                            var value = 0;
+                                            var info = get.info(card);
+                                            var current = player.getEquip(info.subtype);
+                                            if (current && card != current) {
+                                                value = get.value(current, player);
+                                            }
+                                            var equipValue = info.ai.equipValue;
+                                            if (equipValue == undefined) {
+                                                equipValue = info.ai.basic.equipValue;
+                                            }
+                                            if (typeof equipValue == 'function') {
+                                                if (method == 'raw') return equipValue(card, player);
+                                                if (method == 'raw2') return equipValue(card, player) - value;
+                                                return Math.max(0.1, equipValue(card, player) - value);
+                                            }
+                                            if (typeof equipValue != 'number') equipValue = 0;
+                                            if (method == 'raw') return equipValue;
+                                            if (method == 'raw2') return equipValue - value;
+                                            return Math.max(0.1, equipValue - value);
+                                        },
+                                    },
+                                    result: {
+                                        target: function (player, target, card) {
+                                            return get.equipResult(player, target, card.name);
+                                        },
+                                    },
+                                },
+                                skills: [],
+                                enable: true,
+                                selectTarget: -1,
+                                filterTarget: function (card, player, target) {
+                                    return target == player;
+                                },
+                                modTarget: true,
+                                allowMultiple: false,
+                                content: function () {
+                                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
+                                },
+                                toself: true,
+                            },
+                            "jianzaidaodan3": {
+                                image: 'ext:舰R牌将/jianzaidaodan3.png',
+                                fullskin: true,
+                                type: "equip",
+                                subtype: "equip1",
+                                distance: {
+                                    attackFrom: -1,
+                                },
+                                ai: {
+                                    basic: {
+                                        equipValue: 2.5,
+                                        order: function (card, player) {
+                                            if (player && player.hasSkillTag('reverseEquip')) {
+                                                return 8.5 - get.equipValue(card, player) / 20;
+                                            }
+                                            else {
+                                                return 8 + get.equipValue(card, player) / 20;
+                                            }
+                                        },
+                                        useful: 2,
+                                        value: function (card, player, index, method) {
+                                            if (player.isDisabled(get.subtype(card))) return 0.01;
+                                            var value = 0;
+                                            var info = get.info(card);
+                                            var current = player.getEquip(info.subtype);
+                                            if (current && card != current) {
+                                                value = get.value(current, player);
+                                            }
+                                            var equipValue = info.ai.equipValue;
+                                            if (equipValue == undefined) {
+                                                equipValue = info.ai.basic.equipValue;
+                                            }
+                                            if (typeof equipValue == 'function') {
+                                                if (method == 'raw') return equipValue(card, player);
+                                                if (method == 'raw2') return equipValue(card, player) - value;
+                                                return Math.max(0.1, equipValue(card, player) - value);
+                                            }
+                                            if (typeof equipValue != 'number') equipValue = 0;
+                                            if (method == 'raw') return equipValue;
+                                            if (method == 'raw2') return equipValue - value;
+                                            return Math.max(0.1, equipValue - value);
+                                        },
+                                    },
+                                    result: {
+                                        target: function (player, target, card) {
+                                            return get.equipResult(player, target, card.name);
+                                        },
+                                    },
+                                },
+                                skills: [],
+                                enable: true,
+                                selectTarget: -1,
+                                filterTarget: function (card, player, target) {
+                                    return target == player;
+                                },
+                                modTarget: true,
+                                allowMultiple: false,
+                                content: function () {
+                                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
+                                },
+                                toself: true,
+                            },
+                            "yuleiji3": {
+                                image: 'ext:舰R牌将/yuleiji3.png',
+                                fullskin: true,
+                                type: "equip",
+                                subtype: "equip1",
+                                distance: {
+                                    attackFrom: -1,
+                                },
+                                ai: {
+                                    basic: {
+                                        equipValue: 2.5,
+                                        order: function (card, player) {
+                                            if (player && player.hasSkillTag('reverseEquip')) {
+                                                return 8.5 - get.equipValue(card, player) / 20;
+                                            }
+                                            else {
+                                                return 8 + get.equipValue(card, player) / 20;
+                                            }
+                                        },
+                                        useful: 2,
+                                        value: function (card, player, index, method) {
+                                            if (player.isDisabled(get.subtype(card))) return 0.01;
+                                            var value = 0;
+                                            var info = get.info(card);
+                                            var current = player.getEquip(info.subtype);
+                                            if (current && card != current) {
+                                                value = get.value(current, player);
+                                            }
+                                            var equipValue = info.ai.equipValue;
+                                            if (equipValue == undefined) {
+                                                equipValue = info.ai.basic.equipValue;
+                                            }
+                                            if (typeof equipValue == 'function') {
+                                                if (method == 'raw') return equipValue(card, player);
+                                                if (method == 'raw2') return equipValue(card, player) - value;
+                                                return Math.max(0.1, equipValue(card, player) - value);
+                                            }
+                                            if (typeof equipValue != 'number') equipValue = 0;
+                                            if (method == 'raw') return equipValue;
+                                            if (method == 'raw2') return equipValue - value;
+                                            return Math.max(0.1, equipValue - value);
+                                        },
+                                    },
+                                    result: {
+                                        target: function (player, target, card) {
+                                            return get.equipResult(player, target, card.name);
+                                        },
+                                    },
+                                },
+                                skills: [],
+                                enable: true,
+                                selectTarget: -1,
+                                filterTarget: function (card, player, target) {
+                                    return target == player;
+                                },
+                                modTarget: true,
+                                allowMultiple: false,
+                                content: function () {
+                                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
+                                },
+                                toself: true,
+                            },
+                            "tansheqi3": {
+                                image: 'ext:舰R牌将/tansheqi3.png',
+                                type: "equip",
+                                subtype: "equip4",
+                                ai: {
+                                    basic: {
+                                        equipValue: 7.5,
+                                        order: function (card, player) {
+                                            if (player && player.hasSkillTag('reverseEquip')) {
+                                                return 8.5 - get.equipValue(card, player) / 20;
+                                            }
+                                            else {
+                                                return 8 + get.equipValue(card, player) / 20;
+                                            }
+                                        },
+                                        useful: 2,
+                                        value: function (card, player, index, method) {
+                                            if (player.isDisabled(get.subtype(card))) return 0.01;
+                                            var value = 0;
+                                            var info = get.info(card);
+                                            var current = player.getEquip(info.subtype);
+                                            if (current && card != current) {
+                                                value = get.value(current, player);
+                                            }
+                                            var equipValue = info.ai.equipValue;
+                                            if (equipValue == undefined) {
+                                                equipValue = info.ai.basic.equipValue;
+                                            }
+                                            if (typeof equipValue == 'function') {
+                                                if (method == 'raw') return equipValue(card, player);
+                                                if (method == 'raw2') return equipValue(card, player) - value;
+                                                return Math.max(0.1, equipValue(card, player) - value);
+                                            }
+                                            if (typeof equipValue != 'number') equipValue = 0;
+                                            if (method == 'raw') return equipValue;
+                                            if (method == 'raw2') return equipValue - value;
+                                            return Math.max(0.1, equipValue - value);
+                                        },
+                                    },
+                                    result: {
+                                        target: function (player, target, card) {
+                                            return get.equipResult(player, target, card.name);
+                                        },
+                                    },
+                                },
+                                skills: [],
+                                enable: true,
+                                selectTarget: -1,
+                                filterTarget: function (card, player, target) {
+                                    return target == player;
+                                },
+                                modTarget: false,
+                                allowMultiple: false,
+                                content: function () {
+                                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
+                                },
+                                toself: false,
+                                fullskin: true,
+                            },
+                            "fasheqi3": {
+                                image: 'ext:舰R牌将/fasheqi3.png',
+                                fullskin: true,
+                                type: "equip",
+                                subtype: "equip4",
+                                distance: {
+                                    attackFrom: -1,
+                                },
+                                ai: {
+                                    basic: {
+                                        equipValue: 2.5,
+                                        order: function (card, player) {
+                                            if (player && player.hasSkillTag('reverseEquip')) {
+                                                return 8.5 - get.equipValue(card, player) / 20;
+                                            }
+                                            else {
+                                                return 8 + get.equipValue(card, player) / 20;
+                                            }
+                                        },
+                                        useful: 2,
+                                        value: function (card, player, index, method) {
+                                            if (player.isDisabled(get.subtype(card))) return 0.01;
+                                            var value = 0;
+                                            var info = get.info(card);
+                                            var current = player.getEquip(info.subtype);
+                                            if (current && card != current) {
+                                                value = get.value(current, player);
+                                            }
+                                            var equipValue = info.ai.equipValue;
+                                            if (equipValue == undefined) {
+                                                equipValue = info.ai.basic.equipValue;
+                                            }
+                                            if (typeof equipValue == 'function') {
+                                                if (method == 'raw') return equipValue(card, player);
+                                                if (method == 'raw2') return equipValue(card, player) - value;
+                                                return Math.max(0.1, equipValue(card, player) - value);
+                                            }
+                                            if (typeof equipValue != 'number') equipValue = 0;
+                                            if (method == 'raw') return equipValue;
+                                            if (method == 'raw2') return equipValue - value;
+                                            return Math.max(0.1, equipValue - value);
+                                        },
+                                    },
+                                    result: {
+                                        target: function (player, target, card) {
+                                            return get.equipResult(player, target, card.name);
+                                        },
+                                    },
+                                },
+                                skills: [],
+                                enable: true,
+                                selectTarget: -1,
+                                filterTarget: function (card, player, target) {
+                                    return target == player;
+                                },
+                                modTarget: true,
+                                allowMultiple: false,
+                                content: function () {
+                                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
+                                },
+                                toself: true,
+                            },
                         },
-                        useful: 2,
-                        value: function (card, player, index, method) {
-                            if (player.isDisabled(get.subtype(card))) return 0.01;
-                            var value = 0;
-                            var info = get.info(card);
-                            var current = player.getEquip(info.subtype);
-                            if (current && card != current) {
-                                value = get.value(current, player);
-                            }
-                            var equipValue = info.ai.equipValue;
-                            if (equipValue == undefined) {
-                                equipValue = info.ai.basic.equipValue;
-                            }
-                            if (typeof equipValue == 'function') {
-                                if (method == 'raw') return equipValue(card, player);
-                                if (method == 'raw2') return equipValue(card, player) - value;
-                                return Math.max(0.1, equipValue(card, player) - value);
-                            }
-                            if (typeof equipValue != 'number') equipValue = 0;
-                            if (method == 'raw') return equipValue;
-                            if (method == 'raw2') return equipValue - value;
-                            return Math.max(0.1, equipValue - value);
+                        translate: {
+                            jinjuzy: "近距支援",
+                            "jinjuzy_info": "出牌阶段，对所有其他角色使用。每名目标角色需打出一张【闪】，否则受到1点伤害。",
+                            jiakongls: "架空历史",
+                            "jiakongls_info": "群星璀璨，欧陆风云，该武将首次使用会有两轮1.5展示牌量的五谷丰登，再次使用仅有一轮。",
+                            mingzuyq: "民族乐器",
+                            "mingzuyq_info": "北境之地的文化艺术。锁定技，你视为拥有技能国战“制衡”，若你已经有“制衡”，则改为取消可弃置牌数的限制。",
+                            hangkongzhan: "航空战",
+                            "hangkongzhan_info": "建树丰厚，参与每轮开始时的三连杀战斗吗，每轮最多弃置三张牌。",
+                            paohuozb: "炮火准备",
+                            "paohuozb_info": "试试就逝世，扣一血得属性杀增强效果，然而现在所有舰船都有这个，可以图加一杀次数。",
+                            xingyun: "强力规避",
+                            "xingyun_info": "可以进行一次判定，为桃、闪则视为打出闪。<br>若判定未生效,会获得判定牌。<br>若武将为驱逐且没有判定成功，可以额外触发一次。",
+                            lianxugongji: "连续攻击",
+                            "lianxugongji_info": "其实就是杀，但此杀能连打两次。。",
+                            "sushepao3": "速射炮",
+                            "sushepao3_info": "射速与精度很吓人，当然消耗也很惊人（没有特殊效果）",
+                            "quzhupao3": "速射炮",
+                            "quzhupao3_info": "可以连续使用水弹击退敌人（没有特殊效果）",
+                            "qingxunpao3": "两用炮",
+                            "qingxunpao3_info": "对地对空的好帮手（没有特殊效果）",
+                            "zhongxunpao3": "中型主炮",
+                            "zhongxunpao3_info": "对付轻巡很给力，对付大船则充满了不幸（没有特殊效果）",
+                            "zhanliepao3": "大型主炮",
+                            "zhanliepao3_info": "能击穿才是传奇，有严重损害更好（没有特殊效果）",
+                            "zhandouji3": "战斗机",
+                            "zhandouji3_info": "适合满速轻型航母的战斗机，启航，编队，狗斗，加速降落（没有特殊效果）",
+                            huokongld_equip: "火控雷达",
+                            "huokongld_equip_info": "强大的雷达，可以精准的命中对手。（没有技能的装备）",
+                            "yuleiqianting3": "鱼雷(潜艇用)",
+                            "yuleiqianting3_info": "来偷袭，我一个英姿闭月双刀的老头子，这合理吗（没有特殊效果）",
+                            "jianzaidaodan3": "反舰导弹",
+                            "jianzaidaodan3_info": "融合卫星定位，（没有特殊效果）",
+                            "yuleiji3": "鱼雷机",
+                            "yuleiji3_info": "可以反潜，较小的起飞距离则能支援主力作战，。（没有特殊效果）",
+                            "tansheqi3": "弹射器",
+                            "tansheqi3_info": "加速飞机起飞，缩短航母甲板或者增加飞机承载量（没有特殊效果）",
+                            "fasheqi3": "发射器",
+                            "fasheqi3_info": "发射导弹的同时要牺牲一个火控雷达槽位（没有特殊效果）",
                         },
-                    },
-                    result: {
-                        target: function (player, target, card) {
-                            return get.equipResult(player, target, card.name);
-                        },
-                    },
-                },
-                skills: [],
-                enable: true,
-                selectTarget: -1,
-                filterTarget: function (card, player, target) {
-                    return target == player;
-                },
-                modTarget: true,
-                allowMultiple: false,
-                content: function () {
-                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
-                },
-                toself: true,
-            },
-            "qingxunpao3": {
-                image: 'ext:舰R牌将/qingxunpao3.png',
-                fullskin: true,
-                type: "equip",
-                subtype: "equip1",
-                distance: {
-                    attackFrom: -1,
-                },
-                ai: {
-                    basic: {
-                        equipValue: 2.5,
-                        order: function (card, player) {
-                            if (player && player.hasSkillTag('reverseEquip')) {
-                                return 8.5 - get.equipValue(card, player) / 20;
-                            }
-                            else {
-                                return 8 + get.equipValue(card, player) / 20;
-                            }
-                        },
-                        useful: 2,
-                        value: function (card, player, index, method) {
-                            if (player.isDisabled(get.subtype(card))) return 0.01;
-                            var value = 0;
-                            var info = get.info(card);
-                            var current = player.getEquip(info.subtype);
-                            if (current && card != current) {
-                                value = get.value(current, player);
-                            }
-                            var equipValue = info.ai.equipValue;
-                            if (equipValue == undefined) {
-                                equipValue = info.ai.basic.equipValue;
-                            }
-                            if (typeof equipValue == 'function') {
-                                if (method == 'raw') return equipValue(card, player);
-                                if (method == 'raw2') return equipValue(card, player) - value;
-                                return Math.max(0.1, equipValue(card, player) - value);
-                            }
-                            if (typeof equipValue != 'number') equipValue = 0;
-                            if (method == 'raw') return equipValue;
-                            if (method == 'raw2') return equipValue - value;
-                            return Math.max(0.1, equipValue - value);
-                        },
-                    },
-                    result: {
-                        target: function (player, target, card) {
-                            return get.equipResult(player, target, card.name);
-                        },
-                    },
-                },
-                skills: [],
-                enable: true,
-                selectTarget: -1,
-                filterTarget: function (card, player, target) {
-                    return target == player;
-                },
-                modTarget: true,
-                allowMultiple: false,
-                content: function () {
-                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
-                },
-                toself: true,
-            },
-            "zhongxunpao3": {
-                image: 'ext:舰R牌将/zhongxunpao3.png',
-                fullskin: true,
-                type: "equip",
-                subtype: "equip1",
-                distance: {
-                    attackFrom: -1,
-                },
-                ai: {
-                    basic: {
-                        equipValue: 2.5,
-                        order: function (card, player) {
-                            if (player && player.hasSkillTag('reverseEquip')) {
-                                return 8.5 - get.equipValue(card, player) / 20;
-                            }
-                            else {
-                                return 8 + get.equipValue(card, player) / 20;
-                            }
-                        },
-                        useful: 2,
-                        value: function (card, player, index, method) {
-                            if (player.isDisabled(get.subtype(card))) return 0.01;
-                            var value = 0;
-                            var info = get.info(card);
-                            var current = player.getEquip(info.subtype);
-                            if (current && card != current) {
-                                value = get.value(current, player);
-                            }
-                            var equipValue = info.ai.equipValue;
-                            if (equipValue == undefined) {
-                                equipValue = info.ai.basic.equipValue;
-                            }
-                            if (typeof equipValue == 'function') {
-                                if (method == 'raw') return equipValue(card, player);
-                                if (method == 'raw2') return equipValue(card, player) - value;
-                                return Math.max(0.1, equipValue(card, player) - value);
-                            }
-                            if (typeof equipValue != 'number') equipValue = 0;
-                            if (method == 'raw') return equipValue;
-                            if (method == 'raw2') return equipValue - value;
-                            return Math.max(0.1, equipValue - value);
-                        },
-                    },
-                    result: {
-                        target: function (player, target, card) {
-                            return get.equipResult(player, target, card.name);
-                        },
-                    },
-                },
-                skills: [],
-                enable: true,
-                selectTarget: -1,
-                filterTarget: function (card, player, target) {
-                    return target == player;
-                },
-                modTarget: true,
-                allowMultiple: false,
-                content: function () {
-                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
-                },
-                toself: true,
-            },
-            "zhanliepao3": {
-                image: 'ext:舰R牌将/zhanliepao3.png',
-                fullskin: true,
-                type: "equip",
-                subtype: "equip1",
-                distance: {
-                    attackFrom: -1,
-                },
-                ai: {
-                    basic: {
-                        equipValue: 2.5,
-                        order: function (card, player) {
-                            if (player && player.hasSkillTag('reverseEquip')) {
-                                return 8.5 - get.equipValue(card, player) / 20;
-                            }
-                            else {
-                                return 8 + get.equipValue(card, player) / 20;
-                            }
-                        },
-                        useful: 2,
-                        value: function (card, player, index, method) {
-                            if (player.isDisabled(get.subtype(card))) return 0.01;
-                            var value = 0;
-                            var info = get.info(card);
-                            var current = player.getEquip(info.subtype);
-                            if (current && card != current) {
-                                value = get.value(current, player);
-                            }
-                            var equipValue = info.ai.equipValue;
-                            if (equipValue == undefined) {
-                                equipValue = info.ai.basic.equipValue;
-                            }
-                            if (typeof equipValue == 'function') {
-                                if (method == 'raw') return equipValue(card, player);
-                                if (method == 'raw2') return equipValue(card, player) - value;
-                                return Math.max(0.1, equipValue(card, player) - value);
-                            }
-                            if (typeof equipValue != 'number') equipValue = 0;
-                            if (method == 'raw') return equipValue;
-                            if (method == 'raw2') return equipValue - value;
-                            return Math.max(0.1, equipValue - value);
-                        },
-                    },
-                    result: {
-                        target: function (player, target, card) {
-                            return get.equipResult(player, target, card.name);
-                        },
-                    },
-                },
-                skills: [],
-                enable: true,
-                selectTarget: -1,
-                filterTarget: function (card, player, target) {
-                    return target == player;
-                },
-                modTarget: true,
-                allowMultiple: false,
-                content: function () {
-                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
-                },
-                toself: true,
-            },
-            "zhandouji3": {
-                image: 'ext:舰R牌将/zhandouji3.png',
-                fullskin: true,
-                type: "equip",
-                subtype: "equip1",
-                distance: {
-                    attackFrom: -1,
-                },
-                ai: {
-                    basic: {
-                        equipValue: 2.5,
-                        order: function (card, player) {
-                            if (player && player.hasSkillTag('reverseEquip')) {
-                                return 8.5 - get.equipValue(card, player) / 20;
-                            }
-                            else {
-                                return 8 + get.equipValue(card, player) / 20;
-                            }
-                        },
-                        useful: 2,
-                        value: function (card, player, index, method) {
-                            if (player.isDisabled(get.subtype(card))) return 0.01;
-                            var value = 0;
-                            var info = get.info(card);
-                            var current = player.getEquip(info.subtype);
-                            if (current && card != current) {
-                                value = get.value(current, player);
-                            }
-                            var equipValue = info.ai.equipValue;
-                            if (equipValue == undefined) {
-                                equipValue = info.ai.basic.equipValue;
-                            }
-                            if (typeof equipValue == 'function') {
-                                if (method == 'raw') return equipValue(card, player);
-                                if (method == 'raw2') return equipValue(card, player) - value;
-                                return Math.max(0.1, equipValue(card, player) - value);
-                            }
-                            if (typeof equipValue != 'number') equipValue = 0;
-                            if (method == 'raw') return equipValue;
-                            if (method == 'raw2') return equipValue - value;
-                            return Math.max(0.1, equipValue - value);
-                        },
-                    },
-                    result: {
-                        target: function (player, target, card) {
-                            return get.equipResult(player, target, card.name);
-                        },
-                    },
-                },
-                skills: [],
-                enable: true,
-                selectTarget: -1,
-                filterTarget: function (card, player, target) {
-                    return target == player;
-                },
-                modTarget: true,
-                allowMultiple: false,
-                content: function () {
-                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
-                },
-                toself: true,
-            },
-            huokongld_equip: {
-                image: 'ext:舰R牌将/huokongld_equip.png',
-                fullskin: true,
-                type: "equip",
-                subtype: "equip4",
-                distance: {
-                    attackFrom: -1,
-                },
-                ai: {
-                    basic: {
-                        equipValue: 2.5,
-                        order: function (card, player) {
-                            if (player && player.hasSkillTag('reverseEquip')) {
-                                return 8.5 - get.equipValue(card, player) / 20;
-                            }
-                            else {
-                                return 8 + get.equipValue(card, player) / 20;
-                            }
-                        },
-                        useful: 2,
-                        value: function (card, player, index, method) {
-                            if (player.isDisabled(get.subtype(card))) return 0.01;
-                            var value = 0;
-                            var info = get.info(card);
-                            var current = player.getEquip(info.subtype);
-                            if (current && card != current) {
-                                value = get.value(current, player);
-                            }
-                            var equipValue = info.ai.equipValue;
-                            if (equipValue == undefined) {
-                                equipValue = info.ai.basic.equipValue;
-                            }
-                            if (typeof equipValue == 'function') {
-                                if (method == 'raw') return equipValue(card, player);
-                                if (method == 'raw2') return equipValue(card, player) - value;
-                                return Math.max(0.1, equipValue(card, player) - value);
-                            }
-                            if (typeof equipValue != 'number') equipValue = 0;
-                            if (method == 'raw') return equipValue;
-                            if (method == 'raw2') return equipValue - value;
-                            return Math.max(0.1, equipValue - value);
-                        },
-                    },
-                    result: {
-                        target: function (player, target, card) {
-                            return get.equipResult(player, target, card.name);
-                        },
-                    },
-                },
-                skills: [""],
-                enable: true,
-                selectTarget: -1,
-                filterTarget: function (card, player, target) {
-                    return target == player;
-                },
-                modTarget: true,
-                allowMultiple: false,
-                content: function () {
-                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
-                },
-                toself: true,
-            },
-            "yuleiqianting3": {
-                image: 'ext:舰R牌将/yuleiqianting3.png',
-                fullskin: true,
-                type: "equip",
-                subtype: "equip1",
-                distance: {
-                    attackFrom: -1,
-                },
-                ai: {
-                    basic: {
-                        equipValue: 2.5,
-                        order: function (card, player) {
-                            if (player && player.hasSkillTag('reverseEquip')) {
-                                return 8.5 - get.equipValue(card, player) / 20;
-                            }
-                            else {
-                                return 8 + get.equipValue(card, player) / 20;
-                            }
-                        },
-                        useful: 2,
-                        value: function (card, player, index, method) {
-                            if (player.isDisabled(get.subtype(card))) return 0.01;
-                            var value = 0;
-                            var info = get.info(card);
-                            var current = player.getEquip(info.subtype);
-                            if (current && card != current) {
-                                value = get.value(current, player);
-                            }
-                            var equipValue = info.ai.equipValue;
-                            if (equipValue == undefined) {
-                                equipValue = info.ai.basic.equipValue;
-                            }
-                            if (typeof equipValue == 'function') {
-                                if (method == 'raw') return equipValue(card, player);
-                                if (method == 'raw2') return equipValue(card, player) - value;
-                                return Math.max(0.1, equipValue(card, player) - value);
-                            }
-                            if (typeof equipValue != 'number') equipValue = 0;
-                            if (method == 'raw') return equipValue;
-                            if (method == 'raw2') return equipValue - value;
-                            return Math.max(0.1, equipValue - value);
-                        },
-                    },
-                    result: {
-                        target: function (player, target, card) {
-                            return get.equipResult(player, target, card.name);
-                        },
-                    },
-                },
-                skills: [],
-                enable: true,
-                selectTarget: -1,
-                filterTarget: function (card, player, target) {
-                    return target == player;
-                },
-                modTarget: true,
-                allowMultiple: false,
-                content: function () {
-                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
-                },
-                toself: true,
-            },
-            "jianzaidaodan3": {
-                image: 'ext:舰R牌将/jianzaidaodan3.png',
-                fullskin: true,
-                type: "equip",
-                subtype: "equip1",
-                distance: {
-                    attackFrom: -1,
-                },
-                ai: {
-                    basic: {
-                        equipValue: 2.5,
-                        order: function (card, player) {
-                            if (player && player.hasSkillTag('reverseEquip')) {
-                                return 8.5 - get.equipValue(card, player) / 20;
-                            }
-                            else {
-                                return 8 + get.equipValue(card, player) / 20;
-                            }
-                        },
-                        useful: 2,
-                        value: function (card, player, index, method) {
-                            if (player.isDisabled(get.subtype(card))) return 0.01;
-                            var value = 0;
-                            var info = get.info(card);
-                            var current = player.getEquip(info.subtype);
-                            if (current && card != current) {
-                                value = get.value(current, player);
-                            }
-                            var equipValue = info.ai.equipValue;
-                            if (equipValue == undefined) {
-                                equipValue = info.ai.basic.equipValue;
-                            }
-                            if (typeof equipValue == 'function') {
-                                if (method == 'raw') return equipValue(card, player);
-                                if (method == 'raw2') return equipValue(card, player) - value;
-                                return Math.max(0.1, equipValue(card, player) - value);
-                            }
-                            if (typeof equipValue != 'number') equipValue = 0;
-                            if (method == 'raw') return equipValue;
-                            if (method == 'raw2') return equipValue - value;
-                            return Math.max(0.1, equipValue - value);
-                        },
-                    },
-                    result: {
-                        target: function (player, target, card) {
-                            return get.equipResult(player, target, card.name);
-                        },
-                    },
-                },
-                skills: [],
-                enable: true,
-                selectTarget: -1,
-                filterTarget: function (card, player, target) {
-                    return target == player;
-                },
-                modTarget: true,
-                allowMultiple: false,
-                content: function () {
-                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
-                },
-                toself: true,
-            },
-            "yuleiji3": {
-                image: 'ext:舰R牌将/yuleiji3.png',
-                fullskin: true,
-                type: "equip",
-                subtype: "equip1",
-                distance: {
-                    attackFrom: -1,
-                },
-                ai: {
-                    basic: {
-                        equipValue: 2.5,
-                        order: function (card, player) {
-                            if (player && player.hasSkillTag('reverseEquip')) {
-                                return 8.5 - get.equipValue(card, player) / 20;
-                            }
-                            else {
-                                return 8 + get.equipValue(card, player) / 20;
-                            }
-                        },
-                        useful: 2,
-                        value: function (card, player, index, method) {
-                            if (player.isDisabled(get.subtype(card))) return 0.01;
-                            var value = 0;
-                            var info = get.info(card);
-                            var current = player.getEquip(info.subtype);
-                            if (current && card != current) {
-                                value = get.value(current, player);
-                            }
-                            var equipValue = info.ai.equipValue;
-                            if (equipValue == undefined) {
-                                equipValue = info.ai.basic.equipValue;
-                            }
-                            if (typeof equipValue == 'function') {
-                                if (method == 'raw') return equipValue(card, player);
-                                if (method == 'raw2') return equipValue(card, player) - value;
-                                return Math.max(0.1, equipValue(card, player) - value);
-                            }
-                            if (typeof equipValue != 'number') equipValue = 0;
-                            if (method == 'raw') return equipValue;
-                            if (method == 'raw2') return equipValue - value;
-                            return Math.max(0.1, equipValue - value);
-                        },
-                    },
-                    result: {
-                        target: function (player, target, card) {
-                            return get.equipResult(player, target, card.name);
-                        },
-                    },
-                },
-                skills: [],
-                enable: true,
-                selectTarget: -1,
-                filterTarget: function (card, player, target) {
-                    return target == player;
-                },
-                modTarget: true,
-                allowMultiple: false,
-                content: function () {
-                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
-                },
-                toself: true,
-            },
-            "tansheqi3": {
-                image: 'ext:舰R牌将/tansheqi3.png',
-                type: "equip",
-                subtype: "equip4",
-                ai: {
-                    basic: {
-                        equipValue: 7.5,
-                        order: function (card, player) {
-                            if (player && player.hasSkillTag('reverseEquip')) {
-                                return 8.5 - get.equipValue(card, player) / 20;
-                            }
-                            else {
-                                return 8 + get.equipValue(card, player) / 20;
-                            }
-                        },
-                        useful: 2,
-                        value: function (card, player, index, method) {
-                            if (player.isDisabled(get.subtype(card))) return 0.01;
-                            var value = 0;
-                            var info = get.info(card);
-                            var current = player.getEquip(info.subtype);
-                            if (current && card != current) {
-                                value = get.value(current, player);
-                            }
-                            var equipValue = info.ai.equipValue;
-                            if (equipValue == undefined) {
-                                equipValue = info.ai.basic.equipValue;
-                            }
-                            if (typeof equipValue == 'function') {
-                                if (method == 'raw') return equipValue(card, player);
-                                if (method == 'raw2') return equipValue(card, player) - value;
-                                return Math.max(0.1, equipValue(card, player) - value);
-                            }
-                            if (typeof equipValue != 'number') equipValue = 0;
-                            if (method == 'raw') return equipValue;
-                            if (method == 'raw2') return equipValue - value;
-                            return Math.max(0.1, equipValue - value);
-                        },
-                    },
-                    result: {
-                        target: function (player, target, card) {
-                            return get.equipResult(player, target, card.name);
-                        },
-                    },
-                },
-                skills: [],
-                enable: true,
-                selectTarget: -1,
-                filterTarget: function (card, player, target) {
-                    return target == player;
-                },
-                modTarget: false,
-                allowMultiple: false,
-                content: function () {
-                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
-                },
-                toself: false,
-                fullskin: true,
-            },
-            "fasheqi3": {
-                image: 'ext:舰R牌将/fasheqi3.png',
-                fullskin: true,
-                type: "equip",
-                subtype: "equip4",
-                distance: {
-                    attackFrom: -1,
-                },
-                ai: {
-                    basic: {
-                        equipValue: 2.5,
-                        order: function (card, player) {
-                            if (player && player.hasSkillTag('reverseEquip')) {
-                                return 8.5 - get.equipValue(card, player) / 20;
-                            }
-                            else {
-                                return 8 + get.equipValue(card, player) / 20;
-                            }
-                        },
-                        useful: 2,
-                        value: function (card, player, index, method) {
-                            if (player.isDisabled(get.subtype(card))) return 0.01;
-                            var value = 0;
-                            var info = get.info(card);
-                            var current = player.getEquip(info.subtype);
-                            if (current && card != current) {
-                                value = get.value(current, player);
-                            }
-                            var equipValue = info.ai.equipValue;
-                            if (equipValue == undefined) {
-                                equipValue = info.ai.basic.equipValue;
-                            }
-                            if (typeof equipValue == 'function') {
-                                if (method == 'raw') return equipValue(card, player);
-                                if (method == 'raw2') return equipValue(card, player) - value;
-                                return Math.max(0.1, equipValue(card, player) - value);
-                            }
-                            if (typeof equipValue != 'number') equipValue = 0;
-                            if (method == 'raw') return equipValue;
-                            if (method == 'raw2') return equipValue - value;
-                            return Math.max(0.1, equipValue - value);
-                        },
-                    },
-                    result: {
-                        target: function (player, target, card) {
-                            return get.equipResult(player, target, card.name);
-                        },
-                    },
-                },
-                skills: [],
-                enable: true,
-                selectTarget: -1,
-                filterTarget: function (card, player, target) {
-                    return target == player;
-                },
-                modTarget: true,
-                allowMultiple: false,
-                content: function () {
-                    if (cards.length && get.position(cards[0], true) == 'o') target.equip(cards[0]);
-                },
-                toself: true,
-            },
-        },
-        translate: {
-            jinjuzy: "近距支援",
-            "jinjuzy_info": "出牌阶段，对所有其他角色使用。每名目标角色需打出一张【闪】，否则受到1点伤害。",
-            jiakongls: "架空历史",
-            "jiakongls_info": "群星璀璨，欧陆风云，该武将首次使用会有两轮1.5展示牌量的五谷丰登，再次使用仅有一轮。",
-            mingzuyq: "民族乐器",
-            "mingzuyq_info": "北境之地的文化艺术。锁定技，你视为拥有技能国战“制衡”，若你已经有“制衡”，则改为取消可弃置牌数的限制。",
-            hangkongzhan: "航空战",
-            "hangkongzhan_info": "建树丰厚，参与每轮开始时的三连杀战斗吗，每轮最多弃置三张牌。",
-            paohuozb: "炮火准备",
-            "paohuozb_info": "试试就逝世，扣一血得属性杀增强效果，然而现在所有舰船都有这个，可以图加一杀次数。",
-            xingyun: "强力规避",
-            "xingyun_info": "可以进行一次判定，为桃、闪则视为打出闪。<br>若判定未生效,会获得判定牌。<br>若武将为驱逐且没有判定成功，可以额外触发一次。",
-            lianxugongji: "连续攻击",
-            "lianxugongji_info": "其实就是杀，但此杀能连打两次。。",
-            "sushepao3": "速射炮",
-            "sushepao3_info": "射速与精度很吓人，当然消耗也很惊人（没有特殊效果）",
-            "quzhupao3": "速射炮",
-            "quzhupao3_info": "可以连续使用水弹击退敌人（没有特殊效果）",
-            "qingxunpao3": "两用炮",
-            "qingxunpao3_info": "对地对空的好帮手（没有特殊效果）",
-            "zhongxunpao3": "中型主炮",
-            "zhongxunpao3_info": "对付轻巡很给力，对付大船则充满了不幸（没有特殊效果）",
-            "zhanliepao3": "大型主炮",
-            "zhanliepao3_info": "能击穿才是传奇，有严重损害更好（没有特殊效果）",
-            "zhandouji3": "战斗机",
-            "zhandouji3_info": "适合满速轻型航母的战斗机，启航，编队，狗斗，加速降落（没有特殊效果）",
-            huokongld_equip: "火控雷达",
-            "huokongld_equip_info": "强大的雷达，可以精准的命中对手。（没有技能的装备）",
-            "yuleiqianting3": "鱼雷(潜艇用)",
-            "yuleiqianting3_info": "来偷袭，我一个英姿闭月双刀的老头子，这合理吗（没有特殊效果）",
-            "jianzaidaodan3": "反舰导弹",
-            "jianzaidaodan3_info": "融合卫星定位，（没有特殊效果）",
-            "yuleiji3": "鱼雷机",
-            "yuleiji3_info": "可以反潜，较小的起飞距离则能支援主力作战，。（没有特殊效果）",
-            "tansheqi3": "弹射器",
-            "tansheqi3_info": "加速飞机起飞，缩短航母甲板或者增加飞机承载量（没有特殊效果）",
-            "fasheqi3": "发射器",
-            "fasheqi3_info": "发射导弹的同时要牺牲一个火控雷达槽位（没有特殊效果）",
-        },
-        list: [["heart", "1", "hangkongzhan"], ["diamond", "1", "xingyun"], ["spade", "1", "lianxugongji"], ["club", "1", "jinjuzy"], ["heart", "1", "jiakongls"]],//牌堆添加
-    }
-    return jianrjinjibao
-});
-lib.translate['jianrjinjibao_card_config'] = '舰R卡牌';
-lib.config.all.cards.push('jianrjinjibao');
+                        list: [["heart", "1", "hangkongzhan"], ["diamond", "1", "xingyun"], ["spade", "1", "lianxugongji"], ["club", "1", "jinjuzy"], ["heart", "1", "jiakongls"]],//牌堆添加
+                    }
+                    return jianrjinjibao
+                });
+                lib.translate['jianrjinjibao_card_config'] = '舰R卡牌';
+                lib.config.all.cards.push('jianrjinjibao');
                 //if (!lib.config.cards.includes('jianrjinjibao')) lib.config.cards.push('jianrjinjibao');//包名翻译，失败了：,"jianrjinjibao":{"name":"禁用舰R测试内卡包","intro":"联机卡组在游戏内运行时才添加至游戏内，禁用添加这些卡组的技能，才能真正禁用这些卡组","init":true},
                 //闪避（响应）对面的攻击，通过攻击减少对手手牌数，config.diewulimitaiconfig.hanbing_gaiconfig.tiaozhanbiaojiang
             };
-        }, help: { }, config: {//config就是配置文件，类似于minecraft的模组设置文本。无名将其可视化了....。当你进行了至少一次强化后<br>1.出牌阶段<br>你可以弃置3张不同花色的牌，提升一点血量上限。<br>2.当你濒死时，<br>你可以弃置4张不同花色的牌，回复一点体力。<br>（未开启强化，则无需强化即可使用建造。未开启建造，则强化上限仅为1级。）火杀：令目标回合结束后，受到一点火焰伤害，摸两张牌。</br>冰杀：护甲加1伤；减少对手1点防御距离。</br>雷杀：自动判断是否流失对手体力；减少对手1点手牌上限；。</br>此角色回合结束后移除所有的进水、减速、燃烧。
-    jianrjinji: { "name": "禁用舰R联机武将/可自定义角色技能", "intro": "在游戏运行时，扩展通过运行一个技能，将联机武将添加至游戏内，<br>禁用此技能，才能禁用联机武将。<br>禁用后，单机武将不会被联机部分覆盖。<br>进入修改武将的界面：点击上方的编辑扩展-武将。", "init": false },
-    _yuanhang: { "name": "远航-用一张牌摸一张牌，濒死可摸牌", "intro": "开启后，所有玩家受伤时手牌上限+1；<br>每轮限1/2/3次，当失去手牌后，且手牌数<手牌上限的一半时，你摸一张牌。<br>当你进入濒死状态时，你可以摸一张牌，体力上限>2时需减少一点体力上限，额外摸一张牌；死亡后，若你为忠臣，你可以令主公摸一张牌。", "init": true },
-    _jianzaochuan: { "name": "建造-用三张牌提升血量上限，用四张牌回血", "intro": "开启后，若任意玩家进行了至少一次强化：<br>1.出牌阶段，<br>你可以弃置3张不同花色的牌，提升一点血量上限。<br>2.当你濒死时，<br>你可以弃置4张不同花色的牌，回复一点体力。<br>（未开启强化，则无需强化即可使用建造。未开启建造，则强化上限仅为1级。）", "init": true },
-    _qianghuazhuang: { "name": "强化-消耗牌增加自身能力", "intro": "开启后，出牌阶段限一次，所有玩家可以弃置二至四张牌或消耗经验，选择一至两个永久效果升级。<br>（如摸牌、攻击距离、手牌上限等）", "init": true },
-    _wulidebuff: { "name": "火杀燃烧、雷杀穿甲、寒冰剑对甲加伤", "intro": "开启后，属性伤害会有额外效果。<br>火杀：令目标回合结束后，受到一点火焰伤害，摸两张牌（有护甲则不会触发摸牌）。</br>冰杀/寒冰剑雷杀：护甲加1伤；减少对手1点防御距离。</br>雷杀：有护甲时改为造成对手流失体力；减少对手1点手牌上限；。</br>此角色回合结束后/濒死时移除进水、减速、燃烧。", "init": true },
-    qyzhugeliang: { "name": "第一轮休闲局-添加原版技能", "intro": "开启后，主公可以在回合开始时，选择一组技能，直到下一回合开始前，所有角色都能使用这些技能；还有火攻一类的卡组可供选择，让每一个玩家选择打出这些卡", "init": false },
-    diewulimitai: { "name": "蝶舞-给队友递一张杀、装备", "intro": "开启后，所有玩家获得辅助类技能【蝶舞】，<br>出牌阶段，可以给队友递一张装备/杀，队友得到此牌后可以立即使用，但每轮只能以此法只能出一次杀。", "init": false },
-    yidong: { "name": "回合内，与相邻玩家互换座位", "intro": "开启后，所有玩家获得辅助类技能【移动】：<br>1.可以在局内移动自己角色的座位，<br>限制为相邻座位，<br>对ai的限制为队友/目标距离此角色为2。", "init": false },
-    kaishimopao: { "name": "更好的摸牌阶段", "intro": "开启后，所有玩家获得摸牌类技能【摸牌】，<br>摸牌阶段摸牌量>1时：<br>可以弃置等同于摸牌数的牌，改为获得1张由你指定类别的牌，<br>在你判定延时锦囊牌前，<br>可令1.下一个摸牌阶段--少摸一张牌;2.本回合结束时--摸一张牌。", "init": false },
-    _hanbing_gai: { "name": "寒冰剑-增强", "intro": "开启后，拥有寒冰剑时，寒冰剑的弃牌数改为你造成的伤害*2，<br>弃置到没有手牌时，会将没有计算完的伤害继续打出（以普通伤害的属性）。", "init": true },
-    tiaozhanbiaojiang: { "name": "挑战模式全员国战不屈", "intro": "开启后，所有玩家获得技能【挑战技能】：<br>开局流失体力到剩余1血，根据流失的体力数多摸等量的牌；<br>全员获得国战不屈，唤醒界标武将的力量。<br>暂缺一个扶起负数血队友的技能", "init": true },
-}, package: {
-    character: {
-        character: {//单机部分，在联机框架开启时，联机武将会覆盖同名武将应该不生效。
-            /*liekexingdun: ["female", "wu", 4, ["hangmucv", "hangkongzhanshuxianqu"], ["zhu", "des:血量中等的航母，温柔，体贴，过渡期追着大船打的航母。"]],
-            qixichicheng: ["female", "shu", 4, ["hangmucv", "qixi_cv"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
-            wufenzhongchicheng: ["female", "shu", 4, ["hangmucv", "mingyundewufenzhong"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
- 
-            qiye: ["female", "USN", 4, ["hangmucv", "dumuchenglin"], ["des:有必中攻击，快跑"]],
-            bisimai: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["zhu", "des:更多刮痧炮，更多炮弹，更多削弱光环，更多护甲模组，更多血量。"]],
-            misuli: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["des:用精巧的手枪去质疑，用绝对的火力回击对手。"]],
-            weineituo: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["des:身材小，而强度惊人。"]],
-            lisailiu: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["des:幸运的象征之一，同时有着丰富的精神象征。"]],
-            changmen: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["des:。"]],
-            kunxi: ["female", "shu", 4, ["huokongld", "zhongxunca", "gaosusheji"], ["des:画师优秀的功底让这名角色美而可爱，这是出色的角色塑造。"]],
-            ougengqi: ["female", "shu", 4, ["huokongld", "zhongxunca"], ["des:励志偶像，与标志性舰装，给人以强大的保护。"]],
-            qingye: ["female", "shu", 4, ["huokongld", "zhongxunca", "sawohaizhan"], ["des:励志偶像，与一首动人的歌，与一段坎坷旅途。"]],
-            beianpudun: ["female", "shu", 4, ["huokongld", "zhongxunca"], ["des:励志青年，在旅途中成长，与恋人坚定的望向远方。"]],
-            jiujinshan: ["female", "shu", 4, ["huokongld", "zhongxunca"], ["des:航海服饰，侦查员与火炮观瞄。"]],
-            yixian: ["female", "USN", 3, ["fangkong2", "qingxuncl"], ["des:经典美术设计的款式，意气风发，威猛先生"]],
-            tianlangxing: ["female", "USN", 3, ["fangkong2", "qingxuncl"], ["des:阻敌计谋表现优秀，这是先发制敌的优势所在，"]],
-            dading: ["female", "USN", 3, ["fangkong2", "qingxuncl"], ["des:手持竹伞的轻巡，辅助队友，防御攻击。"]],
-            degelasi: ["female", "USN", 3, ["fangkong2", "qingxuncl"], ["des:现代文职服饰，一看就很会办公。"]],
-            yatelanda: ["female", "USN", 3, ["fangkong2", "qingxuncl"], ["des:双枪射手点形象，其双枪能以极快的射速打出爆炸弹匣，清空一小片区域。"]],
-            "z31": ["female", "USN", 3, ["dajiaoduguibi", "quzhudd"], ["des:婚纱与轻纱是多数人的美梦,与绿草平原，与绿水青山"]],
-            xuefeng: ["female", "shu", 3, ["dajiaoduguibi", "quzhudd", "xiangrui", "yumian"], ["des:幸运的驱逐舰，多位画师、花了大款的大佬亲情奉献。"]],
-            kangfusi: ["female", "USN", 3, ["dajiaoduguibi", "quzhudd"], ["des:水手服欸,优秀的构图，不过图少改造晚。"]],
-            "47project": ["female", "USN", 3, ["dajiaoduguibi", "quzhudd"], ["des:这是个依赖科技的舰船，有着科幻的舰装，与兼备温柔体贴与意气风发的表现。"]],
-            guzhuyizhichuixue: ["female", "shu", 3, ["dajiaoduguibi", "quzhudd", "guzhuyizhi"], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
-            shuileizhanduichuixue: ["female", "shu", 3, ["dajiaoduguibi", "quzhudd", "shuileizhandui",], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
-            mingsike: ["female", "qun", 3, ["dajiaoduguibi", "quzhudd", "manchangzhanyi", "manchangzhanyi_1"], ["des:跑得快，看得多。"]],
-            "u1405": ["female", "wu", 2, ["qianting", "baiyin_skill"], ["des:无需隐匿的偷袭大师，马上就让对手的后勤捉襟见肘。"]],
-            baiyanjuren: ["female", "wu", 3, ["junfu"], ["des:需要武器支援，伙计倒下了。"]],
-            changchun: ["female", "wu", 3, ["daoqu", "tianyi"], ["des:尚处于正能量之时。"]],*/
-        },
-        translate: {
+        }, help: {}, config: {//config就是配置文件，类似于minecraft的模组设置文本。无名将其可视化了....。当你进行了至少一次强化后<br>1.出牌阶段<br>你可以弃置3张不同花色的牌，提升一点血量上限。<br>2.当你濒死时，<br>你可以弃置4张不同花色的牌，回复一点体力。<br>（未开启强化，则无需强化即可使用建造。未开启建造，则强化上限仅为1级。）火杀：令目标回合结束后，受到一点火焰伤害，摸两张牌。</br>冰杀：护甲加1伤；减少对手1点防御距离。</br>雷杀：自动判断是否流失对手体力；减少对手1点手牌上限；。</br>此角色回合结束后移除所有的进水、减速、燃烧。
+            jianrjinji: { "name": "禁用舰R联机武将/可自定义角色技能", "intro": "在游戏运行时，扩展通过运行一个技能，将联机武将添加至游戏内，<br>禁用此技能，才能禁用联机武将。<br>禁用后，单机武将不会被联机部分覆盖。<br>进入修改武将的界面：点击上方的编辑扩展-武将。", "init": false },
+            _yuanhang: { "name": "远航-用一张牌摸一张牌，濒死可摸牌", "intro": "开启后，所有玩家受伤时手牌上限+1；<br>每轮限1/2/3次，当失去手牌后，且手牌数<手牌上限的一半时，你摸一张牌。<br>当你进入濒死状态时，你可以摸一张牌，体力上限>2时需减少一点体力上限，额外摸一张牌；死亡后，若你为忠臣，你可以令主公摸一张牌。", "init": true },
+            _jianzaochuan: { "name": "建造-用三张牌提升血量上限，用四张牌回血", "intro": "开启后，若任意玩家进行了至少一次强化：<br>1.出牌阶段，<br>你可以弃置3张不同花色的牌，提升一点血量上限。<br>2.当你濒死时，<br>你可以弃置4张不同花色的牌，回复一点体力。<br>（未开启强化，则无需强化即可使用建造。未开启建造，则强化上限仅为1级。）", "init": true },
+            _qianghuazhuang: { "name": "强化-消耗牌增加自身能力", "intro": "开启后，出牌阶段限一次，所有玩家可以弃置二至四张牌或消耗经验，选择一至两个永久效果升级。<br>（如摸牌、攻击距离、手牌上限等）", "init": true },
+            _wulidebuff: { "name": "火杀燃烧、雷杀穿甲、寒冰剑对甲加伤", "intro": "开启后，属性伤害会有额外效果。<br>火杀：令目标回合结束后，受到一点火焰伤害，摸两张牌（有护甲则不会触发摸牌）。</br>冰杀/寒冰剑雷杀：护甲加1伤；减少对手1点防御距离。</br>雷杀：有护甲时改为造成对手流失体力；减少对手1点手牌上限；。</br>此角色回合结束后/濒死时移除进水、减速、燃烧。", "init": true },
+            qyzhugeliang: { "name": "第一轮休闲局-添加原版技能", "intro": "开启后，主公可以在回合开始时，选择一组技能，直到下一回合开始前，所有角色都能使用这些技能；还有火攻一类的卡组可供选择，让每一个玩家选择打出这些卡", "init": false },
+            diewulimitai: { "name": "蝶舞-给队友递一张杀、装备", "intro": "开启后，所有玩家获得辅助类技能【蝶舞】，<br>出牌阶段，可以给队友递一张装备/杀，队友得到此牌后可以立即使用，但每轮只能以此法只能出一次杀。", "init": false },
+            yidong: { "name": "回合内，与相邻玩家互换座位", "intro": "开启后，所有玩家获得辅助类技能【移动】：<br>1.可以在局内移动自己角色的座位，<br>限制为相邻座位，<br>对ai的限制为队友/目标距离此角色为2。", "init": false },
+            kaishimopao: { "name": "更好的摸牌阶段", "intro": "开启后，所有玩家获得摸牌类技能【摸牌】，<br>摸牌阶段摸牌量>1时：<br>可以弃置等同于摸牌数的牌，改为获得1张由你指定类别的牌，<br>在你判定延时锦囊牌前，<br>可令1.下一个摸牌阶段--少摸一张牌;2.本回合结束时--摸一张牌。", "init": false },
+            _hanbing_gai: { "name": "寒冰剑-增强", "intro": "开启后，拥有寒冰剑时，寒冰剑的弃牌数改为你造成的伤害*2，<br>弃置到没有手牌时，会将没有计算完的伤害继续打出（以普通伤害的属性）。", "init": true },
+            tiaozhanbiaojiang: { "name": "挑战模式全员国战不屈", "intro": "开启后，所有玩家获得技能【挑战技能】：<br>开局流失体力到剩余1血，根据流失的体力数多摸等量的牌；<br>全员获得国战不屈，唤醒界标武将的力量。<br>暂缺一个扶起负数血队友的技能", "init": true },
+        }, package: {
+            character: {
+                character: {//单机部分，在联机框架开启时，联机武将会覆盖同名武将应该不生效。
+                    /*liekexingdun: ["female", "wu", 4, ["hangmucv", "hangkongzhanshuxianqu"], ["zhu", "des:血量中等的航母，温柔，体贴，过渡期追着大船打的航母。"]],
+                    qixichicheng: ["female", "shu", 4, ["hangmucv", "qixi_cv"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
+                    wufenzhongchicheng: ["female", "shu", 4, ["hangmucv", "mingyundewufenzhong"], ["des:大佬友情放出精美壁纸，坚定与自信的姿态"]],
+         
+                    qiye: ["female", "USN", 4, ["hangmucv", "dumuchenglin"], ["des:有必中攻击，快跑"]],
+                    bisimai: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["zhu", "des:更多刮痧炮，更多炮弹，更多削弱光环，更多护甲模组，更多血量。"]],
+                    misuli: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["des:用精巧的手枪去质疑，用绝对的火力回击对手。"]],
+                    weineituo: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["des:身材小，而强度惊人。"]],
+                    lisailiu: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["des:幸运的象征之一，同时有着丰富的精神象征。"]],
+                    changmen: ["female", "shu", 4, ["zhuangjiafh", "zhanliebb"], ["des:。"]],
+                    kunxi: ["female", "shu", 4, ["huokongld", "zhongxunca", "gaosusheji"], ["des:画师优秀的功底让这名角色美而可爱，这是出色的角色塑造。"]],
+                    ougengqi: ["female", "shu", 4, ["huokongld", "zhongxunca"], ["des:励志偶像，与标志性舰装，给人以强大的保护。"]],
+                    qingye: ["female", "shu", 4, ["huokongld", "zhongxunca", "sawohaizhan"], ["des:励志偶像，与一首动人的歌，与一段坎坷旅途。"]],
+                    beianpudun: ["female", "shu", 4, ["huokongld", "zhongxunca"], ["des:励志青年，在旅途中成长，与恋人坚定的望向远方。"]],
+                    jiujinshan: ["female", "shu", 4, ["huokongld", "zhongxunca"], ["des:航海服饰，侦查员与火炮观瞄。"]],
+                    yixian: ["female", "USN", 3, ["fangkong2", "qingxuncl"], ["des:经典美术设计的款式，意气风发，威猛先生"]],
+                    tianlangxing: ["female", "USN", 3, ["fangkong2", "qingxuncl"], ["des:阻敌计谋表现优秀，这是先发制敌的优势所在，"]],
+                    dading: ["female", "USN", 3, ["fangkong2", "qingxuncl"], ["des:手持竹伞的轻巡，辅助队友，防御攻击。"]],
+                    degelasi: ["female", "USN", 3, ["fangkong2", "qingxuncl"], ["des:现代文职服饰，一看就很会办公。"]],
+                    yatelanda: ["female", "USN", 3, ["fangkong2", "qingxuncl"], ["des:双枪射手点形象，其双枪能以极快的射速打出爆炸弹匣，清空一小片区域。"]],
+                    "z31": ["female", "USN", 3, ["dajiaoduguibi", "quzhudd"], ["des:婚纱与轻纱是多数人的美梦,与绿草平原，与绿水青山"]],
+                    xuefeng: ["female", "shu", 3, ["dajiaoduguibi", "quzhudd", "xiangrui", "yumian"], ["des:幸运的驱逐舰，多位画师、花了大款的大佬亲情奉献。"]],
+                    kangfusi: ["female", "USN", 3, ["dajiaoduguibi", "quzhudd"], ["des:水手服欸,优秀的构图，不过图少改造晚。"]],
+                    "47project": ["female", "USN", 3, ["dajiaoduguibi", "quzhudd"], ["des:这是个依赖科技的舰船，有着科幻的舰装，与兼备温柔体贴与意气风发的表现。"]],
+                    guzhuyizhichuixue: ["female", "shu", 3, ["dajiaoduguibi", "quzhudd", "guzhuyizhi"], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
+                    shuileizhanduichuixue: ["female", "shu", 3, ["dajiaoduguibi", "quzhudd", "shuileizhandui",], ["des:水手服与宽袖的结合，给人以温柔的感觉。"]],
+                    mingsike: ["female", "qun", 3, ["dajiaoduguibi", "quzhudd", "manchangzhanyi", "manchangzhanyi_1"], ["des:跑得快，看得多。"]],
+                    "u1405": ["female", "wu", 2, ["qianting", "baiyin_skill"], ["des:无需隐匿的偷袭大师，马上就让对手的后勤捉襟见肘。"]],
+                    baiyanjuren: ["female", "wu", 3, ["junfu"], ["des:需要武器支援，伙计倒下了。"]],
+                    changchun: ["female", "wu", 3, ["daoqu", "tianyi"], ["des:尚处于正能量之时。"]],*/
+                },
+                translate: {
 
-        },
-    },
-    card: {
-        card: { },
-        translate: {
-
-        },
-        list: [],
+                },
             },
-    skill: {
+            card: {
+                card: {},
+                translate: {
 
-        translate: {
+                },
+                list: [],
+            },
+            skill: {
 
-        },
-    },
-    intro: "制作组群，730255133。<br>长按或右键下方全局技能的选项简介查看技能详情，可根据需要开关",
-        author: "※人杰地灵游戏中",
+                translate: {
+
+                },
+            },
+            intro: "制作组群，730255133。<br>长按或右键下方全局技能的选项简介查看技能详情，可根据需要开关",
+            author: "※人杰地灵游戏中",
             diskURL: "https://pan.baidu.com/s/1VPMQuAUgucpRRbef9Dmy3g?pwd=gfmv",
-                forumURL: "",
-                    version: "1.97+",
+            forumURL: "",
+            version: "1.97+",
         }, files: { "character": ["changchun.jpg"], "card": ["fasheqi3.png"], "skill": [] }
     }
 
