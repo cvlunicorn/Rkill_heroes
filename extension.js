@@ -23,8 +23,7 @@ try {
 } catch (error) {
     console.warn("require('ws') failed");
 }
-//const { connect } = require("ws");//突然生成出来的，暂未查明生成原因，且难以复现。require导入属于cjs格式，在手机上会报错，电脑上不会。写为import来导入会产生另一种错误。目前使用try-catch包裹起来。
-//2025.1.19升级至无名杀1.10.12版本，该版本联机允许扩展，不额外需要“一劳永逸”扩展。
+//const { connect } = require("ws");///vscode生成出来的，vscodeAI检测到enable认为没导入自动添加了导入但其实enable只是一个标签。目前使用try-catch包裹起来。
 import { lib, game, ui, get, ai, _status } from '../../noname.js'
 game.import("extension", function (lib, game, ui, get, ai, _status) {
 
@@ -11715,7 +11714,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "fasheqi3": "发射器",
                             "fasheqi3_info": "发射导弹的同时要牺牲一个火控雷达槽位（没有特殊效果）",
                         },
-                        list: [["heart", "1", "hangkongzhan"], ["diamond", "1", "xingyun"], ["spade", "1", "lianxugongji"], ["club", "1", "jinjuzy"], ["heart", "1", "jiakongls"]],//牌堆添加
+                        list: [/* ["heart", "1", "hangkongzhan"], ["diamond", "1", "xingyun"], ["spade", "1", "lianxugongji"], ["club", "1", "jinjuzy"], ["heart", "1", "jiakongls"] */],//牌堆添加
                     }
                     return jianrjinjibao
                 });
@@ -11725,7 +11724,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 //闪避（响应）对面的攻击，通过攻击减少对手手牌数，config.diewulimitaiconfig.hanbing_gaiconfig.tiaozhanbiaojiang
             };
         }, help: {}, config: {//config就是配置文件，类似于minecraft的模组设置文本。无名将其可视化了....。当你进行了至少一次强化后<br>1.出牌阶段<br>你可以弃置3张不同花色的牌，提升一点血量上限。<br>2.当你濒死时，<br>你可以弃置4张不同花色的牌，回复一点体力。<br>（未开启强化，则无需强化即可使用建造。未开启建造，则强化上限仅为1级。）火杀：令目标回合结束后，受到一点火焰伤害，摸两张牌。</br>冰杀：护甲加1伤；减少对手1点防御距离。</br>雷杀：自动判断是否流失对手体力；减少对手1点手牌上限；。</br>此角色回合结束后移除所有的进水、减速、燃烧。
-            jianrjinji: { "name": "禁用舰R联机武将/可自定义角色技能", "intro": "在游戏运行时，扩展通过运行一个技能，将联机武将添加至游戏内，<br>禁用此技能，才能禁用联机武将。<br>禁用后，单机武将不会被联机部分覆盖。<br>进入修改武将的界面：点击上方的编辑扩展-武将。", "init": false },
+            jianrjinji: { "name": "禁用舰R联机武将/可自定义角色技能", "intro": "在游戏运行时，扩展通过运行一个技能，将联机武将添加至游戏内，<br>启用此技能，才能禁用联机武将。<br>禁用后，单机武将不会被联机部分覆盖。<br>进入修改武将的界面：点击上方的编辑扩展-武将。", "init": false },
             _yuanhang: { "name": "远航-用一张牌摸一张牌，濒死可摸牌", "intro": "开启后，所有玩家受伤时手牌上限+1；<br>每轮限1/2/3次，当失去手牌后，且手牌数<手牌上限的一半时，你摸一张牌。<br>当你进入濒死状态时，你可以摸一张牌，体力上限>2时需减少一点体力上限，额外摸一张牌；死亡后，若你为忠臣，你可以令主公摸一张牌。", "init": true },
             _jianzaochuan: { "name": "建造-用三张牌提升血量上限，用四张牌回血", "intro": "开启后，若任意玩家进行了至少一次强化：<br>1.出牌阶段，<br>你可以弃置3张不同花色的牌，提升一点血量上限。<br>2.当你濒死时，<br>你可以弃置4张不同花色的牌，回复一点体力。<br>（未开启强化，则无需强化即可使用建造。未开启建造，则强化上限仅为1级。）", "init": true },
             _qianghuazhuang: { "name": "强化-消耗牌增加自身能力", "intro": "开启后，出牌阶段限一次，所有玩家可以弃置二至四张牌或消耗经验，选择一至两个永久效果升级。<br>（如摸牌、攻击距离、手牌上限等）", "init": true },
