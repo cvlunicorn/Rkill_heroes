@@ -218,30 +218,30 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 if (ui.system1 || ui.system2) {
                     // @ts-ignore
                     clearInterval(getSystem);
-                        ui.jian_R_readme = ui.create.system('舰r杀机制介绍', function () {
-                            game.jianRAlert(
-                                "所有全局技能均可在扩展详情中查看说明和配置开关，" +
-                                "以下是默认开启的全局技能<br><br>" +
-                                "<b>远航:</b>你受伤时手牌上限+1；每轮限1/2/3次，失去手牌后，若手牌数少于一半，你可以摸一张牌。<br>" +
-                                "当你进入濒死状态时，若你的体力上限大于2，你可以减少一点体力上限，摸两张牌，否则摸一张牌；<br>" +
-                                "你死亡后，若你为忠臣，你可以令主公摸一张牌。<br><br>" +
-                                "<b>建造:</b>若你进行了至少一次强化：出牌阶段" +
-                                "你可以弃置3张不同花色的牌，提升一点血量上限，解锁强化二级效果。<br>" +
-                                "<b>强化:</b>出牌阶段限一次，你可以弃置二至四张牌，选择一至两个效果升级。（如摸牌、攻击距离、手牌上限等）<br><br>" +
-                                "<b>属性伤害:</b>火杀燃烧:令目标回合结束后，受到一点火焰伤害，摸两张张牌。<br>" +
-                                "冰杀减速:对有护甲的目标加1伤害；减少1点其他角色计算与目标的距离。<br>" +
-                                "雷杀进水:有护甲时改为造成目标流失体力；减少目标1点手牌上限。<br>" +
-                                "目标回合结束后或濒死时移除进水、减速、燃烧。",
-                                {
-                                    containerStyle: {
-                                        width: '60%',
-                                        // height: '80%',
-                                        padding: '5px 20px 5px 20px',
-                                    },
-                                }
-                            );
-                        });
-                    }
+                    ui.jian_R_readme = ui.create.system('舰r杀机制介绍', function () {
+                        game.jianRAlert(
+                            "所有全局技能均可在扩展详情中查看说明和配置开关，" +
+                            "以下是默认开启的全局技能<br><br>" +
+                            "<b>远航:</b>你受伤时手牌上限+1；每轮限1/2/3次，失去手牌后，若手牌数少于一半，你可以摸一张牌。<br>" +
+                            "当你进入濒死状态时，若你的体力上限大于2，你可以减少一点体力上限，摸两张牌，否则摸一张牌；<br>" +
+                            "你死亡后，若你为忠臣，你可以令主公摸一张牌。<br><br>" +
+                            "<b>建造:</b>若你进行了至少一次强化：出牌阶段" +
+                            "你可以弃置3张不同花色的牌，提升一点血量上限，解锁强化二级效果。<br>" +
+                            "<b>强化:</b>出牌阶段限一次，你可以弃置二至四张牌，选择一至两个效果升级。（如摸牌、攻击距离、手牌上限等）<br><br>" +
+                            "<b>属性伤害:</b>火杀燃烧:令目标回合结束后，受到一点火焰伤害，摸两张张牌。<br>" +
+                            "冰杀减速:对有护甲的目标加1伤害；减少1点其他角色计算与目标的距离。<br>" +
+                            "雷杀进水:有护甲时改为造成目标流失体力；减少目标1点手牌上限。<br>" +
+                            "目标回合结束后或濒死时移除进水、减速、燃烧。",
+                            {
+                                containerStyle: {
+                                    width: '60%',
+                                    // height: '80%',
+                                    padding: '5px 20px 5px 20px',
+                                },
+                            }
+                        );
+                    });
+                }
             }, 500);
 
 
@@ -6000,7 +6000,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return player.countMark('jueshengzhibing_count') < 2;
                                 },
                                 content: function () {
-                                    player.addTempSkill('zhiyu', { player: 'phaseBegin' });
+                                    player.addTempSkill('zhiyu_R', { player: 'phaseBegin' });
                                 },
                                 group: ["jueshengzhibing_discard", "jueshengzhibing_draw"],
                                 //preHidden: ["jueshengzhibing_discard", "jueshengzhibing_draw"],
@@ -6067,6 +6067,33 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
 
+                            },
+                            zhiyu_R: {
+                                audio: 2,
+                                trigger: {
+                                    player: "damageEnd",
+                                },
+                                preHidden: true,
+                                content: function () {
+                                    "step 0";
+                                    player.draw();
+                                    "step 1";
+                                    if (!player.countCards("h")) event.finish();
+                                    else player.showHandcards();
+                                    "step 2";
+                                    if (!trigger.source) return;
+                                    var cards = player.getCards("h");
+                                    var color = get.color(cards[0], player);
+                                    for (var i = 1; i < cards.length; i++) {
+                                        if (get.color(cards[i], player) != color) return;
+                                    }
+                                    trigger.source.chooseToDiscard(true);
+                                },
+                                ai: {
+                                    "maixie_defend": true,
+                                    threaten: 0.9,
+                                },
+                                "_priority": 0,
                             },
                             zhanfu: {
                                 nobracket: true,
@@ -10386,7 +10413,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             bigseven: "BIGSEVEN", "bigseven_info": "你使用基本牌和非延时锦囊牌指定唯一目标后，可以进行判定。若结果与使用的牌类型相同，你可以额外指一名角色为目标。(场上每有一名自己以外拥有bigseven的角色，目标+1)",
                             saobaxing: "扫把星", "saobaxing_info": "锁定技，每回合限一次，当一名角色的判定牌生效前，若判定结果为红色，你须令其重新判定。",
                             shaojie: "哨戒", "shaojie_info": "锁定技，你无法打出闪响应万箭齐发/近距支援。当你受到万箭齐发/近距支援伤害时，你获得一点护甲。",
-
+                            zhiyu_R: "智愚", "zhiyu_R_info": "当你受到伤害后你可以摸一张牌，然后展示所有手牌。若颜色均相同，你令伤害来源弃置一张手牌。",
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
                             lishizhanyi_naerweike: '历史战役-纳尔维克',
