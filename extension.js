@@ -8639,6 +8639,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             if (event.num <= 0) { return 0; }
                                             var cards = player.getExpansions('hongseqiangwei');
                                             var num = event.player.getSeatNum();
+                                            game.log(num);
                                             for (i = 0; i < player.getExpansions('hongseqiangwei').length; i++) {
                                                 if (get.number(cards[i]) % game.countPlayer() == num) {
                                                     return event.player.isAlive();
@@ -10009,7 +10010,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return lib.filter.cardDiscardable(card, player);
                                         },
                                         filterTarget: function (card, player, target) {
-                                            if (_status.event.targets.includes(target) && !target.hasSkill('duikongzhiwei_aibiexuan')) {
+                                            if (_status.event.targets.includes(target) && !target.hasSkill('fangkong2_aibiexuan')) {
                                                 return get.distance(player, target) <= 1;
                                             }
                                         },//选择事件包含的目标，同trigger的目标。有其他同技能的角色时，ai不要重复选择目标。
@@ -10026,7 +10027,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (result.bool) {//只能判断你有没有选择，然后给你true与false，没其他文本。
                                         player.discard(result.cards);//前面有卡牌card，可以返回card，不同于仁德主动技能直接写card。
                                         event.target = result.targets;//前面有目标target，可以返回target。
-                                        if (event.target != undefined) { for (var i = 0; i < trigger.targets.length; i += (1)) { if (event.target.includes(trigger.targets[i])) { trigger.getParent().excluded.add(trigger.targets[i]); trigger.targets[i].addSkill('duikongzhiwei_aibiexuan'); game.log('取消卡牌目标', trigger.targets[i], '编号', i) } } };//三级选择，集合target是否包含trigger.target。同时测试是否选到了目标。
+                                        if (event.target != undefined) { for (var i = 0; i < trigger.targets.length; i += (1)) { if (event.target.includes(trigger.targets[i])) { trigger.getParent().excluded.add(trigger.targets[i]); trigger.targets[i].addSkill('fangkong2_aibiexuan'); game.log('取消卡牌目标', trigger.targets[i], '编号', i) } } };//三级选择，集合target是否包含trigger.target。同时测试是否选到了目标。
                                         player.logSkill('duikongzhiwei', event.target);
                                     }//让技能发语音，发历史记录。
                                 },
@@ -10036,7 +10037,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             global: "useCardEnd",
                                         },
                                         forced: true,
-                                        content: function () { game.log('保护结束'); player.removeSkill('duikongzhiwei_aibiexuan'); },
+                                        content: function () { game.log('保护结束'); player.removeSkill('fangkong2_aibiexuan'); },
                                         sub: true,
                                         "_priority": 0,
                                     },
@@ -10215,7 +10216,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                 },
                                 ai: {
-                                    expose:0.4,
+                                    expose: 0.4,
                                 },
                                 "_priority": 0,
                             },
