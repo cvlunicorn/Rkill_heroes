@@ -863,7 +863,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lishizhanyi_naerweike: ["shengwang", "z17", "z18", "z21", "z22", "gesakeren", "biaoqiang"],
                                 lishizhanyi_matapanjiao: ["kewei", "kente", "luodeni"],
                                 lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "weiershiqinwang", "z1", "z16"],
-                                lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng", "qiuyue", "weilianDbote", "xianghe"],
+                                lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng", "qiuyue", "weilianDbote", "xianghe", "ruihe"],
                                 lishizhanyi_haixiafujizhan: ["u47", "u81", "u505"],
                                 weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan"],
                             },
@@ -938,10 +938,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             luodeni: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "bigseven"], ["des:　纳尔逊级2号舰，于1927年服役。罗德尼号同纳尔逊号、科罗拉多级、长门级一起被称为海军假日七巨头。二战爆发后罗德尼号参与了围歼击沉俾斯麦号的最后战斗，之后由于航速较慢，主要执行护航和支援任务。43年参与了在地中海的一系列作战，44年罗德尼号参与了支援诺曼底的行动，战后退役拆解。"]],
                             weilianDbote: ["female", "USN", 3, ["dajiaoduguibi", "quzhudd", "saobaxing", "shaojie"], ["des:　这是一艘有着戏剧性经历的驱逐舰，在43年为总统座舰衣阿华号护航时她不慎对衣阿华号发射鱼雷，幸好衣阿华号躲避及时，没有造成更大后果。在冲绳战役中，她担任危险的雷达哨舰时被神风攻击撞中，整个船体都被抬离水面并最终沉没，但是幸运的是在过程中没有一名船员牺牲。"]],
                             xianghe: ["female", "IJN", 4, ["hangmucv", "beihaidandang"], ["des:　翔鹤型是日本退出条约后建造的舰队航母，由于不再受条约限制，所以她的设计比之前的日本航母更加成熟。1941年8月翔鹤竣工，同一个月后完工的瑞鹤号编为第五航空战队，一起参加了12月的偷袭珍珠港。1942年两舰参加了珊瑚海海战，海战中翔鹤号被重创，因此错过了中途岛海战，在之后的战争中作为主力鏖战在南太平洋。44年6月的阿号作战中，翔鹤号被美国潜艇棘鳍号命中四发。由于损管得力，一度控制了进水，但最终油气爆炸而沉没。"]],
+                            ruihe: ["female", "IJN", 4, ["hangmucv", "xingyundeyunyuqu"], ["des:　翔鹤型航母2番舰，41年9月服役后编入第五航空战队参加了偷袭珍珠港。在珊瑚海海战中，瑞鹤号凭借雨云躲开了美军的空袭，而翔鹤号被美军命中受创。两舰因此错过了中途岛战役。后来翔鹤号和瑞鹤号编为一航战参加了圣克鲁斯海战，这也是日本最后一次航母的战术胜利。在44年6月的阿号作战中，大凤号被击沉，瑞鹤号顶替其成为旗舰。10月，恩加诺海战中，编入诱饵舰队的瑞鹤号被CV16列克星敦号（又称：蓝色幽灵）的舰载机所击沉。"]],
 
 
 
-                            skilltest: ["male", "OTHER", 9, ["rendeonly2"], ["forbidai", "des:测试用"]],
+                            skilltest: ["male", "OTHER", 9, [], ["forbidai", "des:测试用"]],
                         },
                         skill: {
                             _yuanhang: {
@@ -10220,6 +10221,51 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
                             },
+                            xingyundeyunyuqu: {
+                                nobracket: true,
+                                audio: true,
+                                mod: {
+                                    globalTo(from, to, distance) {
+                                        if (player.countCards("j")) { return distance + 1; }
+                                    },
+                                },
+                                trigger: {
+                                    player: ["phaseUseEnd"],
+                                },
+                                filter: function (event, player) {
+                                    if (player.hasJudge("lebu")) return false;
+                                    return player.countCards("hes") > 0;
+                                },
+                                frequent: true,
+                                content:function() {
+                                    "step 0";
+                                    player
+                                        .chooseCard("he", get.prompt("xingyundeyunyuqu", player), "将一张牌当做乐不思蜀对自己使用", function (card, player) {
+                                            return true;
+                                        })
+                                        .set("target", player)
+                                        .set("ai", function (card) {
+                                            return 6 - get.value(card);
+                                        });
+                                    "step 1";
+                                    if (result.bool) {
+                                        player.useCard(get.autoViewAs({ name: "lebu" }, result.cards), result.cards, false, trigger.player, "qingleng");
+                                    }
+                                },
+                                ai: {
+                                    threaten: 1.5,
+                                    tag: {
+                                        skip: "phaseUse",
+
+                                    },
+
+                                },
+                            },
+                            xingyundeyunyuqu_bazhen: {
+                                group: "bazhen_bagua",
+                                locked: true,
+                                "_priority": 0,
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -10287,6 +10333,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             luodeni: "罗德尼",
                             weilianDbote: "威廉D波特",
                             xianghe: "翔鹤",
+                            ruihe: "瑞鹤",
 
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐", "quzhudd_info": "",
@@ -10482,6 +10529,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             shaojie: "哨戒", "shaojie_info": "锁定技，你无法打出闪响应万箭齐发/近距支援。当你受到万箭齐发/近距支援伤害时，你获得一点护甲。",
                             zhiyu_R: "智愚", "zhiyu_R_info": "当你受到伤害后你可以摸一张牌，然后展示所有手牌。若颜色均相同，你令伤害来源弃置一张手牌。",
                             beihaidandang: "被害担当", "beihaidandang_info": "每回合限一次，其他角色受到伤害时，你可以代替其受此伤害，然后摸x张牌，将x张手牌交给一名其他角色或弃置(x为你的体力上限)。若目标为航母，此伤害值-1。",
+                            xingyundeyunyuqu: "幸运的云雨区", "xingyundeyunyuqu_info": "出牌阶段结束时，你可以将一张牌当作乐不思蜀对自己使用然后恢复一点体力，然后获得[八阵]直到下回合开始。你的判定区有牌时计算与其他角色距离+1。",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
@@ -10549,7 +10597,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                 },
                                 ai: {
-
+                 
                                     wuxie: function (target, card, player, viewer) {
                                         if (get.attitude(viewer, target) > 0 && target.countCards('h', 'shan')) {
                                             if (!target.countCards('h') || target.hp == 1 || Math.random() < 0.7) return 0;
@@ -10689,7 +10737,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }
                                         if (!card) card = event.dialog.buttons[0].link;
                                     }
-
+                 
                                     var button;
                                     for (var i = 0; i < dialog.buttons.length; i++) {
                                         if (dialog.buttons[i].link == card) {
