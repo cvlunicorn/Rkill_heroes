@@ -863,7 +863,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lishizhanyi_naerweike: ["shengwang", "z17", "z18", "z21", "z22", "gesakeren", "biaoqiang"],
                                 lishizhanyi_matapanjiao: ["kewei", "kente", "luodeni"],
                                 lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "weiershiqinwang", "z1", "z16"],
-                                lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng", "qiuyue", "weilianDbote"],
+                                lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng", "qiuyue", "weilianDbote", "xianghe"],
                                 lishizhanyi_haixiafujizhan: ["u47", "u81", "u505"],
                                 weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan"],
                             },
@@ -937,6 +937,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qiuyue: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "duikongzhiwei",], ["des:　秋月型是日本少有的以护卫和对空为任务的驱逐舰，为了区别雷击用的甲驱而被称做乙驱，主炮使用100毫米双联高炮。秋月号建成后主要伴随航母提供防空掩护，经历了马里亚纳海战，目睹了日本航母部队的失败。同年10月在恩加诺海战中被美军飞机炸沉。"]],
                             luodeni: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "bigseven"], ["des:　纳尔逊级2号舰，于1927年服役。罗德尼号同纳尔逊号、科罗拉多级、长门级一起被称为海军假日七巨头。二战爆发后罗德尼号参与了围歼击沉俾斯麦号的最后战斗，之后由于航速较慢，主要执行护航和支援任务。43年参与了在地中海的一系列作战，44年罗德尼号参与了支援诺曼底的行动，战后退役拆解。"]],
                             weilianDbote: ["female", "USN", 3, ["dajiaoduguibi", "quzhudd", "saobaxing", "shaojie"], ["des:　这是一艘有着戏剧性经历的驱逐舰，在43年为总统座舰衣阿华号护航时她不慎对衣阿华号发射鱼雷，幸好衣阿华号躲避及时，没有造成更大后果。在冲绳战役中，她担任危险的雷达哨舰时被神风攻击撞中，整个船体都被抬离水面并最终沉没，但是幸运的是在过程中没有一名船员牺牲。"]],
+                            xianghe: ["female", "IJN", 4, ["hangmucv", "beihaidandang"], ["des:　翔鹤型是日本退出条约后建造的舰队航母，由于不再受条约限制，所以她的设计比之前的日本航母更加成熟。1941年8月翔鹤竣工，同一个月后完工的瑞鹤号编为第五航空战队，一起参加了12月的偷袭珍珠港。1942年两舰参加了珊瑚海海战，海战中翔鹤号被重创，因此错过了中途岛海战，在之后的战争中作为主力鏖战在南太平洋。44年6月的阿号作战中，翔鹤号被美国潜艇棘鳍号命中四发。由于损管得力，一度控制了进水，但最终油气爆炸而沉没。"]],
 
 
 
@@ -10154,6 +10155,70 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
+                            beihaidandang: {
+                                nobracket: true,
+                                audio: true,
+                                usable: 1,
+                                trigger: {
+                                    global: ["damageBegin4"],
+                                },
+                                filter(event, player, name) {
+                                    return event.num > 0 && event.player != player;
+                                },
+                                check: function (event, player) {
+                                    return get.attitude(player, event.player) > 2;
+                                },
+                                content: function () {
+                                    "step 0"
+                                    let num = event.num
+                                    trigger.cancel();
+                                    if (trigger.player.hasSkill("hangmucv")) { num = num - 1; }
+                                    player.damage(num);
+                                    player.draw(player.maxHp);
+                                    "step 1"
+                                    if (!player.countCards("he")) event.finish();
+                                    else player.chooseControl().set("choiceList", ["将" + player.maxHp + "张牌交给一名其他角色", "弃置" + player.maxHp + "张牌"]).set("ai", function () {
+                                        if (game.hasPlayer(function (current) {
+                                            return current != player && get.attitude(player, current) > 2;
+                                        })) return 0;
+                                        return 1;
+                                    });
+                                    "step 2"
+                                    if (result.index == 0) {
+                                        player.chooseCardTarget({
+                                            position: "he",
+                                            filterCard: true,
+                                            selectCard: Math.min(player.maxHp, player.countCards("he")),
+                                            filterTarget: function (card, player, target) {
+                                                return player != target;
+                                            },
+                                            ai1: function (card) {
+                                                return 1;
+                                            },
+                                            ai2: function (target) {
+                                                var att = get.attitude(_status.event.player, target);
+                                                if (target.hasSkillTag("nogain")) att /= 10;
+                                                if (target.hasJudge("lebu")) att /= 5;
+                                                return att;
+                                            },
+                                            prompt: "选择" + player.maxHp + "张牌，交给一名其他角色。",
+                                            forced: true,
+                                        });
+                                    } else {
+                                        player.chooseToDiscard(player.maxHp, true, "he");
+                                        event.finish();
+                                    }
+                                    "step 3";
+                                    if (result.bool) {
+                                        var target = result.targets[0];
+                                        player.give(result.cards, target);
+                                    }
+                                },
+                                ai: {
+                                    expose:0.4,
+                                },
+                                "_priority": 0,
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -10220,6 +10285,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qiuyue: "秋月",
                             luodeni: "罗德尼",
                             weilianDbote: "威廉D波特",
+                            xianghe: "翔鹤",
 
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐", "quzhudd_info": "",
@@ -10414,6 +10480,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             saobaxing: "扫把星", "saobaxing_info": "锁定技，每回合限一次，当一名角色的判定牌生效前，若判定结果为红色，你须令其重新判定。",
                             shaojie: "哨戒", "shaojie_info": "锁定技，你无法打出闪响应万箭齐发/近距支援。当你受到万箭齐发/近距支援伤害时，你获得一点护甲。",
                             zhiyu_R: "智愚", "zhiyu_R_info": "当你受到伤害后你可以摸一张牌，然后展示所有手牌。若颜色均相同，你令伤害来源弃置一张手牌。",
+                            beihaidandang: "被害担当", "beihaidandang_info": "每回合限一次，其他角色受到伤害时，你可以代替其受此伤害，然后摸x张牌，将x张手牌交给一名其他角色或弃置(x为你的体力上限)。若目标为航母，此伤害值-1。",
+
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
                             lishizhanyi_naerweike: '历史战役-纳尔维克',
