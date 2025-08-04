@@ -9934,7 +9934,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     "step 2";
                                     game.log(_status.event.player);
                                     if (!trigger.target.hasSkill("zhanliebb") || !player == _status.event.player) {
-                                        player.addTempSkill('guanjianyiji_disable', 'roundStart');
+                                        player.addTempSkill('guanjianyiji_disable', 'phaseEnd');
                                     }
                                 },
                                 mark: false,
@@ -9943,7 +9943,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     disable: {
                                         mark: true,
                                         intro: {
-                                            content: "本轮已发动",
+                                            content: "本回合已发动",
                                         },
                                         sub: true,
                                         "_priority": 0,
@@ -10522,7 +10522,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             juejingfengsheng: "绝境逢生", juejingfengsheng_info: "锁定技，你的最大耐久增加11。免疫一次致命伤害。",
                             saqijian: "萨奇剪", "saqijian_info": "你可以将一张黑色牌当无懈可击使用",
                             jupaohuoli: "巨炮火力", "jupaohuoli_info": "你使用杀造成伤害时，若你手牌数大于目标手牌数，此伤害+1。",
-                            guanjianyiji: "关键一击", "guanjianyiji_info": "每轮限一次，有牌指定目标后，你可以扣置目标的一张牌于武将牌上，此回合结束后再获得之。若此时是你的回合内且指定战列舰为目标，不计入发动次数限制。",
+                            guanjianyiji: "关键一击", "guanjianyiji_info": "每回合限一次，有牌指定目标后，你可以扣置目标的一张牌于武将牌上，此回合结束后再获得之。若此时是你的回合内且指定战列舰为目标，不计入发动次数限制。",
                             duikongzhiwei: "对空直卫", "duikongzhiwei_info": "每轮限一次，当一名角色使用锦囊牌指定至少两名角色为目标时，你可以弃置一张牌，令此牌对你和距离1的角色无效。",
                             bigseven: "BIGSEVEN", "bigseven_info": "你使用基本牌和非延时锦囊牌指定唯一目标后，可以进行判定。若结果与使用的牌类型相同，你可以额外指一名角色为目标。(场上每有一名自己以外拥有bigseven的角色，目标+1)",
                             saobaxing: "扫把星", "saobaxing_info": "锁定技，每回合限一次，当一名角色的判定牌生效前，若判定结果为红色，你须令其重新判定。",
