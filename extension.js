@@ -2539,6 +2539,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 filterCard: function (card, player, event) { return true },
                                 selectCard: function (card) { return 1 },
+                                discard:false,
                                 check: function (card) {
                                     var player = _status.event.player; return 7 - get.value(card)//if(get.suit(card)=='club'&&player.countMark('jinengup')<1){return -1};，本回合内不能再对同一目标使用此技能
                                 },
@@ -3301,12 +3302,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }//让技能发语音，发历史记录。
                                 },
                                 subSkill: {
-                                    d: {
+                                    aibiexuan: {
                                         trigger: {
                                             global: "useCardEnd",
                                         },
                                         forced: true,
-                                        content: function () { game.log('保护结束'); player.removeSkill('fangkong2_aibiexuan'); },
+                                        content: function () {
+                                            game.log('保护结束');
+                                            player.removeSkill('fangkong2_aibiexuan');
+                                        },
                                         sub: true,
                                     },
                                 },
@@ -3439,7 +3443,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 position: 'hejs',
                                 discard: false,
                                 selectCard: [1, Infinity],
-                                lose: false, check: function (card) {
+                                lose: false, 
+                                check: function (card) {
                                     var player = _status.event.player;
                                     var val = 5;
                                     if (player.needsToDiscard()) val = 15;
@@ -4647,6 +4652,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 selectCard: [1, Infinity],
                                 selectTarget: [1, Infinity],
+                                discard:false,
+                                lose:false,
                                 position: "h",
                                 filterOk: function () {
                                     return ui.selected.cards.length == ui.selected.targets.length;
