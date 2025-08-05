@@ -863,7 +863,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lishizhanyi_naerweike: ["shengwang", "z17", "z18", "z21", "z22", "gesakeren", "biaoqiang"],
                                 lishizhanyi_matapanjiao: ["kewei", "kente", "luodeni"],
                                 lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "weiershiqinwang", "z1", "z16"],
-                                lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng", "qiuyue", "weilianDbote", "xianghe", "ruihe"],
+                                lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng", "qiuyue", "weilianDbote", "xianghe", "ruihe", "yuhei"],
                                 lishizhanyi_haixiafujizhan: ["u47", "u81", "u505"],
                                 weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan"],
                             },
@@ -939,6 +939,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             weilianDbote: ["female", "USN", 3, ["dajiaoduguibi", "quzhudd", "saobaxing", "shaojie"], ["des:　这是一艘有着戏剧性经历的驱逐舰，在43年为总统座舰衣阿华号护航时她不慎对衣阿华号发射鱼雷，幸好衣阿华号躲避及时，没有造成更大后果。在冲绳战役中，她担任危险的雷达哨舰时被神风攻击撞中，整个船体都被抬离水面并最终沉没，但是幸运的是在过程中没有一名船员牺牲。"]],
                             xianghe: ["female", "IJN", 4, ["hangmucv", "beihaidandang"], ["des:　翔鹤型是日本退出条约后建造的舰队航母，由于不再受条约限制，所以她的设计比之前的日本航母更加成熟。1941年8月翔鹤竣工，同一个月后完工的瑞鹤号编为第五航空战队，一起参加了12月的偷袭珍珠港。1942年两舰参加了珊瑚海海战，海战中翔鹤号被重创，因此错过了中途岛海战，在之后的战争中作为主力鏖战在南太平洋。44年6月的阿号作战中，翔鹤号被美国潜艇棘鳍号命中四发。由于损管得力，一度控制了进水，但最终油气爆炸而沉没。"]],
                             ruihe: ["female", "IJN", 4, ["hangmucv", "xingyundeyunyuqu"], ["des:　翔鹤型航母2番舰，41年9月服役后编入第五航空战队参加了偷袭珍珠港。在珊瑚海海战中，瑞鹤号凭借雨云躲开了美军的空袭，而翔鹤号被美军命中受创。两舰因此错过了中途岛战役。后来翔鹤号和瑞鹤号编为一航战参加了圣克鲁斯海战，这也是日本最后一次航母的战术胜利。在44年6月的阿号作战中，大凤号被击沉，瑞鹤号顶替其成为旗舰。10月，恩加诺海战中，编入诱饵舰队的瑞鹤号被CV16列克星敦号（又称：蓝色幽灵）的舰载机所击沉。"]],
+                            yuhei: ["female", "IJN", 4, ["huokongld", "zhongxunca", "diwuzhandui"], ["des:她是该级重巡洋舰的三号舰。装备五座双联主炮。在该级相继完工后，她们被编为第5战队。在战前时期，本舰及其姐妹舰均经过了数次改造以提升性能。在战争爆发后，第5战队随队参与了南方作战。爪哇海战中本舰及其舰队击沉盟军德·鲁伊特等军舰。在43年的奥古斯塔皇后湾海战中曾同美国巡洋舰交手。莱特湾海战中羽黑一度受损，并且并未返回本土，受损一直没有彻底修复。在45年的一次运输任务中，遭遇索玛雷兹等英国驱逐舰，最终被维纳斯号驱逐舰击沉。"]],
 
 
 
@@ -10237,7 +10238,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return player.countCards("hes") > 0;
                                 },
                                 frequent: true,
-                                content:function() {
+                                content: function () {
                                     "step 0";
                                     player
                                         .chooseCard("he", get.prompt("xingyundeyunyuqu", player), "将一张牌当做乐不思蜀对自己使用", function (card, player) {
@@ -10265,6 +10266,78 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 group: "bazhen_bagua",
                                 locked: true,
                                 "_priority": 0,
+                            },
+                            diwuzhandui: {
+                                nobracket: true,
+                                audio: true,
+                                trigger: {
+                                    player: ["phaseBegin"],
+                                },
+                                frequent: true,
+                                filter(event, player, name) {
+                                    return true;
+                                },
+                                content: function () {
+                                    "step 0"
+                                    let cruiser = game.countPlayer(function (current) { return current.hasSkill("zhongxunca") || current.hasSkill("qingxuncl"); });
+                                    event.cards = get.cards(Math.min(Math.min(cruiser, 3), 1));
+                                    //event.cards = get.cards(6);
+                                    game.cardsGotoOrdering(event.cards);
+                                    "step 1"
+                                    var next = player.chooseButton(["第五战队", cards], false);
+                                    next.set("filterButton", function (button) {
+                                        return player.hasUseTarget(button.link);
+                                    });
+                                    next.set("ai", function (button) {
+                                        return get.value(button.link, _status.event.player);
+                                    });
+                                    "step 2"
+                                    game.log(result.links);
+                                    if (result.links) {
+                                        event.cards2 = result.links;
+                                    }
+                                    else {
+                                        event.finish();
+                                    }/* 
+                                    var time = 1000 - (get.utc() - event.time);
+                                    if (time > 0) {
+                                        game.delay(0, time);
+                                    } */
+                                    "step 3"
+                                    game.broadcastAll('closeDialog', event.videoId);
+                                    var cards2 = event.cards2;
+                                    player.chooseUseTarget(cards2, true);
+                                    "step 4"
+
+                                    var damageHistory = player.hasHistory("sourceDamage", function (evt) {
+                                        return true;
+
+                                    });
+                                    game.log(damageHistory);
+                                    if (!damageHistory) {
+                                        event.finish();
+                                    }
+                                    if (event.cards.lenth == 1) { event.finish(); }
+                                    event.cards3 = event.cards.removeArray(event.cards2);
+                                    game.log(event.cards3);
+                                    "step 5"
+                                    player
+                                        .chooseTarget("选择一名角色获得" + get.translation(event.cards3), true, true)
+                                        .set("ai", function (target) {
+                                            var att = get.attitude(_status.event.player, target);
+                                            if (_status.event.enemy) {
+                                                return -att;
+                                            } else if (att > 0) {
+                                                return att / (1 + target.countCards("h"));
+                                            } else {
+                                                return att / 100;
+                                            }
+                                        });
+                                    "step 6"
+                                    game.log(result.targets);
+                                    game.log(event.cards3);
+                                    result.targets[0].gain(event.cards3, 'gain2');
+                                },
                             },
                             //在这里添加新技能。
 
@@ -10334,6 +10407,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             weilianDbote: "威廉D波特",
                             xianghe: "翔鹤",
                             ruihe: "瑞鹤",
+                            yuhei: "羽黑",
 
                             skilltest: "skill测试武将test",
                             quzhudd: "驱逐", "quzhudd_info": "",
@@ -10530,7 +10604,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhiyu_R: "智愚", "zhiyu_R_info": "当你受到伤害后你可以摸一张牌，然后展示所有手牌。若颜色均相同，你令伤害来源弃置一张手牌。",
                             beihaidandang: "被害担当", "beihaidandang_info": "每回合限一次，其他角色受到伤害时，你可以代替其受此伤害，然后摸x张牌，将x张手牌交给一名其他角色或弃置(x为你的体力上限)。若目标为航母，此伤害值-1。",
                             xingyundeyunyuqu: "幸运的云雨区", "xingyundeyunyuqu_info": "出牌阶段结束时，你可以将一张牌当作乐不思蜀对自己使用然后恢复一点体力，然后获得[八阵]直到下回合开始。你的判定区有牌时计算与其他角色距离+1。",
-
+                            diwuzhandui: "第五战队", "diwuzhandui_info": "准备阶段，你可以展示牌顶堆X张牌，你可以使用其中一张牌，若你在结算过程中造成了伤害，你可以将剩余的牌交给任意角色。（X为场上巡洋舰数量且至多为3）",
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
                             lishizhanyi_naerweike: '历史战役-纳尔维克',
