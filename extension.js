@@ -3257,7 +3257,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (get.info(event.card).multitarget) return false;
                                     if (!player.countCards('he')) return false;
                                     if (event.targets.length < 2) return false;
-                                    return true;
+    for(var i =0;i<event.targets.length;i++){
+    if(!event.targets[i].hasSkill("fangkong2_aibiexuan"))return true;
+    }                                return false;
                                 },
                                 frequent: true,
                                 content: function () {
@@ -3289,7 +3291,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },//建议卡牌以7为标准就行，怕ai不救队友，所以调高了。同时ai顺次选择卡牌时不要选太多卡牌，要形成持续的牵制。
                                         ai2: function (target) {
                                             var trigger = _status.event.getTrigger();
-                                            return -get.effect(target, trigger.card, trigger.player, _status.event.player);
+                                            return -get.effect(target, trigger.card, trigger.player, _status.event.player)&&!target.hasSkill("fangkong2_aibiexuan");
                                         }, targets: trigger.targets,//这个代码不能照搬到content以外的地方。贯石斧、朱雀羽扇有类似代码。还有recover版的。
                                     });//技能还没扩起来，括起来。
                                     'step 1'
@@ -9999,7 +10001,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (get.info(event.card).multitarget) return false;
                                     if (!player.countCards('he')) return false;
                                     if (event.targets.length < 2) return false;
-                                    return true;
+for(var i =0;i<event.targets.length;i++){
+    if(!event.targets[i].hasSkill("fangkong2_aibiexuan"))return true;
+    }                                return false;                           
                                 },
                                 frequent: true,
                                 round: 1,
@@ -10040,17 +10044,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player.logSkill('duikongzhiwei', event.target);
                                     }//让技能发语音，发历史记录。
                                 },
-                                subSkill: {
-                                    d: {
-                                        trigger: {
-                                            global: "useCardEnd",
-                                        },
-                                        forced: true,
-                                        content: function () { game.log('保护结束'); player.removeSkill('fangkong2_aibiexuan'); },
-                                        sub: true,
-                                        "_priority": 0,
-                                    },
-                                },
+                               
+                                
                                 "_priority": 0,
                             },
                             bigseven: {
@@ -10260,7 +10255,7 @@ player.draw((player.maxHp - player.hp));
                                     "step 1";
                                     if (result.bool) {
                                         player.useCard(get.autoViewAs({ name: "lebu" }, result.cards), result.cards, false, trigger.player, "xingyundeyunyuqu");
-                                        "step 2";
+                                  
                                         player.drawTo(Math.min(5,player.maxHp))
                                         //player.addTempSkill("xingyundeyunyuqu_bazhen",{player:"phaseBegin"})
                                     }
