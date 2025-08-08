@@ -7637,7 +7637,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     game.log("2");
                                     if (result.bool) {
                                         event.target = result.targets[0];
-                                        player.discardPlayerCard(event.target, 'he', true);
+                                        player.choosePlayerCard(event.target, 'he', true);
                                     } else {
                                         event.finish();
                                     }
@@ -7716,7 +7716,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     'step 1'
                                     if (result.bool) {
                                         event.target = result.targets[0];
-                                        player.discardPlayerCard(event.target, 'he', true);
+                                        player.choosePlayerCard(event.target, 'he', true);
                                     } else {
                                         event.finish();
                                     }
