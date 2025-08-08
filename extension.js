@@ -4634,18 +4634,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             Zqujingying: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
-                                unique: true,
+  usable:1,
                                 enable: "phaseUse",
-                                skillAnimation: true,
-                                limited: true,
-                                animationColor: "wood",
-                                mark: true,
-                                intro: {
-                                    content: "limited",
-                                },
-                                init: (player, skill) => player.storage[skill] = false,
-                                filter: function (event, player) {
-                                    if (player.storage.Zqujingying) return false;
+                                
+      filter: function (event, player) {
                                     return true;
                                 },
                                 filterCard: true,
@@ -4679,7 +4671,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     'step 0'
-                                    player.awakenSkill('Zqujingying');
+                                    //player.awakenSkill('Zqujingying');
                                     'step 1'
                                     var targets = event.getParent()._Zqujingying_targets;
                                     var list = [];
@@ -10501,7 +10493,7 @@ player.draw((player.maxHp - player.hp));
                             qijianshashou_1: "旗舰杀手", "qijianshashou_1_info": "",
                             zhanxianfangyu: "战线防御", "zhanxianfangyu_info": "每名角色回合限一次，若你没有装备防具，你成为黑色杀的目标时，取消之。每回合限一次，距你为1的角色成为杀的目标时，你可以弃置一张牌并代替该名角色成为此杀的目标。",
                             zhanxianfangyu1: "战线防御", "zhanxianfangyu1_info": "",
-                            Zqujingying: "Z驱菁英", "Zqujingying_info": "限定技，出牌阶段，你可以把任意张牌交给等量名角色，获得牌的角色依次选择:其交给你一张牌作为Z或令你获得其两张牌。",
+                            Zqujingying: "Z驱菁英", "Zqujingying_info": "出牌阶段限一次，你可以把任意张牌交给等量名角色，获得牌的角色依次选择:其交给你一张牌作为Z或令你获得其两张牌。",
                             Z_qianghua: "Z强化", "Z_qianghua_info": "出牌阶段，你可以移去一张Z,强化一项。",
                             huhangyuanhu: "护航援护", "huhangyuanhu_info": "其他角色成为杀的唯一目标时，你可以交给其一张牌并获得其区域内的一张牌；当你成为杀的唯一目标时，你可以选择一名目标，其可以选择交给你一张牌并获得你区域内的一张牌",
                             shizhibuyu: "矢志不渝", "shizhibuyu_info": "当你受到伤害时，你可以弃置两张颜色相同的牌令此伤害-1。你受到伤害时进行判定，若结果为红色，你摸一张牌，黑色，你弃置一名角色的一张牌。 当你的判定牌生效后，你可以令一名角色使用杀次数+1和手牌上限+1直到你的下回合开始。",
