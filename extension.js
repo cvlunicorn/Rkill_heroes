@@ -6154,7 +6154,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return get.translation(name);
                                         }
                                         for (let i = 0; i < targets.length; i++) {
-                                            dialog.buttons[i].querySelector('.info').innerHTML = getName(targets[i]) + '|' + get.strNumber(cards[i].number);
+                                            dialog.buttons[i].querySelector('.info').innerHTML = getName(targets[i]) + '|' + get.translation(cards[i].suit);
                                         }
                                     }, targets, cards, videoId, player);
                                     await game.asyncDelay(4);
