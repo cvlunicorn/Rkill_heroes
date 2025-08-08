@@ -10180,10 +10180,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     "step 0"
-                                    let num = event.num
+                                    var num0 = event.num;
+                                    game.log(num0);
                                     trigger.cancel();
-                                    if (trigger.player.hasSkill("hangmucv")) { num = num - 1; }
-                                    player.damage(num);
+                                    if (trigger.player.hasSkill("hangmucv")) { num0 = num0 - 1; }
+    if(num>0)                                {player.damage(num0);}
                                     player.draw(player.maxHp);
                                     "step 1"
                                     if (!player.countCards("he")) event.finish();
@@ -10234,7 +10235,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 audio: true,
                                 mod: {
                                     globalTo(from, to, distance) {
-                                        if (player.countCards("j")) { return distance + 1; }
+                                        if (to.countCards("j")) { return distance + 1; }
                                     },
                                 },
                                 trigger: {
@@ -10257,7 +10258,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         });
                                     "step 1";
                                     if (result.bool) {
-                                        player.useCard(get.autoViewAs({ name: "lebu" }, result.cards), result.cards, false, trigger.player, "qingleng");
+                                        player.useCard(get.autoViewAs({ name: "lebu" }, result.cards), result.cards, false, trigger.player, "xingyundeyunyuqu");
+                                        player.addTempSkill("xingyundeyunyuqu_bazhen",{player:"phaseBegin"})
                                     }
                                 },
                                 ai: {
