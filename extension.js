@@ -10240,7 +10240,7 @@ player.draw((player.maxHp - player.hp));
                                     },
                                 },
                                 trigger: {
-                                    player: ["phaseUseEnd"],
+                                    player: ["phaseEnd"],
                                 },
                                 filter: function (event, player) {
                                     if (player.hasJudge("lebu")) return false;
@@ -10260,7 +10260,9 @@ player.draw((player.maxHp - player.hp));
                                     "step 1";
                                     if (result.bool) {
                                         player.useCard(get.autoViewAs({ name: "lebu" }, result.cards), result.cards, false, trigger.player, "xingyundeyunyuqu");
-                                        player.addTempSkill("xingyundeyunyuqu_bazhen",{player:"phaseBegin"})
+                                        "step 2";
+                                        player.drawTo(Math.min(5,player.maxHp))
+                                        //player.addTempSkill("xingyundeyunyuqu_bazhen",{player:"phaseBegin"})
                                     }
                                 },
                                 ai: {
@@ -10281,7 +10283,7 @@ player.draw((player.maxHp - player.hp));
                                 nobracket: true,
                                 audio: true,
                                 trigger: {
-                                    player: ["phaseBegin"],
+                                    player: ["phaseJieshuBegin"],
                                 },
                                 frequent: true,
                                 filter(event, player, name) {
@@ -10613,7 +10615,7 @@ player.draw((player.maxHp - player.hp));
                             shaojie: "哨戒", "shaojie_info": "锁定技，你无法打出闪响应万箭齐发/近距支援。当你受到万箭齐发/近距支援伤害时，你获得一点护甲。",
                             zhiyu_R: "智愚", "zhiyu_R_info": "当你受到伤害后你可以摸一张牌，然后展示所有手牌。若颜色均相同，你令伤害来源弃置一张手牌。",
                             beihaidandang: "被害担当", "beihaidandang_info": "每回合限一次，其他角色受到伤害时，你可以代替其受此伤害，然后摸x张牌，将x张手牌交给一名其他角色或弃置(x为你已损失的体力值)。若目标为航母，此伤害值-1。",
-                            xingyundeyunyuqu: "幸运的云雨区", "xingyundeyunyuqu_info": "出牌阶段结束时，你可以将一张牌当作乐不思蜀对自己使用然后恢复一点体力，然后获得[八阵]直到下回合开始。你的判定区有牌时计算与其他角色距离+1。",
+                            xingyundeyunyuqu: "幸运的云雨区", "xingyundeyunyuqu_info": "结束阶段，你可以将一张牌当作乐不思蜀对自己使用然后恢复一点体力，然后将手牌摸至体力上限(至多为5)。你的判定区有牌时计算与其他角色距离+1。",
                             diwuzhandui: "第五战队", "diwuzhandui_info": "准备阶段，你可以展示牌顶堆X张牌，你可以使用其中一张牌，若你在结算过程中造成了伤害，你可以将剩余的牌交给任意角色。（X为场上巡洋舰数量且至多为3）",
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
