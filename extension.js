@@ -10180,26 +10180,27 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     "step 0"
-                                    var num0 = event.num;
+                                    var num0 = trigger.num;
                                     game.log(num0);
                                     trigger.cancel();
                                     if (trigger.player.hasSkill("hangmucv")) { num0 = num0 - 1; }
-    if(num>0)                                {player.damage(num0);}
-                                    player.draw(player.maxHp);
-                                    "step 1"
-                                    if (!player.countCards("he")) event.finish();
-                                    else player.chooseControl().set("choiceList", ["将" + player.maxHp + "张牌交给一名其他角色", "弃置" + player.maxHp + "张牌"]).set("ai", function () {
+    if(num0>0)                                {player.damage(num0);}
+"step 1"
+player.draw((player.maxHp - player.hp));
+                                    "step 2"
+                                    if (!player.countCards("he")||(player.maxHp == player.hp)) event.finish();
+                                    else player.chooseControl().set("choiceList", ["将" + (player.maxHp - player.hp) + "张牌交给一名其他角色", "弃置" + (player.maxHp - player.hp) + "张牌"]).set("ai", function () {
                                         if (game.hasPlayer(function (current) {
                                             return current != player && get.attitude(player, current) > 2;
                                         })) return 0;
                                         return 1;
                                     });
-                                    "step 2"
+                                    "step 3"
                                     if (result.index == 0) {
                                         player.chooseCardTarget({
                                             position: "he",
                                             filterCard: true,
-                                            selectCard: Math.min(player.maxHp, player.countCards("he")),
+                                            selectCard: Math.min((player.maxHp - player.hp), player.countCards("he")),
                                             filterTarget: function (card, player, target) {
                                                 return player != target;
                                             },
@@ -10212,14 +10213,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 if (target.hasJudge("lebu")) att /= 5;
                                                 return att;
                                             },
-                                            prompt: "选择" + player.maxHp + "张牌，交给一名其他角色。",
+                                            prompt: "选择" + (player.maxHp - player.hp) + "张牌，交给一名其他角色。",
                                             forced: true,
                                         });
                                     } else {
-                                        player.chooseToDiscard(player.maxHp, true, "he");
+                                        player.chooseToDiscard((player.maxHp - player.hp), true, "he");
                                         event.finish();
                                     }
-                                    "step 3";
+                                    "step 4";
                                     if (result.bool) {
                                         var target = result.targets[0];
                                         player.give(result.cards, target);
@@ -10611,7 +10612,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             saobaxing: "扫把星", "saobaxing_info": "锁定技，每回合限一次，当一名角色的判定牌生效前，若判定结果为红色，你须令其重新判定。",
                             shaojie: "哨戒", "shaojie_info": "锁定技，你无法打出闪响应万箭齐发/近距支援。当你受到万箭齐发/近距支援伤害时，你获得一点护甲。",
                             zhiyu_R: "智愚", "zhiyu_R_info": "当你受到伤害后你可以摸一张牌，然后展示所有手牌。若颜色均相同，你令伤害来源弃置一张手牌。",
-                            beihaidandang: "被害担当", "beihaidandang_info": "每回合限一次，其他角色受到伤害时，你可以代替其受此伤害，然后摸x张牌，将x张手牌交给一名其他角色或弃置(x为你的体力上限)。若目标为航母，此伤害值-1。",
+                            beihaidandang: "被害担当", "beihaidandang_info": "每回合限一次，其他角色受到伤害时，你可以代替其受此伤害，然后摸x张牌，将x张手牌交给一名其他角色或弃置(x为你已损失的体力值)。若目标为航母，此伤害值-1。",
                             xingyundeyunyuqu: "幸运的云雨区", "xingyundeyunyuqu_info": "出牌阶段结束时，你可以将一张牌当作乐不思蜀对自己使用然后恢复一点体力，然后获得[八阵]直到下回合开始。你的判定区有牌时计算与其他角色距离+1。",
                             diwuzhandui: "第五战队", "diwuzhandui_info": "准备阶段，你可以展示牌顶堆X张牌，你可以使用其中一张牌，若你在结算过程中造成了伤害，你可以将剩余的牌交给任意角色。（X为场上巡洋舰数量且至多为3）",
                             jianrbiaozhun: "舰r标准",
