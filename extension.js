@@ -6339,6 +6339,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             jifu_weicheng: {
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 nobracket: true,
                                 mod: {
                                     maxHandcard: function (player, num) {
@@ -6366,6 +6367,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             jifu_yuanjing: {
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 nobracket: true,
                                 trigger: {
                                     player: "dying",
