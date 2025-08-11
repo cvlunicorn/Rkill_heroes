@@ -15,7 +15,7 @@ yield需要无名杀版本1.10.10或更高版本的支持
 //目录：全局技能、武将列表、武将技能、武将和技能翻译、卡牌包与卡牌技能、卡牌翻译、配置（config）、单机武将列表、扩展简介、全局函数模块
 
 //nobracket:true,该属性可以让技能显示完整名称（而不是只有前两个字）
-//var player = _status.event.player;指的是当前正在做选择的角色，如果是玩家让其他角色选择，这个选择的ai里_status.event.player就是“其他角色“。
+//var player = get.player();指的是当前正在做选择的角色，如果是玩家让其他角色选择，这个选择的ai里get.player()就是“其他角色“。此写法中获取到的player等价于_status.event.player但不包含对客机的广播（也就是_status.event.player在单机中可用，联机时可能出错）
 let connect;
 try {
     const ws = require("ws");
@@ -340,7 +340,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             intro: {
                                 marktext: "濒死", content: function (player) {
-                                    var player = _status.event.player, a = player.countMark('_yuanhang_bingsimopai'), tishi = '因濒死而减少的体力上限，牺牲上限，获得应急的牌，保一时的平安。<br>'; if (a > 0 && a <= 2 && player.hp <= 2) { tishi += ('勇敢的前锋<br>') }; if (a > 2 && a < 4 && player.hp <= 2) { tishi += ('rn勇的中坚<br>') }; if (a >= 4 && player.hp <= 2) { tishi += ('顽强的、折磨对手的大将<br>') };
+                                    var player = get.player(), a = player.countMark('_yuanhang_bingsimopai'), tishi = '因濒死而减少的体力上限，牺牲上限，获得应急的牌，保一时的平安。<br>'; if (a > 0 && a <= 2 && player.hp <= 2) { tishi += ('勇敢的前锋<br>') }; if (a > 2 && a < 4 && player.hp <= 2) { tishi += ('rn勇的中坚<br>') }; if (a >= 4 && player.hp <= 2) { tishi += ('顽强的、折磨对手的大将<br>') };
                                     return tishi;
                                 },
                             }, sub: true,
@@ -370,7 +370,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         return true;
                     },
                     check: function (card) {
-                        var player = _status.event.player; var event = _status.event; var huifu = player.countCards('h', 'jiu') + player.countCards('h', 'tao');
+                        var player = get.player(); var event = _status.event; var huifu = player.countCards('h', 'jiu') + player.countCards('h', 'tao');
                         if (player != event.dying && (player.hp < player.maxHp) && (player.countCards('h') > 4 || !player.hasMark('_jianzaochuan'))) return 11 - get.value(card);
                         if (player.hp <= 0 && (huifu < (-player.hp + 1) || !player.hasMark('_jianzaochuan'))) return 15 - get.value(card);
                     },
@@ -432,12 +432,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         ;
                     },
                     filterCard: {}, position: "h", selectCard: function (card) {
-                        var player = _status.event.player, num = 0;/*num+=(player.countMark('Expup'));if(ui.selected.cards.length&&get.type(ui.selected.cards[0],'equip')=='equip'){num+=(1)};if(ui.selected.cards.length>1&&get.type(ui.selected.cards[1],'equip')=='equip'){num+=(1)};*///装备不再记为2强化点数
+                        var player = get.player(), num = 0;/*num+=(player.countMark('Expup'));if(ui.selected.cards.length&&get.type(ui.selected.cards[0],'equip')=='equip'){num+=(1)};if(ui.selected.cards.length>1&&get.type(ui.selected.cards[1],'equip')=='equip'){num+=(1)};*///装备不再记为2强化点数
                         return [Math.max(2 - num, 0), Math.max(4 - num, 2)];
                     },
 
                     check: function (card) {//ui，参考仁德，ai执行判断，卡牌价值大于1就执行（只管卡片）当然，能把玩家设置进来就可以if玩家没桃 return-1。
-                        var player = _status.event.player;
+                        var player = get.player();
                         if (ui.selected.cards.length && get.type(ui.selected.cards[0], 'equip') == 'equip') return 5 - get.value(card);
                         if (ui.selected.cards.length >= Math.max(1, player.countCards('h') / 2)) return 0;
                         if (game.phaseNumber < 3) return 7 - get.value(card);
@@ -532,10 +532,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         player.storage._qianghuazhuang = [a, b, c, d, e, f, g, h];
                     },
                     ai: {
-                        order: function (player) { var player = _status.event.player; if (player.countMark('_jianzaochuan') < 3) { return 7 }; return 1 }, threaten: 0,
+                        order: function (player) { var player = get.player(); if (player.countMark('_jianzaochuan') < 3) { return 7 }; return 1 }, threaten: 0,
                         result: {
                             player: function (player) {
-                                var player = _status.event.player;
+                                var player = get.player();
                                 var num = player.countCards('h', { name: 'shan' }) - 1;
                                 return num;
                             },
@@ -613,7 +613,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             intro: {
                                 marktext: "燃烧", content: function (player) {//+player.countMark('_wulidebuff_ranshao')+'次，'+tishi
-                                    var player = _status.event.player; var tishi = '回合结束受到一点火焰伤害，摸两张牌（有护甲则不会触发摸牌），火杀带来的负面效果，本回合被攻击了' + player.countMark('_wulidebuff_ranshao') + '次，'; if (player.countMark('_wulidebuff_ranshao') > 0 && player.hp <= 2) { tishi += ('可能小命不保，求求队友给点力，发挥抽卡游戏的玄学力量。”') }; if (player.countMark('_wulidebuff_ranshao') > 2 && player.hp <= 2) { tishi += ('“被集火了，希望队友能能继续扛起重任。') }; if (player.identity == 'nei') { tishi += ('为了自己的光辉岁月，我内奸一定能苟住，一定要苟住') }; if (player.identity == 'zhu') { tishi += ('我的生命在燃烧，') }; if (player.identity == 'zho') { tishi += ('同志，救我，我被火力压制了。') }; if (player.identity == 'fan') { tishi += ('就怕火攻一大片啊，我们的大好前程被火杀打到功亏一篑') };
+                                    var player = get.player(); var tishi = '回合结束受到一点火焰伤害，摸两张牌（有护甲则不会触发摸牌），火杀带来的负面效果，本回合被攻击了' + player.countMark('_wulidebuff_ranshao') + '次，'; if (player.countMark('_wulidebuff_ranshao') > 0 && player.hp <= 2) { tishi += ('可能小命不保，求求队友给点力，发挥抽卡游戏的玄学力量。”') }; if (player.countMark('_wulidebuff_ranshao') > 2 && player.hp <= 2) { tishi += ('“被集火了，希望队友能能继续扛起重任。') }; if (player.identity == 'nei') { tishi += ('为了自己的光辉岁月，我内奸一定能苟住，一定要苟住') }; if (player.identity == 'zhu') { tishi += ('我的生命在燃烧，') }; if (player.identity == 'zho') { tishi += ('同志，救我，我被火力压制了。') }; if (player.identity == 'fan') { tishi += ('就怕火攻一大片啊，我们的大好前程被火杀打到功亏一篑') };
                                     return tishi;
                                 },
                             }, sub: true,
@@ -1043,7 +1043,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         intro: {
                                             marktext: "濒死", content: function (player) {
-                                                var player = _status.event.player, a = player.countMark('_yuanhang_bingsimopai'), tishi = '因濒死而减少的体力上限，牺牲上限，获得应急的牌，保一时的平安。<br>'; if (a > 0 && a <= 2 && player.hp <= 2) { tishi += ('勇敢的前锋<br>') }; if (a > 2 && a < 4 && player.hp <= 2) { tishi += ('rn勇的中坚<br>') }; if (a >= 4 && player.hp <= 2) { tishi += ('顽强的、折磨对手的大将<br>') };
+                                                var player = get.player(), a = player.countMark('_yuanhang_bingsimopai'), tishi = '因濒死而减少的体力上限，牺牲上限，获得应急的牌，保一时的平安。<br>'; if (a > 0 && a <= 2 && player.hp <= 2) { tishi += ('勇敢的前锋<br>') }; if (a > 2 && a < 4 && player.hp <= 2) { tishi += ('rn勇的中坚<br>') }; if (a >= 4 && player.hp <= 2) { tishi += ('顽强的、折磨对手的大将<br>') };
                                                 return tishi;
                                             },
                                         }, sub: true,
@@ -1069,7 +1069,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return true;
                                 },
                                 check: function (card) {
-                                    var player = _status.event.player; var event = _status.event; var huifu = player.countCards('h', 'jiu') + player.countCards('h', 'tao');
+                                    var player = get.player(); var event = _status.event; var huifu = player.countCards('h', 'jiu') + player.countCards('h', 'tao');
                                     if (player != event.dying && (player.hp < player.maxHp) && (player.countCards('h') > 4 || !player.hasMark('_jianzaochuan'))) return 11 - get.value(card);
                                     if (player.hp <= 0 && (huifu < (-player.hp + 1) || !player.hasMark('_jianzaochuan'))) return 15 - get.value(card);
                                 },
@@ -1127,12 +1127,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     ;
                                 },
                                 filterCard: {}, position: "h", selectCard: function (card) {
-                                    var player = _status.event.player, num = 0;/*num+=(player.countMark('Expup'));if(ui.selected.cards.length&&get.type(ui.selected.cards[0],'equip')=='equip'){num+=(1)};if(ui.selected.cards.length>1&&get.type(ui.selected.cards[1],'equip')=='equip'){num+=(1)};*///装备不再记为2强化点数
+                                    var player = get.player(), num = 0;/*num+=(player.countMark('Expup'));if(ui.selected.cards.length&&get.type(ui.selected.cards[0],'equip')=='equip'){num+=(1)};if(ui.selected.cards.length>1&&get.type(ui.selected.cards[1],'equip')=='equip'){num+=(1)};*///装备不再记为2强化点数
                                     return [Math.max(2 - num, 0), Math.max(4 - num, 2)];
                                 },
 
                                 check: function (card) {//ui，参考仁德，ai执行判断，卡牌价值大于1就执行（只管卡片）当然，能把玩家设置进来就可以if玩家没桃 return-1。
-                                    var player = _status.event.player;
+                                    var player = get.player();
                                     if (ui.selected.cards.length && get.type(ui.selected.cards[0], 'equip') == 'equip') return 5 - get.value(card);
                                     if (ui.selected.cards.length >= Math.max(1, player.countCards('h') / 2)) return 0;
                                     if (game.phaseNumber < 3) return 7 - get.value(card);
@@ -1227,10 +1227,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.storage._qianghuazhuang = [a, b, c, d, e, f, g, h];
                                 },
                                 ai: {
-                                    order: function (player) { var player = _status.event.player; if (player.countMark('_jianzaochuan') < 3) { return 7 }; return 1 }, threaten: 0,
+                                    order: function (player) { var player = get.player(); if (player.countMark('_jianzaochuan') < 3) { return 7 }; return 1 }, threaten: 0,
                                     result: {
                                         player: function (player) {
-                                            var player = _status.event.player;
+                                            var player = get.player();
                                             var num = player.countCards('h', { name: 'shan' }) - 1;
                                             return num;
                                         },
@@ -1305,7 +1305,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         intro: {
                                             marktext: "燃烧", content: function (player) {//+player.countMark('_wulidebuff_ranshao')+'次，'+tishi
-                                                var player = _status.event.player; var tishi = '回合结束受到一点火焰伤害，摸两张牌（有护甲则不会触发摸牌），火杀带来的负面效果，本回合被攻击了' + player.countMark('_wulidebuff_ranshao') + '次，'; if (player.countMark('_wulidebuff_ranshao') > 0 && player.hp <= 2) { tishi += ('可能小命不保，求求队友给点力，发挥抽卡游戏的玄学力量。”') }; if (player.countMark('_wulidebuff_ranshao') > 2 && player.hp <= 2) { tishi += ('“被集火了，希望队友能能继续扛起重任。') }; if (player.identity == 'nei') { tishi += ('为了自己的光辉岁月，我内奸一定能苟住，一定要苟住') }; if (player.identity == 'zhu') { tishi += ('我的生命在燃烧，') }; if (player.identity == 'zho') { tishi += ('同志，救我，我被火力压制了。') }; if (player.identity == 'fan') { tishi += ('就怕火攻一大片啊，我们的大好前程被火杀打到功亏一篑') };
+                                                var player = get.player(); var tishi = '回合结束受到一点火焰伤害，摸两张牌（有护甲则不会触发摸牌），火杀带来的负面效果，本回合被攻击了' + player.countMark('_wulidebuff_ranshao') + '次，'; if (player.countMark('_wulidebuff_ranshao') > 0 && player.hp <= 2) { tishi += ('可能小命不保，求求队友给点力，发挥抽卡游戏的玄学力量。”') }; if (player.countMark('_wulidebuff_ranshao') > 2 && player.hp <= 2) { tishi += ('“被集火了，希望队友能能继续扛起重任。') }; if (player.identity == 'nei') { tishi += ('为了自己的光辉岁月，我内奸一定能苟住，一定要苟住') }; if (player.identity == 'zhu') { tishi += ('我的生命在燃烧，') }; if (player.identity == 'zho') { tishi += ('同志，救我，我被火力压制了。') }; if (player.identity == 'fan') { tishi += ('就怕火攻一大片啊，我们的大好前程被火杀打到功亏一篑') };
                                                 return tishi;
                                             },
                                         }, sub: true,
@@ -1547,7 +1547,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             });
                                             'step 1'
                                             if (result.bool) {
-                                                player.chooseControl('<span class=yellowtext>基本', '<span class=yellowtext>装备', '<span class=yellowtext>锦囊', 'cancel2').set('prompt', get.prompt('kaishimopao')).set('prompt2', '选择一张牌并发现之').set('ai', function (event, player) { var player = _status.event.player; return 1; });
+                                                player.chooseControl('<span class=yellowtext>基本', '<span class=yellowtext>装备', '<span class=yellowtext>锦囊', 'cancel2').set('prompt', get.prompt('kaishimopao')).set('prompt2', '选择一张牌并发现之').set('ai', function (event, player) { var player = get.player(); return 1; });
                                             };
                                             'step 2'
                                             if (result.control != 'cancel2') {
@@ -1577,7 +1577,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         filter: function (event, player) { return player.countCards('j') > 0 },
                                         content: function () {
                                             'step 0'
-                                            player.chooseControl('<span class=yellowtext>少摸一张牌' + '</span>', 'cancel2').set('prompt', get.prompt('判定藏牌')).set('prompt2', '准备阶段，若你的判定区有牌时，<br>你可以令自己的摸牌阶段少摸一张牌，<br>然后在自己的回合结束时摸一张牌。').set('ai', function (event, player) { var player = _status.event.player; return 0; });
+                                            player.chooseControl('<span class=yellowtext>少摸一张牌' + '</span>', 'cancel2').set('prompt', get.prompt('判定藏牌')).set('prompt2', '准备阶段，若你的判定区有牌时，<br>你可以令自己的摸牌阶段少摸一张牌，<br>然后在自己的回合结束时摸一张牌。').set('ai', function (event, player) { var player = get.player(); return 0; });
                                             'step 1'
                                             if (result.control != 'cancel2') { player.addMark('kaishimopao_jieshudraw'); player.addMark('kaishimopao_draw'); };
                                         }, sub: true, mark: false, intro: { marktext: "闭月", content: function (player) { return ('结束时摸一张牌'); }, },
@@ -1683,7 +1683,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             zhongpaoduijue: {
                                 enable: "phaseUse", usable: 1, position: "hejs", complexCard: true,
-                                selectCard: function (card, player) { var player = _status.event.player; return [2, player.countMark('jinengup') + 2] },
+                                selectCard: function (card, player) { var player = get.player(); return [2, player.countMark('jinengup') + 2] },
                                 filterTarget: function (card, player, target) { if (target != player && player.inRange(target)) return true; },
                                 filter: function (event, player) {
                                     return !player.countCards('h', 'sha') || !player.canUse('sha', player);
@@ -2002,7 +2002,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 content: function () {
                                     'step 0'
                                     player.chooseControl('<span class=yellowtext>友军摸牌防御' + '</span>', '<span class=yellowtext>友军远射攻击' + '</span>', 'cancel2').set('prompt', get.prompt('huokongld')).set('prompt2', '<br>防御：你让实际距离此角色为' + (1 + player.countMark('songpaiup')) + '的队友：<br>防御距离+1，但用杀攻击的距离-1，令自己的摸牌阶段摸牌数-1。<br>攻击：让距离自己' + (1 + player.countMark('jinengup')) + '的队友及自己的攻击距离+1，但防御杀的距离-1,队友的摸牌阶段摸牌数+1。<br>强化技能可以增加这两个技能的作用距离').set('ai', function (event, player) {
-                                        var player = _status.event.player, chusha = lib.filter.cardEnabled({ name: 'sha' }, player), renshu = game.countPlayer(function (current) { return get.attitude(player, current) > 0 && get.distance(from, current, 'pure') <= 1 + current.countMark('jinengup'); });
+                                        var player = get.player(), chusha = lib.filter.cardEnabled({ name: 'sha' }, player), renshu = game.countPlayer(function (current) { return get.attitude(player, current) > 0 && get.distance(from, current, 'pure') <= 1 + current.countMark('jinengup'); });
                                         if (renshu < 2 || chusha) return 1; if (renshu >= 2 && !chusha) return 0;
                                     });
                                     'step 1'
@@ -2161,7 +2161,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             }
                                             if (list.length) {
                                                 player.chooseButton(['是否视为使用一张基本牌？', [list, 'vcard']]).set('ai', function (button) {
-                                                    var player = _status.event.player;
+                                                    var player = get.player();
                                                     var card = { name: button.link[2], nature: button.link[3] };
                                                     if (card.name == 'tao') {
                                                         if (player.hp == 1 || (player.hp == 2 && !player.hasShan()) || player.needsToDiscard()) {
@@ -2249,7 +2249,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return player.countCards('h', 'sha') > 0 || player.countCards('he', { type: 'equip' }) > 0;
                                 },
                                 filterCard: function (card) {
-                                    var player = _status.event.player;
+                                    var player = get.player();
                                     return card.name == 'sheji9' || card.name == 'zziqi9' || card.name == 'sha' || card.name == 'jiu' || get.type(card) == 'equip';
                                 },
                                 filterTarget: function (card, player, target) {
@@ -2547,7 +2547,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 selectCard: function (card) { return 1 },
                                 discard: false,
                                 check: function (card) {
-                                    var player = _status.event.player; return 7 - get.value(card)//if(get.suit(card)=='club'&&player.countMark('jinengup')<1){return -1};，本回合内不能再对同一目标使用此技能
+                                    var player = get.player(); return 7 - get.value(card)//if(get.suit(card)=='club'&&player.countMark('jinengup')<1){return -1};，本回合内不能再对同一目标使用此技能
                                 },
                                 content: function () { },
                                 ai: {
@@ -2676,10 +2676,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         prompt2: ('弃置一张符合要求的牌'),
                                         position: 'hejs',//hej代指牌的位置，加个j即可用木流流马的牌。
                                         selectCard: function () {
-                                            var player = _status.event.player; if (ui.selected.targets) return [1, 1]; return 1;
+                                            var player = get.player(); if (ui.selected.targets) return [1, 1]; return 1;
                                         },//要气质的卡牌，可以return[1,3]
                                         selectTarget: function () {
-                                            var player = _status.event.player; if (ui.selected.cards) return [ui.selected.cards.length, ui.selected.cards.length]; return 1;
+                                            var player = get.player(); if (ui.selected.cards) return [ui.selected.cards.length, ui.selected.cards.length]; return 1;
                                         },//要选择的目标，同上，目标上限跟着手牌数走，怕报错跟个判定。
                                         
                                         filterCard: function (card, player) {
@@ -2805,7 +2805,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             var zongshu = 1 + player.countMark('jinengup'), cunpaishu = player.getExpansions('junfu').length + player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length;
                                             if (nh && zongshu > cunpaishu) {
                                                 player.chooseCard('h', [1, Math.min(nh, zongshu - cunpaishu)], '将任意张手牌置于你的武将牌上,<br>存牌上限为1+技能强化等级。<br>单次存牌量上限为手牌上限,<br>这些牌可以在回合外递给其他角色').set('ai', function (card) {
-                                                    var player = _status.event.player;
+                                                    var player = get.player();
                                                     if (ui.selected.cards.type == "equip") return -get.value(card);
                                                     if (ui.selected.cards.length >= duiyou) return -get.value(card);
                                                     return 9 - get.value(card);
@@ -2864,7 +2864,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     var zongshu = 1 + player.countMark('jinengup'), cunpaishu = player.getExpansions('daodan').length + player.getCards('s', function (card) { return card.hasGaintag('daodan') }).length;
                                     if (nh && zongshu > cunpaishu) {
                                         player.chooseCard('h', [1, Math.min(nh, zongshu - cunpaishu)], '将任意张手牌置于你的武将牌上,<br>存牌上限为1+技能强化等级。<br>单次存牌量上限为手牌上限,<br>这些牌可以当作无懈可击使用').set('ai', function (card) {
-                                            var player = _status.event.player;
+                                            var player = get.player();
                                             if (ui.selected.cards.type == "equip") return -get.value(card);
                                             return 9 - get.value(card);
                                         });
@@ -2925,7 +2925,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 enable: "phaseUse",
                                 filterCard: function (card) {
-                                    var player = _status.event.player;
+                                    var player = get.player();
                                     if (player.countMark('jinengup') <= 0) {
                                         return get.subtype(card) == "equip1";
                                     } else if (player.countMark('jinengup') == 1) {
@@ -3275,11 +3275,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         prompt2: ('当一名角色使用的锦囊牌指定了至少两名角色为目标时，<br>你可弃置两张牌令此牌对距离你' + (player.countMark('jinengup') + 1) + '内的任意名角色无效。'),
                                         position: 'hejs',//hej代指牌的位置，加个s即可用木流流马的牌。
                                         selectCard: function () {
-                                            var player = _status.event.player;/*if(ui.selected.targets)return [1,Math.min(trigger.targets.length,Math.floor(player.countCards('he')))];*///取消弃牌数与选择目标数相等改为固定弃置两张牌2023.8.7
+                                            var player = get.player();/*if(ui.selected.targets)return [1,Math.min(trigger.targets.length,Math.floor(player.countCards('he')))];*///取消弃牌数与选择目标数相等改为固定弃置两张牌2023.8.7
                                             return 2;
                                         },//要气质的卡牌，可以return[1,3]if(ui.selected.cards)return [ui.selected.cards.length,ui.selected.cards.length+player.countMark('jinengup')];return 1;-player.countMark('jinengup')
                                         selectTarget: function () {
-                                            var player = _status.event.player;/*if(ui.selected.cards)return [ui.selected.cards.length,ui.selected.cards.length];*/return [1, 7];
+                                            var player = get.player();/*if(ui.selected.cards)return [ui.selected.cards.length,ui.selected.cards.length];*/return [1, 7];
                                         },//要选择的目标，同上，目标上限跟着手牌数走，怕报错跟个判定。
                                         filterCard: function (card, player) {
                                             return lib.filter.cardDiscardable(card, player);
@@ -3455,7 +3455,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 selectCard: [1, Infinity],
                                 lose: false,
                                 check: function (card) {
-                                    var player = _status.event.player;
+                                    var player = get.player();
                                     var val = 5;
                                     if (player.needsToDiscard()) val = 15;
                                     return val - get.value(card);
@@ -3519,11 +3519,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         prompt2: ('选择一张卡牌，令指定的一名本回合内未因“水雷战队1”获得牌的角色获得之'),
                                         position: 'hejs',//hej代指牌的位置，加个s即可用木流流马的牌。
                                         selectCard: function () {
-                                            var player = _status.event.player;
+                                            var player = get.player();
                                             return 1;
                                         },//要气质的卡牌，可以return[1,3]
                                         selectTarget: function () {
-                                            var player = _status.event.player; return [1];
+                                            var player = get.player(); return [1];
                                         },//要选择的目标，同上，目标上限跟着手牌数走，怕报错跟个判定。
                                         filterCard: function (card, player) {
                                             return lib.filter.cardDiscardable(card, player);
@@ -3724,12 +3724,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.removeMark('xiangrui', i);
                                     game.log("i" + i);
                                     player.chooseTarget(get.prompt2('yumian'), true, function (card, player, target) {
-                                        //if (i > 0) { return 1; }
                                         return get.distance(player, target) <= 1;
                                     }).set('ai', function (target) {
-                                        return get.effect(target, { name: 'loseHp' }, player, target);
+                                        var player = get.player();
+                                        return get.effect(target, { name: 'losehp' }, player, target);
                                     });
-                                    //}
                                     "step 1"
                                     game.log("result.bool" + result.bool);
                                     if (result.bool) {
@@ -3894,7 +3893,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             '本回合不能使用或打出手牌', '翻面'],
                                         true).set('ai', function (event, player) {
                                             var target = _status.event.getParent().player;
-                                            var player = _status.event.player;
+                                            var player = get.player();
                                             var options = [
                                                 { name: "弃牌", weight: 3 },
                                                 { name: "沉默", weight: 3 },
@@ -4299,7 +4298,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         return target != player && !evt.targets.includes(target) && lib.filter.targetEnabled(evt.card, evt.player, target);
                                     }).set('ai', function (target) {
                                         var trigger = _status.event.getTrigger();
-                                        var player = _status.event.player;
+                                        var player = get.player();
                                         return get.effect(target, trigger.card, trigger.player, player) + 0.1;
                                     }).set('targets', trigger.targets).set('playerx', trigger.player);
                                     'step 1'
@@ -4713,7 +4712,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         '令' + get.translation(player) + '给出一张牌作为Z'],
                                         true).set('ai', function (event, player) {
                                             var target = _status.event.getParent().player;
-                                            var player = _status.event.player;
+                                            var player = get.player();
                                             var options = [
                                                 { name: "给牌", weight: 1 },
                                                 { name: "给Z", weight: 1 },
@@ -4929,7 +4928,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         next.skills = skills;
                                         next.ai = function (card) {
                                             var skills = _status.event.skills;
-                                            var player = _status.event.player;
+                                            var player = get.player();
                                             var rank = 0;
                                             if (skills.includes('new_retuxi') && game.countPlayer(function (current) {
                                                 return get.attitude(player, current) < 0 && current.countGainableCards(player, 'h')
@@ -5064,7 +5063,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         return true;
                                     }).set('complexCard', true).set('ai', function (card) {
                                         if (!_status.event.check) return 0;
-                                        var player = _status.event.player;
+                                        var player = get.player();
                                         if (player.hp == 1) {
                                             if (!player.countCards('h', function (card) { return get.tag(card, 'save') }) && !player.hasSkillTag('save', true)) return 10 - get.value(card);
                                             return 7 - get.value(card);
@@ -5104,7 +5103,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                     true
                                                 )
                                                 .set("ai", function (target) {
-                                                    var player = _status.event.player;
+                                                    var player = get.player();
                                                     var att = get.attitude(player, target);
                                                     if (att < 0) {
                                                         att = -Math.sqrt(-att);
@@ -5235,7 +5234,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         '令' + str + '不能响应' + card,
                                         '令当前回合角色摸一张牌',/*然后"31节中队"暂时失效',*/
                                     ]).set('prompt', get.prompt('31jiezhongdui', trigger.target)).setHiddenSkill('31jiezhongdui').set('ai', function () {
-                                        var player = _status.event.player, target = _status.event.getTrigger().target;
+                                        var player = get.player(), target = _status.event.getTrigger().target;
                                         if (get.attitude(player, trigger.target) >= 0) {
                                             game.log("return'cancel2'");
                                             return 'cancel2';
@@ -5329,7 +5328,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                     check(button) {
                                         if ((lib.inpile.includes("juedouba9") && lib.inpile.includes("manchangyy9") && lib.inpile.includes("jingjixiuli9") && lib.inpile.includes("ewaibuji9"))) {
-                                            var player = _status.event.player;
+                                            var player = get.player();
                                             var recover = 0, lose = 1, players = game.filterPlayer();
                                             //game.log("s" + player.storage.jujianmengxiang);
                                             for (var i = 0; i < players.length; i++) {
@@ -5561,7 +5560,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return get.color(card) == "red";
                                         },
                                         selectCard: function () {
-                                            var player = _status.event.player;
+                                            var player = get.player();
                                             return 1;
                                         },
                                         check: function (card) {
@@ -5704,7 +5703,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                 },
                                 filterCard(card, player) {
-                                    var player = _status.event.player;
+                                    var player = get.player();
                                     //var event = _status.event;
                                     //game.log("选择卡牌过滤器" + JSON.stringify(player.storage.duomianshou));
                                     var numbers = [];
@@ -6410,7 +6409,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             '令此牌伤害+1',
                                             '令此牌无法响应',
                                         ]).set('ai', function () {
-                                            var player = _status.event.player, target = _status.event.getTrigger().target;
+                                            var player = get.player(), target = _status.event.getTrigger().target;
                                             if (get.attitude(player, trigger.target) > 0) {
                                                 game.log("return'cancel2'");
                                                 return 'cancel2';
@@ -6581,7 +6580,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 content: function () {
                                     "step 0"
                                     player.chooseToDiscard(1, 'he', '是否弃置一张黑色牌并记录' + get.translation(trigger.player) + '状态？', { color: 'black' }).set('ai', function (card, player) {
-                                        var player = _status.event.player, target = _status.event.getTrigger().player;
+                                        var player = get.player(), target = _status.event.getTrigger().player;
                                         if (get.attitude(player, target >= 0)) {
                                             if (target.hp < 3 && target.countCards("h") < 3) return 0;
                                         } else {
@@ -7575,7 +7574,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 prompt: "出牌阶段，你可以将任意张手牌置于武将牌上，称为Z，然后将一名角色至多等量张手牌置于其武将牌上，也称为Z。",
                                 check: function (card) {
-                                    var player = _status.event.player;
+                                    var player = get.player();
                                     if ((36 - player.getExpansions('old_jijun').length) <= player.countCards('h')) return 1;
                                     return 5 - get.value(card);
                                 },
@@ -8167,7 +8166,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         ai: {
                                             order: function (item, player) {
-                                                var player = _status.event.player;
+                                                var player = get.player();
                                                 var event = _status.event;
                                                 if (event.filterCard({ name: "sha" }, player, event)) {
                                                     if (
@@ -8180,7 +8179,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                     }
                                                     return 2.95;
                                                 } else {
-                                                    var player = _status.event.player;
+                                                    var player = get.player();
                                                     return 3.15;
                                                 }
                                             },
@@ -8582,7 +8581,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 content: function () {
                                     "step 0";
                                     player.chooseControl("zuihouderongyao_less", "zuihouderongyao_more", "cancel2", function () {
-                                        var player = _status.event.player;
+                                        var player = get.player();
                                         if (player.countCards("h") > 3) {
                                             return "zuihouderongyao_less";
                                         }
@@ -9365,7 +9364,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         return target != player;
                                     })
                                         .set("ai", function (target) {
-                                            var player = _status.event.player;
+                                            var player = get.player();
                                             var att = get.attitude(player, target);
                                             return att;
                                         });
@@ -9377,7 +9376,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             '视为对' + player.name + '使用一张杀',
                                             '令' + player.name + '从牌堆中获得一张基本牌',
                                         ]).set('prompt', get.prompt('houfu', event.target)).setHiddenSkill('houfu').set('ai', function () {
-                                            //var player = _status.event.player;
+                                            //var player = get.player();
                                             game.log(get.attitude(event.target, player));
                                             if (get.attitude(event.target, player) < 0) {
                                                 return 0;
