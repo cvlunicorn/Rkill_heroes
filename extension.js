@@ -865,11 +865,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jianrjinji: {
                                 jianrbiaozhun: ["liekexingdun", "qixichicheng", "wufenzhongchicheng", "qiye", "bisimai", "misuli", "weineituo", "lisailiu", "1913", "changmen", "kunxi", "ougengqi", "qingye", "beianpudun", "jiujinshan", "jiujinshan", "yixian", "tianlangxing", "dadianrendian", "yatelanda", "z31", "xuefeng", "kangfusi", "47project", "guzhuyizhichuixue", "shuileizhanduichuixue", "mingsike", "yinghuochong", "u1405", "baiyanjuren", "changchun"],
                                 lishizhanyi_naerweike: ["shengwang", "z17", "z18", "z21", "z22", "gesakeren", "biaoqiang"],
-                                lishizhanyi_matapanjiao: ["kewei", "kente", "luodeni"],
+                                lishizhanyi_matapanjiao: ["kewei", "shengqiaozhi", "luodeni"],
                                 lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "weiershiqinwang", "z1", "z16"],
                                 lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng", "qiuyue", "weilianDbote", "xianghe", "ruihe", "yuhei"],
-                                lishizhanyi_haixiafujizhan: ["u47", "u81", "u505"],
-                                weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan"],
+                                lishizhanyi_haixiafujizhan: ["u47", "u81", "u505", "jinqu"],
+                                weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan", "kente"],
                             },
 
                         },
@@ -944,6 +944,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             xianghe: ["female", "IJN", 4, ["hangmucv", "beihaidandang"], ["des:　翔鹤型是日本退出条约后建造的舰队航母，由于不再受条约限制，所以她的设计比之前的日本航母更加成熟。1941年8月翔鹤竣工，同一个月后完工的瑞鹤号编为第五航空战队，一起参加了12月的偷袭珍珠港。1942年两舰参加了珊瑚海海战，海战中翔鹤号被重创，因此错过了中途岛海战，在之后的战争中作为主力鏖战在南太平洋。44年6月的阿号作战中，翔鹤号被美国潜艇棘鳍号命中四发。由于损管得力，一度控制了进水，但最终油气爆炸而沉没。"]],
                             ruihe: ["female", "IJN", 4, ["hangmucv", "xingyundeyunyuqu"], ["des:　翔鹤型航母2番舰，41年9月服役后编入第五航空战队参加了偷袭珍珠港。在珊瑚海海战中，瑞鹤号凭借雨云躲开了美军的空袭，而翔鹤号被美军命中受创。两舰因此错过了中途岛战役。后来翔鹤号和瑞鹤号编为一航战参加了圣克鲁斯海战，这也是日本最后一次航母的战术胜利。在44年6月的阿号作战中，大凤号被击沉，瑞鹤号顶替其成为旗舰。10月，恩加诺海战中，编入诱饵舰队的瑞鹤号被CV16列克星敦号（又称：蓝色幽灵）的舰载机所击沉。"]],
                             yuhei: ["female", "IJN", 4, ["huokongld", "zhongxunca", "diwuzhandui"], ["des:她是该级重巡洋舰的三号舰。装备五座双联主炮。在该级相继完工后，她们被编为第5战队。在战前时期，本舰及其姐妹舰均经过了数次改造以提升性能。在战争爆发后，第5战队随队参与了南方作战。爪哇海战中本舰及其舰队击沉盟军德·鲁伊特等军舰。在43年的奥古斯塔皇后湾海战中曾同美国巡洋舰交手。莱特湾海战中羽黑一度受损，并且并未返回本土，受损一直没有彻底修复。在45年的一次运输任务中，遭遇索玛雷兹等英国驱逐舰，最终被维纳斯号驱逐舰击沉。"]],
+                            jinqu: ["female", "RN", 3, ["fangkong2", "qingxuncl", "bisikaiwanshoulie"], ["des:进取号是翡翠级2号舰，其舰首采用连装主炮取代了之前的单装主炮，这种连装炮设计也被后来的英国巡洋舰沿用。战争中进取号主要执行搜捕德国袭击舰的任务，43年在比斯开湾的战斗中她曾经重创德国舰艇。同翡翠号一样，进取号也参加了对诺曼底的支援任务，战争胜利后进取号于46年退役。"]],
 
 
 
@@ -5550,7 +5551,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 subSkill: {
                                     recast: {
                                         usable: 2,
-                                        audio: 2,
+                                        audio: "ext:舰R牌将/audio/skill:2",
                                         enable: "phaseUse",
                                         position: "he",
                                         filter: function (card, player) {
@@ -5642,7 +5643,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     source: "damageBefore",
                                 },
                                 forced: true,
-                                audio: 2,
+                                audio: "ext:舰R牌将/audio/skill:2",
                                 check: function () { return false; },
                                 content: function () {
                                     trigger.cancel();
@@ -6081,7 +6082,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                             },
                             zhiyu_R: {
-                                audio: 2,
+                                audio: "ext:舰R牌将/audio/skill:2",
                                 trigger: {
                                     player: "damageEnd",
                                 },
@@ -7364,7 +7365,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 nobracket: true,
                                 global: "Z_judge",
                                 frequent: true,
-                                usable:1,
+                                usable: 1,
                                 trigger: {
                                     source: "damageSource",
                                 },
@@ -7998,7 +7999,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             tianshi2: {//新版标司马懿鬼才
                                 nobracket: true,
-                                audio: 2,
+                                audio: "ext:舰R牌将/audio/skill:2",
                                 trigger: {
                                     global: "judge",
                                 },
@@ -8060,7 +8061,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             jishiyu: {//天妒
                                 nobracket: true,
-                                audio: 2,
+                                audio: "ext:舰R牌将/audio/skill:2",
                                 usable: 3,
                                 trigger: {
                                     player: "judgeEnd",
@@ -8507,7 +8508,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             guochuan: {
                                 nobracket: true,
-                                audio: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
                                     player: ["damageBegin4"],
                                 },
@@ -9894,7 +9895,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                                 locked: false,
-                                audio: 2,
+                                audio: "ext:舰R牌将/audio/skill:2",
                                 enable: "chooseToUse",
                                 filterCard(card) {
                                     return get.color(card) == "black";
@@ -10185,7 +10186,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             beihaidandang: {
                                 nobracket: true,
-                                audio: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 usable: 1,
                                 trigger: {
                                     global: ["damageBegin4"],
@@ -10251,7 +10252,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             xingyundeyunyuqu: {
                                 nobracket: true,
-                                audio: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 mod: {
                                     globalTo(from, to, distance) {
                                         if (to.countCards("j")) { return distance + 1; }
@@ -10299,7 +10300,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             diwuzhandui: {
                                 nobracket: true,
-                                audio: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
                                     player: ["phaseJieshuBegin"],
                                 },
@@ -10367,6 +10368,33 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     game.log(result.targets);
                                     game.log(event.cards3);
                                     result.targets[0].gain(event.cards3, 'gain2');
+                                },
+                            },
+                            bisikaiwanshoulie: {
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                nobracket: true,
+                                trigger: {
+                                    player: ["loseAfter"],
+                                    global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
+                                },
+                                filter: function (event, player) {
+                                    var evt = event.getl(player);
+                                    return evt && (evt.cards2.length > 1);
+                                },
+                                frequent: true,
+                                content: function () {
+                                    "step 0";
+                                    player.chooseTarget([1, Infinity], get.prompt("bisikaiwanshoulie"), "令任意名角色摸1张牌").ai = function (target) {
+                                        var player = get.player();
+                                        return get.attitude(player, target);
+                                    };
+                                    "step 1";
+                                    if (result.bool) {
+                                        result.targets.sortBySeat();
+                                        game.asyncDraw(result.targets, 1);
+                                    } else event.finish();
+                                    "step 2";
+                                    game.delay();
                                 },
                             },
                             //在这里添加新技能。
@@ -10438,6 +10466,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             xianghe: "翔鹤",
                             ruihe: "瑞鹤",
                             yuhei: "羽黑",
+                            jinqu: "进取",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -10634,6 +10663,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             beihaidandang: "被害担当", "beihaidandang_info": "每回合限一次，其他角色受到伤害时，你可以代替其受此伤害，然后摸x张牌，将x张手牌交给一名其他角色或弃置(x为你已损失的体力值)。若目标为航母，此伤害值-1。",
                             xingyundeyunyuqu: "幸运的云雨区", "xingyundeyunyuqu_info": "结束阶段，你可以将一张牌当作乐不思蜀对自己使用然后恢复一点体力，然后将手牌摸至体力上限(至多为5)。你的判定区有牌时计算与其他角色距离+1。",
                             diwuzhandui: "第五战队", "diwuzhandui_info": "准备阶段，你可以展示牌顶堆X张牌，你可以使用其中一张牌，若你在结算过程中造成了伤害，你可以将剩余的牌交给任意角色。（X为场上巡洋舰数量且至多为3）",
+                            bisikaiwanshoulie: "比斯开湾狩猎", "bisikaiwanshoulie_info": "当你一次性失去两张牌时，你可以令任意名角色各摸一张牌",
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
                             lishizhanyi_naerweike: '历史战役-纳尔维克',
@@ -10661,7 +10691,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         connect: true,//卡包是否可以联机
                         card: {
                             /* jinjuzy: {
-                                audio: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 image: 'ext:舰R牌将/jinjuzy.jpg',
                                 type: "trick",
                                 enable: true,
@@ -10749,7 +10779,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             jiakongls: {
                                 image: 'ext:舰R牌将/jiakongls.jpg',
-                                audio: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 type: "trick",
                                 enable: true,
                                 cardcolor: "red",
@@ -10938,7 +10968,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             mingzuyq: {
                                 image: 'ext:舰R牌将/mingzuyq.jpg',
-                                audio: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 mode: ["guozhan"],
                                 type: "equip",
                                 subtype: "equip5",
