@@ -10409,7 +10409,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter: function (event, player) {
                                     return 1;
                                 },
-                                frequent: true,
+                                //frequent: true,
                                 content: function () {
                                     "step 0"
                                     var cards = Array.from(ui.discardPile.childNodes);
@@ -10460,12 +10460,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return true;
                                         })
                                             .set("ai", function (button) {
-                                                if (get.position(button.link) == 'j') { return 2 }
+                                                if (get.position(button.link) == 'j') { return 2; }
                                                 return get.value(button.link, player);
                                             })
                                             .set("filterButton", function (button) {
                                                 var filtersuit = [...new Set(ui.selected.buttons.map(card => get.suit(card)))]
-                                                if (filtersuit.length >= event.suitNum) { return false; }
+                                                if (filtersuit.length >= event.suitNum&&!filtersuit.includes(get.suit(button.link))) { return false; }
                                                 return true;
                                             });
                                     }
@@ -10752,7 +10752,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             xingyundeyunyuqu: "幸运的云雨区", "xingyundeyunyuqu_info": "结束阶段，你可以将一张牌当作乐不思蜀对自己使用然后恢复一点体力，然后将手牌摸至体力上限(至多为5)。你的判定区有牌时计算与其他角色距离+1。",
                             diwuzhandui: "第五战队", "diwuzhandui_info": "准备阶段，你可以展示牌顶堆X张牌，你可以使用其中一张牌，若你在结算过程中造成了伤害，你可以将剩余的牌交给任意角色。（X为场上巡洋舰数量且至多为3）",
                             bisikaiwanshoulie: "比斯开湾狩猎", "bisikaiwanshoulie_info": "当你一次性失去两张牌时，你可以令任意名角色各摸一张牌",
-                            maliyanaliehuoji: "马里亚纳猎火鸡", "maliyanaliehuoji_info": "单次由处理区进入弃牌堆的牌数≥3时，你可以从中选择至多3张牌，令一名角色用自己区域内任意张花色数相等的牌置换之。若其置换后手牌数增加，则其受到X点火属性伤害，X=增加的手牌数。",
+                            maliyanaliehuoji: "马里亚纳猎火鸡", "maliyanaliehuoji_info": "每名角色的结束阶段，若本回合进入弃牌堆的牌数≥3，你可以从中选择至多3张牌，令一名角色用自己区域内任意张花色数相等的牌置换之。若其置换后手牌数增加，则其受到X点火属性伤害，X=增加的手牌数。",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
