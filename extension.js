@@ -7364,6 +7364,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 nobracket: true,
                                 global: "Z_judge",
                                 frequent: true,
+                                usable:1,
                                 trigger: {
                                     source: "damageSource",
                                 },
@@ -10568,7 +10569,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                             z16_lianhuanbaopo: "连环爆破", z16_lianhuanbaopo_info: "你的黑色【杀】可以当做【雷杀】使用，你的其他黑色牌可以当做【杀】使用或打出，你使用【雷杀】时无距离次数限制防具。",
                             z16_lianhuanbaopo_sha: "黑牌当杀", z16_lianhuanbaopo_sha_info: "你的黑色牌可以当做【杀】使用或打出",
-                            z16_shuileibuzhi: "水雷布置", z16_shuileibuzhi_info: "当你造成伤害时，你可以将牌堆顶的一张牌置于武将牌上，称为Z。出牌阶段，你可以将一张Z当作兵粮寸断使用。(全局)有Z的角色准备阶段，可以弃置一张Z并弃置判定区内所有与此牌花色相同的牌。",
+                            z16_shuileibuzhi: "水雷布置", z16_shuileibuzhi_info: "当你每回合第一次造成伤害时，你可以将牌堆顶的一张牌置于武将牌上，称为Z。出牌阶段，你可以将一张Z当作兵粮寸断使用。(全局)有Z的角色准备阶段，可以弃置一张Z并弃置判定区内所有与此牌花色相同的牌。",
                             z16_shuileibuzhi_bingliang: "兵粮寸断", z16_shuileibuzhi_bingliang_info: "出牌阶段，你可以将一张Z当作兵粮寸断使用。",
                             z18_weisebaoxingdong: "威瑟堡行动", z18_weisebaoxingdong_info: "每回合限一次，你可以将至多两张手牌置于等量角色的武将牌上，称为Z。出牌阶段，你可以移去一张Z，观看一名角色的手牌，然后视为使用一张火攻。(全局)武将牌上有Z的角色出牌阶段使用杀的次数+1；使用与Z中包含类型相同的牌时须弃一张牌(没有则不弃)，然后可以弃置一张与使用的牌相同牌名的Z。",
                             z18_weisebaoxingdong_huogong: "火攻", z18_weisebaoxingdong_huogong_info: "你可以移去一张Z，观看一名角色的手牌，然后视为使用一张火攻。",
