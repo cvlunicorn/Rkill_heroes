@@ -9951,10 +9951,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return !player.hasSkill("guanjianyiji_disable");
                                 },
                                 check: function (event, player) {
-                                    if (_status.currentPhase == player && event.target == player) {
-                                        return 1;
-                                    }
-                                    return -get.attitude(player, event.target);
+                                    return -get.attitude(player, event.target)>0;
                                 },
                                 content: function () {
                                     "step 0";
