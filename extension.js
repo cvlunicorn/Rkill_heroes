@@ -868,8 +868,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lishizhanyi_matapanjiao: ["kewei", "shengqiaozhi", "luodeni"],
                                 lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "weiershiqinwang", "z1", "z16"],
                                 lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng", "qiuyue", "weilianDbote", "xianghe", "ruihe", "yuhei"],
-                                lishizhanyi_haixiafujizhan: ["u47", "u81", "u505", "jinqu"],
-                                weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan", "kente"],
+                                lishizhanyi_haixiafujizhan: ["u47", "u81", "u505", "jinqu", "kente"],
+                                weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan", "sp_aisaikesi"],
                             },
 
                         },
@@ -945,7 +945,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             ruihe: ["female", "IJN", 4, ["hangmucv", "xingyundeyunyuqu"], ["des:　翔鹤型航母2番舰，41年9月服役后编入第五航空战队参加了偷袭珍珠港。在珊瑚海海战中，瑞鹤号凭借雨云躲开了美军的空袭，而翔鹤号被美军命中受创。两舰因此错过了中途岛战役。后来翔鹤号和瑞鹤号编为一航战参加了圣克鲁斯海战，这也是日本最后一次航母的战术胜利。在44年6月的阿号作战中，大凤号被击沉，瑞鹤号顶替其成为旗舰。10月，恩加诺海战中，编入诱饵舰队的瑞鹤号被CV16列克星敦号（又称：蓝色幽灵）的舰载机所击沉。"]],
                             yuhei: ["female", "IJN", 4, ["huokongld", "zhongxunca", "diwuzhandui"], ["des:她是该级重巡洋舰的三号舰。装备五座双联主炮。在该级相继完工后，她们被编为第5战队。在战前时期，本舰及其姐妹舰均经过了数次改造以提升性能。在战争爆发后，第5战队随队参与了南方作战。爪哇海战中本舰及其舰队击沉盟军德·鲁伊特等军舰。在43年的奥古斯塔皇后湾海战中曾同美国巡洋舰交手。莱特湾海战中羽黑一度受损，并且并未返回本土，受损一直没有彻底修复。在45年的一次运输任务中，遭遇索玛雷兹等英国驱逐舰，最终被维纳斯号驱逐舰击沉。"]],
                             jinqu: ["female", "RN", 3, ["fangkong2", "qingxuncl", "bisikaiwanshoulie"], ["des:进取号是翡翠级2号舰，其舰首采用连装主炮取代了之前的单装主炮，这种连装炮设计也被后来的英国巡洋舰沿用。战争中进取号主要执行搜捕德国袭击舰的任务，43年在比斯开湾的战斗中她曾经重创德国舰艇。同翡翠号一样，进取号也参加了对诺曼底的支援任务，战争胜利后进取号于46年退役。"]],
-
+                            sp_aisaikesi: ["female", "USN", 4, ["hangmucv", "maliyanaliehuoji"], ["des:埃塞克斯级舰队航母设计上汲取了此前诸多级别航母的经验，使其性能达到了一个全新的高度。美国参战后，其惊人的工业机器全力开动，埃塞克斯号在42年12月服役。这一量产舰队航母开始如下饺子般陆续下水。埃塞克斯级是美国二战后期的主力航母。马里亚纳海战中埃塞克斯号在内的美国航母将日军航母部队彻底击溃，奠定了战争的走向。冲绳战役中，她参加了对大和号的围攻。东京湾，她见证了战争的胜利。在冷战中经过改造的埃塞克斯号也继续活跃，一直到69年才退役。"]],
 
 
                             skilltest: ["male", "OTHER", 9, [], ["forbidai", "des:测试用"]],
@@ -9951,7 +9951,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return !player.hasSkill("guanjianyiji_disable");
                                 },
                                 check: function (event, player) {
-                                    return -get.attitude(player, event.target)>0;
+                                    return -get.attitude(player, event.target) > 0;
                                 },
                                 content: function () {
                                     "step 0";
@@ -10394,6 +10394,90 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     game.delay();
                                 },
                             },
+                            maliyanaliehuoji: {
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                nobracket: true,
+                                trigger: {
+                                    global: ["phaseJieshuBegin"],
+                                },
+                                filter: function (event, player) {
+                                    return 1;
+                                },
+                                frequent: true,
+                                content: function () {
+                                    "step 0"
+                                    var cards = Array.from(ui.discardPile.childNodes);
+                                    var gains = [];
+                                    var history = game.getGlobalHistory("cardMove", evt => {
+                                        if (evt.name == "lose") return evt.position == ui.discardPile;
+                                        return evt.name == "cardsDiscard";
+                                    });
+                                    for (var i = history.length - 1; i >= 0; i--) {
+                                        var evt = history[i];
+                                        var cards2 = evt.cards.filter(card => {
+                                            return cards.includes(card);
+                                        });
+                                        if (cards2.length) {
+                                            gains.addArray(cards2);
+                                            cards.removeArray(cards2);
+                                        }
+                                        if (!cards.length) break;
+                                    }
+                                    //game.log(gains);
+                                    if (gains.length) {
+                                        player.chooseButton(["选择至多三张牌？", gains], [1, 3], true).set("ai", get.buttonValue);
+                                    } else event._result = { bool: false };
+                                    "step 1"
+                                    if (result.links.length) {
+                                        event.cards2 = result.links;
+                                        //game.log("目标获得");
+                                        //game.log(event.cards2);
+                                        var suits = event.cards2.map(card => get.suit(card));
+                                        var uniqueSuits = [...new Set(suits)];
+                                        event.suitNum = uniqueSuits.length;
+                                        player.chooseTarget(1, get.prompt("maliyanaliehuoji"), "令一名角色使用区域内任意张花色数为" + event.suitNum + "的牌交换", function (card, player, target) {
+                                            var cards = target.getCards('hej');
+                                            var suits3 = cards.map(card => get.suit(card));
+                                            var uniqueSuits3 = [...new Set(suits3)];
+                                            return uniqueSuits3.length >= event.suitNum;
+                                        }).ai = function (target) {
+                                            var player = get.player();
+                                            return get.attitude(player, target);
+                                        };
+                                    }
+                                    "step 2"
+                                    if (result.targets.length) {
+                                        event.targets = result.targets[0];
+                                        game.log(event.targets);
+                                        var targetCards = event.targets.getCards('hej');
+                                        event.targets.chooseCardButton('选择区域内任意张花色数为' + event.suitNum + '的牌与' + get.translation(event.cards2) + '交换', targetCards, [1, Infinity], true, function (card, player) {
+                                            return true;
+                                        })
+                                            .set("ai", function (button) {
+                                                if (get.position(button.link) == 'j') { return 2 }
+                                                return get.value(button.link, player);
+                                            })
+                                            .set("filterButton", function (button) {
+                                                var filtersuit = [...new Set(ui.selected.buttons.map(card => get.suit(card)))]
+                                                if (filtersuit.length >= event.suitNum) { return false; }
+                                                return true;
+                                            });
+                                    }
+                                    "step 3"
+                                    if (result.links.length) {
+                                        //game.log("目标弃置");
+                                        //game.log(result.links);
+                                        event.targets.gain(event.cards2, "gain2");
+                                        event.targets.discard(result.links);
+                                        if (event.cards2.length - result.links.length > 0) {
+                                            var fireDamage = event.cards2.length - result.links.length;
+                                            event.targets.damage(fireDamage, "fire");
+                                        }
+                                    } else {
+                                        event.finish();
+                                    }
+                                },
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -10464,6 +10548,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             ruihe: "瑞鹤",
                             yuhei: "羽黑",
                             jinqu: "进取",
+                            sp_aisaikesi: "sp埃塞克斯",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -10661,6 +10746,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             xingyundeyunyuqu: "幸运的云雨区", "xingyundeyunyuqu_info": "结束阶段，你可以将一张牌当作乐不思蜀对自己使用然后恢复一点体力，然后将手牌摸至体力上限(至多为5)。你的判定区有牌时计算与其他角色距离+1。",
                             diwuzhandui: "第五战队", "diwuzhandui_info": "准备阶段，你可以展示牌顶堆X张牌，你可以使用其中一张牌，若你在结算过程中造成了伤害，你可以将剩余的牌交给任意角色。（X为场上巡洋舰数量且至多为3）",
                             bisikaiwanshoulie: "比斯开湾狩猎", "bisikaiwanshoulie_info": "当你一次性失去两张牌时，你可以令任意名角色各摸一张牌",
+                            maliyanaliehuoji: "马里亚纳猎火鸡", "maliyanaliehuoji_info": "单次由处理区进入弃牌堆的牌数≥3时，你可以从中选择至多3张牌，令一名角色用自己区域内任意张花色数相等的牌置换之。若其置换后手牌数增加，则其受到X点火属性伤害，X=增加的手牌数。",
+
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
                             lishizhanyi_naerweike: '历史战役-纳尔维克',
