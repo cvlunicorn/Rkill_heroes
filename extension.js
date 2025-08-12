@@ -435,7 +435,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         var player = get.player(), num = 0;/*num+=(player.countMark('Expup'));if(ui.selected.cards.length&&get.type(ui.selected.cards[0],'equip')=='equip'){num+=(1)};if(ui.selected.cards.length>1&&get.type(ui.selected.cards[1],'equip')=='equip'){num+=(1)};*///装备不再记为2强化点数
                         return [Math.max(2 - num, 0), Math.max(4 - num, 2)];
                     },
-
+                    discard: false,
+                    lose: false,
                     check: function (card) {//ui，参考仁德，ai执行判断，卡牌价值大于1就执行（只管卡片）当然，能把玩家设置进来就可以if玩家没桃 return-1。
                         var player = get.player();
                         if (ui.selected.cards.length && get.type(ui.selected.cards[0], 'equip') == 'equip') return 5 - get.value(card);
@@ -521,10 +522,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         }).set('selectButton', [0, xuanze]);
                         'step 1'
                         game.log(result.links, result.bool)//只能返还这两个，所以更适合技能，更需要循环的方式进行计算。
-                        if (!result.bool) { game.log(event.cao); player.gain(event.cao, player); player.removeMark('Expup1', player.countMark('Expup1')); event.finish(); };//返还牌再计算
+                        if (!result.bool) { player.removeMark('Expup1', player.countMark('Expup1')); event.finish(); };//取消强化
                         if (result.bool) {  //player.addMark('Expup',event.cadechangdu);//先给经验再计算扣除经验升级，随着此项目的升级，花费也越多。通过一个有序的清单，遍历比对返回的内容，来定位要增加的标记/数组。
                             player.addMark('Expup', player.countMark('Expup1')); player.removeMark('Expup1', player.countMark('Expup1'));
                             for (var i = 0; i < result.links.length; i += (1)) { if (!result.links.includes('Expup')) { player.addMark(result.links[i], 1); player.removeMark('Expup', 1 + player.countMark(result.links[i])); game.log('数组识别:', result.links[i], '编号', i, '，总编号', result.links.length - 1); } }
+                            player.discard(event.cao);
                         };
                         //    if(event.choiceList.length<event.cao){player.addMark('Expup',1);};从0开始，当介绍数组有内容==选项数组的内容（第i个），就加的简称数组第i个(内容)标签。并通过game.log()调试,在出牌记录中查看执行效果。result.links.includes(event.list[i])&&
                         'step 2'
@@ -1132,6 +1134,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return [Math.max(2 - num, 0), Math.max(4 - num, 2)];
                                 },
 
+                                discard: false,
+                                lose: false,
                                 check: function (card) {//ui，参考仁德，ai执行判断，卡牌价值大于1就执行（只管卡片）当然，能把玩家设置进来就可以if玩家没桃 return-1。
                                     var player = get.player();
                                     if (ui.selected.cards.length && get.type(ui.selected.cards[0], 'equip') == 'equip') return 5 - get.value(card);
@@ -1217,10 +1221,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }).set('selectButton', [0, xuanze]);
                                     'step 1'
                                     game.log(result.links, result.bool)//只能返还这两个，所以更适合技能，更需要循环的方式进行计算。
-                                    if (!result.bool) { game.log(event.cao); player.gain(event.cao, player); player.removeMark('Expup1', player.countMark('Expup1')); event.finish(); };//返还牌再计算
+                                    if (!result.bool) { player.removeMark('Expup1', player.countMark('Expup1')); event.finish(); };//返还牌再计算
                                     if (result.bool) {  //player.addMark('Expup',event.cadechangdu);//先给经验再计算扣除经验升级，随着此项目的升级，花费也越多。通过一个有序的清单，遍历比对返回的内容，来定位要增加的标记/数组。
                                         player.addMark('Expup', player.countMark('Expup1')); player.removeMark('Expup1', player.countMark('Expup1'));
                                         for (var i = 0; i < result.links.length; i += (1)) { if (!result.links.includes('Expup')) { player.addMark(result.links[i], 1); player.removeMark('Expup', 1 + player.countMark(result.links[i])); game.log('数组识别:', result.links[i], '编号', i, '，总编号', result.links.length - 1); } }
+                                    player.discard(event.cao);
                                     };
                                     //    if(event.choiceList.length<event.cao){player.addMark('Expup',1);};从0开始，当介绍数组有内容==选项数组的内容（第i个），就加的简称数组第i个(内容)标签。并通过game.log()调试,在出牌记录中查看执行效果。result.links.includes(event.list[i])&&
                                     'step 2'
@@ -5437,6 +5442,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 group: ["sidajingang_mopai", "sidajingang_pindian"],
                                 subSkill: {
                                     mopai: {
+                                        frequent:true,
                                         audio: "ext:舰R牌将/audio/skill:true",
                                         trigger: {
                                             player: "logSkill",
