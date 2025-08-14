@@ -867,7 +867,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jianrjinji: {
                                 jianrbiaozhun: ["liekexingdun", "qixichicheng", "wufenzhongchicheng", "qiye", "bisimai", "misuli", "weineituo", "lisailiu", "1913", "changmen", "kunxi", "ougengqi", "qingye", "beianpudun", "jiujinshan", "jiujinshan", "yixian", "tianlangxing", "dadianrendian", "yatelanda", "z31", "xuefeng", "kangfusi", "47project", "guzhuyizhichuixue", "shuileizhanduichuixue", "mingsike", "yinghuochong", "u1405", "baiyanjuren", "changchun"],
                                 lishizhanyi_naerweike: ["shengwang", "z17", "z18", "z21", "z22", "gesakeren", "biaoqiang"],
-                                lishizhanyi_matapanjiao: ["kewei", "shengqiaozhi", "luodeni", "boerzanuo"],
+                                lishizhanyi_matapanjiao: ["kewei", "shengqiaozhi", "luodeni", "boerzanuo", "jialibodi"],
                                 lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "weiershiqinwang", "z1", "z16"],
                                 lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng", "qiuyue", "weilianDbote", "xianghe", "ruihe", "yuhei"],
                                 lishizhanyi_haixiafujizhan: ["u47", "u81", "u505", "jinqu", "kente"],
@@ -949,6 +949,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jinqu: ["female", "RN", 3, ["fangkong2", "qingxuncl", "bisikaiwanshoulie"], ["des:进取号是翡翠级2号舰，其舰首采用连装主炮取代了之前的单装主炮，这种连装炮设计也被后来的英国巡洋舰沿用。战争中进取号主要执行搜捕德国袭击舰的任务，43年在比斯开湾的战斗中她曾经重创德国舰艇。同翡翠号一样，进取号也参加了对诺曼底的支援任务，战争胜利后进取号于46年退役。"]],
                             sp_aisaikesi: ["female", "USN", 4, ["hangmucv", "maliyanaliehuoji"], ["des:埃塞克斯级舰队航母设计上汲取了此前诸多级别航母的经验，使其性能达到了一个全新的高度。美国参战后，其惊人的工业机器全力开动，埃塞克斯号在42年12月服役。这一量产舰队航母开始如下饺子般陆续下水。埃塞克斯级是美国二战后期的主力航母。马里亚纳海战中埃塞克斯号在内的美国航母将日军航母部队彻底击溃，奠定了战争的走向。冲绳战役中，她参加了对大和号的围攻。东京湾，她见证了战争的胜利。在冷战中经过改造的埃塞克斯号也继续活跃，一直到69年才退役。"]],
                             boerzhanuo: ["female", "RM", 4, ["sixiangquanneng", "tebiekongxi"], ["des:波尔扎诺号是意大利建造的第3级重巡洋舰，前者分别是高航速轻防护的塔兰托级和重防护的扎拉级。波尔扎诺保持了高航速，并一定程度加强了防护。在战争期间，虽然波尔扎诺参加了历次重大海战，但都没有出色表现，反倒两次被潜艇击伤，波尔扎诺受伤后，有过改造为航空巡洋舰的计划。但随着意大利的停战，波尔扎诺落入德方，于44年被英军击沉。"]],
+                            jialibodi: ["female", "RM", 4, ["fangkong", "beijixingweishe"], ["des:加里波第是阿布鲁奇公爵级巡洋舰2号舰（佣兵队长5批次）该级巡洋舰有着很强的防护力。 在战争中，加里波第号作为主力巡洋舰参加了多次海战，表现不错并最终幸存到战后，在战后中继续服役。冷战期间，加里波第加装了新的电子设备和武器继续服役，并担任海军旗舰。1957年根据协议，加里波第进行了二战之后的第二次改造，装备了全新的小猎犬防空导弹与北极星发射筒。"]],
 
                             skilltest: ["male", "OTHER", 9, [], ["forbidai", "des:测试用"]],
                         },
@@ -10505,6 +10506,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player: "loseAfter",
                                     global: "loseAsyncAfter",
                                 },
+                                frequent: true,
                                 filter: function (event, player) {
                                     //var evtx = event.getParent('phaseUse');
                                     //if (!evtx || evtx.player != player) return false;
@@ -10537,7 +10539,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     var zhandouji = player.getExpansions('zhandouji').length + player.getCards('s', function (card) { return card.hasGaintag('zhandouji') }).length;
                                     if (zhandouji < 3) {
                                         game.log(trigger.getl(player).cards2);
-                                        player.chooseCardButton('将一张牌置于你的武将牌上，称为“战”，<br>至多为三<br>这些牌可以当作无懈可击使用',true,trigger.getl(player).cards2).set('ai', function (card) {
+                                        player.chooseCardButton('将一张牌置于你的武将牌上，称为“战”，<br>至多为三<br>这些牌可以当作无懈可击使用', true, trigger.getl(player).cards2).set('ai', function (card) {
                                             var player = get.player();
                                             return true;
                                         });
@@ -10550,15 +10552,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player.loseToSpecial(result.links, 'zhandouji', player).visible = true;
                                     }
                                 },
-                               /*  onremove: function (player, skill) {
-                                    var cards = player.getExpansions(skill);
-                                    if (cards.length) player.loseToDiscardpile(cards);
-                                },
-                                intro: {
-                                    content: function () {
-                                        return get.translation(skill + '_info');
-                                    },
-                                }, */
+                                /*  onremove: function (player, skill) {
+                                     var cards = player.getExpansions(skill);
+                                     if (cards.length) player.loseToDiscardpile(cards);
+                                 },
+                                 intro: {
+                                     content: function () {
+                                         return get.translation(skill + '_info');
+                                     },
+                                 }, */
 
                                 group: "tebiekongxi_wuxie",
                                 subSkill: {
@@ -10591,6 +10593,40 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                                 "_priority": 0,
+                            },
+                            beijixingweishe: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: {
+                                    source: "damageSource",
+                                },
+                                frequent: true,
+                                filter(event, player) {
+                                    return event.player != player;
+                                },
+                                content() {
+                                    trigger.player.addTempSkill("beijixingweishe_effect", { player: "phaseEnd" });
+                                },
+                                subSkill: {
+                                    effect: {
+                                        charlotte: true,
+                                        force: true,
+                                        intro: {
+                                            marktext: "威慑",
+                                            content: function () {
+                                                return "不能使用或打出杀";
+                                            },
+                                        },
+                                        mod: {
+                                            cardEnabled: function (card, player) {
+                                                if (card.name == "sha" || card.name == "sheji9") return false;
+                                            },
+                                            cardRespondable: function (card, player) {
+                                                if (card.name == "sha" || card.name == "sheji9") return false;
+                                            },
+                                        },
+                                    }
+                                },
                             },
                             //在这里添加新技能。
 
@@ -10664,6 +10700,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jinqu: "进取",
                             sp_aisaikesi: "sp埃塞克斯",
                             boerzhanuo: "波尔扎诺",
+                            jialibodi: "加里波第",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -10864,6 +10901,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             bisikaiwanshoulie: "比斯开湾狩猎", "bisikaiwanshoulie_info": "当你一次性失去两张牌时，你可以令任意名角色各摸一张牌",
                             maliyanaliehuoji: "马里亚纳猎火鸡", "maliyanaliehuoji_info": "每名角色的结束阶段，若本回合进入弃牌堆的牌数≥3，你可以从中选择至多3张牌，令一名角色用自己区域内任意张花色数相等的牌置换之。若其置换后手牌数增加，则其受到X点火属性伤害，X=增加的手牌数。",
                             tebiekongxi: "特别空袭", "tebiekongxi_info": "转换技，阳:你的回合外；阴:你的回合内，当你因使用打出或弃置而一次性失去两张或更多牌时，你可以将其中一张牌置于武将牌上，称为“战”(至多三张)。你可以将“战”当作无懈可击使用或如手牌般使用打出。",
+                            beijixingweishe: "北极星威慑", "beijixingweishe_info": "你使用杀对其他角色造成伤害后，目标不能使用或打出杀直到其回合结束。",
+                            beijixingweishe_effect: "北极星威慑效果", "beijixingweishe_info": "不能使用或打出杀直到回合结束。",
+
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
