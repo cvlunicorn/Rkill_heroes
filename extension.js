@@ -4671,7 +4671,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 check: function (card) {
                                     var player = get.player();
                                     if (ui.selected.cards.length >= game.countPlayer(current => {
-                                        return current != player && get.attitude(player, current) > 0;
+                                        return current != player && get.attitude(player, current) <= 0;
                                     })) return 0;
                                     return 5 - get.value(card);
                                 },
@@ -4750,7 +4750,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     'step 4'
                                     if (result.index == 0) {
                                         game.log("给牌");
-                                        player.gainPlayerCard(2, lib.target);
+                                        player.gainPlayerCard(2, lib.target,true);
                                         event.goto(7);
 
                                     } else if (result.index == 1) {
@@ -4789,6 +4789,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             Z_qianghua: {
+                                nobracket: true,
                                 init: function (player) {//初始化数组，也可以运行事件再加if后面的内容
                                     if (!player.storage._qianghuazhuang) player.storage._qianghuazhuang = [0, 0, 0, 0, 0, 0, 0, 0, 0];
                                 },
