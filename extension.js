@@ -462,7 +462,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             list.push('mopaiup');
                             choiceList.push(['mopaiup', jieshao[0]]);
                         };
-                        if (info[1] < k && (info[1] + 2 <= info[7] + exp1) && info[1] <= 2 && !player.hasSkill("shixiangquanneng")) {
+                        if (info[1] < k && (info[1] + 2 <= info[7] + exp1) && info[1] <= 2 && !player.hasSkill("sixiangquanneng")) {
                             list.push('jinengup');
                             choiceList.push(['jinengup', jieshao[1]]);
                         };
@@ -867,7 +867,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jianrjinji: {
                                 jianrbiaozhun: ["liekexingdun", "qixichicheng", "wufenzhongchicheng", "qiye", "bisimai", "misuli", "weineituo", "lisailiu", "1913", "changmen", "kunxi", "ougengqi", "qingye", "beianpudun", "jiujinshan", "jiujinshan", "yixian", "tianlangxing", "dadianrendian", "yatelanda", "z31", "xuefeng", "kangfusi", "47project", "guzhuyizhichuixue", "shuileizhanduichuixue", "mingsike", "yinghuochong", "u1405", "baiyanjuren", "changchun"],
                                 lishizhanyi_naerweike: ["shengwang", "z17", "z18", "z21", "z22", "gesakeren", "biaoqiang"],
-                                lishizhanyi_matapanjiao: ["kewei", "shengqiaozhi", "luodeni"],
+                                lishizhanyi_matapanjiao: ["kewei", "shengqiaozhi", "luodeni", "boerzanuo"],
                                 lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "weiershiqinwang", "z1", "z16"],
                                 lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng", "qiuyue", "weilianDbote", "xianghe", "ruihe", "yuhei"],
                                 lishizhanyi_haixiafujizhan: ["u47", "u81", "u505", "jinqu", "kente"],
@@ -932,7 +932,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             shiyu: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "jishiyu", "jishiyu1"], ["des:她在海军中以幸运而著名，参加过多次激烈海战都能最终幸存下来。在激烈的苏里高海战和维拉湾海战中，她都是编队中唯一的幸存。不过到45年，她还是被一艘潜艇击中沉没。"]],
                             dujiaoshou: ["female", "RN", 3, ["junfu", "xiuqi", "wanbei"], ["des:30年代英国设计了一级飞机修理舰，以修理航母部队载机，由于要求修复的飞机可以直接起飞，索性将她设计成了航母的结构，可当成航母使用。独角兽号于1942年完工，初期主要被当作航母使用，在地中海执行支援任务。1943年年末起，独角兽号加入太平洋战场作为航母支援舰使用，在冲绳战役期间修复了大量飞机。冷战时期独角兽号还参加了朝鲜战争，最终于50年代退役。"]],
                             jiate: ["female", "USN", 3, ["fangqu", "mbmeibu"], ["des:基林级驱逐舰之一，由于服役太晚没有参加二战的实战。服役之后主要在大西洋活动。在1955年基阿特进行了改装，成为世界上第一艘导弹驱逐舰，其换装了双联防空导弹发射架，76毫米高炮和反潜鱼雷。在1957年为了显示其地位，刷上了DDG-1的编号。这艘划时代的军舰于1968年退役。"]],
-                            getelan: ["female", "OTHER", 3, ["mujizhengren", "pingduzhanhuo", "shixiangquanneng"], ["des:出于海防和海军航空的需求，瑞典设计建造了这一级航空巡洋舰。尽管吨位在5000吨左右，但是哥特兰的装备齐全，载机量也达到了6-8架。哥特兰也是最早的航空巡洋舰，之后的类似军舰或多或少均受其影响。哥特兰漫长的服役期中最著名的事迹是发现了俾斯麦和欧根的编队。而在这之前英海军正在满世界找她们。"]],
+                            getelan: ["female", "OTHER", 3, ["mujizhengren", "pingduzhanhuo", "sixiangquanneng"], ["des:出于海防和海军航空的需求，瑞典设计建造了这一级航空巡洋舰。尽管吨位在5000吨左右，但是哥特兰的装备齐全，载机量也达到了6-8架。哥特兰也是最早的航空巡洋舰，之后的类似军舰或多或少均受其影响。哥特兰漫长的服役期中最著名的事迹是发现了俾斯麦和欧根的编队。而在这之前英海军正在满世界找她们。"]],
                             rangbaer: ["female", "MN", 4, ["zhanliebb", "zhuangjiafh", "pangguanzhe"], ["des:让巴尔号战列舰是黎塞留级2号舰。在陆地战场失利时，黎塞留接近完工并撤退到海外，而让巴尔仅完成了一座炮塔，且具备航行能力，撤退到了达喀尔。在停泊期间，她还受到了马萨诸塞炮击和突击者的轰炸。两舰在后来都加入盟军作战，但由于让巴尔完工程度不高，并未参加战斗。在战争胜利后，考虑到战列舰巨大的象征意义，让巴尔以战列舰状态建造完工。她的电子设备和防空能力比黎塞留更强，船体也修改了设计，有更好的水下防护系统。在运河冲突中，让巴尔也曾开火支援。"]],
                             dafeng: ["female", "IJN", 4, ["hangmucv", "chuansuohongzha", "hangkongyazhi"], ["des:　大凤号是日本设计建造的装甲航空母舰。与其它日本海军航空母舰不同的是，大凤号预备在舰队中承担起支援其他航母作战的功能，因此大凤号将船舰的防护性摆在首位，重点增强装甲。竣工后被编入第三舰队第一航空战队，担任旗舰参加了马里亚纳海战。6月19日，大凤号在飞机起飞作业时，被美国潜艇大青花鱼号发射鱼雷并命中其右舷，最终因损管不当而沉没。"]],
                             dahuangfeng: ["female", "USN", 4, ["hangmucv", "yuanyangpoxi"], ["des:　　大黄蜂号是约克城级航母3号舰。她服役后第一项作战任务就是搭载B25轰炸机轰炸东京。在4月18日，杜立特带领的B25机群从大黄蜂号上起飞，完成了轰炸任务并在中国迫降。5月中旬，大黄蜂号在内的全部约克级航母作为主力参加了中途岛海战并击溃了日本机动部队，可以说正是她们三位扭转了太平洋的局势。在42年10月的圣克鲁斯海战中，大黄蜂号击伤了翔鹤号和筑摩号，但是自身也被重创，之后被驱逐舰击沉。"]],
@@ -948,7 +948,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             yuhei: ["female", "IJN", 4, ["huokongld", "zhongxunca", "diwuzhandui"], ["des:她是该级重巡洋舰的三号舰。装备五座双联主炮。在该级相继完工后，她们被编为第5战队。在战前时期，本舰及其姐妹舰均经过了数次改造以提升性能。在战争爆发后，第5战队随队参与了南方作战。爪哇海战中本舰及其舰队击沉盟军德·鲁伊特等军舰。在43年的奥古斯塔皇后湾海战中曾同美国巡洋舰交手。莱特湾海战中羽黑一度受损，并且并未返回本土，受损一直没有彻底修复。在45年的一次运输任务中，遭遇索玛雷兹等英国驱逐舰，最终被维纳斯号驱逐舰击沉。"]],
                             jinqu: ["female", "RN", 3, ["fangkong2", "qingxuncl", "bisikaiwanshoulie"], ["des:进取号是翡翠级2号舰，其舰首采用连装主炮取代了之前的单装主炮，这种连装炮设计也被后来的英国巡洋舰沿用。战争中进取号主要执行搜捕德国袭击舰的任务，43年在比斯开湾的战斗中她曾经重创德国舰艇。同翡翠号一样，进取号也参加了对诺曼底的支援任务，战争胜利后进取号于46年退役。"]],
                             sp_aisaikesi: ["female", "USN", 4, ["hangmucv", "maliyanaliehuoji"], ["des:埃塞克斯级舰队航母设计上汲取了此前诸多级别航母的经验，使其性能达到了一个全新的高度。美国参战后，其惊人的工业机器全力开动，埃塞克斯号在42年12月服役。这一量产舰队航母开始如下饺子般陆续下水。埃塞克斯级是美国二战后期的主力航母。马里亚纳海战中埃塞克斯号在内的美国航母将日军航母部队彻底击溃，奠定了战争的走向。冲绳战役中，她参加了对大和号的围攻。东京湾，她见证了战争的胜利。在冷战中经过改造的埃塞克斯号也继续活跃，一直到69年才退役。"]],
-
+                            boerzhanuo: ["female", "RM", 4, ["sixiangquanneng", "tebiekongxi"], ["des:波尔扎诺号是意大利建造的第3级重巡洋舰，前者分别是高航速轻防护的塔兰托级和重防护的扎拉级。波尔扎诺保持了高航速，并一定程度加强了防护。在战争期间，虽然波尔扎诺参加了历次重大海战，但都没有出色表现，反倒两次被潜艇击伤，波尔扎诺受伤后，有过改造为航空巡洋舰的计划。但随着意大利的停战，波尔扎诺落入德方，于44年被英军击沉。"]],
 
                             skilltest: ["male", "OTHER", 9, [], ["forbidai", "des:测试用"]],
                         },
@@ -1161,7 +1161,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         list.push('mopaiup');
                                         choiceList.push(['mopaiup', jieshao[0]]);
                                     };
-                                    if (info[1] < k && (info[1] + 2 <= info[7] + exp1) && info[1] <= 2 && !player.hasSkill("shixiangquanneng")) {
+                                    if (info[1] < k && (info[1] + 2 <= info[7] + exp1) && info[1] <= 2 && !player.hasSkill("sixiangquanneng")) {
                                         list.push('jinengup');
                                         choiceList.push(['jinengup', jieshao[1]]);
                                     };
@@ -1225,7 +1225,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (result.bool) {  //player.addMark('Expup',event.cadechangdu);//先给经验再计算扣除经验升级，随着此项目的升级，花费也越多。通过一个有序的清单，遍历比对返回的内容，来定位要增加的标记/数组。
                                         player.addMark('Expup', player.countMark('Expup1')); player.removeMark('Expup1', player.countMark('Expup1'));
                                         for (var i = 0; i < result.links.length; i += (1)) { if (!result.links.includes('Expup')) { player.addMark(result.links[i], 1); player.removeMark('Expup', 1 + player.countMark(result.links[i])); game.log('数组识别:', result.links[i], '编号', i, '，总编号', result.links.length - 1); } }
-                                    player.discard(event.cao);
+                                        player.discard(event.cao);
                                     };
                                     //    if(event.choiceList.length<event.cao){player.addMark('Expup',1);};从0开始，当介绍数组有内容==选项数组的内容（第i个），就加的简称数组第i个(内容)标签。并通过game.log()调试,在出牌记录中查看执行效果。result.links.includes(event.list[i])&&
                                     'step 2'
@@ -4822,7 +4822,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         list.push('mopaiup');
                                         choiceList.push(['mopaiup', jieshao[0]]);
                                     };
-                                    if (info[1] < k && (info[1] + 2 <= info[7] + exp1) && info[1] <= 2 && !player.hasSkill("shixiangquanneng")) {
+                                    if (info[1] < k && (info[1] + 2 <= info[7] + exp1) && info[1] <= 2 && !player.hasSkill("sixiangquanneng")) {
                                         list.push('jinengup');
                                         choiceList.push(['jinengup', jieshao[1]]);
                                     };
@@ -5442,7 +5442,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 group: ["sidajingang_mopai", "sidajingang_pindian"],
                                 subSkill: {
                                     mopai: {
-                                        frequent:true,
+                                        frequent: true,
                                         audio: "ext:舰R牌将/audio/skill:true",
                                         trigger: {
                                             player: "logSkill",
@@ -9542,20 +9542,20 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
-                            shixiangquanneng: {
+                            sixiangquanneng: {
                                 init: function (player) {
-                                    player.storage.shixiangquanneng = [];
+                                    player.storage.sixiangquanneng = [];
                                 },
                                 nobracket: true,
                                 trigger: { global: "roundStart", },
                                 forced: true,
                                 content() {
                                     "step 0"
-                                    if (player.storage.shixiangquanneng.length) {
-                                        player.removeSkills(player.storage.shixiangquanneng[0]);
+                                    if (player.storage.sixiangquanneng.length) {
+                                        player.removeSkills(player.storage.sixiangquanneng[0]);
 
                                     }
-                                    player.storage.shixiangquanneng = [];
+                                    player.storage.sixiangquanneng = [];
                                     "step 1"
                                     event.skills = ["junfu", "fangkong2", "hangmucv"]
                                     player
@@ -9566,7 +9566,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         });
                                     "step 2"
                                     player.addTempSkills(result.control, { player: "dieAfter" });
-                                    player.storage.shixiangquanneng = [result.control];
+                                    player.storage.sixiangquanneng = [result.control];
                                 },
                                 "_priority": 0,
                             },
@@ -9583,7 +9583,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     //if (player.storage.pangguanzhe.length) return false;
                                     return true;
                                 },
-                                bannedList: ["pangguanzhe", "zhanliebb", "hangmucv", "zhongxunca", "qingxuncl", "quzhudd", "qianting", "junfu", "daoqu", "fangqu", "zhuangjiafh", "dajiaoduguibi", "huokongld", "fangkong2", "shixiangquanneng"],
+                                bannedList: ["pangguanzhe", "zhanliebb", "hangmucv", "zhongxunca", "qingxuncl", "quzhudd", "qianting", "junfu", "daoqu", "fangqu", "zhuangjiafh", "dajiaoduguibi", "huokongld", "fangkong2", "sixiangquanneng"],
                                 content: function () {
                                     "step 0"
                                     if (player.storage.pangguanzhe.length) {
@@ -10465,7 +10465,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             })
                                             .set("filterButton", function (button) {
                                                 var filtersuit = [...new Set(ui.selected.buttons.map(card => get.suit(card)))]
-                                                if (filtersuit.length >= event.suitNum&&!filtersuit.includes(get.suit(button.link))) { return false; }
+                                                if (filtersuit.length >= event.suitNum && !filtersuit.includes(get.suit(button.link))) { return false; }
                                                 return true;
                                             });
                                     }
@@ -10483,6 +10483,114 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         event.finish();
                                     }
                                 },
+                            },
+                            tebiekongxi: {
+                                nobracket: true,
+                                init: function (player) {
+                                    game.log("特别空袭初始化检查");
+                                    //game.log(typeof player.storage.gaosusheji);
+                                    if (typeof player.storage.tebiekongxi === 'undefined') player.storage.tebiekongxi = false;
+                                },
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                zhuanhuanji: true,
+                                mark: true,
+                                marktext: "☯",
+                                intro: {
+                                    content: function (storage, player, skill) {
+                                        if (player.storage.tebiekongxi) return '你的回合内，当你因使用打出或弃置而一次性失去两张或更多牌时，你可以将其中一张牌置于武将牌上，称为“战”(至多三张)。';
+                                        return '你的回合外，当你因使用打出或弃置而一次性失去两张或更多牌时，你可以将其中一张牌置于武将牌上，称为“战”(至多三张)。';
+                                    },
+                                },
+                                trigger: {
+                                    player: "loseAfter",
+                                    global: "loseAsyncAfter",
+                                },
+                                filter: function (event, player) {
+                                    //var evtx = event.getParent('phaseUse');
+                                    //if (!evtx || evtx.player != player) return false;
+                                    game.log("特别空袭初始化检查");
+                                    if (typeof player.storage.tebiekongxi === 'undefined') player.storage.tebiekongxi = false;
+                                    var evt = event.getl(player);
+                                    if (evt.cards2.length <= 1) { return false; }
+                                    var zhandouji = player.getExpansions('zhandouji').length + player.getCards('s', function (card) { return card.hasGaintag('zhandouji') }).length;
+                                    if (zhandouji >= 3) { return false; }
+                                    if (player.storage.tebiekongxi) {
+                                        game.log("阳");
+                                        return _status.currentPhase == player;
+                                    } else {
+                                        game.log("阴");
+                                        return _status.currentPhase != player;
+
+                                    }
+
+                                },
+                                check(event, player) {
+                                    return true;
+                                },
+                                content: function () {
+                                    'step 0'
+                                    if (typeof player.storage.tebiekongxi === 'undefined') { player.storage.tebiekongxi = false; }
+                                    game.log("1:" + player.storage.tebiekongxi);
+                                    player.storage.tebiekongxi = (!player.storage.tebiekongxi);
+                                    //player.changeZhuanhuanji('gaosusheji');
+                                    game.log("2:" + player.storage.tebiekongxi);
+                                    var zhandouji = player.getExpansions('zhandouji').length + player.getCards('s', function (card) { return card.hasGaintag('zhandouji') }).length;
+                                    if (zhandouji < 3) {
+                                        game.log(trigger.getl(player).cards2);
+                                        player.chooseCardButton('将一张牌置于你的武将牌上，称为“战”，<br>至多为三<br>这些牌可以当作无懈可击使用',true,trigger.getl(player).cards2).set('ai', function (card) {
+                                            var player = get.player();
+                                            return true;
+                                        });
+                                    }
+                                    else { event.finish(); }
+                                    'step 1'
+                                    game.log(result.links);
+                                    if (result.bool) {
+                                        // player.addToExpansion(result.cards,player,'giveAuto').gaintag.add('junfu');player.update();
+                                        player.loseToSpecial(result.links, 'zhandouji', player).visible = true;
+                                    }
+                                },
+                               /*  onremove: function (player, skill) {
+                                    var cards = player.getExpansions(skill);
+                                    if (cards.length) player.loseToDiscardpile(cards);
+                                },
+                                intro: {
+                                    content: function () {
+                                        return get.translation(skill + '_info');
+                                    },
+                                }, */
+
+                                group: "tebiekongxi_wuxie",
+                                subSkill: {
+                                    wuxie: {
+                                        /*  */
+                                        enable: "chooseToUse",
+                                        filterCard: true,
+                                        position: "s",
+                                        viewAs: {
+                                            name: "wuxie",
+                                        },
+                                        filter(event, player) {
+                                            return player.countCards("s") > 0;
+                                        },
+                                        viewAsFilter(player) {
+                                            return player.countCards("s") > 0;
+                                        },
+                                        prompt: "将一张武将牌上的牌当无懈可击使用",
+                                        sub: true,
+                                        ai: {
+                                            basic: {
+                                                useful: [6, 4, 3],
+                                                value: [6, 4, 3],
+                                            },
+                                            result: {
+                                                player: 1,
+                                            },
+                                            expose: 0.2,
+                                        },
+                                    },
+                                },
+                                "_priority": 0,
                             },
                             //在这里添加新技能。
 
@@ -10555,6 +10663,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             yuhei: "羽黑",
                             jinqu: "进取",
                             sp_aisaikesi: "sp埃塞克斯",
+                            boerzhanuo: "波尔扎诺",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -10563,6 +10672,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             daoqu: "导驱", "daoqu_info": "你的攻击范围增加2+X(x为技能强化次数),出牌阶段限一次，你可以弃置一张武器/武器或防具/装备牌，对一名角色造成一点伤害。",
                             fangqu: "防驱",
                             daodan: "防空导弹",
+                            zhandouji: "战斗机",
                             "fangqu_info": "游戏开始时/出牌阶段开始时，将至多1/2/3张手牌放到武将牌上.你可以将武将牌上的牌当作无懈使用.",
                             hangmucv: "航母", "hangmucv_info": "(可强化)你的出牌阶段开始时，<br>你可以将2张：零级强化，黑桃或梅花手牌；一级强化，黑桃或梅花或红桃手牌；二级强化，任意手牌。当作万箭齐发对你选择的任意个目标使用",
                             qianting_xiji: "袭击", "qianting_xiji_info": "每回合限两次，将♦/♥牌当做顺手牵羊，♣/♠牌当做兵粮寸断使用<br>你使用的锦囊牌可以对距离你2以内的角色使用。",
@@ -10731,7 +10841,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhanliexianfuchou: "战列线复仇", zhanliexianfuchou_info: "你造成的伤害+X，X=你本轮成为其他角色伤害类牌目标的次数",
                             pingduzhanhuo: "平度战火", pingduzhanhuo_info: "结束阶段，若你本回合未造成伤害，你摸一张牌；准备阶段，若你自上个结束阶段起未受到伤害，你摸一张牌",
                             mujizhengren: "目击证人", mujizhengren_info: "限定技，出牌阶段，你可以弃置3张手牌，然后令一名角色翻面。",
-                            shixiangquanneng: "十项全能", shixiangquanneng_info: "锁定技，你的舰种技能无法升级，每轮开始时，你失去以此法获得的技能，然后从以下技能中选择一项获得：1、防空，2、开幕航空，3、军辅",
+                            sixiangquanneng: "十项全能", sixiangquanneng_info: "锁定技，你的舰种技能无法升级，每轮开始时，你失去以此法获得的技能，然后从以下技能中选择一项获得：1、防空，2、开幕航空，3、军辅",
                             pangguanzhe: "旁观者", pangguanzhe_info: "锁定技，你的回合开始时，失去上回合以此法获得的技能，随机获得在场角色武将牌上的一个技能。若该技能带有判定，你可以选择判定结果。(远航，强化，航母，战列，巡洋，驱逐，潜艇，开幕航空，火控雷达，先制鱼雷，十项全能除外;主公技，限定技，使命技，觉醒技除外)",
                             hangkongyazhi: "航空压制", "hangkongyazhi_info": "限定技，你可以失去开幕航空，令一名角色失去所有护甲且本轮技能失效。",
                             chuansuohongzha: "穿梭轰炸", "chuansuohongzha_info": "每轮限一次，其他角色使用伤害类牌结算结束后，若你未受伤，你可以获得此牌对应的所有实体牌。每回合限一次，你使用的伤害类牌结算结束后，你可以将其交给一名未受伤角色。",
@@ -10753,6 +10863,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             diwuzhandui: "第五战队", "diwuzhandui_info": "准备阶段，你可以展示牌顶堆X张牌，你可以使用其中一张牌，若你在结算过程中造成了伤害，你可以将剩余的牌交给任意角色。（X为场上巡洋舰数量且至多为3）",
                             bisikaiwanshoulie: "比斯开湾狩猎", "bisikaiwanshoulie_info": "当你一次性失去两张牌时，你可以令任意名角色各摸一张牌",
                             maliyanaliehuoji: "马里亚纳猎火鸡", "maliyanaliehuoji_info": "每名角色的结束阶段，若本回合进入弃牌堆的牌数≥3，你可以从中选择至多3张牌，令一名角色用自己区域内任意张花色数相等的牌置换之。若其置换后手牌数增加，则其受到X点火属性伤害，X=增加的手牌数。",
+                            tebiekongxi: "特别空袭", "tebiekongxi_info": "转换技，阳:你的回合外；阴:你的回合内，当你因使用打出或弃置而一次性失去两张或更多牌时，你可以将其中一张牌置于武将牌上，称为“战”(至多三张)。你可以将“战”当作无懈可击使用或如手牌般使用打出。",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
