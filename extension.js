@@ -4750,7 +4750,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     'step 4'
                                     if (result.index == 0) {
                                         game.log("给牌");
-                                        player.gainPlayerCard(2, lib.target,true);
+                                        player.gainPlayerCard(2, lib.target, true);
                                         event.goto(7);
 
                                     } else if (result.index == 1) {
@@ -5781,23 +5781,20 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return true;
                                         }
                                     }).set('ai', function (button) {
-                                        var MostValue = 0;
+                                        var MostValue = -1;
                                         var MostValuableCard = card;
-
-                                        for (var j of list) {
-                                            game.log(j + "价值" + get.value(j));
+                                        game.log(get.translation(button.link) + "价值" + get.value(button.link));
+                                            
                                             //game.log("最大卡牌价值" + MostValue);
 
-                                            if (get.value(j) > MostValue) {
-                                                MostValuableCard = j;
-                                                MostValue = get.value(j);
+                                            /* if (get.value(button.link) > MostValue) {
+                                                MostValuableCard = button.link;
+                                                MostValue = get.value(button.link);
                                                 //game.log("最有价值的卡牌变更为" + get.name(MostValuableCard));
-                                            }
-
-                                        }
+                                            } */
                                         //game.log("button.link[0]"+JSON.stringify(button.link));
                                         //game.log("MostValuableCard"+JSON.stringify(MostValuableCard));
-                                        return (button.link == MostValuableCard) ? 1 : -1;
+                                        return (get.value(button.link)||1);//(button.link == MostValuableCard) ? 1 : -1;
 
                                     }).set('selectButton', 1);
 
