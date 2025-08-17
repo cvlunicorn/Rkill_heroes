@@ -2758,7 +2758,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 locked: false,
                                 filter: function (event, player, name) {//输粮改
                                     //var a = (event.name == 'phase');
-                                    return player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length > 0 && event.player.countCards('h') < 8 && event.player.isAlive() && event.player != player;//&& a == true
+                                    return player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length > 0 &&event.player.isAlive() && event.player != player;//&& a == true
                                 },
                                 content: function () {
                                     'step 0'
@@ -10758,7 +10758,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             huijiahuihe: "额外回合",
                             "huijiahuihe_info": "当你有护甲时，你可以移除所有护甲并进行一个额外的回合；额外回合的摸牌数等于护甲数。此回合没有输出时，摸一张牌。",
                             junfu: "军辅船",
-                            "junfu_info": "准备阶段,你可以把至多1/2/3张手牌存于武将牌上，如手牌般使用。<br>其他角色回合开始时，你可以把存储的牌交给ta，然后你摸一张牌。<br>可以强化(目标的手牌数<8才能使用此技能)<br>拥有技能强化和远航强化即可起飞。",
+                            "junfu_info": "（可强化）准备阶段,你可以把至多1/2/3张手牌存于武将牌上，如手牌般使用。<br>其他角色回合开始时，你可以把存储的牌交给ta，然后你摸一张牌。",
                             manchangzhanyi: "漫长战役", "manchangzhanyi_info": "每轮限一次，你受到锦囊牌的伤害时，你免疫此伤害。你攻击范围内的其他角色的准备阶段，你可以弃置其一张手牌。",
                             manchangzhanyi_mianyi: "漫长战役", "manchangzhanyi_mianyi_info": "",
                             guzhuyizhi: "孤注一掷", "guzhuyizhi_info": "准备阶段，你可以摸两张牌并弃置所有手牌，然后摸等量的牌，如此做，你的其他技能失效直到你的下回合开始，你计算与其他角色的距离-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。",
