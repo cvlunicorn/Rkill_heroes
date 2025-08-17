@@ -10573,11 +10573,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         viewAs: {
                                             name: "wuxie",
                                         },
-                                        filter(event, player) {
-                                            return player.countCards("s") > 0;
+                                        filter: function (event, player, name) {
+                                            return player.getCards('s', function (card) { return card.hasGaintag('zhandouji') }).length > 0;
                                         },
                                         viewAsFilter(player) {
-                                            return player.countCards("s") > 0;
+                                            return player.getCards('s', function (card) { return card.hasGaintag('zhandouji') }).length > 0;
                                         },
                                         prompt: "将一张武将牌上的牌当无懈可击使用",
                                         sub: true,
