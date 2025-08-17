@@ -5784,17 +5784,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         var MostValue = -1;
                                         var MostValuableCard = card;
                                         game.log(get.translation(button.link) + "价值" + get.value(button.link));
-                                            
-                                            //game.log("最大卡牌价值" + MostValue);
 
-                                            /* if (get.value(button.link) > MostValue) {
-                                                MostValuableCard = button.link;
-                                                MostValue = get.value(button.link);
-                                                //game.log("最有价值的卡牌变更为" + get.name(MostValuableCard));
-                                            } */
+                                        //game.log("最大卡牌价值" + MostValue);
+
+                                        /* if (get.value(button.link) > MostValue) {
+                                            MostValuableCard = button.link;
+                                            MostValue = get.value(button.link);
+                                            //game.log("最有价值的卡牌变更为" + get.name(MostValuableCard));
+                                        } */
                                         //game.log("button.link[0]"+JSON.stringify(button.link));
                                         //game.log("MostValuableCard"+JSON.stringify(MostValuableCard));
-                                        return (get.value(button.link)||1);//(button.link == MostValuableCard) ? 1 : -1;
+                                        return (get.value(button.link) || 1);//(button.link == MostValuableCard) ? 1 : -1;
 
                                     }).set('selectButton', 1);
 
@@ -10304,7 +10304,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
-                                    player: ["phaseJieshuBegin"],
+                                    player: ["phaseZhunbeiBegin"],
                                 },
                                 frequent: true,
                                 filter(event, player, name) {
@@ -10325,8 +10325,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         return get.value(button.link, _status.event.player);
                                     });
                                     "step 2"
-                                    game.log(result.links);
                                     if (result.links) {
+                                        game.log(result.links);
                                         event.cards2 = result.links;
                                     }
                                     else {
@@ -10350,22 +10350,25 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (!damageHistory) {
                                         event.finish();
                                     }
-                                    if (event.cards.lenth == 1) { event.finish(); }
-                                    event.cards3 = event.cards.removeArray(event.cards2);
-                                    game.log(event.cards3);
+                                    game.log(event.cards.length);
+                                    if (event.cards.length <= 1) { event.finish(); }
+
                                     "step 5"
-                                    player
-                                        .chooseTarget("选择一名角色获得" + get.translation(event.cards3), true, true)
-                                        .set("ai", function (target) {
-                                            var att = get.attitude(_status.event.player, target);
-                                            if (_status.event.enemy) {
-                                                return -att;
-                                            } else if (att > 0) {
-                                                return att / (1 + target.countCards("h"));
-                                            } else {
-                                                return att / 100;
-                                            }
-                                        });
+                                    event.cards3 = event.cards.removeArray(event.cards2);
+                                    if (event.cards3.length) {
+                                        player
+                                            .chooseTarget("选择一名角色获得" + get.translation(event.cards3), true, true)
+                                            .set("ai", function (target) {
+                                                var att = get.attitude(_status.event.player, target);
+                                                if (_status.event.enemy) {
+                                                    return -att;
+                                                } else if (att > 0) {
+                                                    return att / (1 + target.countCards("h"));
+                                                } else {
+                                                    return att / 100;
+                                                }
+                                            });
+                                    } else { event.finish(); }
                                     "step 6"
                                     game.log(result.targets);
                                     game.log(event.cards3);
