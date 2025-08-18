@@ -10265,6 +10265,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (player.hasJudge("lebu")) return false;
                                     return player.countCards("hes") > 0;
                                 },
+                                check: function (event, player) {
+                                    return player.countCards("h") <= player.maxHp - 2;
+                                },
                                 frequent: true,
                                 content: function () {
                                     "step 0";
@@ -10274,15 +10277,21 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         })
                                         .set("target", player)
                                         .set("ai", function (card) {
+                                            let player = get.player();
+                                            if (player.Hp == 1 && (player.countCards("h") <= player.maxHp - 3)) { return 9 - get.value(card); }
                                             return 6 - get.value(card);
                                         });
                                     "step 1";
                                     if (result.bool) {
                                         player.useCard(get.autoViewAs({ name: "lebu" }, result.cards), result.cards, false, trigger.player, "xingyundeyunyuqu");
 
-                                        player.drawTo(Math.min(5, player.maxHp))
-                                        //player.addTempSkill("xingyundeyunyuqu_bazhen",{player:"phaseBegin"})
+                                    } else {
+                                        event.finish();
+
                                     }
+                                    "step 2";
+                                    player.drawTo(Math.min(5, player.maxHp));
+                                    //player.addTempSkill("xingyundeyunyuqu_bazhen",{player:"phaseBegin"});
                                 },
                                 ai: {
                                     threaten: 1.5,
