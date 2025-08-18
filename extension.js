@@ -2758,7 +2758,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 locked: false,
                                 filter: function (event, player, name) {//输粮改
                                     //var a = (event.name == 'phase');
-                                    return player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length > 0 &&event.player.isAlive() && event.player != player;//&& a == true
+                                    return player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length > 0 && event.player.isAlive() && event.player != player;//&& a == true
                                 },
                                 content: function () {
                                     'step 0'
@@ -6927,6 +6927,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         filter: function (event, player) {
                                             return event.hasNature("thunder") && player.getExpansions('Z').length && event.notLink();
                                         },
+                                        check: function (event, player) {
+                                            return -get.attitude(player, event.player);
+                                        },
                                         content: function () {
                                             'step 0'
                                             var cards = player.getExpansions('Z'), count = cards.length;
@@ -6952,6 +6955,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         filter: function (event, player) {
                                             return player.getExpansions('Z').length && event.hasNature("thunder") && event.player != player && event.notLink();
                                         },
+                                        check: function (event, player) {
+                                            return get.attitude(player, event.player);
+                                        },
                                         content: function () {
                                             'step 0'
                                             var cards = player.getExpansions('Z'), count = cards.length;
@@ -6965,8 +6971,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             else event.finish();
                                             'step 1'
                                             var cards = result.links;
-                                            //game.log(result.links);
-                                            //game.log(JSON.stringify(result.links));
                                             player.loseToDiscardpile(cards);
                                             'step 2'
                                             trigger.num -= 1;
@@ -6978,7 +6982,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             player: "phaseZhunbeiBegin",
                                         },
                                         filter: function (event, player) {
-                                            return game.findPlayer(current => current.getExpansions('Z').length);;
+                                            return game.findPlayer(current => current.getExpansions('Z').length);
                                         },
                                         content: function* (event, map) {
                                             "step 0"
@@ -6989,10 +6993,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 }
                                                 return target.getExpansions('Z').length;
                                             }).set('targetprompt', ['移走Z', '获得Z']).set('multitarget', true).set('ai', target => {
-                                                if (player.getExpansions('Z').length > 1 && target.getExpansions('Z').length < 1) {
-                                                    return get.attitude(player, target);
+                                                if (!ui.selected.targets.length) {
+                                                    if (get.attitude(player, target) < 0) { return -get.attitude(player, target) }
+                                                    else if (player.getExpansions('Z').length > 1 && target.getExpansions('Z').length < 1) {
+                                                        return 4 - get.attitude(player, target);
+                                                    }
                                                 }
-                                                return 0;
+                                                else return get.attitude(player, target);
                                             });
                                             "step 1"
                                             if (result.bool) {
@@ -7020,7 +7027,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             result.targets[0].loseToDiscardpile(cards);
                                             result.targets[1].addToExpansion(cards, 'gain2').gaintag.add('Z');
                                             "step 3"
-
+                                            game.logSkill("z1_Zqulingjian_move");
                                             event.finish();
                                         },
                                     },
