@@ -317,7 +317,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             sub: true,
                         },
                         bingsimopai: {
-                            name: "濒死摸牌", usable: 2, fixed: true, mark: false,
+                            name: "濒死摸牌",
+                            //usable: 2,
+                            fixed: true,
+                            mark: false,
                             trigger: { player: "changeHp", },
                             filter: function (event, player) { return player.hp <= 0 && event.num < 0 && (get.mode() != 'boss' || (get.mode() == 'boss' && !lib.character[player.name][4].includes('boss') && player.identity == 'cai')); },
                             "prompt2": function (event, player) {
@@ -326,24 +329,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             content: function () {//兵粮寸断与据守，刚烈， 镇卫同疾吸伤害，国风防锦囊牌。
                                 //轻巡提升己方防守与攻击距离，粮策全体发牌。重巡提供免伤。战列刚烈反击。 
-                                player.draw(1); if (player.maxHp > 2) { player.loseMaxHp(1); player.draw(); } else /*game.playAudio('..','extension','舰R牌将/audio','bingsimosanpai')*/; /*if (player.maxHp > 5) { player.loseMaxHp(1); player.draw(); game.log('血量上限好高啊，额外来一次扣血摸牌吧', player); }*/
-                                if (!player.hasMark('_yuanhang_bingsimopai')) {
-                                    //if(player.hasSkill('qianting')){player.addSkill('olzhiji');;};
-                                    //if(player.hasSkill('quzhudd')){player.addSkill('hzhenwei');player.addSkill('qigong')};
-                                    //if(player.hasSkill('qingxuncl')){player.addSkill('qigong')};
-                                    // if(player.hasSkill('zhongxunca')){player.addSkill('ganglie_gai')};
-                                    //if(player.hasSkill('zhanliebb')){player.addSkill('ganglie_gai')};
-                                    // if(player.hasSkill('hangmucv')){player.addSkill('relianying')};
-                                    // if(player.hasSkill('junfu')){player.addSkill('spcangni')};
-                                    //if(player.hasSkill('daoqu')){player.addSkill('relianying')}; 
-                                }; trigger.player.addMark('_yuanhang_bingsimopai', 1);
+                                player.draw(1); if (player.maxHp > 2) { player.loseMaxHp(1); player.draw(); } /*game.playAudio('..','extension','舰R牌将/audio','bingsimosanpai')*/; /*if (player.maxHp > 5) { player.loseMaxHp(1); player.draw(); game.log('血量上限好高啊，额外来一次扣血摸牌吧', player); }*/
+
+                                //trigger.player.addMark('_yuanhang_bingsimopai', 1);
                             },
-                            intro: {
+                            /* intro: {
                                 marktext: "濒死", content: function (player) {
                                     var player = get.player(), a = player.countMark('_yuanhang_bingsimopai'), tishi = '因濒死而减少的体力上限，牺牲上限，获得应急的牌，保一时的平安。<br>'; if (a > 0 && a <= 2 && player.hp <= 2) { tishi += ('勇敢的前锋<br>') }; if (a > 2 && a < 4 && player.hp <= 2) { tishi += ('rn勇的中坚<br>') }; if (a >= 4 && player.hp <= 2) { tishi += ('顽强的、折磨对手的大将<br>') };
                                     return tishi;
                                 },
-                            }, sub: true,
+                            },  */
+                            sub: true,
                         },
                     },
                 };
@@ -1024,7 +1020,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         sub: true,
                                     },
                                     bingsimopai: {
-                                        name: "濒死摸牌", usable: 2, fixed: true, mark: false,
+                                        name: "濒死摸牌",
+                                        //usable: 2, 
+                                        fixed: true,
+                                        mark: false,
                                         trigger: { player: "changeHp", },
                                         filter: function (event, player) { return player.hp <= 0 && event.num < 0 && (get.mode() != 'boss' || (get.mode() == 'boss' && !lib.character[player.name][4].includes('boss') && player.identity == 'cai')); },
                                         "prompt2": function (event, player) {
@@ -1034,23 +1033,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         content: function () {//兵粮寸断与据守，刚烈， 镇卫同疾吸伤害，国风防锦囊牌。
                                             //轻巡提升己方防守与攻击距离，粮策全体发牌。重巡提供免伤。战列刚烈反击。 
                                             player.draw(1); if (player.maxHp > 2) { player.loseMaxHp(1); player.draw(); } else /*game.playAudio('..','extension','舰R牌将/audio','bingsimosanpai')*/; if (player.maxHp > 5) { player.loseMaxHp(1); player.draw(); game.log('血量上限好高啊，额外来一次扣血摸牌吧', player); }
-                                            if (!player.hasMark('_yuanhang_bingsimopai')) {
-                                                //if(player.hasSkill('qianting')){player.addSkill('olzhiji');;};
-                                                //if(player.hasSkill('quzhudd')){player.addSkill('hzhenwei');player.addSkill('qigong')};
-                                                //if(player.hasSkill('qingxuncl')){player.addSkill('qigong')};
-                                                // if(player.hasSkill('zhongxunca')){player.addSkill('ganglie_gai')};
-                                                //if(player.hasSkill('zhanliebb')){player.addSkill('ganglie_gai')};
-                                                // if(player.hasSkill('hangmucv')){player.addSkill('relianying')};
-                                                // if(player.hasSkill('junfu')){player.addSkill('spcangni')};
-                                                //if(player.hasSkill('daoqu')){player.addSkill('relianying')}; 
-                                            }; trigger.player.addMark('_yuanhang_bingsimopai', 1);
+                                            //trigger.player.addMark('_yuanhang_bingsimopai', 1);
                                         },
-                                        intro: {
+                                        /* intro: {
                                             marktext: "濒死", content: function (player) {
                                                 var player = get.player(), a = player.countMark('_yuanhang_bingsimopai'), tishi = '因濒死而减少的体力上限，牺牲上限，获得应急的牌，保一时的平安。<br>'; if (a > 0 && a <= 2 && player.hp <= 2) { tishi += ('勇敢的前锋<br>') }; if (a > 2 && a < 4 && player.hp <= 2) { tishi += ('rn勇的中坚<br>') }; if (a >= 4 && player.hp <= 2) { tishi += ('顽强的、折磨对手的大将<br>') };
                                                 return tishi;
                                             },
-                                        }, sub: true,
+                                        },  */
+                                        sub: true,
                                     },
                                 },
                             },
