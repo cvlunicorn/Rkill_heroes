@@ -10197,6 +10197,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 check: function (event, player) {
                                     return get.attitude(player, event.player) > 2;
                                 },
+                                prompt2: function (event, player) {
+                                    return "你可以代替" + get.translation(event.player) + "承受此伤害，然后摸x张牌，将x张手牌交给一名其他角色或弃置(x为你已损失的体力值)。若目标为航母，此伤害值-1。";
+                                },
+
                                 content: function () {
                                     "step 0"
                                     var num0 = trigger.num;
