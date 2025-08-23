@@ -10461,6 +10461,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return uniqueSuits3.length >= event.suitNum;
                                         }).ai = function (target) {
                                             var player = get.player();
+                                            if (target.countCards("j") == 0 && target.countCards("h") < event.cards2.length) { return -get.attitude(player, target); }
                                             return get.attitude(player, target);
                                         };
                                     }
@@ -10473,8 +10474,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return true;
                                         })
                                             .set("ai", function (button) {
-                                                if (get.position(button.link) == 'j') { return 2; }
-                                                return get.value(button.link, player);
+                                                game.log(get.translation(button.link));
+                                                game.log(get.value(button.link));
+                                                let player = get.player();
+                                                if (ui.selected.buttons.length >= event.cards2.length) return 0;
+                                                if (get.position(button.link) == 'j') { return 12; }
+                                                if (player.hp < 3) return 7 - get.value(button.link, player);
+                                                return 10 - get.value(button.link, player);
                                             })
                                             .set("filterButton", function (button) {
                                                 var filtersuit = [...new Set(ui.selected.buttons.map(card => get.suit(card)))]
