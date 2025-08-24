@@ -10417,17 +10417,25 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 nobracket: true,
                                 trigger: {
-                                    global: ["phaseJieshuBegin"],
+                                    global: ["phaseDiscardEnd"],
                                 },
-                                filter: function (event, player) {
-                                    return 1;
+                                filter(event, player) {
+                                    var cards = [];
+                                    event.player.getHistory("lose", function (evt) {
+                                        if (evt.type == "discard" && evt.getParent("phaseDiscard") == event) cards.addArray(evt.cards2);
+                                    });
+                                    return cards.length > 0;
                                 },
-                                //frequent: true,
+                                frequent: true,
                                 content: function () {
                                     "step 0"
-                                    var cards = Array.from(ui.discardPile.childNodes);
-                                    var gains = [];
-                                    var history = game.getGlobalHistory("cardMove", evt => {
+                                    //var cards = Array.from(ui.discardPile.childNodes);
+                                    var cards = [];
+                                    trigger.player.getHistory("lose", evt => {
+                                        if (evt.type == "discard" && evt.getParent("phaseDiscard") == trigger) cards.addArray(evt.cards2.filterInD("d"));
+                                    });
+                                    game.log(get.translation(cards));
+                                    /* var history = game.getGlobalHistory("cardMove", evt => {
                                         if (evt.name == "lose") return evt.position == ui.discardPile;
                                         return evt.name == "cardsDiscard";
                                     });
@@ -10440,11 +10448,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             gains.addArray(cards2);
                                             cards.removeArray(cards2);
                                         }
-                                        if (!cards.length) break;
-                                    }
+                                        if (!cards.length) break; 
+                                    }*/
                                     //game.log(gains);
-                                    if (gains.length) {
-                                        player.chooseButton(["选择至多三张牌？", gains], [1, 3], true).set("ai", get.buttonValue);
+                                    if (cards.length) {
+                                        player.chooseButton(["选择至多三张牌？", cards], [1, 3], true).set("ai", get.buttonValue);
                                     } else event._result = { bool: false };
                                     "step 1"
                                     if (result.links.length) {
@@ -10454,9 +10462,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         var suits = event.cards2.map(card => get.suit(card));
                                         var uniqueSuits = [...new Set(suits)];
                                         event.suitNum = uniqueSuits.length;
-                                        player.chooseTarget(1, get.prompt("maliyanaliehuoji"), "令一名角色使用区域内任意张花色数为" + event.suitNum + "的牌交换", function (card, player, target) {
-                                            var cards = target.getCards('hej');
-                                            var suits3 = cards.map(card => get.suit(card));
+                                        player.chooseTarget(1, get.prompt("maliyanaliehuoji"), "令一名其他角色使用区域内任意张花色数为" + event.suitNum + "的牌交换", function (card, player, target) {
+                                            if (player == target) { return false; }
+                                            var cards1 = target.getCards('hej');
+                                            var suits3 = cards1.map(card => get.suit(card));
                                             var uniqueSuits3 = [...new Set(suits3)];
                                             return uniqueSuits3.length >= event.suitNum;
                                         }).ai = function (target) {
@@ -10917,7 +10926,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             xingyundeyunyuqu: "幸运的云雨区", "xingyundeyunyuqu_info": "结束阶段，你可以将一张牌当作乐不思蜀对自己使用然后恢复一点体力，然后将手牌摸至体力上限(至多为5)。你的判定区有牌时计算与其他角色距离+1。",
                             diwuzhandui: "第五战队", "diwuzhandui_info": "准备阶段，你可以展示牌顶堆X张牌，你可以使用其中一张牌，若你在结算过程中造成了伤害，你可以将剩余的牌交给任意角色。（X为场上巡洋舰数量且至多为3）",
                             bisikaiwanshoulie: "比斯开湾狩猎", "bisikaiwanshoulie_info": "当你一次性失去两张牌时，你可以令任意名角色各摸一张牌",
-                            maliyanaliehuoji: "马里亚纳猎火鸡", "maliyanaliehuoji_info": "每名角色的结束阶段，若本回合进入弃牌堆的牌数≥3，你可以从中选择至多3张牌，令一名角色用自己区域内任意张花色数相等的牌置换之。若其置换后手牌数增加，则其受到X点火属性伤害，X=增加的手牌数。",
+                            maliyanaliehuoji: "马里亚纳猎火鸡", "maliyanaliehuoji_info": "每名角色的弃牌阶段结束时，你可以本阶段进入弃牌堆的牌中选择至多3张牌，令一名其他角色用自己区域内任意张花色数相等的牌置换之。若其置换后手牌数增加，则其受到X点火属性伤害，X=增加的手牌数。",
                             tebiekongxi: "特别空袭", "tebiekongxi_info": "转换技，阳:你的回合外；阴:你的回合内，当你因使用打出或弃置而一次性失去两张或更多牌时，你可以将其中一张牌置于武将牌上，称为“战”(至多三张)。你可以将“战”当作无懈可击使用或如手牌般使用打出。",
                             beijixingweishe: "北极星威慑", "beijixingweishe_info": "你使用杀对其他角色造成伤害后，目标不能使用或打出杀直到其回合结束。",
                             beijixingweishe_effect: "北极星威慑效果", "beijixingweishe_info": "不能使用或打出杀直到回合结束。",
