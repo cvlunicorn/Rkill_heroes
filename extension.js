@@ -945,7 +945,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jinqu: ["female", "RN", 3, ["fangkong2", "qingxuncl", "bisikaiwanshoulie"], ["des:进取号是翡翠级2号舰，其舰首采用连装主炮取代了之前的单装主炮，这种连装炮设计也被后来的英国巡洋舰沿用。战争中进取号主要执行搜捕德国袭击舰的任务，43年在比斯开湾的战斗中她曾经重创德国舰艇。同翡翠号一样，进取号也参加了对诺曼底的支援任务，战争胜利后进取号于46年退役。"]],
                             sp_aisaikesi: ["female", "USN", 4, ["hangmucv", "maliyanaliehuoji"], ["des:埃塞克斯级舰队航母设计上汲取了此前诸多级别航母的经验，使其性能达到了一个全新的高度。美国参战后，其惊人的工业机器全力开动，埃塞克斯号在42年12月服役。这一量产舰队航母开始如下饺子般陆续下水。埃塞克斯级是美国二战后期的主力航母。马里亚纳海战中埃塞克斯号在内的美国航母将日军航母部队彻底击溃，奠定了战争的走向。冲绳战役中，她参加了对大和号的围攻。东京湾，她见证了战争的胜利。在冷战中经过改造的埃塞克斯号也继续活跃，一直到69年才退役。"]],
                             boerzhanuo: ["female", "RM", 4, ["sixiangquanneng", "tebiekongxi"], ["des:波尔扎诺号是意大利建造的第3级重巡洋舰，前者分别是高航速轻防护的塔兰托级和重防护的扎拉级。波尔扎诺保持了高航速，并一定程度加强了防护。在战争期间，虽然波尔扎诺参加了历次重大海战，但都没有出色表现，反倒两次被潜艇击伤，波尔扎诺受伤后，有过改造为航空巡洋舰的计划。但随着意大利的停战，波尔扎诺落入德方，于44年被英军击沉。"]],
-                            jialibodi: ["female", "RM", 4, ["fangkong", "beijixingweishe"], ["des:加里波第是阿布鲁奇公爵级巡洋舰2号舰（佣兵队长5批次）该级巡洋舰有着很强的防护力。 在战争中，加里波第号作为主力巡洋舰参加了多次海战，表现不错并最终幸存到战后，在战后中继续服役。冷战期间，加里波第加装了新的电子设备和武器继续服役，并担任海军旗舰。1957年根据协议，加里波第进行了二战之后的第二次改造，装备了全新的小猎犬防空导弹与北极星发射筒。"]],
+                            jialibodi: ["female", "RM", 4, ["qingxuncl","fangkong2", "beijixingweishe"], ["des:加里波第是阿布鲁奇公爵级巡洋舰2号舰（佣兵队长5批次）该级巡洋舰有着很强的防护力。 在战争中，加里波第号作为主力巡洋舰参加了多次海战，表现不错并最终幸存到战后，在战后中继续服役。冷战期间，加里波第加装了新的电子设备和武器继续服役，并担任海军旗舰。1957年根据协议，加里波第进行了二战之后的第二次改造，装备了全新的小猎犬防空导弹与北极星发射筒。"]],
 
                             skilltest: ["male", "OTHER", 9, [], ["forbidai", "des:测试用"]],
                         },
@@ -3294,9 +3294,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return 7 - get.useful(card);
                                         },//建议卡牌以7为标准就行，怕ai不救队友，所以调高了。同时ai顺次选择卡牌时不要选太多卡牌，要形成持续的牵制。
                                         ai2: function (target) {
-                                            var player = get.player(); var trigger = _status.event.getTrigger();
-                                            game.log(get.translation(_status.event.player)); if (!target.hasSkill("fangkong2_aibiexuan")) { return -get.effect(target, trigger.card, trigger.player, _status.event.player); }
-                                            return 0;
+         var player=get.player();                                   var trigger = _status.event.getTrigger(); 
+         game.log(get.translation(_status.event.player));   if(!target.hasSkill("fangkong2_aibiexuan")) {                            return -get.effect(target, trigger.card, trigger.player, _status.event.player);}
+         return 0;
                                         }, targets: trigger.targets,//这个代码不能照搬到content以外的地方。贯石斧、朱雀羽扇有类似代码。还有recover版的。
                                     });//技能还没扩起来，括起来。
                                     'step 1'
