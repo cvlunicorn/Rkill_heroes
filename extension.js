@@ -3294,8 +3294,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return 7 - get.useful(card);
                                         },//建议卡牌以7为标准就行，怕ai不救队友，所以调高了。同时ai顺次选择卡牌时不要选太多卡牌，要形成持续的牵制。
                                         ai2: function (target) {
-                                            var trigger = _status.event.getTrigger();
-                                            return -get.effect(target, trigger.card, trigger.player, _status.event.player) && !target.hasSkill("fangkong2_aibiexuan");
+                                            var player = get.player(); var trigger = _status.event.getTrigger();
+                                            game.log(get.translation(_status.event.player)); if (!target.hasSkill("fangkong2_aibiexuan")) { return -get.effect(target, trigger.card, trigger.player, _status.event.player); }
+                                            return 0;
                                         }, targets: trigger.targets,//这个代码不能照搬到content以外的地方。贯石斧、朱雀羽扇有类似代码。还有recover版的。
                                     });//技能还没扩起来，括起来。
                                     'step 1'
