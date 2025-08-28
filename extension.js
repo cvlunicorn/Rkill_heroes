@@ -867,7 +867,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "weiershiqinwang", "z1", "z16"],
                                 lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng", "qiuyue", "weilianDbote", "xianghe", "ruihe", "yuhei"],
                                 lishizhanyi_haixiafujizhan: ["u47", "u81", "u505", "jinqu", "kente"],
-                                weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan", "sp_aisaikesi"],
+                                weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan", "sp_aisaikesi", "sp_ninghai"],
                             },
 
                         },
@@ -945,7 +945,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jinqu: ["female", "RN", 3, ["fangkong2", "qingxuncl", "bisikaiwanshoulie"], ["des:进取号是翡翠级2号舰，其舰首采用连装主炮取代了之前的单装主炮，这种连装炮设计也被后来的英国巡洋舰沿用。战争中进取号主要执行搜捕德国袭击舰的任务，43年在比斯开湾的战斗中她曾经重创德国舰艇。同翡翠号一样，进取号也参加了对诺曼底的支援任务，战争胜利后进取号于46年退役。"]],
                             sp_aisaikesi: ["female", "USN", 4, ["hangmucv", "maliyanaliehuoji"], ["des:埃塞克斯级舰队航母设计上汲取了此前诸多级别航母的经验，使其性能达到了一个全新的高度。美国参战后，其惊人的工业机器全力开动，埃塞克斯号在42年12月服役。这一量产舰队航母开始如下饺子般陆续下水。埃塞克斯级是美国二战后期的主力航母。马里亚纳海战中埃塞克斯号在内的美国航母将日军航母部队彻底击溃，奠定了战争的走向。冲绳战役中，她参加了对大和号的围攻。东京湾，她见证了战争的胜利。在冷战中经过改造的埃塞克斯号也继续活跃，一直到69年才退役。"]],
                             boerzhanuo: ["female", "RM", 4, ["sixiangquanneng", "tebiekongxi"], ["des:波尔扎诺号是意大利建造的第3级重巡洋舰，前者分别是高航速轻防护的塔兰托级和重防护的扎拉级。波尔扎诺保持了高航速，并一定程度加强了防护。在战争期间，虽然波尔扎诺参加了历次重大海战，但都没有出色表现，反倒两次被潜艇击伤，波尔扎诺受伤后，有过改造为航空巡洋舰的计划。但随着意大利的停战，波尔扎诺落入德方，于44年被英军击沉。"]],
-                            jialibodi: ["female", "RM", 4, ["qingxuncl","fangkong2", "beijixingweishe"], ["des:加里波第是阿布鲁奇公爵级巡洋舰2号舰（佣兵队长5批次）该级巡洋舰有着很强的防护力。 在战争中，加里波第号作为主力巡洋舰参加了多次海战，表现不错并最终幸存到战后，在战后中继续服役。冷战期间，加里波第加装了新的电子设备和武器继续服役，并担任海军旗舰。1957年根据协议，加里波第进行了二战之后的第二次改造，装备了全新的小猎犬防空导弹与北极星发射筒。"]],
+                            jialibodi: ["female", "RM", 4, ["qingxuncl", "fangkong2", "beijixingweishe"], ["des:加里波第是阿布鲁奇公爵级巡洋舰2号舰（佣兵队长5批次）该级巡洋舰有着很强的防护力。 在战争中，加里波第号作为主力巡洋舰参加了多次海战，表现不错并最终幸存到战后，在战后中继续服役。冷战期间，加里波第加装了新的电子设备和武器继续服役，并担任海军旗舰。1957年根据协议，加里波第进行了二战之后的第二次改造，装备了全新的小猎犬防空导弹与北极星发射筒。"]],
+                            ninghai: ["female", "ROCN", 3, ["fangkong2", "qingxuncl", "jianduixunlian"], ["des:　1931年中国向日本订购的一艘轻巡洋舰。该舰吸取了夕张号的设计经验，布局紧凑，火力强于一般同吨位军舰。出于训练目的，该舰虽然只有2600吨左右，但是水上飞机，鱼雷均齐备，也正因为过多的装备导致该舰适航性不佳。1937年全面抗战爆发，宁海号死守江阴防线，并战沉于此。"]],
+                            sp_ninghai: ["female", "ROCN", 3, ["fangkong2", "qingxuncl", "aizhi", "longgu", "jianghun"], ["des:　1931年中国向日本订购的一艘轻巡洋舰。该舰吸取了夕张号的设计经验，布局紧凑，火力强于一般同吨位军舰。出于训练目的，该舰虽然只有2600吨左右，但是水上飞机，鱼雷均齐备，也正因为过多的装备导致该舰适航性不佳。1937年全面抗战爆发，宁海号死守江阴防线，并战沉于此。"]],
+
 
                             skilltest: ["male", "OTHER", 9, [], ["forbidai", "des:测试用"]],
                         },
@@ -3294,9 +3297,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return 7 - get.useful(card);
                                         },//建议卡牌以7为标准就行，怕ai不救队友，所以调高了。同时ai顺次选择卡牌时不要选太多卡牌，要形成持续的牵制。
                                         ai2: function (target) {
-         var player=get.player();                                   var trigger = _status.event.getTrigger(); 
-         game.log(get.translation(_status.event.player));   if(!target.hasSkill("fangkong2_aibiexuan")) {                            return -get.effect(target, trigger.card, trigger.player, _status.event.player);}
-         return 0;
+                                            var player = get.player(); var trigger = _status.event.getTrigger();
+                                            game.log(get.translation(_status.event.player)); if (!target.hasSkill("fangkong2_aibiexuan")) { return -get.effect(target, trigger.card, trigger.player, _status.event.player); }
+                                            return 0;
                                         }, targets: trigger.targets,//这个代码不能照搬到content以外的地方。贯石斧、朱雀羽扇有类似代码。还有recover版的。
                                     });//技能还没扩起来，括起来。
                                     'step 1'
@@ -10656,6 +10659,208 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                 },
                             },
+                            jianduixunlian: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                enable: "phaseUse",
+                                usable: 1,
+                                filter: function (event, player) {
+                                    return player.countCards("h") > 0 && game.hasPlayer(current => lib.skill.spshangyi.filterTarget(null, player, current));
+                                },
+                                filterTarget: function (card, player, target) {
+                                    return target != player && target.countCards("h") > 0;
+                                },
+                                content: function () {
+                                    player.viewHandcards(target);
+                                    var handcards1 = player.getCards("h");
+                                    var handcards2 = target.getCards("h");
+                                    var list1 = [], list2 = [];
+                                    for (var i of handcards1) {
+                                        list1.add(get.type2(i, player));
+                                        if (list1.length >= 3) break;
+                                    }
+                                    for (var i of handcards2) {
+                                        list2.add(get.type2(i, player));
+                                        if (list2.length >= 3) break;
+                                    }
+                                    if (list1.length != list2.length) { player.draw(1); }
+                                },
+                                ai: {
+                                    order: 6,
+                                    result: {
+                                        player: 1,
+                                        target: function (player, target) {
+                                            if (target.hasSkillTag("noh")) return 0;
+                                            return -0.5;
+                                        },
+                                    },
+                                },
+                                "_priority": 0,
+                            },
+                            aizhi: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                enable: "phaseUse",
+                                usable: 1,
+                                content: function () {
+                                    'step 0'
+                                    event.num = 0;
+                                    event.targets = game.filterPlayer(function (current) {
+                                        var player = get.player();
+                                        return current != player && player.inRange(current) && current.countCards("h") > 0;
+                                    }).sortBySeat();
+                                    'step 1'
+                                    lib.target = event.targets.shift();
+                                    game.log("展示牌角色" + get.translation(lib.target));
+                                    player.choosePlayerCard(lib.target, "h", true);
+                                    'step 2'
+                                    event.card = result.cards[0];
+                                    player.showCards(event.card);
+                                    let cardtype = get.type(event.card);
+                                    game.log(cardtype);
+                                    'step 3'
+                                    if (get.type(event.card) != "trick") {
+                                        event.goto(5);
+                                    } else {
+                                        player.chooseTarget("可以令一名角色弃置一张牌，然后其视为使用" + get.translation(result.cards) + "(若不能使用则只弃牌)").set("ai", function (target) {
+                                            var player = get.player();
+                                            if (target.hasUseTarget(result.cards, null, false)) { return get.attitude(player, target); }
+                                            else { return get.attitude(player, target); }
+                                            return 0;
+                                        });
+                                    }
+                                    'step 4'
+                                    if (result.bool) {
+                                        game.log("弃牌角色" + get.translation(result.targets[0]));
+                                        result.targets[0].chooseToDiscard(1, true);
+                                        result.targets[0].chooseUseTarget(
+                                            {
+                                                name: event.card.name,
+                                                isCard: true,
+                                            },
+                                            "请选择" + get.translation(event.card) + "的目标",
+                                            false
+                                        );
+                                    }
+                                    'step 5'
+                                    if (event.num < targets.length) { event.goto(1); }
+                                    else {
+                                        game.log("技能结束");
+                                    }
+                                },
+                            },
+                            longgu: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                global: "longgu_skill",
+                            },
+                            longgu_skill: {
+                                trigger: {
+                                    player: "phaseZhunbeiBegin",
+                                },
+                                filter: function (event, player) {
+                                    if (game.hasPlayer(function (current) {
+                                        return current.hasSkill("longgu") && current.isAlive();
+                                    })
+                                    ) {
+                                        if (!(player.hasSkill("longgu_basic") || player.hasSkill("longgu_trick"))) {
+                                            return player == game.zhu || player.group == "ROCN";
+                                        }
+                                    }
+                                },
+                                check: function (event, player) {
+                                    return player.hp <= 2;
+                                },
+                                content: function () {
+                                    'step 0'
+                                    player.skip('phaseDraw');
+                                    var str = get.translation(trigger.player);
+                                    player.chooseControl().set('choiceList', [
+                                        '不能成为基本牌的目标',
+                                        '不能成为普通锦囊牌和延时锦囊牌的目标',
+                                    ]).set('ai', function () {
+                                        if (player.countCards("h", card => get.type(card) === "trick") > 1) return 0;
+                                        return 1;
+                                    });
+                                    'step 1'
+                                    if (result.control) {
+                                        if (result.index == 1) {
+                                            game.log(get.translation(player), '不能成为普通锦囊牌和延时锦囊牌的目标');
+                                            player.addSkill("longgu_trick");
+                                        }
+                                        else if (result.index == 0) {
+                                            game.log(get.translation(player), '不能成为基本牌的目标');
+                                            player.addSkill("longgu_basic");
+                                        }
+                                    }
+                                }
+                            },
+                            longgu_trick: {
+                                mod: {
+                                    targetEnabled(card, player, target, now) {
+                                        game.log(get.translation(card));
+                                        game.log(get.type(card));
+                                        if (get.type(card) == "trick" || get.type(card) == "delay") return false;
+                                    },
+                                },
+                                force: true,
+                                direct: true,
+                                trigger: {
+                                    player: "useCard",
+                                },
+                                filter: function (event, player) {
+                                    return get.type(event.card) == "trick" || get.type(event.card) == "delay";
+                                },
+                                content: function (event, player) {
+                                    player.removeSkill("longgu_trick");
+                                },
+                                "_priority": 0,
+                            },
+                            longgu_basic: {
+                                mod: {
+                                    targetEnabled(card, player, target, now) {
+                                        game.log(get.translation(card));
+                                        game.log(get.type(card));
+                                        if (get.type(card) == "basic") return false;
+                                    },
+                                },
+                                force: true,
+                                direct: true,
+                                trigger: {
+                                    player: "useCard",
+                                },
+                                filter: function (event, player) {
+                                    return get.type(event.card) == "basic";
+                                },
+                                content: function (event, player) {
+                                    player.removeSkill("longgu_basic");
+                                },
+                                "_priority": 0,
+                            },
+                            jianghun: {
+                                trigger: {
+                                    player: "die",
+                                },
+                                direct: true,
+                                skillAnimation: true,
+                                animationColor: "wood",
+                                forceDie: true,
+                                content: function (event, player) {
+                                    game.addGlobalSkill("jianghun_effect");
+                                    player.$fullscreenpop("江魂！", "thunder");
+                                },
+                            },
+                            jianghun_effect: {
+                                mod: {
+                                    globalTo(from, to, distance) {
+                                        if (to.group == "ROCN" || to.group == "PLAN") {
+                                            return distance + 1;
+                                        }
+                                    },
+                                },
+                                forced: true,
+                                silent: true,
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -10729,6 +10934,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             sp_aisaikesi: "sp埃塞克斯",
                             boerzhanuo: "波尔扎诺",
                             jialibodi: "加里波第",
+                            ninghai: "宁海",
+                            sp_ninghai: "SP宁海",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -10931,6 +11138,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             tebiekongxi: "特别空袭", "tebiekongxi_info": "转换技，阳:你的回合外；阴:你的回合内，当你因使用打出或弃置而一次性失去两张或更多牌时，你可以将其中一张牌置于武将牌上，称为“战”(至多三张)。你可以将“战”当作无懈可击使用或如手牌般使用打出。",
                             beijixingweishe: "北极星威慑", "beijixingweishe_info": "你使用杀对其他角色造成伤害后，目标不能使用或打出杀直到其回合结束。",
                             beijixingweishe_effect: "北极星威慑效果", "beijixingweishe_info": "不能使用或打出杀直到回合结束。",
+                            jianduixunlian: "舰队训练", "jianduixunlian_info": "出牌阶段限一次，你可以观看一名角色的手牌，若你与其手牌包含的类型数不同则你摸一张牌",
+                            aizhi: "爱知", "aizhi_info": "出牌阶段限一次，你可以依次选择并展示攻击范围内其他角色的一张手牌，若为锦囊牌，你可以选择一名角色，令其弃置一张牌并视为其使用该锦囊（若不能使用则只弃牌）。",
+                            longgu: "龙崮", "longgu_info": "你存活时，与你同势力的角色和主公准备阶段时，可以跳过摸牌阶段并选择一项：不能成为基本牌/普通锦囊牌和延时锦囊牌的目标，直至其下一次使用基本牌/普通锦囊牌和延时锦囊牌。",
+                            longgu_skill: "龙崮", "longgu_skill_info": "准备阶段时，你可以跳过摸牌阶段并选择一项：不能成为基本牌/普通锦囊牌和延时锦囊牌的目标，直至其下一次使用基本牌/普通锦囊牌和延时锦囊牌。",
+                            longgu_basic: "龙崮_基本", "longgu_basic_info": "锁定技，你不能成为基本牌的目标，直至其下一次使用基本牌。",
+                            longgu_trick: "龙崮_锦囊", "longgu_trick_info": "锁定技，你不能成为锦囊牌和延时锦囊牌的目标，直至其下一次使用普通锦囊牌和延时锦囊牌。",
+                            jianghun: "江魂", "jianghun_info": "你阵亡时，令其他角色与全部C势力计算距离时始终+1。",
 
 
                             jianrbiaozhun: "舰r标准",
