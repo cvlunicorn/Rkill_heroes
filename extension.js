@@ -25,6 +25,7 @@ try {
 }
 //const { connect } = require("ws");///vscode生成出来的，vscodeAI检测到enable认为没导入自动添加了导入但其实enable只是一个标签。目前使用try-catch包裹起来。
 import { lib, game, ui, get, ai, _status } from '../../noname.js'
+import { checkBegin } from '../../noname/library/assembly/buildin.js';
 game.import("extension", function (lib, game, ui, get, ai, _status) {
 
     return {
@@ -948,6 +949,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jialibodi: ["female", "RM", 4, ["qingxuncl", "fangkong2", "beijixingweishe"], ["des:加里波第是阿布鲁奇公爵级巡洋舰2号舰（佣兵队长5批次）该级巡洋舰有着很强的防护力。 在战争中，加里波第号作为主力巡洋舰参加了多次海战，表现不错并最终幸存到战后，在战后中继续服役。冷战期间，加里波第加装了新的电子设备和武器继续服役，并担任海军旗舰。1957年根据协议，加里波第进行了二战之后的第二次改造，装备了全新的小猎犬防空导弹与北极星发射筒。"]],
                             ninghai: ["female", "ROCN", 3, ["fangkong2", "qingxuncl", "jianduixunlian"], ["des:　1931年中国向日本订购的一艘轻巡洋舰。该舰吸取了夕张号的设计经验，布局紧凑，火力强于一般同吨位军舰。出于训练目的，该舰虽然只有2600吨左右，但是水上飞机，鱼雷均齐备，也正因为过多的装备导致该舰适航性不佳。1937年全面抗战爆发，宁海号死守江阴防线，并战沉于此。"]],
                             sp_ninghai: ["female", "ROCN", 3, ["fangkong2", "qingxuncl", "aizhi", "longgu", "jianghun"], ["des:　1931年中国向日本订购的一艘轻巡洋舰。该舰吸取了夕张号的设计经验，布局紧凑，火力强于一般同吨位军舰。出于训练目的，该舰虽然只有2600吨左右，但是水上飞机，鱼雷均齐备，也正因为过多的装备导致该舰适航性不佳。1937年全面抗战爆发，宁海号死守江阴防线，并战沉于此。"]],
+                            yiahua: ["female", "USN", 4, ["zhuangjiafh", "zhanliebb", "zhizhanzhige"], ["des:衣阿华级战列舰是U海军在战争期间最新式的战列舰，在火力与防护有所增强的情况下，相比前代的南达与北卡，衣阿华的航速超过30节。衣阿华于43年服役，并于同年负责运送总统参加德黑兰会议。44年衣阿华转战太平洋战场，在莱特湾海战期间，衣阿华及其姐妹舰本有与大和级交手的机会，但敌方舰队已经先行转向。在战争后期，衣阿华主要依靠其高速执行护航与火力支援任务。在冲绳战役时本舰预备拦截大和号，但大和号最终被航母空袭击沉，双方最强战列舰就此失去交手机会。"]],
 
 
                             skilltest: ["male", "OTHER", 9, [], ["forbidai", "des:测试用"]],
@@ -10838,6 +10840,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             jianghun: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
                                     player: "die",
                                 },
@@ -10860,6 +10864,21 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 forced: true,
                                 silent: true,
+                            },
+                            zhizhanzhige: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: {
+                                    player: "phaseZhunbeiBegin",
+                                },
+                                check: function (event, player) {
+                                    return 1;
+                                },
+                                content: function (event, player) {
+                                    player.draw(2);
+                                    player.turnOver();
+                                    trigger.getParent("phase").phaseList.splice(trigger.getParent("phase").num+1, 0, "phaseUse");
+                                },
                             },
                             //在这里添加新技能。
 
@@ -10936,6 +10955,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jialibodi: "加里波第",
                             ninghai: "宁海",
                             sp_ninghai: "SP宁海",
+                            yiahua: "衣阿华",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -11145,6 +11165,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             longgu_basic: "龙崮_基本", "longgu_basic_info": "锁定技，你不能成为基本牌的目标，直至其下一次使用基本牌。",
                             longgu_trick: "龙崮_锦囊", "longgu_trick_info": "锁定技，你不能成为锦囊牌和延时锦囊牌的目标，直至其下一次使用普通锦囊牌和延时锦囊牌。",
                             jianghun: "江魂", "jianghun_info": "你阵亡时，令其他角色与全部C势力计算距离时始终+1。",
+                            zhizhanzhige: "止战之戈", "zhizhanzhige_info": "准备阶段，你可以摸两张牌，额外执行一个出牌阶段，然后翻面。",
 
 
                             jianrbiaozhun: "舰r标准",
