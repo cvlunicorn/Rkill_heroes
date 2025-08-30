@@ -7022,7 +7022,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             result.targets[0].loseToDiscardpile(cards);
                                             result.targets[1].addToExpansion(cards, 'gain2').gaintag.add('Z');
                                             "step 3"
-                                            game.logSkill("z1_Zqulingjian_move");
+                                            player.logSkill("z1_Zqulingjian_move");
                                             event.finish();
                                         },
                                     },
