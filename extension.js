@@ -950,6 +950,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             ninghai: ["female", "ROCN", 3, ["fangkong2", "qingxuncl", "jianduixunlian"], ["des:　1931年中国向日本订购的一艘轻巡洋舰。该舰吸取了夕张号的设计经验，布局紧凑，火力强于一般同吨位军舰。出于训练目的，该舰虽然只有2600吨左右，但是水上飞机，鱼雷均齐备，也正因为过多的装备导致该舰适航性不佳。1937年全面抗战爆发，宁海号死守江阴防线，并战沉于此。"]],
                             sp_ninghai: ["female", "ROCN", 3, ["fangkong2", "qingxuncl", "aizhi", "longgu", "jianghun"], ["des:　1931年中国向日本订购的一艘轻巡洋舰。该舰吸取了夕张号的设计经验，布局紧凑，火力强于一般同吨位军舰。出于训练目的，该舰虽然只有2600吨左右，但是水上飞机，鱼雷均齐备，也正因为过多的装备导致该舰适航性不佳。1937年全面抗战爆发，宁海号死守江阴防线，并战沉于此。"]],
                             yiahua: ["female", "USN", 4, ["zhuangjiafh", "zhanliebb", "zhizhanzhige"], ["des:衣阿华级战列舰是U海军在战争期间最新式的战列舰，在火力与防护有所增强的情况下，相比前代的南达与北卡，衣阿华的航速超过30节。衣阿华于43年服役，并于同年负责运送总统参加德黑兰会议。44年衣阿华转战太平洋战场，在莱特湾海战期间，衣阿华及其姐妹舰本有与大和级交手的机会，但敌方舰队已经先行转向。在战争后期，衣阿华主要依靠其高速执行护航与火力支援任务。在冲绳战役时本舰预备拦截大和号，但大和号最终被航母空袭击沉，双方最强战列舰就此失去交手机会。"]],
+                            dajingbeishang: ["female", "IJN", 3, ["zhongleizhuangjiantuxi", "jianjianleiji"], ["des:球磨型轻巡3番舰。41年北上号被改装为了雷击巡洋舰，全舰共装备了十座四联装鱼雷发射器，单边齐射达到了二十枚鱼雷。但由于海战环境的变化，她始终没有派上用场。她在1942年拆除了八座鱼雷发射器，改为了高速运输舰。44年北上号改装为人操鱼雷“回天”母舰。北上号也是唯一残存到战后的球磨级，在1946年拆毁。"]],
 
 
                             skilltest: ["male", "OTHER", 9, [], ["forbidai", "des:测试用"]],
@@ -10877,7 +10878,229 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 content: function (event, player) {
                                     player.draw(2);
                                     player.turnOver();
-                                    trigger.getParent("phase").phaseList.splice(trigger.getParent("phase").num+1, 0, "phaseUse");
+                                    trigger.getParent("phase").phaseList.splice(trigger.getParent("phase").num + 1, 0, "phaseUse");
+                                },
+                            },
+                            jianjianleiji: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                usable: 1,
+                                enable: ["chooseToRespond", "chooseToUse"],
+                                mod: {
+                                    cardUsable: function (card) {
+                                        if (card.storage && card.storage.jianjianleiji) return Infinity;
+                                    },
+                                    targetInRange(card, player, target, now) {
+                                        if (card.storage && card.storage.jianjianleiji) return true;
+                                    },
+                                },
+                                filterCard(card) {
+                                    return get.type(card) == 'equip';
+                                },
+                                position: "hes",
+                                viewAs: {
+                                    name: "sha",
+                                    nature: "thunder",
+                                    storage: {
+                                        jianjianleiji: true,
+                                    },
+                                },
+                                viewAsFilter(player) {
+                                    if (!player.countCards('hes')) return false;
+                                },
+                                prompt: "将一张装备牌当雷杀使用",
+                                check(card) { return 4 - get.value(card) },
+                                ai: {
+                                    yingbian: function (card, player, targets, viewer) {
+                                        if (get.attitude(viewer, player) <= 0) return 0;
+                                        var base = 0, hit = false;
+                                        if (get.cardtag(card, 'yingbian_hit')) {
+                                            hit = true;
+                                            if (targets.some(target => {
+                                                return target.mayHaveShan(viewer, 'use', target.getCards('h', i => {
+                                                    return i.hasGaintag('sha_notshan');
+                                                })) && get.attitude(viewer, target) < 0 && get.damageEffect(target, player, viewer, get.natureList(card)) > 0;
+                                            })) base += 5;
+                                        }
+                                        if (get.cardtag(card, 'yingbian_add')) {
+                                            if (game.hasPlayer(function (current) {
+                                                return !targets.includes(current) && lib.filter.targetEnabled2(card, player, current) && get.effect(current, card, player, player) > 0;
+                                            })) base += 5;
+                                        }
+                                        if (get.cardtag(card, 'yingbian_damage')) {
+                                            if (targets.some(target => {
+                                                return get.attitude(player, target) < 0 && (hit || !target.mayHaveShan(viewer, 'use', target.getCards('h', i => {
+                                                    return i.hasGaintag('sha_notshan');
+                                                })) || player.hasSkillTag('directHit_ai', true, {
+                                                    target: target,
+                                                    card: card,
+                                                }, true)) && !target.hasSkillTag('filterDamage', null, {
+                                                    player: player,
+                                                    card: card,
+                                                    jiu: true,
+                                                })
+                                            })) base += 5;
+                                        }
+                                        return base;
+                                    },
+                                    canLink: function (player, target, card) {
+                                        if (!target.isLinked() && !player.hasSkill('wutiesuolian_skill')) return false;
+                                        if (player.hasSkill('jueqing') || player.hasSkill('gangzhi') || target.hasSkill('gangzhi')) return false;
+                                        return true;
+                                    },
+                                    basic: {
+                                        useful: [5, 3, 1],
+                                        value: [5, 3, 1],
+                                    },
+                                    order: function (item, player) {
+                                        if (player.hasSkillTag('presha', true, null, true)) return 10;
+                                        if (typeof item === 'object' && game.hasNature(item, 'linked')) {
+                                            if (game.hasPlayer(function (current) {
+                                                return current != player && lib.card.sha.ai.canLink(player, current, item) && player.canUse(item, current, null, true) && get.effect(current, item, player, player) > 0;
+                                            }) && game.countPlayer(function (current) {
+                                                return current.isLinked() && get.damageEffect(current, player, player, get.nature(item)) > 0;
+                                            }) > 1) return 3.1;
+                                            return 3;
+                                        }
+                                        return 3.05;
+                                    },
+                                    result: {
+                                        target: function (player, target, card, isLink) {
+                                            let eff = -1.5, odds = 1.35, num = 1;
+                                            if (isLink) {
+                                                let cache = _status.event.getTempCache('sha_result', 'eff');
+                                                if (typeof cache !== 'object' || cache.card !== get.translation(card)) return eff;
+                                                if (cache.odds < 1.35 && cache.bool) return 1.35 * cache.eff;
+                                                return cache.odds * cache.eff;
+                                            }
+                                            if (player.hasSkill('jiu') || player.hasSkillTag('damageBonus', true, {
+                                                target: target,
+                                                card: card
+                                            })) {
+                                                if (target.hasSkillTag('filterDamage', null, {
+                                                    player: player,
+                                                    card: card,
+                                                    jiu: true,
+                                                })) eff = -0.5;
+                                                else {
+                                                    num = 2;
+                                                    if (get.attitude(player, target) > 0) eff = -7;
+                                                    else eff = -4;
+                                                }
+                                            }
+                                            if (!player.hasSkillTag('directHit_ai', true, {
+                                                target: target,
+                                                card: card,
+                                            }, true)) odds -= 0.7 * target.mayHaveShan(player, 'use', target.getCards('h', i => {
+                                                return i.hasGaintag('sha_notshan');
+                                            }), 'odds');
+                                            _status.event.putTempCache('sha_result', 'eff', {
+                                                bool: target.hp > num && get.attitude(player, target) > 0,
+                                                card: get.translation(card),
+                                                eff: eff,
+                                                odds: odds
+                                            });
+                                            return odds * eff;
+                                        },
+                                    },
+                                    tag: {
+                                        respond: 1,
+                                        respondShan: 1,
+                                        damage: function (card) {
+                                            if (game.hasNature(card, 'poison')) return;
+                                            return 1;
+                                        },
+                                        natureDamage: function (card) {
+                                            if (game.hasNature(card, 'linked')) return 1;
+                                        },
+                                        fireDamage: function (card, nature) {
+                                            if (game.hasNature(card, 'fire')) return 1;
+                                        },
+                                        thunderDamage: function (card, nature) {
+                                            if (game.hasNature(card, 'thunder')) return 1;
+                                        },
+                                        poisonDamage: function (card, nature) {
+                                            if (game.hasNature(card, 'poison')) return 1;
+                                        },
+                                    },
+                                },
+                            },
+                            zhongleizhuangjiantuxi: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                skillAnimation: true,
+                                animationColor: "wood",
+                                juexingji: true,
+                                unique: true,
+                                trigger: {
+                                    player: "phaseZhunbeiBegin",
+                                },
+                                filter(event, player) {
+                                    return player.hp <= 1 && !player.storage.zhongleizhuangjiantuxi;
+                                },
+                                forced: true,
+                                content() {
+                                    "step 0"
+                                    player.awakenSkill(event.name);
+                                    player.addSkill("zhongleizhuangjiantuxi_count");
+                                    player
+                                        .chooseTarget(get.prompt("zhongleizhuangjiantuxi"), "对一名其他角色视为使用三张雷杀", function (card, player, target) {
+                                            return target != player;
+                                        })
+                                        .set("ai", function (target) {
+                                            var player = get.player();
+                                            return get.damageEffect(target, player, player, "thunder") * (target.hp == 1 ? 2 : 1);
+                                        });
+                                    "step 1"
+                                    if (result.bool) {
+                                        var target = result.targets[0];
+                                        for (var i = 0; i < 3; i++) {
+                                            player.useCard({ name: "sha", isCard: true }, target);
+                                        }
+                                    } else event.finish();
+                                    "step 2"
+                                    var list = player.getStorage("zhongleizhuangjiantuxi_count").filter(function (target) {
+                                        return 1;
+                                    });
+                                    game.log(list);
+                                    if (list.length) {
+                                        player.removeSkill("zhongleizhuangjiantuxi_count");
+                                        event.finish();
+                                    } else {
+                                        player.discard(player.getCards("he"));
+                                        player.removeSkill("zhongleizhuangjiantuxi_count");
+                                    }
+                                },
+                                ai: {
+                                    threaten(player, target) {
+                                        if (target.hp == 1) return 2;
+                                        return 0.5;
+                                    },
+                                    maixie: true,
+                                    effect: {
+                                        target(card, player, target) {
+                                            if (!target.hasFriend()) return;
+                                            if (target.hp === 2 && get.tag(card, "damage") == 1 && !target.isTurnedOver() && _status.currentPhase !== target && get.distance(_status.currentPhase, target, "absolute") <= 3) return [0.5, 1];
+                                            if (target.hp === 1 && get.tag(card, "recover") && !target.isTurnedOver() && _status.currentPhase !== target && get.distance(_status.currentPhase, target, "absolute") <= 3) return [1, -3];
+                                        },
+                                    },
+                                },
+                                "_priority": 0,
+                                subSkill: {
+                                    count: {
+                                        sub: true,
+                                        trigger: {
+                                            global: "dyingBegin",
+                                        },
+                                        silent: true,
+                                        charlotte: true,
+                                        filter: function (event, player) {
+                                            return event.getParent("zhongleizhuangjiantuxi").player == player;
+                                        },
+                                        content: function () {
+                                            player.markAuto("zhongleizhuangjiantuxi_count", [trigger.player]);
+                                        },
+                                    },
                                 },
                             },
                             //在这里添加新技能。
@@ -10956,6 +11179,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             ninghai: "宁海",
                             sp_ninghai: "SP宁海",
                             yiahua: "衣阿华",
+                            dajingbeishang: "大井北上",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -11166,6 +11390,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             longgu_trick: "龙崮_锦囊", "longgu_trick_info": "锁定技，你不能成为锦囊牌和延时锦囊牌的目标，直至其下一次使用普通锦囊牌和延时锦囊牌。",
                             jianghun: "江魂", "jianghun_info": "你阵亡时，令其他角色与全部C势力计算距离时始终+1。",
                             zhizhanzhige: "止战之戈", "zhizhanzhige_info": "准备阶段，你可以摸两张牌，额外执行一个出牌阶段，然后翻面。",
+                            zhongleizhuangjiantuxi: "重雷装舰突袭", "zhongleizhuangjiantuxi_info": "觉醒技，准备阶段若你体力值为一，你可以视为对一名角色使用三张无次数限制的雷杀，若此技能结算流程中目标未进入过濒死状态，你弃置所有手牌与装备牌",
+                            jianjianleiji: "渐减雷击", "jianjianleiji_info": "每回合限一次，你可以将一张装备牌当作无距离次数限制的雷杀使用",
 
 
                             jianrbiaozhun: "舰r标准",
