@@ -3295,7 +3295,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 if (player.hasSkill('duikongfangyu')) {
                                                     return get.distance(player, target) <= (3);
                                                 }
-                                                return get.distance(player, target) <= (1 + player.countMark('jinengup'));
+                                                return get.distance(player, target) <= (1 + 2*player.countMark('jinengup'));
                                             }
                                         },//选择事件包含的目标，同trigger的目标。有其他同技能的角色时，ai不要重复选择目标。
                                         ai1: function (card) {
@@ -11546,7 +11546,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhiyangai: "直言",
                             "zhiyangai_info": "令一名目标角色摸一张牌并展示之。<br>若为装备牌，则其可以选择是否装备。<br>可强化(每强化一次技能，便+1技能的目标数)",
                             "fangkong2": "防空",
-                            "fangkong2_info": "当一名角色使用的锦囊牌指定了至少两名角色为目标时，<br>你可弃置两张牌令此牌对距离你为1/2/3的任意名角色无效,可强化",
+                            "fangkong2_info": "当一名角色使用的锦囊牌指定了至少两名角色为目标时，<br>你可弃置两张牌令此牌对距离你为1/3/5的任意名角色无效,可强化",
                             huokongld: "火控雷达",
                             "huokongld_info": "（可强化）当你使用的【杀】被目标角色使用的【闪】抵消时，你可以弃置：零级，一张杀/一级，一张黑色牌/二级，一张牌，令此【杀】依然对其造成伤害。",
                             "ganglie_gai": "刚烈弱化",
