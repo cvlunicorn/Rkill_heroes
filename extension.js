@@ -952,6 +952,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             yiahua: ["female", "USN", 4, ["zhuangjiafh", "zhanliebb", "zhizhanzhige"], ["des:衣阿华级战列舰是U海军在战争期间最新式的战列舰，在火力与防护有所增强的情况下，相比前代的南达与北卡，衣阿华的航速超过30节。衣阿华于43年服役，并于同年负责运送总统参加德黑兰会议。44年衣阿华转战太平洋战场，在莱特湾海战期间，衣阿华及其姐妹舰本有与大和级交手的机会，但敌方舰队已经先行转向。在战争后期，衣阿华主要依靠其高速执行护航与火力支援任务。在冲绳战役时本舰预备拦截大和号，但大和号最终被航母空袭击沉，双方最强战列舰就此失去交手机会。"]],
                             dajingbeishang: ["female", "IJN", 3, ["zhongleizhuangjiantuxi", "jianjianleiji"], ["des:球磨型轻巡3番舰。41年北上号被改装为了雷击巡洋舰，全舰共装备了十座四联装鱼雷发射器，单边齐射达到了二十枚鱼雷。但由于海战环境的变化，她始终没有派上用场。她在1942年拆除了八座鱼雷发射器，改为了高速运输舰。44年北上号改装为人操鱼雷“回天”母舰。北上号也是唯一残存到战后的球磨级，在1946年拆毁。"]],
                             wugelini: ["female", "RM", 3, ["dajiaoduguibi", "quzhudd", "fenzhandaodi"], ["des:　乌戈里尼•维瓦尔迪号属航海家级驱逐舰5号舰。乌戈里尼•维瓦尔迪号也同姐妹舰安东尼奥•达诺利号一样坚持到了1943年意大利投降，在接应意大利主力舰队一同前往盟军港口时遭到了德军阻截，在规避中触雷，两姐妹舰在不到一天的时间内相继沉没。"]],
+                            xukufu: ["female", "MN", 3, ["qianting", "huofu", "xunqian"], ["des:絮库夫号是法国建造的一艘大型潜艇，她搭载了潜艇上罕见的203毫米双联主炮，同时还搭载了水上飞机，这些一般是重巡洋舰的配备。她还在甲板上装备了类似驱逐舰的回旋式的鱼雷发射器。40年法国迅速战败后，絮库夫号在盟军阵营参加作战，在42年与商船相撞的事故中沉没。"]],
 
 
                             skilltest: ["male", "OTHER", 9, [], ["forbidai", "des:测试用"]],
@@ -11260,7 +11261,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                     game.log(evt.respondTo[0].hasSkill("fenzhandaodi"));
                                                     game.log(evt.respondTo[1].name);
                                                 } */
-                                                if (!evt?.respondTo || !evt.respondTo[0].hasSkill("fenzhandaodi")|| evt.respondTo[1].name != "sha"|| evt.respondTo[1].name != "sheji9") {
+                                                if (!evt?.respondTo || !evt.respondTo[0].hasSkill("fenzhandaodi") || evt.respondTo[1].name != "sha" || evt.respondTo[1].name != "sheji9") {
                                                     return;
                                                 }
                                                 const color1 = get.color(card),
@@ -11285,6 +11286,150 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
+                            huofu: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                count: function () {
+                                    var num = 0;
+                                    game.countPlayer2(function (current) {
+                                        current.getHistory('lose', function (evt) {
+                                            if (evt.position == ui.discardPile) {
+                                                for (var i = 0; i < evt.cards.length; i++) {
+                                                    if (get.color(evt.cards[i]) == 'red' && get.type(evt.cards[i]) == 'basic') num++;
+                                                }
+                                            }
+                                        })
+                                    });
+                                    return num;
+                                },
+                                direct: true,
+                                force: true,
+                                filter: function (event, player) {
+                                    return lib.skill.huofu.count() > 0;
+
+                                },
+                                trigger: {
+                                    player: "phaseJieshuBegin",
+                                },
+                                content: function () {
+                                    if (lib.skill.huofu.count() > 0) player.addTempSkill("huofu_mianyi", { player: 'phaseBegin' })
+                                },
+                                group: "huofu_mianyi",
+                                subSkill: {
+                                    mianyi: {
+                                        audio: "ext:舰R牌将/audio/skill:2",
+                                        trigger: {
+                                            player: "damageBegin4",
+                                        },
+                                        forced: true,
+                                        filter: function (event, player) {
+                                            return get.color(event.card) == "red";
+                                        },
+                                        content: function () {
+                                            trigger.cancel();
+                                        },
+                                        ai: {
+                                            effect: {
+                                                target: function (card, player, target, current) {
+                                                    if (get.color(card) == "red" && get.tag(card, "damage")) {
+                                                        return "zeroplayertarget";
+                                                    }
+                                                },
+                                            },
+                                        },
+                                        sub: true,
+                                    },
+                                },
+                            },
+                            xunqian: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: {
+                                    player: "useCard",
+                                },
+                                frequent: true,
+                                filter: function (event) {
+                                    return get.type(event.card, "trick") == "trick" && event.card.isCard;
+                                },
+                                init: function (player) {
+                                    player.storage.xunqian = 0;
+                                },
+                                content: function () {
+                                    "step 0";
+                                    player.draw();
+                                    "step 1";
+                                    player.chooseControl().set('choiceList', [
+                                        '弃置一张牌',
+                                        '将任意张牌交给一名其他角色',
+                                    ]).set('prompt', get.prompt('xunqian')).setHiddenSkill('xunqian').set('ai', function () {
+                                        var player = get.player();
+                                        if (game.countPlayer(function (current) {
+                                            return get.attitude(player, current) > 0;
+                                        })) { return 1; }
+                                        return 0;
+
+                                    });
+                                    "step 2";
+                                    if (result.index == 1) {
+                                        player.chooseCardTarget({
+                                            filterCard: function (card) {
+                                                return get.itemtype(card) == "card";
+                                            },
+                                            filterTarget: lib.filter.notMe,
+                                            selectCard: [1, Infinity],
+                                            prompt: "请选择要分配的卡牌和目标",
+                                            ai1: function (card) {
+                                                if (!ui.selected.cards.length) return 1;
+                                                return 0;
+                                            },
+                                            ai2: function (target) {
+                                                var player = _status.event.player,
+                                                    card = ui.selected.cards[0];
+                                                var val = target.getUseValue(card);
+                                                if (val > 0) return val * get.attitude(player, target) * 2;
+                                                return get.value(card, target) * get.attitude(player, target);
+                                            },
+                                        });
+                                    }
+                                    else if (result.index == 0) {
+                                        player.chooseToDiscard(1);
+                                        event.finish();
+                                    }
+                                    "step 3";
+                                    if (result.bool) {
+                                        //game.log(get.translation(result.cards));
+                                        //game.log(get.translation(result.targets));
+                                        player.give(result.cards, result.targets[0]);
+                                    }
+                                },
+                                ai: {
+                                    threaten: 1.4,
+                                    noautowuxie: true,
+                                },
+
+                                intro: {
+                                    content: "本回合手牌上限+#",
+                                },
+                                group: "rejizhi_clear",
+                                subSkill: {
+                                    clear: {
+                                        trigger: {
+                                            global: "phaseAfter",
+                                        },
+                                        silent: true,
+                                        content: function () {
+                                            player.storage.rejizhi = 0;
+                                            player.unmarkSkill("rejizhi");
+                                        },
+                                        sub: true,
+                                        forced: true,
+                                        popup: false,
+                                        "_priority": 1,
+                                    },
+                                },
+                                "_priority": 0,
+                            },
+
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -11363,6 +11508,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             yiahua: "衣阿华",
                             dajingbeishang: "大井北上",
                             wugelini: "乌戈里尼",
+                            xukufu: "絮库夫",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -11576,6 +11722,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhongleizhuangjiantuxi: "重雷装舰突袭", "zhongleizhuangjiantuxi_info": "觉醒技，准备阶段若你体力值为一，你可以视为对一名角色使用三张无次数限制的雷杀，若此技能结算流程中目标未进入过濒死状态，你弃置所有手牌与装备牌",
                             jianjianleiji: "渐减雷击", "jianjianleiji_info": "每回合限一次，你可以将一张装备牌当作无距离次数限制的雷杀使用",
                             fenzhandaodi: "奋战到底", "fenzhandaodi_info": "你的手牌上限基数为你的体力上限。你可以将红色牌当作雷杀使用。你使用杀指定的目标不能使用花色与此杀不相同的牌响应。",
+                            huofu: "祸福", "huofu_info": "锁定技，若你于回合内弃置了红色基本牌，则防止你受到由红色牌造成的伤害直至你下回合开始。",
+                            xunqian: "巡潜", "xunqian_info": "你使用锦囊牌时，你可以摸一张牌，然后你选择：1.弃置一张牌；2.将任意张牌交给一名其他角色(以此法交出的牌每回合每种类型限一张)。",
 
 
                             jianrbiaozhun: "舰r标准",
