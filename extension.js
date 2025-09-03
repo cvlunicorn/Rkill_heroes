@@ -487,7 +487,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         };
                         //game.log(choiceList);
                         event.first = true;    //存了6个变量，可以导出为button，与textbutton样式，看需求
-                        var xuanze = Math.max(Math.floor(event.cao.length / 2), 1);
+                        var xuanze = Math.max(Math.floor(event.cao.length / 2+info[7]), 1);
                         //game.log("xuanze" + xuanze);
                         player.chooseButton([
                             '将手牌转化为强化点数强化以下能力；取消将返还卡牌，<br>未使用完的点数将保留，上限默认为1，发动建造技能后提高。',
