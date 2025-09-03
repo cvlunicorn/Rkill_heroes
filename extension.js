@@ -3295,7 +3295,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 if (player.hasSkill('duikongfangyu')) {
                                                     return get.distance(player, target) <= (3);
                                                 }
-                                                return get.distance(player, target) <= (1 + 2*player.countMark('jinengup'));
+                                                return get.distance(player, target) <= (1 + 2 * player.countMark('jinengup'));
                                             }
                                         },//选择事件包含的目标，同trigger的目标。有其他同技能的角色时，ai不要重复选择目标。
                                         ai1: function (card) {
@@ -4481,14 +4481,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qijianshashou: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
-                                trigger: {
-                                    player: "phaseUseBegin",
-                                },
-                                check: function (event, player) {
+                                enable:"phaseUse",
+                                usable:1,
+                                /* check: function (event, player) {
                                     if (player.countCards('h') > (player.maxHandcard + 3)) return false;
                                     if (player.countCards('h', function (card) { if (get.number(card) > 10) return true; })) return true;
                                     return false;
-                                },
+                                }, */
                                 content: function () {
                                     'step 0'
                                     player.chooseTarget(get.prompt2('qijianshashou'), function (card, player, target) {
@@ -4520,6 +4519,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 ai: {
                                     expose: 0.2,
+                                    order:8,
                                     result: {
                                         target(player, target) {
                                             var hs = player.getCards("h");
@@ -4548,6 +4548,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         if (from.getStorage('qijianshashou_1').includes(to)) {
                                             return -Infinity;
                                         }
+                                    },
+                                    cardUsableTarget(card, player, target) {
+                                        if (player.getStorage('qijianshashou_1').includes(target)&&(card.name=="sha"||card.name=="sheji9")) return true;
                                     },
                                 },
                                 trigger: {
@@ -11591,7 +11594,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             wufenzhong1: "命运的五分钟", "wufenzhong1_info": "你可以跳过判定和摸牌阶段，视为使用一张雷杀或火杀",
                             wufenzhong2: "命运的五分钟", "wufenzhong2_info": "你可以弃置一张装备牌并跳过出牌阶段，视为使用一张雷杀或火杀",
                             wufenzhong4: "命运的五分钟", "wufenzhong4_info": "你可以跳过弃牌阶段并翻面，视为使用一张雷杀或火杀。",
-                            qijianshashou: "旗舰杀手", "qijianshashou_info": "出牌阶段开始时，你可以与一名角色进行拼点，若你赢，本回合你与该角色距离视为1，你对该目标使用杀伤害+1，若你没赢，你跳过出牌阶段和弃牌阶段。",
+                            qijianshashou: "旗舰杀手", "qijianshashou_info": "出牌阶段限一次，你可以与一名角色进行拼点，若你赢，本回合你与该角色距离视为1，你对该目标使用杀无次数限制且伤害+1，若你没赢，你跳过出牌阶段和弃牌阶段。",
                             qijianshashou_1: "旗舰杀手", "qijianshashou_1_info": "",
                             zhanxianfangyu: "战线防御", "zhanxianfangyu_info": "每名角色回合限一次，若你没有装备防具，你成为黑色杀的目标时，取消之。每回合限一次，距你为1的角色成为杀的目标时，你可以弃置一张牌并代替该名角色成为此杀的目标。",
                             zhanxianfangyu1: "战线防御", "zhanxianfangyu1_info": "",
