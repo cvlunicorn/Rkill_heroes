@@ -10724,7 +10724,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.choosePlayerCard(lib.target, "h", true);
                                     'step 2'
                                     event.card = result.cards[0];
-                                    player.showCards(event.card);
+                                    player.showCards(event.card, get.translation(player) + "对" + get.translation(lib.target) + "发动了【爱知】");
                                     let cardtype = get.type(event.card);
                                     game.log(cardtype);
                                     'step 3'
@@ -11414,23 +11414,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 intro: {
                                     content: "本回合手牌上限+#",
                                 },
-                                group: "rejizhi_clear",
-                                subSkill: {
-                                    clear: {
-                                        trigger: {
-                                            global: "phaseAfter",
-                                        },
-                                        silent: true,
-                                        content: function () {
-                                            player.storage.rejizhi = 0;
-                                            player.unmarkSkill("rejizhi");
-                                        },
-                                        sub: true,
-                                        forced: true,
-                                        popup: false,
-                                        "_priority": 1,
-                                    },
-                                },
                                 "_priority": 0,
                             },
                             jinyangmaozhishi: {
@@ -11477,6 +11460,20 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     trigger.num += player.countMark("jinyangmaozhishi_mark");
+                                },
+                                ai: {
+                                    effect: {
+                                        target: function (card, player, target) {
+                                            if (target.hasFriend()) {
+                                                if ((get.tag(card, "damage") == 1 || get.tag(card, "loseHp")) && target.hp == target.maxHp) return [0, 1];
+                                            }
+                                        },
+                                    },
+                                    threaten: function (player, target) {
+                                        if (target.maxHp == 1) return 4;
+                                        if (target.maxHp == 2) return 2;
+                                        return 1;
+                                    },
                                 },
                             },
                             //在这里添加新技能。
