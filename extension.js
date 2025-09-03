@@ -487,7 +487,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         };
                         //game.log(choiceList);
                         event.first = true;    //存了6个变量，可以导出为button，与textbutton样式，看需求
-                        var xuanze = Math.max(Math.floor(event.cao.length / 2+info[7]), 1);
+                        var xuanze = Math.max(Math.floor(event.cao.length / 2 + info[7]), 1);
                         //game.log("xuanze" + xuanze);
                         player.chooseButton([
                             '将手牌转化为强化点数强化以下能力；取消将返还卡牌，<br>未使用完的点数将保留，上限默认为1，发动建造技能后提高。',
@@ -953,6 +953,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             dajingbeishang: ["female", "IJN", 3, ["zhongleizhuangjiantuxi", "jianjianleiji"], ["des:球磨型轻巡3番舰。41年北上号被改装为了雷击巡洋舰，全舰共装备了十座四联装鱼雷发射器，单边齐射达到了二十枚鱼雷。但由于海战环境的变化，她始终没有派上用场。她在1942年拆除了八座鱼雷发射器，改为了高速运输舰。44年北上号改装为人操鱼雷“回天”母舰。北上号也是唯一残存到战后的球磨级，在1946年拆毁。"]],
                             wugelini: ["female", "RM", 3, ["dajiaoduguibi", "quzhudd", "fenzhandaodi"], ["des:　乌戈里尼•维瓦尔迪号属航海家级驱逐舰5号舰。乌戈里尼•维瓦尔迪号也同姐妹舰安东尼奥•达诺利号一样坚持到了1943年意大利投降，在接应意大利主力舰队一同前往盟军港口时遭到了德军阻截，在规避中触雷，两姐妹舰在不到一天的时间内相继沉没。"]],
                             xukufu: ["female", "MN", 3, ["qianting", "huofu", "xunqian"], ["des:絮库夫号是法国建造的一艘大型潜艇，她搭载了潜艇上罕见的203毫米双联主炮，同时还搭载了水上飞机，这些一般是重巡洋舰的配备。她还在甲板上装备了类似驱逐舰的回旋式的鱼雷发射器。40年法国迅速战败后，絮库夫号在盟军阵营参加作战，在42年与商船相撞的事故中沉没。"]],
+                            yaergushuishou: ["female", "RN", 3, ["fangkong2", "qingxuncl", "jinyangmaozhishi", "zhengzhansihai"], ["des:亚尔古水手号是黛朵级巡洋舰的一艘。如同她的名字一样，亚尔古水手号巡洋舰的航迹也遍布东西。在战争初期亚尔古水手号主要在大西洋战场作战。在一次出击中，亚尔古水手号遭到潜艇雷击，舰艏艉都被炸飞，瞬间舰身短了约50米。进行临时修理后，亚尔古水手号单独穿越大西洋前往后方进行修理。在修理完成后，亚尔古水手号参与了诺曼底作战与远东作战。"]],
 
 
                             skilltest: ["male", "OTHER", 9, [], ["forbidai", "des:测试用"]],
@@ -4481,8 +4482,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qijianshashou: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
-                                enable:"phaseUse",
-                                usable:1,
+                                enable: "phaseUse",
+                                usable: 1,
                                 /* check: function (event, player) {
                                     if (player.countCards('h') > (player.maxHandcard + 3)) return false;
                                     if (player.countCards('h', function (card) { if (get.number(card) > 10) return true; })) return true;
@@ -4519,7 +4520,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 ai: {
                                     expose: 0.2,
-                                    order:8,
+                                    order: 8,
                                     result: {
                                         target(player, target) {
                                             var hs = player.getCards("h");
@@ -4550,7 +4551,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }
                                     },
                                     cardUsableTarget(card, player, target) {
-                                        if (player.getStorage('qijianshashou_1').includes(target)&&(card.name=="sha"||card.name=="sheji9")) return true;
+                                        if (player.getStorage('qijianshashou_1').includes(target) && (card.name == "sha" || card.name == "sheji9")) return true;
                                     },
                                 },
                                 trigger: {
@@ -11432,7 +11433,52 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
                             },
-
+                            jinyangmaozhishi: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: { player: "dying", },
+                                force: true,
+                                direct: true,
+                                filter: function (event, player) {
+                                    return event.name == "dying" && player.maxHp > 1;
+                                },
+                                content: function (event, player) {
+                                    player.loseMaxHp(1);
+                                    player.recover(1);
+                                },
+                                group: ["jinyangmaozhishi_mark"],
+                                subSkill: {
+                                    mark: {
+                                        trigger: { player: "loseMaxHpAfter", },
+                                        force: true,
+                                        direct: true,
+                                        silent: true,
+                                        sub: true,
+                                        content: function (event, player) {
+                                            player.addMark("jinyangmaozhishi_mark", 1);
+                                        },
+                                        mark: true,
+                                        intro: {
+                                            marktext: "金",
+                                        },
+                                    },
+                                },
+                            },
+                            zhengzhansihai: {
+                                nobracket: true,
+                                force: true,
+                                mod: {
+                                    maxHandcard: function (player, num) {
+                                        return num += player.countMark("jinyangmaozhishi_mark");
+                                    },
+                                },
+                                trigger: {
+                                    source: "damageBegin4",
+                                },
+                                content: function () {
+                                    trigger.num += player.countMark("jinyangmaozhishi_mark");
+                                },
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -11512,6 +11558,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             dajingbeishang: "大井北上",
                             wugelini: "乌戈里尼",
                             xukufu: "絮库夫",
+                            yaergushuishou: "亚尔古水手",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -11727,6 +11774,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             fenzhandaodi: "奋战到底", "fenzhandaodi_info": "你的手牌上限基数为你的体力上限。你可以将红色牌当作雷杀使用。你使用杀指定的目标不能使用花色与此杀不相同的牌响应。",
                             huofu: "祸福", "huofu_info": "锁定技，若你于回合内弃置了红色基本牌，则防止你受到由红色牌造成的伤害直至你下回合开始。",
                             xunqian: "巡潜", "xunqian_info": "你使用锦囊牌时，你可以摸一张牌，然后你选择：1.弃置一张牌；2.将任意张牌交给一名其他角色。",
+                            jinyangmaozhishi: "金羊毛之誓", "jinyangmaozhishi_info": "锁定技，你进入濒死时，若你体力上限大于一，你扣减一点体力上限并回复一点体力。",
+                            zhengzhansihai: "征战四海", "zhengzhansihai_info": "锁定技，你的手牌上限+X，你造成的伤害+X（X为你损失的体力上限数）",
 
 
                             jianrbiaozhun: "舰r标准",
