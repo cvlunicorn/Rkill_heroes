@@ -5307,6 +5307,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 nobracket: true,
                                 init: function (player) {
                                     player.storage.jujianmengxiang = [];
+                                    player.storage.jujianmengxiang_error=false;
                                 },
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 enable: "phaseUse",
@@ -5332,7 +5333,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         game.log("巨舰梦想列表已生成");
                                         if (list == "") {
                                             game.log("没有可用的牌了！");
-                                            player.markAuto('jujianmengxiang', "error");
+                                            player.storage.jujianmengxiang_error=true;
                                             event.finish();
                                         }
                                         return ui.create.dialog('巨舰梦想', [list, "vcard"]);
@@ -5391,8 +5392,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             }
                                         } else {
                                             game.log("AI没有可用的牌了！</br>也许您没有正确安装并启用‘舰r美化’卡牌包？");
-                                            player.markAuto('jujianmengxiang', "error");
-                                            //player.getStorage('jujianmengxiang').includes("error");
+                                            player.storage.jujianmengxiang_error=true;
                                             event.finish();
                                         }
                                     },
@@ -5416,6 +5416,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                     next.player = player;
                                                     next.setContent(function () {
                                                         delete player.storage.jujianmengxiang;
+                                                        player.storage.jujianmengxiang_error=false;
                                                     });
                                                 }
                                                 player.markAuto('jujianmengxiang', [result.card.name]);
@@ -5432,7 +5433,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     result: {
                                         player: function (player) {
                                             if (!player.storage.jujianmengxiang) { player.storage.jujianmengxiang = []; }
-                                            if (player.storage.jujianmengxiang.includes('error')) return -1;
+                                            if (player.storage.jujianmengxiang_error==true) return -1;
                                             if (player.countCards('h') >= player.hp - 1) return -1;
                                             if (player.hp < 3) return -1;
                                             if (player.storage.jujianmengxiang.includes('ewaibuji9')) return -1;
@@ -5950,7 +5951,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 mod: {
 
                                     targetInRange(card, player, target) {
-                                        game.log(player.getHistory('useCard', evt => get.name(evt.card) == 'sha' || "sheji9"));
+                                        //game.log(player.getHistory('useCard', evt => get.name(evt.card) == 'sha' || "sheji9"));
                                         if ((get.name(card) == 'sha' || get.name(card) == "sheji9") && !player.getHistory('useCard', evt => get.name(evt.card) == 'sha' || "sheji9").length) return true;
                                     },
                                 },
@@ -5973,13 +5974,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     });
                                     "step 1"
                                     game.log("此杀伤害基数" + trigger.getParent().baseDamage);
-                                    game.log(get.suit(result));
+                                    //game.log(get.suit(result));
                                     game.log(trigger.target);
                                     if (get.suit(result) != "heart") {
                                         trigger.getParent().baseDamage++;
 
                                     } else if (get.suit(result) == "heart") {
-                                        game.log("else");
                                         trigger.targets.length = 0;
                                         trigger.getParent().triggeredTargets1.length = 0;//取消所有目标，来自秦宓谏征
                                     }
@@ -9160,8 +9160,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return res;
                                         },
                                         target(player, target) {
-                                            let zhu =
-                                                (get.mode() === "identity" && target.isZhu) || target.identity === "zhu";
+                                            let zhu = (get.mode() === "identity" && isZhu(target)) || target.identity === "zhu";
                                             if (!lib.filter.cardRespondable({ name: "shan" }, target)) {
                                                 if (zhu) {
                                                     if (target.hp < 2) return -99;
@@ -11253,18 +11252,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     block: {
                                         mod: {
                                             cardEnabled(card, player) {
-                                                //game.log(get.translation(player) + "奋战到底");
                                                 let evt = get.event();
 
                                                 if (evt.name != "chooseToUse") {
 
                                                     evt = evt.getParent("chooseToUse");
                                                 }
-                                                /* game.log(get.translation(evt.respondTo));
-                                                if (evt.respondTo) {
-                                                    game.log(evt.respondTo[0].hasSkill("fenzhandaodi"));
-                                                    game.log(evt.respondTo[1].name);
-                                                } */
                                                 if (!evt?.respondTo || !evt.respondTo[0].hasSkill("fenzhandaodi") || evt.respondTo[1].name != "sha" || evt.respondTo[1].name != "sheji9") {
                                                     return;
                                                 }
