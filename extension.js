@@ -957,6 +957,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             yaergushuishou: ["female", "RN", 3, ["fangkong2", "qingxuncl", "jinyangmaozhishi", "zhengzhansihai"], ["des:亚尔古水手号是黛朵级巡洋舰的一艘。如同她的名字一样，亚尔古水手号巡洋舰的航迹也遍布东西。在战争初期亚尔古水手号主要在大西洋战场作战。在一次出击中，亚尔古水手号遭到潜艇雷击，舰艏艉都被炸飞，瞬间舰身短了约50米。进行临时修理后，亚尔古水手号单独穿越大西洋前往后方进行修理。在修理完成后，亚尔古水手号参与了诺曼底作战与远东作战。"]],
                             mist_dujiaoshou: ["female", "RN", 3, ["junfu", "shuqinzhiyin",], ["des:指挥官大人，您贵安。我是轻型航空母舰独角兽。为守护我们第四舰队那些美丽的花朵，也为了指挥官大人，我会尽心尽力工作。今后还望请多指教。"]],
                             mist_xiawu: ["female", "IJN", 3, ["quzhudd", "dajiaoduguibi", "yixinyiyi"], ["des:我是属于NeoForce第一舰队，识别号码NF001的夏霧。我是个初来乍到的新人，敬请提督指教。"]],
+                            mist_shanhuhai: ["female", "USN", 4, ["hangmucv", "buxiuzhanshi"], ["des:Nice to meet you~航空母舰珊瑚海~。经历比较丰富，现在担任指导员工作。海战不用说，陆战也很在行~。啊，当然陆战的时候要卸掉舰装，拿枪战斗。"]],
 
                             skilltest: ["male", "OTHER", 9, [], ["forbidai", "des:测试用"]],
                         },
@@ -11750,6 +11751,103 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
+                            buxiuzhanshi: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                usable: 1,
+                                enable: "phaseUse",
+                                init: function (player) {
+                                    if (typeof player.storage.buxiuzhanshi === 'undefined') player.storage.buxiuzhanshi = 0;
+                                },
+                                filter: function (event, player) {
+                                    return player.countCards("h") > 0;
+                                },
+                                filterCard: true,
+                                filterTarget: function (card, player, target) {
+                                    return player != target && player.canUse("juedou", target, false);
+                                },
+                                selectCard: [1, Infinity],
+                                selectTarget: [1, Infinity],
+                                position: "h",
+                                filterOk: function () {
+                                    return ui.selected.cards.length == ui.selected.targets.length;
+                                },
+                                check: function (card) {
+                                    var player = get.player();
+                                    if (ui.selected.cards.length >= game.countPlayer(current => {
+                                        return current != player && get.attitude(player, current) <= 0;
+                                    })) return 0;
+                                    if (card.name == "sha" || card.name == "sheji9") {
+                                        return player.countCards("h", function (card) { return card.name == "sha" || card.name == "sheji9"; }) - ui.selected.cards.length;
+                                    }
+                                    return 7 - get.value(card);
+                                },
+                                prompt: "弃置任意张手牌并视为对等量角色使用决斗",
+                                complexSelect: true,
+                                multitarget: true,
+                                multiline: true,
+                                delay: false,
+                                contentBefore: function () {
+                                    event.getParent()._buxiuzhanshi_targets = targets.slice();
+                                },
+                                content: function () {
+                                    "step 0"
+                                    var targets = event.getParent()._buxiuzhanshi_targets;
+                                    var card = {
+                                            name: "juedou",
+                                            isCard: true,
+                                        };
+                                    player.useCard(card, targets, false);
+                                    /* for (var i = 0; i < targets.length; i++) {
+                                        var target = targets[i];
+                                        var card = {
+                                            name: "juedou",
+                                            isCard: true,
+                                        };
+                                        if (player.canUse(card, target, false)) {
+                                            player.useCard(card, target, false);
+                                        }
+                                    }  */
+                                    "step 1"
+                                    player.getHistory('sourceDamage', function (evt) {
+                                        var player = get.player();
+                                        //game.log("不朽战士" + evt.getParent("buxiuzhanshi").name + get.translation(evt.player) + get.translation(player));
+                                        if (evt.getParent("buxiuzhanshi").name == "buxiuzhanshi" && evt.player != player) {
+                                            player.addMark("buxiuzhanshi", 1);
+                                            return 1;
+                                        }
+                                        return 0;
+                                    });
+                                },
+                                mark: true,
+                                intro: {
+                                    name: "不朽战士",
+                                    content: function (storage, player) {
+                                        var str = "下回合摸牌增加" + get.translation(player.getStorage("buxiuzhanshi"));
+                                        return str;
+                                    },
+                                },
+                                group: ["buxiuzhanshi_draw"],
+                                subSkill: {
+                                    draw: {
+                                        trigger: {
+                                            player: "phaseDrawBegin2",
+                                        },
+                                        frequent: true,
+                                        filter(event, player) {
+                                            return !event.numFixed && player.countMark("buxiuzhanshi") > 0;
+                                        },
+                                        async content(event, trigger, player) {
+                                            var drawNum = player.countMark("buxiuzhanshi");
+                                            trigger.num += drawNum;
+                                            player.removeMark("buxiuzhanshi", drawNum);
+                                        },
+                                        ai: {
+                                            threaten: 1.3,
+                                        },
+                                    },
+                                },
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -11832,6 +11930,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             yaergushuishou: "亚尔古水手",
                             mist_dujiaoshou: "MIST独角兽",
                             mist_xiawu: "MIST夏雾",
+                            mist_shanhuhai: "MIST珊瑚海",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -12051,6 +12150,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhengzhansihai: "征战四海", "zhengzhansihai_info": "锁定技，你的手牌上限+X，你造成的伤害+X（X为你损失的体力上限数）",
                             shuqinzhiyin: "竖琴之音", "shuqinzhiyin_info": "每轮限一次，其他角色技能结算后，你可以弃置两张牌，重置一名其他角色武将牌上的技能，然后其回复一点体力",
                             yixinyiyi: "一心一意", "yixinyiyi_info": "你可以将一张牌当作雷杀使用。此杀根据主公已损失体力值:不小于一点，无距离限制，不小于两点，无次数限制，不小于三点，伤害+1。",
+                            buxiuzhanshi: "不朽战士", "buxiuzhanshi_info": "出牌阶段限一次，你可以弃置任意张牌，视为对等量名角色使用决斗。下个回合摸牌阶段，你的摸牌数量+x（x为你本回合以此法对其他角色造成的伤害数）",
 
 
                             jianrbiaozhun: "舰r标准",
