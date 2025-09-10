@@ -10472,8 +10472,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     "step 1"
                                     if (result.links.length) {
                                         event.cards2 = result.links;
-                                        //game.log("目标获得");
-                                        //game.log(event.cards2);
                                         var suits = event.cards2.map(card => get.suit(card));
                                         var uniqueSuits = [...new Set(suits)];
                                         event.suitNum = uniqueSuits.length;
@@ -10490,7 +10488,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         };
                                     }
                                     "step 2"
-                                    if (result.targets.length) {
+                                    if (result.bool) {
                                         event.targets = result.targets[0];
                                         game.log(event.targets);
                                         var targetCards = event.targets.getCards('hej');
@@ -10513,9 +10511,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             });
                                     }
                                     "step 3"
-                                    if (result.links.length) {
-                                        //game.log("目标弃置");
-                                        //game.log(result.links);
+                                    if (result.bool) {
                                         event.targets.gain(event.cards2, "gain2");
                                         event.targets.discard(result.links);
                                         if (event.cards2.length - result.links.length > 0) {
@@ -11794,9 +11790,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     "step 0"
                                     var targets = event.getParent()._buxiuzhanshi_targets;
                                     var card = {
-                                            name: "juedou",
-                                            isCard: true,
-                                        };
+                                        name: "juedou",
+                                        isCard: true,
+                                    };
                                     player.useCard(card, targets, false);
                                     /* for (var i = 0; i < targets.length; i++) {
                                         var target = targets[i];
@@ -11818,6 +11814,55 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }
                                         return 0;
                                     });
+                                },
+                                ai: {
+                                    order: function () {
+                                        return get.order({ name: 'juedou' }) - 0.5;
+                                    },
+                                    wuxie: function (target, card, player, viewer, status) {
+                                        if (player === game.me && get.attitude(viewer, player._trueMe || player) > 0) return 0;
+                                        if (status * get.attitude(viewer, target) * get.effect(target, card, player, target) >= 0) return 0;
+                                    },
+                                    basic: {
+                                        order: 5,
+                                        useful: 1,
+                                        value: 5.5,
+                                    },
+                                    result: {
+                                        target: -1.5,
+                                        player: function (player, target, card) {
+                                            if (player.hasSkillTag('directHit_ai', true, {
+                                                target: target,
+                                                card: card,
+                                            }, true)) {
+                                                return 0;
+                                            }
+                                            if (get.damageEffect(target, player, target) > 0 && get.attitude(player, target) > 0 && get.attitude(target, player) > 0) {
+                                                return 0;
+                                            }
+                                            var hs1 = target.getCards('h', 'sha');
+                                            var hs2 = player.getCards('h', 'sha');
+                                            if (hs1.length > hs2.length + 1) {
+                                                return -2;
+                                            }
+                                            var hsx = target.getCards('h');
+                                            if (hsx.length > 2 && hs2.length == 0 && hsx[0].number < 6) {
+                                                return -2;
+                                            }
+                                            if (hsx.length > 3 && hs2.length == 0) {
+                                                return -2;
+                                            }
+                                            if (hs1.length > hs2.length && (!hs2.length || hs1[0].number > hs2[0].number)) {
+                                                return -2;
+                                            }
+                                            return -0.5;
+                                        },
+                                    },
+                                    tag: {
+                                        respond: 2,
+                                        respondSha: 2,
+                                        damage: 1,
+                                    },
                                 },
                                 mark: true,
                                 intro: {
