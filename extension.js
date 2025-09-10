@@ -869,6 +869,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng", "qiuyue", "weilianDbote", "xianghe", "ruihe", "yuhei"],
                                 lishizhanyi_haixiafujizhan: ["u47", "u81", "u505", "jinqu", "kente"],
                                 weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan", "sp_aisaikesi", "sp_ninghai"],
+                                cangqinghuanying: ["mist_dujiaoshou"],
                             },
 
                         },
@@ -954,7 +955,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             wugelini: ["female", "RM", 3, ["dajiaoduguibi", "quzhudd", "fenzhandaodi"], ["des:　乌戈里尼•维瓦尔迪号属航海家级驱逐舰5号舰。乌戈里尼•维瓦尔迪号也同姐妹舰安东尼奥•达诺利号一样坚持到了1943年意大利投降，在接应意大利主力舰队一同前往盟军港口时遭到了德军阻截，在规避中触雷，两姐妹舰在不到一天的时间内相继沉没。"]],
                             xukufu: ["female", "MN", 3, ["qianting", "huofu", "xunqian"], ["des:絮库夫号是法国建造的一艘大型潜艇，她搭载了潜艇上罕见的203毫米双联主炮，同时还搭载了水上飞机，这些一般是重巡洋舰的配备。她还在甲板上装备了类似驱逐舰的回旋式的鱼雷发射器。40年法国迅速战败后，絮库夫号在盟军阵营参加作战，在42年与商船相撞的事故中沉没。"]],
                             yaergushuishou: ["female", "RN", 3, ["fangkong2", "qingxuncl", "jinyangmaozhishi", "zhengzhansihai"], ["des:亚尔古水手号是黛朵级巡洋舰的一艘。如同她的名字一样，亚尔古水手号巡洋舰的航迹也遍布东西。在战争初期亚尔古水手号主要在大西洋战场作战。在一次出击中，亚尔古水手号遭到潜艇雷击，舰艏艉都被炸飞，瞬间舰身短了约50米。进行临时修理后，亚尔古水手号单独穿越大西洋前往后方进行修理。在修理完成后，亚尔古水手号参与了诺曼底作战与远东作战。"]],
-
+                            mist_dujiaoshou: ["female", "RN", 3, ["junfu", "shuqinzhiyin",], ["des:指挥官大人，您贵安。我是轻型航空母舰独角兽。为守护我们第四舰队那些美丽的花朵，也为了指挥官大人，我会尽心尽力工作。今后还望请多指教。"]],
 
                             skilltest: ["male", "OTHER", 9, [], ["forbidai", "des:测试用"]],
                         },
@@ -5307,7 +5308,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 nobracket: true,
                                 init: function (player) {
                                     player.storage.jujianmengxiang = [];
-                                    player.storage.jujianmengxiang_error=false;
+                                    player.storage.jujianmengxiang_error = false;
                                 },
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 enable: "phaseUse",
@@ -5333,7 +5334,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         game.log("巨舰梦想列表已生成");
                                         if (list == "") {
                                             game.log("没有可用的牌了！");
-                                            player.storage.jujianmengxiang_error=true;
+                                            player.storage.jujianmengxiang_error = true;
                                             event.finish();
                                         }
                                         return ui.create.dialog('巨舰梦想', [list, "vcard"]);
@@ -5392,7 +5393,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             }
                                         } else {
                                             game.log("AI没有可用的牌了！</br>也许您没有正确安装并启用‘舰r美化’卡牌包？");
-                                            player.storage.jujianmengxiang_error=true;
+                                            player.storage.jujianmengxiang_error = true;
                                             event.finish();
                                         }
                                     },
@@ -5416,7 +5417,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                     next.player = player;
                                                     next.setContent(function () {
                                                         delete player.storage.jujianmengxiang;
-                                                        player.storage.jujianmengxiang_error=false;
+                                                        player.storage.jujianmengxiang_error = false;
                                                     });
                                                 }
                                                 player.markAuto('jujianmengxiang', [result.card.name]);
@@ -5433,7 +5434,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     result: {
                                         player: function (player) {
                                             if (!player.storage.jujianmengxiang) { player.storage.jujianmengxiang = []; }
-                                            if (player.storage.jujianmengxiang_error==true) return -1;
+                                            if (player.storage.jujianmengxiang_error == true) return -1;
                                             if (player.countCards('h') >= player.hp - 1) return -1;
                                             if (player.hp < 3) return -1;
                                             if (player.storage.jujianmengxiang.includes('ewaibuji9')) return -1;
@@ -11469,6 +11470,116 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
+                            shuqinzhiyin: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                round: 1,
+                                trigger: {
+                                    global: ["useSkillAfter", "logSkill"],
+                                },
+                                filter: function (event, player) {
+                                    game.log(get.translation(event.type));
+                                    game.log(get.translation(event.player));
+                                    return event.type == "player" && event.player != player;
+                                },
+                                check(event, player) {
+                                    return get.attitude(player, event.player) > 0;
+                                },
+                                content() {
+                                    "step 0";
+                                    player
+                                        .chooseToDiscard(2, "hes", get.prompt("shuqinzhiyin"))
+                                        .set("ai", function (card) {
+                                            return 5 - get.value(card);
+                                        });
+                                    "step 1";
+                                    if (result.bool) {
+                                        player.chooseTarget(get.prompt2("shuqinzhiyin"), function (card, player, target) {
+                                            return target != player;
+                                        })
+                                            .set("ai", function (target) {
+                                                var player = get.player();
+                                                var skills = target.getOriginalSkills();
+                                                var list = [];
+                                                for (var i = 0; i < skills.length; i++) {
+                                                    var info = get.info(skills[i]);
+                                                    if (typeof info.usable == "number") {
+                                                        if (target.hasSkill("counttrigger") && target.storage.counttrigger[skills[i]] && target.storage.counttrigger[skills[i]] >= 1) {
+                                                            list.push(skills[i]);
+                                                        }
+                                                        if (typeof get.skillCount(skills[i]) == "number" && get.skillCount(skills[i]) >= 1) {
+                                                            list.push(skills[i]);
+                                                        }
+                                                    }
+                                                    if (info.round && target.storage[skills[i] + "_roundcount"]) {
+                                                        list.push(skills[i]);
+                                                    }
+                                                    if (target.storage[`temp_ban_${skills[i]}`]) {
+                                                        list.push(skills[i]);
+                                                    }
+                                                    if (target.awakenedSkills.includes(skills[i])) {
+                                                        list.push(skills[i]);
+                                                    }
+                                                }
+                                                game.log(list);
+                                                if (target.isDamaged() || list.length >= 1) {
+                                                    return get.attitude(player, target);
+                                                }
+                                                return 0;
+                                            });
+                                    }
+                                    "step 2";
+                                    if (result.bool) {
+                                        var target = result.targets[0];
+                                        var skills = target.getStockSkills(true, true);
+                                        game.expandSkills(skills);
+                                        var resetSkills = [];
+                                        var suffixs = ["used", "round", "block", "blocker"];
+                                        for (var skill of skills) {
+                                            var info = get.info(skill);
+                                            if (typeof info.usable == "number") {
+                                                if (target.hasSkill("counttrigger") && target.storage.counttrigger[skill] && target.storage.counttrigger[skill] >= 1) {
+                                                    delete target.storage.counttrigger[skill];
+                                                    resetSkills.add(skill);
+                                                }
+                                                if (typeof get.skillCount(skill) == "number" && get.skillCount(skill) >= 1) {
+                                                    delete target.getStat("skill")[skill];
+                                                    resetSkills.add(skill);
+                                                }
+                                            }
+                                            if (info.round && target.storage[skill + "_roundcount"]) {
+                                                delete target.storage[skill + "_roundcount"];
+                                                resetSkills.add(skill);
+                                            }
+                                            if (target.storage[`temp_ban_${skill}`]) {
+                                                delete target.storage[`temp_ban_${skill}`];
+                                            }
+                                            if (target.awakenedSkills.includes(skill)) {
+                                                target.restoreSkill(skill);
+                                                resetSkills.add(skill);
+                                            }
+                                            for (var suffix of suffixs) {
+                                                if (target.hasSkill(skill + "_" + suffix)) {
+                                                    target.removeSkill(skill + "_" + suffix);
+                                                    resetSkills.add(skill);
+                                                }
+                                            }
+                                        }
+                                        if (resetSkills.length) {
+                                            var str = "";
+                                            for (var i of resetSkills) {
+                                                str += "【" + get.translation(i) + "】、";
+                                            }
+                                            game.log(target, "重置了技能", "#g" + str.slice(0, -1));
+                                        }
+
+                                        target.recover(1);
+                                    }
+                                },
+                                "_priority": 0,
+
+
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -11549,6 +11660,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             wugelini: "乌戈里尼",
                             xukufu: "絮库夫",
                             yaergushuishou: "亚尔古水手",
+                            mist_dujiaoshou: "MIST独角兽",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -11766,6 +11878,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             xunqian: "巡潜", "xunqian_info": "你使用锦囊牌时，你可以摸一张牌，然后你选择：1.弃置一张牌；2.将任意张牌交给一名其他角色。",
                             jinyangmaozhishi: "金羊毛之誓", "jinyangmaozhishi_info": "锁定技，你进入濒死时，若你体力上限大于一，你扣减一点体力上限并回复一点体力。",
                             zhengzhansihai: "征战四海", "zhengzhansihai_info": "锁定技，你的手牌上限+X，你造成的伤害+X（X为你损失的体力上限数）",
+                            shuqinzhiyin: "竖琴之音", "shuqinzhiyin_info": "每轮限一次，其他角色技能结算后，你可以弃置两张牌，重置一名其他角色武将牌上的技能，然后其回复一点体力",
 
 
                             jianrbiaozhun: "舰r标准",
@@ -11776,6 +11889,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             lishizhanyi_shanhuhai: '历史战役-珊瑚海',
                             lishizhanyi_haixiafujizhan: '历史战役-海峡伏击战',
                             weijingzhizhi: '未竟之志',
+                            cangqinghuanying: '苍青幻影',
                         },
                     };
                     if (lib.device || lib.node) {
