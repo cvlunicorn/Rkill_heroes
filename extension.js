@@ -4674,6 +4674,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                 },
                                 "_priority": 0,
+                                ai: {
+                                    effect: {
+                                        target: function (card, player, target) {
+                                            if (player == target && get.subtypes(card).includes("equip2")) {
+                                                if (get.equipValue(card) <= 8) return 0;
+                                            }
+                                            if (!player.hasEmptySlot(2)) return;
+                                            if (card.name == "sha" && get.color(card) == "black") return "zerotarget";
+                                        },
+                                    },
+                                },
                             },
                             Zqujingying: {
                                 nobracket: true,
