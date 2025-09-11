@@ -325,14 +325,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             trigger: { player: "changeHp", },
                             filter: function (event, player) { return player.hp <= 0 && event.num < 0 && (get.mode() != 'boss' || (get.mode() == 'boss' && !lib.character[player.name][4].includes('boss') && player.identity == 'cai')); },
                             "prompt2": function (event, player) {
-                                if ((player.hasMark('_yuanhang_bingsimopai'))) { return '当你进入濒死状态时，你可以摸一张牌,<br>若血量上限大于2，你需失去一点体力上限，摸一张牌。' };
-                                if ((!player.hasMark('_yuanhang_bingsimopai'))) { return '当你进入濒死状态时，你可以摸一张牌,<br>若血量上限大于2，你需失去一点体力上限，摸一张牌。'/*同时，依据舰种获得以下技能：<br>潜艇-志继（姜维）、重生（）；驱逐-镇卫（文聘）、齐攻（）；<br>轻巡-齐攻；重巡-刚烈改（改自夏侯惇）；<br>战列-刚烈改（夏侯惇)；航母-界连营（陆逊）；军辅：藏匿（）；导驱-界连营（陆逊）*/ };
+                                return '当你进入濒死状态时，你可以摸一张牌,<br>若血量上限大于2，你须失去一点体力上限，改为摸两张牌。'
                             },
-                            content: function () {//兵粮寸断与据守，刚烈， 镇卫同疾吸伤害，国风防锦囊牌。
-                                //轻巡提升己方防守与攻击距离，粮策全体发牌。重巡提供免伤。战列刚烈反击。 
-                                player.draw(1); if (player.maxHp > 2) { player.loseMaxHp(1); player.draw(); } /*game.playAudio('..','extension','舰R牌将/audio','bingsimosanpai')*/; /*if (player.maxHp > 5) { player.loseMaxHp(1); player.draw(); game.log('血量上限好高啊，额外来一次扣血摸牌吧', player); }*/
-
-                                //trigger.player.addMark('_yuanhang_bingsimopai', 1);
+                            content: function () {
+                                if (player.maxHp <= 2) {
+                                    player.draw(1);
+                                } else if (player.maxHp > 2) {
+                                    player.loseMaxHp(1);
+                                    player.draw(2);
+                                }
                             },
                             /* intro: {
                                 marktext: "濒死", content: function (player) {
@@ -1047,14 +1048,16 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger: { player: "changeHp", },
                                         filter: function (event, player) { return player.hp <= 0 && event.num < 0 && (get.mode() != 'boss' || (get.mode() == 'boss' && !lib.character[player.name][4].includes('boss') && player.identity == 'cai')); },
                                         "prompt2": function (event, player) {
-                                            if ((player.hasMark('_yuanhang_bingsimopai'))) { return '当你进入濒死状态时，你可以摸一张牌,<br>若血量上限大于2，你需失去一点体力上限，摸一张牌。' };
-                                            if ((!player.hasMark('_yuanhang_bingsimopai'))) { return '当你进入濒死状态时，你可以摸一张牌,<br>若血量上限大于2，你需失去一点体力上限，摸一张牌。同时，依据舰种获得以下技能：<br>潜艇-志继（姜维）、重生（）；驱逐-镇卫（文聘）、齐攻（）；<br>轻巡-齐攻；重巡-刚烈改（改自夏侯惇）；<br>战列-刚烈改（夏侯惇)；航母-界连营（陆逊）；军辅：藏匿（）；导驱-界连营（陆逊）' };
+                                            return '当你进入濒死状态时，你可以摸一张牌,<br>若血量上限大于2，你须失去一点体力上限，改为摸两张牌。';
                                         },
                                         content: function () {//兵粮寸断与据守，刚烈， 镇卫同疾吸伤害，国风防锦囊牌。
                                             //轻巡提升己方防守与攻击距离，粮策全体发牌。重巡提供免伤。战列刚烈反击。 
-                                            player.draw(1); if (player.maxHp > 2) { player.loseMaxHp(1); player.draw(); } else /*game.playAudio('..','extension','舰R牌将/audio','bingsimosanpai')*/; if (player.maxHp > 5) {
-                                                player.loseMaxHp(1); player.draw(); //game.log('血量上限好高啊，额外来一次扣血摸牌吧', player); 
-                                            }
+                                            if (player.maxHp <= 2) {
+                                                player.draw(1);
+                                            } else if (player.maxHp > 2) {
+                                                player.loseMaxHp(1);
+                                                player.draw(2);
+                                            }/*game.playAudio('..','extension','舰R牌将/audio','bingsimosanpai')*/
                                             //trigger.player.addMark('_yuanhang_bingsimopai', 1);
                                         },
                                         /* intro: {
