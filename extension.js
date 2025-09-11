@@ -6850,7 +6850,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 return event.getl(game.players[i]).cards2;
                                             }
                                         }*///是否从其他角色处获得牌
-                                        return _status.currentPhase != event.player && !event.player.hp > 0;
+                                        return _status.currentPhase != event.player && event.player.hp > 0 && player.countCards("h") > 0 && event.player.countCards("h") > 0;
                                     }
                                     return false;
                                 },
