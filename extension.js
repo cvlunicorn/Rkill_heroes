@@ -5378,8 +5378,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                     },
                                     check(button) {
+                                        const player = get.player();
                                         if ((lib.inpile.includes("juedouba9") && lib.inpile.includes("manchangyy9") && lib.inpile.includes("jingjixiuli9") && lib.inpile.includes("ewaibuji9"))) {
-                                            var player = get.player();
                                             var recover = 0, lose = 1, players = game.filterPlayer();
                                             //game.log("s" + player.storage.jujianmengxiang);
                                             for (var i = 0; i < players.length; i++) {
@@ -5431,7 +5431,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         } else {
                                             game.log("AI没有可用的牌了！</br>也许您没有正确安装并启用‘舰r美化’卡牌包？");
                                             player.storage.jujianmengxiang_error = true;
-                                            event.finish();
                                         }
                                     },
                                     backup(links, player) {
