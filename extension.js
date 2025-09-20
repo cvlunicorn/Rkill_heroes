@@ -1854,11 +1854,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     "step 0"
                                     if (player.countMark('jinengup') <= 0) {
                                         player.chooseCardTarget({
-                                            prompt: "弃置两张黑桃或梅花手牌，视为使用【万箭齐发】",
+                                            prompt: "弃置任意张黑桃或梅花手牌，视为使用【万箭齐发】",
                                             filterCard: { color: 'black' },
                                             position: 'h',
-                                            selectCard: 2,
+                                            selectCard: [1, Infinity],
                                             selectTarget: [1, Infinity],
+                                            filterOk: function () {
+                                                return ui.selected.cards.length == ui.selected.targets.length;
+                                            },
                                             filterTarget: function (card, player, target) {
                                                 return player.canUse({ name: 'wanjian' }, target);
                                             },
@@ -1877,11 +1880,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         });*/
                                     } else if (player.countMark('jinengup') == 1) {
                                         player.chooseCardTarget({
-                                            prompt: "弃置两张黑桃或梅花或红桃手牌，视为使用【万箭齐发】",
+                                            prompt: "弃置任意张黑桃或梅花或红桃手牌，视为使用【万箭齐发】",
                                             filterCard: { suit: ['spade', 'club', 'heart'] },
                                             position: 'h',
-                                            selectCard: 2,
+                                            selectCard: [1, Infinity],
                                             selectTarget: [1, Infinity],
+                                            filterOk: function () {
+                                                return ui.selected.cards.length == ui.selected.targets.length;
+                                            },
                                             filterTarget: function (card, player, target) {
                                                 return player.canUse({ name: 'wanjian' }, target);
                                             },
@@ -1899,11 +1905,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         });*/
                                     } else if (player.countMark('jinengup') >= 2) {
                                         player.chooseCardTarget({
-                                            prompt: "弃置两张手牌，视为使用【万箭齐发】",
+                                            prompt: "弃置任意手牌，视为使用【万箭齐发】",
                                             filterCard: true,
                                             position: 'h',
-                                            selectCard: 2,
+                                            selectCard: [1, Infinity],
                                             selectTarget: [1, Infinity],
+                                            filterOk: function () {
+                                                return ui.selected.cards.length == ui.selected.targets.length;
+                                            },
                                             filterTarget: function (card, player, target) {
                                                 return player.canUse({ name: 'wanjian' }, target);
                                             },
@@ -2948,7 +2957,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     //if(range[1]==-1) return;var a=game.countPlayer(function(current){return get.attitude(player,current)<=0&&current.inRange(player)})-1;
                                     //if(card.name=='sha') range[1]+=Math.min(player.countMark('jinengup'),a);},
                                     attackRange: function (from, distance) {
-                                        return distance + (2 + 2*from.countMark('jinengup'));
+                                        return distance + (2 + 2 * from.countMark('jinengup'));
                                     },
                                 },
                                 usable: 1,
@@ -3310,8 +3319,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         selectCard: function () {
                                             var player = get.player();/*if(ui.selected.targets)return [1,Math.min(trigger.targets.length,Math.floor(player.countCards('he')))];*///取消弃牌数与选择目标数相等改为固定弃置两张牌2023.8.7
                                             if (player.hasSkill('duikongfangyu')) {
-                                                    return 1;//对空防御的技能效果。若玩家拥有对空防御，则视为满级强化。
-                                                }
+                                                return 1;//对空防御的技能效果。若玩家拥有对空防御，则视为满级强化。
+                                            }
                                             return 2;
                                         },//要气质的卡牌，可以return[1,3]if(ui.selected.cards)return [ui.selected.cards.length,ui.selected.cards.length+player.countMark('jinengup')];return 1;-player.countMark('jinengup')
                                         selectTarget: function () {
@@ -12016,7 +12025,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qingxuncl: "轻巡", "qingxuncl_info": "",
                             zhongxunca: "重巡", "zhongxunca_info": "",
                             zhanliebb: "战列", "zhanliebb_info": "",
-                            daoqu: "导驱", "daoqu_info": "你的攻击范围增加2+2X(x为技能强化次数),出牌阶段限一次，你可以弃置一张武器/装备牌/非基本牌，对一名角色造成一点伤害。",
+                            daoqu: "导驱", "daoqu_info": "你的攻击范围增加2+2X(x为技能强化次数),出牌阶段限一次，你可以弃置一张武器/装备牌，对一名角色造成一点伤害。",
                             fangqu: "防驱",
                             daodan: "防空导弹",
                             zhandouji: "战斗机",
