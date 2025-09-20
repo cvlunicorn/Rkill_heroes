@@ -2948,7 +2948,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     //if(range[1]==-1) return;var a=game.countPlayer(function(current){return get.attitude(player,current)<=0&&current.inRange(player)})-1;
                                     //if(card.name=='sha') range[1]+=Math.min(player.countMark('jinengup'),a);},
                                     attackRange: function (from, distance) {
-                                        return distance + (2 + from.countMark('jinengup'));
+                                        return distance + (2 + 2*from.countMark('jinengup'));
                                     },
                                 },
                                 usable: 1,
@@ -2962,9 +2962,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (player.countMark('jinengup') <= 0) {
                                         return get.subtype(card) == "equip1";
                                     } else if (player.countMark('jinengup') == 1) {
-                                        return get.subtype(card) == "equip1" || get.subtype(card) == "equip2";
-                                    } else if (player.countMark('jinengup') >= 2) {
                                         return get.type(card) == "equip";
+                                    } else if (player.countMark('jinengup') >= 2) {
+                                        return get.type(card) != "basic";
                                     }
                                 },
                                 selectCard: 1,
@@ -12016,7 +12016,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qingxuncl: "轻巡", "qingxuncl_info": "",
                             zhongxunca: "重巡", "zhongxunca_info": "",
                             zhanliebb: "战列", "zhanliebb_info": "",
-                            daoqu: "导驱", "daoqu_info": "你的攻击范围增加2+X(x为技能强化次数),出牌阶段限一次，你可以弃置一张武器/武器或防具/装备牌，对一名角色造成一点伤害。",
+                            daoqu: "导驱", "daoqu_info": "你的攻击范围增加2+2X(x为技能强化次数),出牌阶段限一次，你可以弃置一张武器/装备牌/非基本牌，对一名角色造成一点伤害。",
                             fangqu: "防驱",
                             daodan: "防空导弹",
                             zhandouji: "战斗机",
