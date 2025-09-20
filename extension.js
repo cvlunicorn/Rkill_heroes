@@ -943,7 +943,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             dafeng: ["female", "IJN", 4, ["hangmucv", "chuansuohongzha", "hangkongyazhi"], ["des:　大凤号是日本设计建造的装甲航空母舰。与其它日本海军航空母舰不同的是，大凤号预备在舰队中承担起支援其他航母作战的功能，因此大凤号将船舰的防护性摆在首位，重点增强装甲。竣工后被编入第三舰队第一航空战队，担任旗舰参加了马里亚纳海战。6月19日，大凤号在飞机起飞作业时，被美国潜艇大青花鱼号发射鱼雷并命中其右舷，最终因损管不当而沉没。"]],
                             dahuangfeng: ["female", "USN", 4, ["hangmucv", "yuanyangpoxi"], ["des:　　大黄蜂号是约克城级航母3号舰。她服役后第一项作战任务就是搭载B25轰炸机轰炸东京。在4月18日，杜立特带领的B25机群从大黄蜂号上起飞，完成了轰炸任务并在中国迫降。5月中旬，大黄蜂号在内的全部约克级航母作为主力参加了中途岛海战并击溃了日本机动部队，可以说正是她们三位扭转了太平洋的局势。在42年10月的圣克鲁斯海战中，大黄蜂号击伤了翔鹤号和筑摩号，但是自身也被重创，之后被驱逐舰击沉。"]],
                             biaoqiang: ["female", "RN", 14, ["dajiaoduguibi", "quzhudd", "juejingfengsheng"], ["des:　标枪级驱逐舰首舰。英国于部族级之后建造的驱逐舰，其设计也成为战时应急驱逐舰的范本。二战中标枪号参加了纳尔维克海战，战斗中标枪号被德国驱逐舰击伤了船首。修复之后主要在地中海作战，并于1949年退役。"]],
-                            yuekecheng: ["female", "USN", 4, ["hangmucv", "saqijian","fangkong"], ["des:　　约克城级是美国二战前期的主力航母，她的设计吸取了之前级别的经验，布局更加合理。约克城号同列克星敦号一起参加了珊瑚海海战，在海战中被击伤。因为前线急需航母应对中途岛战事，在短短72小时内她就修复完毕。中途岛战役中，三艘约克城级航母联手将日军最精锐的航母部队歼灭，但约克城号自己也被飞龙号两波攻击击伤，最后被I168号潜艇击沉。值得一提的是著名的萨奇少校当时就在约克城号上，他发明的萨奇剪战术使得美军战机可以发挥优势对付零战。"]],
+                            yuekecheng: ["female", "USN", 4, ["hangmucv", "saqijian", "fangkong"], ["des:　　约克城级是美国二战前期的主力航母，她的设计吸取了之前级别的经验，布局更加合理。约克城号同列克星敦号一起参加了珊瑚海海战，在海战中被击伤。因为前线急需航母应对中途岛战事，在短短72小时内她就修复完毕。中途岛战役中，三艘约克城级航母联手将日军最精锐的航母部队歼灭，但约克城号自己也被飞龙号两波攻击击伤，最后被I168号潜艇击沉。值得一提的是著名的萨奇少校当时就在约克城号上，他发明的萨奇剪战术使得美军战机可以发挥优势对付零战。"]],
                             shengqiaozhi: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "jupaohuoli"], ["des:针对日德兰和之前经验设计的皇家海军新式战列舰N3型。和之前战舰不同，该级战列舰在设计上有很多创新，圣乔治采用了独特的前中置主炮塔布局。优点是可以缩短主装甲带，集中更多的防护在武器系统。圣乔治的主炮也远大于之前的战列舰，达到了18英寸。由于华盛顿条约的签订，明显超出规格的N3型战列舰受到限制，圣乔治从未完工。"]],
                             weiershiqinwang: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "guanjianyiji"], ["des:英王乔治五世级2号舰。服役之后同胡德号一同参与了截击俾斯麦号的战斗，在战斗中被击伤撤退，不过她也击伤了俾斯麦号的油舱。修复之后威尔士亲王号搭载英国首相与美国总统进行了会晤，之后双方发表了著名的《大西洋宪章》。41年年末，威尔士亲王号编入Z舰队被派往远东对日本作战，在海战中包括反击号与威尔士亲王号在内的Z舰队被日本空袭击沉。"]],
                             qiuyue: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "duikongzhiwei",], ["des:　秋月型是日本少有的以护卫和对空为任务的驱逐舰，为了区别雷击用的甲驱而被称做乙驱，主炮使用100毫米双联高炮。秋月号建成后主要伴随航母提供防空掩护，经历了马里亚纳海战，目睹了日本航母部队的失败。同年10月在恩加诺海战中被美军飞机炸沉。"]],
@@ -2905,7 +2905,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     var nh = Math.min(player.countCards('h'), Math.ceil(player.getHandcardLimit()));
                                     var zongshu = 1 + player.countMark('jinengup'), cunpaishu = player.getExpansions('daodan').length + player.getCards('s', function (card) { return card.hasGaintag('daodan') }).length;
                                     if (nh && zongshu > cunpaishu) {
-                                        player.chooseCard('h', [1, Math.min(nh, zongshu - cunpaishu)], '将任意张手牌置于你的武将牌上,<br>存牌上限为1+技能强化等级。<br>单次存牌量上限为手牌上限,<br>这些牌可以当作无懈可击使用').set('ai', function (card) {
+                                        player.chooseCard('h', [1, Math.min(nh, zongshu - cunpaishu)], '将任意张手牌置于你的武将牌上,<br>存牌上限为1+技能强化等级。<br>单次存牌量上限为手牌上限,<br>这些牌可以使锦囊牌无效').set('ai', function (card) {
                                             var player = get.player();
                                             if (ui.selected.cards.type == "equip") return -get.value(card);
                                             return 9 - get.value(card);
@@ -2934,20 +2934,52 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 subSkill: {
                                     wuxie: {
-                                        enable: "chooseToUse",
-                                        filterCard: true,
-                                        position: "s",
-                                        viewAs: {
-                                            name: "wuxie",
+                                        trigger: {
+                                            global: ["useCard"],
                                         },
-                                        filter(event, player) {
-                                            return player.countCards("s") > 0;
+                                        filter: function (event, player) {
+                                            return player.countCards("s") > 0 && get.type(event.card) == "trick";
                                         },
-                                        viewAsFilter(player) {
-                                            return player.countCards("s") > 0;
+                                        check: function (event, player) {
+                                            var effect = 0;
+                                            if (event.card.name == "wuxie") {
+                                                if (get.attitude(player, event.player) < -1) {
+                                                    effect = -1;
+                                                }
+                                            } else if (event.targets && event.targets.length) {
+                                                for (var i = 0; i < event.targets.length; i++) {
+                                                    effect += get.effect(event.targets[i], event.card, event.player, player);
+                                                }
+                                            }
+                                            return effect < 0;
                                         },
-
-                                        prompt: "将一张装备区内的牌当无懈可击使用",
+                                        prompt: function (event, player) {
+                                            var str = "防驱：是否拦截" + get.translation(event.player);
+                                            if (event.targets && event.targets.length) {
+                                                str += "对" + get.translation(event.targets);
+                                            }
+                                            str += "使用的" + get.translation(event.card);
+                                            return str;
+                                        },
+                                        content: function () {
+                                            "step 0";
+                                            game.log(player.getCards('s', function (card) { return card.hasGaintag('daodan') }));
+                                            player.chooseCardButton('移去一张防空导弹', player.getCards('s', function (card) { return card.hasGaintag('daodan') }), 1).set('ai', function (button) {
+                                                return 1;
+                                            });
+                                            "step 1";
+                                            if (result.bool) {
+                                                var cards = result.links;
+                                                player.loseToDiscardpile(cards);
+                                                trigger.targets.length = 0;
+                                                trigger.all_excluded = true;
+                                            }
+                                        },
+                                        ai: {
+                                            threaten: 1.8,
+                                            expose: 0.3,
+                                        },
+                                        "_priority": 0,
                                     }
                                 }
                             },
@@ -2978,8 +3010,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 selectCard: 1,
                                 content: function () {
+                                    var card = {
+                                        name: "paohuofg9",
+                                        isCard: true,
 
-                                    target.damage("nocard");
+                                    };
+                                    player.useCard(card, target, false).set("oncard", function () {
+                                        _status.event.directHit.addArray(game.filterPlayer());
+                                    });
+                                    //target.damage("nocard");
                                 },
                                 check: function (card) {
                                     return 10 - get.value(card);
@@ -12025,11 +12064,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qingxuncl: "轻巡", "qingxuncl_info": "",
                             zhongxunca: "重巡", "zhongxunca_info": "",
                             zhanliebb: "战列", "zhanliebb_info": "",
-                            daoqu: "导驱", "daoqu_info": "你的攻击范围增加2+2X(x为技能强化次数),出牌阶段限一次，你可以弃置一张武器/装备牌，对一名角色造成一点伤害。",
+                            daoqu: "导驱", "daoqu_info": "你的攻击范围增加2+2X(x为技能强化次数),出牌阶段限一次，你可以弃置一张武器/装备牌，对一名角色使用一张不可响应的炮火覆盖。",
                             fangqu: "防驱",
                             daodan: "防空导弹",
                             zhandouji: "战斗机",
-                            "fangqu_info": "游戏开始时/出牌阶段开始时，将至多1/2/3张手牌放到武将牌上.你可以将武将牌上的牌当作无懈使用.",
+                            "fangqu_info": "游戏开始时/出牌阶段开始时，将至多1/2/3张手牌放到武将牌上.称为防空导弹。锦囊牌被使用时，你可以移去一枚防空导弹，令其无效。",
+                            "fangqu_wuxie":"发射防空导弹",
                             hangmucv: "航母", "hangmucv_info": "(可强化)你的出牌阶段开始时，<br>你可以将2张：零级强化，黑桃或梅花手牌；一级强化，黑桃或梅花或红桃手牌；二级强化，任意手牌。当作万箭齐发对你选择的任意个目标使用",
                             qianting_xiji: "袭击", "qianting_xiji_info": "每回合限两次，将♦/♥牌当做顺手牵羊，♣/♠牌当做兵粮寸断使用<br>你使用的锦囊牌可以对距离你2以内的角色使用。",
                             qianting: "潜艇", "qianting_info": "（可强化）准备阶段，你可以弃置一张红桃或黑桃/红桃或黑桃或方片/牌，视为对一个目标使用一张雷杀。",
