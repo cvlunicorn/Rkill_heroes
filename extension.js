@@ -3305,10 +3305,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     'step 0'
                                     var next = player.chooseCardTarget({
                                         prompt: get.prompt('防空保护对象'),
-                                        prompt2: ('当一名角色使用的锦囊牌指定了至少两名角色为目标时，<br>你可弃置两张牌令此牌对距离你' + (player.countMark('jinengup') + 1) + '内的任意名角色无效。'),
+                                        prompt2: ('当一名角色使用的锦囊牌指定了至少两名角色为目标时，<br>你可弃置两张牌（拥有对空防御则改为一张）令此牌对距离你' + (player.countMark('jinengup') + 1) + '内的任意名角色无效。'),
                                         position: 'hejs',//hej代指牌的位置，加个s即可用木流流马的牌。
                                         selectCard: function () {
                                             var player = get.player();/*if(ui.selected.targets)return [1,Math.min(trigger.targets.length,Math.floor(player.countCards('he')))];*///取消弃牌数与选择目标数相等改为固定弃置两张牌2023.8.7
+                                            if (player.hasSkill('duikongfangyu')) {
+                                                    return 1;//对空防御的技能效果。若玩家拥有对空防御，则视为满级强化。
+                                                }
                                             return 2;
                                         },//要气质的卡牌，可以return[1,3]if(ui.selected.cards)return [ui.selected.cards.length,ui.selected.cards.length+player.countMark('jinengup')];return 1;-player.countMark('jinengup')
                                         selectTarget: function () {
@@ -3320,7 +3323,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         filterTarget: function (card, player, target) {
                                             if (_status.event.targets.includes(target) && !target.hasSkill('fangkong2_aibiexuan')) {
                                                 if (player.hasSkill('duikongfangyu')) {
-                                                    return get.distance(player, target) <= (3);
+                                                    return get.distance(player, target) <= (5);//对空防御的技能效果。若玩家拥有对空防御，则视为满级强化。
                                                 }
                                                 return get.distance(player, target) <= (1 + 2 * player.countMark('jinengup'));
                                             }
@@ -3341,7 +3344,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         event.target = result.targets;//前面有目标target，可以返回target。
                                         if (event.target != undefined) { for (var i = 0; i < trigger.targets.length; i += (1)) { if (event.target.includes(trigger.targets[i])) { trigger.getParent().excluded.add(trigger.targets[i]); trigger.targets[i].addSkill('fangkong_aibiexuan'); game.log('取消卡牌目标', trigger.targets[i], '编号', i) } } };//三级选择，集合target是否包含trigger.target。同时测试是否选到了目标。
                                         player.logSkill('fangkong2', event.target);
-                                        if (player.hasSkill('duikongfangyu') && _status.currentPhase != player) player.draw(2);//对空防御的技能效果。若玩家拥有对空防御，则发动防空后可以摸牌。
+                                        //if (player.hasSkill('duikongfangyu') && _status.currentPhase != player) player.draw(2);//对空防御的技能效果。若玩家拥有对空防御，则发动防空后可以摸牌。
                                     }//让技能发语音，发历史记录。
                                 },
                                 subSkill: {
@@ -12080,7 +12083,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             gaosusheji: "高速射击", "gaosusheji_info": "转换技，出牌阶段你使用的第一张牌为：阳：基本牌时；阴：普通锦囊牌时。你可以令此牌额外结算一次。",
                             qixi_cv: "奇袭", "qixi_cv_info": "限定技，出牌阶段，你可以令所有其他角色依次选择一项:1你弃置其区域内的两张牌，2本回合不能使用或打出手牌，3翻面。然后你可以视为使用【近距支援】。",
                             rand: "随机数", "rand_info": "遇事不决？扔一个骰子吧。该技能可以生成1~6的随机数",
-                            duikongfangyu: "对空防御", "duikongfangyu_info": "锁定技，你发动防空时技能等级视为满级。你在回合外发动[防空]后，你摸2张牌",
+                            duikongfangyu: "对空防御", "duikongfangyu_info": "锁定技，你发动防空时技能等级视为满级。你发动[防空]仅需弃置一张牌。",
                             zhudaojiandui: "柱岛舰队", "zhudaojiandui_info": "锁定技，每当你使用或打出一张非虚拟非转化的基本牌，你获得一个[柱]标记。你可以移去三个柱标记视为使用一张不计入次数限制的杀。",
                             sawohaizhan: "萨沃海战", "sawohaizhan_info": "出牌阶段各限一次。你可以将一张红牌当做当作洞烛先机使用,你可以将一张黑牌当作雷杀使用。",
                             sawohaizhan_1: "雷杀", "sawohaizhan_1_info": "你可以将一张黑牌当作雷杀使用。",
