@@ -9521,6 +9521,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             zhanliexianfuchou: {
                                 nobracket: true,
+                                usable:1,
                                 trigger: {
                                     source: "damageBegin1",
                                 },
@@ -9529,12 +9530,18 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 forced: true,
                                 content: function () {
-                                    var history = game.countPlayer2(target => target.getRoundHistory("useCard", evt => {
+                                    /* var history = game.countPlayer2(target => target.getRoundHistory("damage", evt => {
                                         //game.log(evt.card);
                                         //game.log(evt.targets);
                                         //game.log(target);
                                         return get.tag(evt.card, 'damage') && target != player && evt.targets && evt.targets.includes(player);
-                                    }).length);
+                                    }).length); */
+                                    var history = player.getRoundHistory("damage", evt => {
+                                        //game.log(evt.card);
+                                        //game.log(evt.targets);
+                                        //game.log(target);
+                                        return 1;
+                                    }).length;
                                     game.log(history);
                                     trigger.num += history;
                                 },
@@ -12234,7 +12241,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jingruizhuangbei_fencha: "精锐装备_分叉",
                             dananbusi: "大难不死", dananbusi_info: "限定技，当你受到的伤害不小于你当前体力值时，你可以防止之。",
                             houfu: "后福", houfu_info: "出牌阶段限一次，你可以选择一名其他角色，其选择一项:1视为对你使用一张杀(无距离限制)，2令你从牌堆中获得一张基本牌。",
-                            zhanliexianfuchou: "战列线复仇", zhanliexianfuchou_info: "你造成的伤害+X，X=你本轮成为其他角色伤害类牌目标的次数",
+                            zhanliexianfuchou: "战列线复仇", zhanliexianfuchou_info: "每回合限一次，你造成的伤害+X，X=你本轮受到伤害的次数",
                             pingduzhanhuo: "平度战火", pingduzhanhuo_info: "结束阶段，若你本回合未造成伤害，你摸一张牌；准备阶段，若你自上个结束阶段起未受到伤害，你摸一张牌",
                             mujizhengren: "目击证人", mujizhengren_info: "限定技，出牌阶段，你可以弃置3张手牌，然后令一名角色翻面。",
                             shixiangquanneng: "十项全能", shixiangquanneng_info: "锁定技，你的舰种技能无法升级，每轮开始时，你失去以此法获得的技能，然后从以下技能中选择一项获得：1、防空，2、开幕航空，3、军辅",
