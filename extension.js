@@ -11891,7 +11891,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.getHistory('sourceDamage', function (evt) {
                                         var player = get.player();
                                         //game.log("不朽战士" + evt.getParent("buxiuzhanshi").name + get.translation(evt.player) + get.translation(player));
-                                        if (evt.getParent("buxiuzhanshi").name == "buxiuzhanshi" && evt.player != player) {
+                                        if (evt.getParent("buxiuzhanshi").name == "buxiuzhanshi") {
                                             player.addMark("buxiuzhanshi", 1);
                                             return 1;
                                         }
@@ -12069,7 +12069,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             daodan: "防空导弹",
                             zhandouji: "战斗机",
                             "fangqu_info": "游戏开始时/出牌阶段开始时，将至多1/2/3张手牌放到武将牌上.称为防空导弹。锦囊牌被使用时，你可以移去一枚防空导弹，令其无效。",
-                            "fangqu_wuxie":"发射防空导弹",
+                            "fangqu_wuxie": "发射防空导弹",
                             hangmucv: "航母", "hangmucv_info": "(可强化)你的出牌阶段开始时，<br>你可以将2张：零级强化，黑桃或梅花手牌；一级强化，黑桃或梅花或红桃手牌；二级强化，任意手牌。当作万箭齐发对你选择的任意个目标使用",
                             qianting_xiji: "袭击", "qianting_xiji_info": "每回合限两次，将♦/♥牌当做顺手牵羊，♣/♠牌当做兵粮寸断使用<br>你使用的锦囊牌可以对距离你2以内的角色使用。",
                             qianting: "潜艇", "qianting_info": "（可强化）准备阶段，你可以弃置一张红桃或黑桃/红桃或黑桃或方片/牌，视为对一个目标使用一张雷杀。",
@@ -12279,7 +12279,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhengzhansihai: "征战四海", "zhengzhansihai_info": "锁定技，你的手牌上限+X，你造成的伤害+X（X为你损失的体力上限数）",
                             shuqinzhiyin: "竖琴之音", "shuqinzhiyin_info": "每轮限一次，其他角色技能结算后，你可以弃置两张牌，重置一名其他角色武将牌上的技能，然后其回复一点体力",
                             yixinyiyi: "一心一意", "yixinyiyi_info": "你可以将一张牌当作雷杀使用。此杀根据主公已损失体力值:不小于一点，无距离限制，不小于两点，无次数限制，不小于三点，伤害+1。",
-                            buxiuzhanshi: "不朽战士", "buxiuzhanshi_info": "出牌阶段限一次，你可以弃置任意张牌，视为对等量名角色使用决斗。下个回合摸牌阶段，你的摸牌数量+x（x为你本回合以此法对其他角色造成的伤害数）",
+                            buxiuzhanshi: "不朽战士", "buxiuzhanshi_info": "出牌阶段限一次，你可以弃置任意张牌，视为对等量名角色使用决斗。下个回合摸牌阶段，你的摸牌数量+x（x为你本回合以此法对造成的伤害数）",
 
 
                             jianrbiaozhun: "舰r标准",
