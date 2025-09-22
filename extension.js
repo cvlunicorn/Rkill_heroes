@@ -9521,7 +9521,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             zhanliexianfuchou: {
                                 nobracket: true,
-                                usable:1,
+                                usable: 1,
                                 trigger: {
                                     source: "damageBegin1",
                                 },
@@ -10780,7 +10780,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         list2.add(get.type2(i, player));
                                         if (list2.length >= 3) break;
                                     }
-                                    if (list1.length != list2.length) { player.draw(1); }
+                                    if (list1.length != list2.length) { player.draw(2); }
                                 },
                                 ai: {
                                     order: 6,
@@ -10799,38 +10799,24 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 enable: "phaseUse",
                                 usable: 1,
+                                chooseTarget: true,
+                                filterTarget: function (card, player, target) {
+                                    return get.distance(player, target, "attack") > 1 && player != target && target.countCards("h") > 0;
+                                },
                                 content: function () {
-                                    'step 0'
-                                    event.num = 0;
-                                    event.targets = game.filterPlayer(function (current) {
-                                        var player = get.player();
-                                        return current != player && player.inRange(current) && current.countCards("h") > 0;
-                                    }).sortBySeat();
-                                    'step 1'
-                                    lib.target = event.targets.shift();
-                                    game.log("展示牌角色" + get.translation(lib.target));
-                                    player.choosePlayerCard(lib.target, "h", true);
-                                    'step 2'
+                                    'step 0';
+                                    player.discardPlayerCard(target, "h", "visible");
+                                    'step 1';
                                     event.card = result.cards[0];
-                                    player.showCards(event.card, get.translation(player) + "对" + get.translation(lib.target) + "发动了【爱知】");
-                                    let cardtype = get.type(event.card);
-                                    //game.log(cardtype);
-                                    'step 3'
-                                    if (get.type(event.card) != "trick") {
-                                        event.goto(5);
-                                    } else {
-                                        player.chooseTarget("可以令一名角色弃置一张牌，然后其视为使用" + get.translation(result.cards) + "(若不能使用则只弃牌)").set("ai", function (target) {
-                                            var player = get.player();
-                                            if (target.hasUseTarget(result.cards, null, false)) { return get.attitude(player, target); }
-                                            else { return get.attitude(player, target); }
-                                            return 0;
-                                        });
+                                    //game.log(event.card);
+                                    if (get.type(event.card) == "trick") {
+                                        game.log("爱知视为未发动过");
+                                        player.getStat('skill').aizhi -= 1;
                                     }
-                                    'step 4'
+                                        player.chooseToDiscard("你可以弃置一张手牌视为使用"+get.translation(event.card),1, false);
+                                    'step 2';
                                     if (result.bool) {
-                                        game.log("弃牌角色" + get.translation(result.targets[0]));
-                                        result.targets[0].chooseToDiscard(1, true);
-                                        result.targets[0].chooseUseTarget(
+                                        player.chooseUseTarget(
                                             {
                                                 name: event.card.name,
                                                 isCard: true,
@@ -10839,11 +10825,19 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             false
                                         );
                                     }
-                                    'step 5'
-                                    if (event.num < targets.length) { event.goto(1); }
-                                    else {
-                                        game.log("技能结束");
-                                    }
+                                },
+                                ai: {
+                                    order: 4,
+                                    expose: 0.2,
+                                    result: {
+                                        target: -1,
+                                        player: function (player, target) {
+                                            if (target.countCards('h') == 0) return 0;
+                                            if (target.countCards('h') == 1) return -0.1;
+                                            return -0.5;
+                                        },
+                                    },
+                                    threaten: 1.1,
                                 },
                             },
                             longgu: {
@@ -12269,8 +12263,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             tebiekongxi: "特别空袭", "tebiekongxi_info": "转换技，阳:你的回合外；阴:你的回合内，当你因使用打出或弃置而一次性失去两张或更多牌时，你可以将其中一张牌置于武将牌上，称为“战”(至多三张)。你可以将“战”当作无懈可击使用或如手牌般使用打出。",
                             beijixingweishe: "北极星威慑", "beijixingweishe_info": "你使用杀对其他角色造成伤害后，目标不能使用或打出杀直到其回合结束。",
                             beijixingweishe_effect: "北极星威慑效果", "beijixingweishe_info": "不能使用或打出杀直到回合结束。",
-                            jianduixunlian: "舰队训练", "jianduixunlian_info": "出牌阶段限一次，你可以观看一名角色的手牌，若你与其手牌包含的类型数不同则你摸一张牌",
-                            aizhi: "爱知", "aizhi_info": "出牌阶段限一次，你可以依次选择并展示攻击范围内其他角色的一张手牌，若为锦囊牌，你可以选择一名角色，令其弃置一张牌并视为其使用该锦囊（若不能使用则只弃牌）。",
+                            jianduixunlian: "舰队训练", "jianduixunlian_info": "出牌阶段限一次，你可以观看一名角色的手牌，若你与其手牌包含的类型数不同则你摸两张牌",
+                            aizhi: "爱知", "aizhi_info": "出牌阶段限一次，你可以观看并弃置你攻击范围外玩家的一张手牌，若为锦囊牌此技能视为未发动过。然后你可以弃置一张牌，视为使用之。",
                             longgu: "龙崮", "longgu_info": "你存活时，与你同势力的角色和主公准备阶段时，可以跳过摸牌阶段并选择一项：不能成为基本牌/普通锦囊牌和延时锦囊牌的目标，直至其下一次使用基本牌/普通锦囊牌和延时锦囊牌。",
                             longgu_skill: "龙崮", "longgu_skill_info": "准备阶段时，你可以跳过摸牌阶段并选择一项：不能成为基本牌/普通锦囊牌和延时锦囊牌的目标，直至其下一次使用基本牌/普通锦囊牌和延时锦囊牌。",
                             longgu_basic: "龙崮_基本", "longgu_basic_info": "锁定技，你不能成为基本牌的目标，直至其下一次使用基本牌。",
