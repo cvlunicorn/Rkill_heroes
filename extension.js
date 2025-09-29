@@ -10813,7 +10813,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         game.log("爱知视为未发动过");
                                         player.getStat('skill').aizhi -= 1;
                                     }
-                                        player.chooseToDiscard("你可以弃置一张手牌视为使用"+get.translation(event.card),1, false);
+                                    player.chooseToDiscard("你可以弃置一张手牌视为使用" + get.translation(event.card), 1, false);
                                     'step 2';
                                     if (result.bool) {
                                         player.chooseUseTarget(
@@ -11669,13 +11669,51 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 mod: {
                                     cardUsable: function (card) {
                                         var check1 = game.countPlayer(function (current) {
-                                            return current.isZhu2() && current.getDamagedHp() >= 2;
+                                            let zhu = false;
+                                            switch (get.mode()) {
+                                                case "identity": {
+                                                    zhu = current.isZhu;
+                                                    break;
+                                                }
+                                                case "guozhan": {
+                                                    zhu = get.is.jun(current);
+                                                    break;
+                                                }
+                                                case "versus": {
+                                                    zhu = current.identity == "zhu";
+                                                    break;
+                                                }
+                                                case "doudizhu": {
+                                                    zhu = current == game.zhu;
+                                                    break;
+                                                }
+                                            }
+                                            return zhu && current.getDamagedHp() >= 2;
                                         });
                                         if (card.storage && card.storage.yixinyiyi && check1) return Infinity;
                                     },
                                     targetInRange(card, player, target, now) {
                                         var check2 = game.countPlayer(function (current) {
-                                            return current.isZhu2() && current.getDamagedHp() >= 1;
+                                            let zhu = false;
+                                            switch (get.mode()) {
+                                                case "identity": {
+                                                    zhu = current.isZhu;
+                                                    break;
+                                                }
+                                                case "guozhan": {
+                                                    zhu = get.is.jun(current);
+                                                    break;
+                                                }
+                                                case "versus": {
+                                                    zhu = current.identity == "zhu";
+                                                    break;
+                                                }
+                                                case "doudizhu": {
+                                                    zhu = current == game.zhu;
+                                                    break;
+                                                }
+                                            }
+                                            return zhu && current.getDamagedHp() >= 1;
                                         });
                                         if (card.storage && card.storage.yixinyiyi && check2) return true;
                                     },
@@ -11683,7 +11721,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filterCard(card) {
                                     return true;
                                 },
-                                position: "hes",
+                                position: "h",
                                 viewAs: {
                                     name: "sha",
                                     nature: "thunder",
@@ -11697,6 +11735,32 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 prompt: "将一张牌当雷杀使用",
                                 check(card) { return 4 - get.value(card) },
                                 ai: {
+                                    threaten(player, target) {
+                                        let zhu = false;
+                                        switch (get.mode()) {
+                                            case "identity": {
+                                                zhu = target.isZhu;
+                                                break;
+                                            }
+                                            case "guozhan": {
+                                                zhu = get.is.jun(target);
+                                                break;
+                                            }
+                                            case "versus": {
+                                                zhu = target.identity == "zhu";
+                                                break;
+                                            }
+                                            case "doudizhu": {
+                                                zhu = target == game.zhu;
+                                                break;
+                                            }
+                                        }
+                                        if (zhu) {
+                                            if (target.maxHp - target.hp < 2) { return 0.5; }
+                                            return 3;
+                                        }
+                                        return 2;
+                                    },
                                     yingbian: function (card, player, targets, viewer) {
                                         if (get.attitude(viewer, player) <= 0) return 0;
                                         var base = 0, hit = false;
@@ -11816,7 +11880,26 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger: { player: "useCard" },
                                         filter: function (event, player) {
                                             var check3 = game.countPlayer(function (current) {
-                                                return current.isZhu2() && current.getDamagedHp() >= 3;
+                                                let zhu = false;
+                                                switch (get.mode()) {
+                                                    case "identity": {
+                                                        zhu = current.isZhu;
+                                                        break;
+                                                    }
+                                                    case "guozhan": {
+                                                        zhu = get.is.jun(current);
+                                                        break;
+                                                    }
+                                                    case "versus": {
+                                                        zhu = current.identity == "zhu";
+                                                        break;
+                                                    }
+                                                    case "doudizhu": {
+                                                        zhu = current == game.zhu;
+                                                        break;
+                                                    }
+                                                }
+                                                return zhu && current.getDamagedHp() >= 3;
                                             });
                                             return get.name(event.card, false) == 'sha' && event.card.storage && event.card.storage.yixinyiyi && check3;
                                         },
@@ -12279,7 +12362,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jinyangmaozhishi: "金羊毛之誓", "jinyangmaozhishi_info": "锁定技，你进入濒死时，若你体力上限大于一，你扣减一点体力上限并回复一点体力。",
                             zhengzhansihai: "征战四海", "zhengzhansihai_info": "锁定技，你的手牌上限+X，你造成的伤害+X（X为你损失的体力上限数）",
                             shuqinzhiyin: "竖琴之音", "shuqinzhiyin_info": "每轮限一次，其他角色技能结算后，你可以弃置两张牌，重置一名其他角色武将牌上的技能，然后其回复一点体力",
-                            yixinyiyi: "一心一意", "yixinyiyi_info": "你可以将一张牌当作雷杀使用。此杀根据主公已损失体力值:不小于一点，无距离限制，不小于两点，无次数限制，不小于三点，伤害+1。",
+                            yixinyiyi: "一心一意", "yixinyiyi_info": "你可以将一张手牌当作雷杀使用。此杀根据主公已损失体力值:不小于一点，无距离限制，不小于两点，无次数限制，不小于三点，伤害+1。",
                             buxiuzhanshi: "不朽战士", "buxiuzhanshi_info": "出牌阶段限一次，你可以弃置任意张牌，视为对等量名角色使用决斗。下个回合摸牌阶段，你的摸牌数量+x（x为你本回合以此法对造成的伤害数）",
 
 
