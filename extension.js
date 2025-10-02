@@ -10209,7 +10209,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     } = await player
                                         .chooseTarget([1, count], get.prompt("bigseven"), "为" + get.translation(trigger.card) + "增加目标", (card, player, target) => {
                                             const trigger = get.event().getTrigger();
-                                            return !trigger.targets.includes(target) && player.canUse(trigger.card, target);
+                                            return !trigger.targets.includes(target) && lib.filter.targetEnabled2(trigger.card, trigger.player, target);
                                         })
                                         .set("card", trigger.card)
                                         .set("ai", target => {
