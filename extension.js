@@ -9353,7 +9353,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             //game.log("salemu1");
                                             if (!player.getEquip(1)) return false;
                                             //game.log("salemu2");
-                                            return 1 || (event.card && (event.card.name == 'sha' || event.card.name == 'sheji9') && event.player.isIn());//&& (event.getParent().name == 'sha' || event.getParent().name == 'sheji9') 
+                                            return (event.card && (event.card.name == 'sha' || event.card.name == 'sheji9') && event.player.isIn());
                                         },
                                         content: function () {
                                             //game.log("salemu3");
