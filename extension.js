@@ -602,8 +602,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (player.hasMark('_wulidebuff_jinshui')) { return num = num - 1 };
                                 },
                             },
-                            name: "进水", intro: { marktext: "进水", content: function (player) { return ('减少1点手牌上限，在出牌阶段会恢复，冰杀与袭击运输船的效果，不叠加计算也很可怕了'); }, },
-                            priority: 2, forced: true, trigger: { player: ["phaseBegin", "phaseJieshuBegin", "dying"], }, filter: function (event, player) { return player.hasMark('_wulidebuff_jinshui') },
+                            name: "进水", intro: { marktext: "进水", content: function (player) { return ('减少1点手牌上限，在结束阶段会恢复，冰杀与袭击运输船的效果，不叠加计算也很可怕了'); }, },
+                            priority: 2, forced: true, trigger: { player: ["phaseJieshuBegin", "dying"], }, filter: function (event, player) { return player.hasMark('_wulidebuff_jinshui') },
                             content: function () {
                                 if (player.hasSkill('_wulidebuff_jinshui')) { player.removeSkill('_wulidebuff_jinshui'); player.removeMark('_wulidebuff_jinshui', player.countMark('_wulidebuff_jinshui')); };
                             },
