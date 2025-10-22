@@ -223,7 +223,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         game.jianRAlert(
                             "所有全局技能均可在扩展详情中查看说明和配置开关，" +
                             "以下是默认开启的全局技能<br><br>" +
-                            "<b>远航:</b>你受伤时手牌上限+1；每轮限1/2/3次，失去手牌后，若手牌数少于一半，你可以摸一张牌。<br>" +
+                            "<b>远航:</b>你受伤时手牌上限+1，挑战模式不屈时手牌上限+1；每轮限1/2/3次，失去手牌后，若手牌数少于一半，你可以摸一张牌。<br>" +
                             "当你进入濒死状态时，若你的体力上限大于2，你可以减少一点体力上限，摸两张牌，否则摸一张牌；<br>" +
                             "你死亡后，若你为忠臣，你可以令主公摸一张牌。<br><br>" +
                             "<b>建造:</b>若你进行了至少一次强化：出牌阶段" +
@@ -252,8 +252,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     group: ["_yuanhang_mopai", "_yuanhang_kaishi", "_yuanhang_bingsimopai", "_yuanhang_dietogain"],
                     mod: {
                         maxHandcard: function (player, num) {
-                            var a = 0; if (player.hasSkill('qianting')) { var a = a + 1 };
-                            if (player.hp < player.maxHp) { a += (1) }; if (player.hp <= 0) { a += (1) };
+                            var a = 0;
+                            //if (player.hasSkill('qianting')) { var a = a + 1 };
+                            if (player.hp < player.maxHp) { a += (1) };
+                            if (get.mode() == 'boss' && player.hp <= 0) { a += (1) };
                             return num = (num + a);
                         },
                     },
@@ -731,13 +733,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             if (config.tiaozhanbiaojiang) {//挑战技能，全局技能每一个人都有，所有人都受相同的一次触发条件触发此技能。
                 lib.skill._tiaozhan3 = {
                     superCharlotte: true, usable: 1, silent: true,
-                    trigger: { global: "useCardToPlayered", },
-                    filter: function (event, player) { return (game.phaseNumber == 1); },
+                    trigger: { global: "gameStart", },
+                    filter: function (event, player) { return 1 || (game.phaseNumber == 1); },
                     content: function () {
                         if (get.mode() == 'boss' && !lib.character[player.name][4].includes('boss') && player.identity == 'cai') {
                             if (!player.hasSkill('gzbuqu')) {
                                 //game.log(player.identity)
-                                player.addSkill('gzbuqu'); player.addSkill('tiaozhanzhuanbei'); player.useSkill('tiaozhanzhuanbei'); player.loseHp(player.hp - 1); player.draw(player.hp * 2 - 1);
+                                player.addSkill('gzbuqu'); player.addSkill('tiaozhanzhuangbei'); player.useSkill('tiaozhanzhuangbei'); player.loseHp(player.hp - 1); player.draw(player.hp * 2 - 1);
                             };
                         };
                     },
@@ -1418,7 +1420,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 intro: { content: function () { return get.translation('__hanbing_gai' + '_info'); }, },
                             },
                             //
-                            tiaozhanzhuanbei: {
+                            tiaozhanzhuangbei: {
                                 trigger: {
                                     global: "phaseBefore",
                                     player: "enterGame",
@@ -1429,17 +1431,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return (event.name != 'phase' || game.phaseNumber == 0) && get.mode() == 'boss';
                                 },
                                 content: function () {
-                                    if (player.hasSkill('qianting')) { player.equip(game.createCard2('yuleiqianting3', 'club', 0)); player.equip(game.createCard2('xingyun', 'club', 0)); };
-                                    if (player.hasSkill('quzhudd')) { player.equip(game.createCard2('quzhupao3', 'club', 0)); player.equip(game.createCard2('xingyun', 'club', 0)); };
-                                    if (player.hasSkill('qingxuncl')) { player.equip(game.createCard2('qingxunpao3', 'club', 0)); player.equip(game.createCard2('xingyun', 'club', 0)); };
-                                    if (player.hasSkill('zhongxunca')) { player.equip(game.createCard2('zhongxunpao3', 'club', 0)); player.equip(game.createCard2('huokongld', 'club', 0)); };
-                                    if (player.hasSkill('zhanliebb')) { player.equip(game.createCard2('zhanliepao3', 'club', 0)); player.equip(game.createCard2('huokongld', 'club', 0)); };
-                                    if (player.hasSkill('hangmucv')) { player.equip(game.createCard2('zhandouji3', 'club', 0)); player.equip(game.createCard2('tansheqi3', 'club', 0)); };
-                                    if (player.hasSkill('junfu')) { player.equip(game.createCard2('yuleiji3', 'club', 0)); player.equip(game.createCard2('xingyun', 'club', 0)); };
-                                    if (player.hasSkill('daoqu')) { player.equip(game.createCard2('jianzaidaodan3', 'club', 0)); player.equip(game.createCard2('fasheqi3', 'club', 0)); };
+                                    if (player.hasSkill('qianting')) { player.equip(game.createCard2('yuleiqianting3', 'club', 1)); player.equip(game.createCard2('xingyun', 'club', 1)); }
+                                    if (player.hasSkill('quzhudd')) { player.equip(game.createCard2('quzhupao3', 'club', 1)); player.equip(game.createCard2('xingyun', 'club', 1)); }
+                                    if (player.hasSkill('qingxuncl')) { player.equip(game.createCard2('qingxunpao3', 'club', 1)); player.equip(game.createCard2('xingyun', 'club', 1)); }
+                                    if (player.hasSkill('zhongxunca')) { player.equip(game.createCard2('zhongxunpao3', 'club', 1)); player.equip(game.createCard2('huokongld_equip', 'club', 1)); }
+                                    if (player.hasSkill('zhanliebb')) { player.equip(game.createCard2('zhanliepao3', 'club', 1)); player.equip(game.createCard2('huokongld_equip', 'club', 1)); }
+                                    if (player.hasSkill('hangmucv')) { player.equip(game.createCard2('zhandouji3', 'club', 1)); player.equip(game.createCard2('tansheqi3', 'club', 1)); }
+                                    if (player.hasSkill('junfu')) { player.equip(game.createCard2('yuleiji3', 'club', 1)); player.equip(game.createCard2('xingyun', 'club', 1)); }
+                                    if (player.hasSkill('daoqu')) { player.equip(game.createCard2('jianzaidaodan3', 'club', 1)); player.equip(game.createCard2('fasheqi3', 'club', 1)); }
 
-                                    player.equip(game.createCard2('xingyun', 'club', 0));
-                                    player.equip(game.createCard2('miki_binoculars', 'diamond', 0));
+                                    player.equip(game.createCard2('xingyun', 'club', 1));
+                                    player.equip(game.createCard2('miki_binoculars', 'diamond', 1));
                                 },
                                 mod: {
                                     canBeDiscarded: function (card) {
@@ -1662,7 +1664,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (result.bool || result.index == 0) {
                                         if (event.triggername == 'shaMiss') {
                                             var evt = _status.event.getTrigger();
-                                            /*if(!player.hasSkill('guanshi_skill')&&!player.getEquip('huokongld')){if(player.countMark('jinengup')=1){trigger.target.draw((evt.baseDamage+evt.extraDamage));};}else{evt.target.draw((2-player.countMark('jinengup'))*(evt.baseDamage+evt.extraDamage));};*///移除对方摸牌的部分，2023.8.6
+                                            /*if(!player.hasSkill('guanshi_skill')&&!player.getEquip('huokongld_equip')){if(player.countMark('jinengup')=1){trigger.target.draw((evt.baseDamage+evt.extraDamage));};}else{evt.target.draw((2-player.countMark('jinengup'))*(evt.baseDamage+evt.extraDamage));};*///移除对方摸牌的部分，2023.8.6
                                             trigger.untrigger(); trigger.trigger('shaHit');
                                             trigger._result.bool = false; trigger._result.result = null;
                                         }
@@ -3171,7 +3173,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (result.bool || result.index == 0) {
                                         if (event.triggername == 'shaMiss') {
                                             var evt = _status.event.getTrigger();
-                                            /*if(!player.hasSkill('guanshi_skill')&&!player.getEquip('huokongld')){if(player.countMark('jinengup')=1){trigger.target.draw((evt.baseDamage+evt.extraDamage));};}else{evt.target.draw((2-player.countMark('jinengup'))*(evt.baseDamage+evt.extraDamage));};*///移除对方摸牌的部分，2023.8.6
+                                            /*if(!player.hasSkill('guanshi_skill')&&!player.getEquip('huokongld_equip')){if(player.countMark('jinengup')=1){trigger.target.draw((evt.baseDamage+evt.extraDamage));};}else{evt.target.draw((2-player.countMark('jinengup'))*(evt.baseDamage+evt.extraDamage));};*///移除对方摸牌的部分，2023.8.6
                                             trigger.untrigger(); trigger.trigger('shaHit');
                                             trigger._result.bool = false; trigger._result.result = null;
                                         }
@@ -9684,7 +9686,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     //if (player.storage.pangguanzhe.length) return false;
                                     return true;
                                 },
-                                bannedList: ["pangguanzhe", "zhanliebb", "hangmucv", "zhongxunca", "qingxuncl", "quzhudd", "qianting", "junfu", "daoqu", "fangqu", "zhuangjiafh", "dajiaoduguibi", "huokongld", "fangkong2", "shixiangquanneng"],
+                                bannedList: ["pangguanzhe", "zhanliebb", "hangmucv", "zhongxunca", "qingxuncl", "quzhudd", "qianting", "junfu", "daoqu", "fangqu", "zhuangjiafh", "dajiaoduguibi", "huokongld", "fangkong2", "shixiangquanneng", "tiaozhanzhuangbei"],
                                 content: function () {
                                     "step 0"
                                     if (player.storage.pangguanzhe.length) {
@@ -12157,7 +12159,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qianting_xiji: "袭击", "qianting_xiji_info": "每回合限两次，将♦/♥牌当做顺手牵羊，♣/♠牌当做兵粮寸断使用<br>你使用的锦囊牌可以对距离你2以内的角色使用。",
                             qianting: "潜艇", "qianting_info": "（可强化）准备阶段，你可以弃置一张红桃或黑桃/红桃或黑桃或方片/牌，视为对一个目标使用一张雷杀。",
                             qianting_jiezi: "截辎", "qianting_jiezi_info": "其他角色跳过阶段时，你摸一张牌",
-                            "_yuanhang": "远航", "_yuanhang_info": "受伤时手牌上限+1<br>当你失去手牌后，且手牌数<手牌上限值时，你摸一张牌。使用次数上限0/1/2次，处于自己的回合时+1，每回合回复一次使用次数。<br>当你进入濒死状态时，你摸一张牌，体力上限大于二时需减少一点体力上限，额外摸一张牌；死亡后，你可以按自己的身份，令一名角色摸-/2/1/1（主/忠/反/内）张牌。",
+                            "_yuanhang": "远航", "_yuanhang_info": "受伤时手牌上限+1,挑战模式不屈时手牌上限+1<br>当你失去手牌后，且手牌数<手牌上限值时，你摸一张牌。使用次数上限0/1/2次，处于自己的回合时+1，每回合回复一次使用次数。<br>当你进入濒死状态时，你摸一张牌，体力上限大于二时需减少一点体力上限，额外摸一张牌；死亡后，你可以按自己的身份，令一名角色摸-/2/1/1（主/忠/反/内）张牌。",
                             kaishimopao: "开始摸牌", "kaishimopao_info": "<br>，判定阶段你可以减少一次摸牌阶段的摸牌，然后在回合结束时摸一张牌。",
                             "_jianzaochuan": "建造", "_jianzaochuan_info": "限一次，当你进行了至少一次强化后<br>1.出牌阶段<br>你可以弃置3张不同花色的牌，提升一点血量上限与强化上限。<br>2.当你濒死时，<br>你可以弃置4张不同花色的牌，回复一点体力。<br>（未开启强化，则无需强化即可使用建造。未开启建造，则强化上限仅为1级。）",
                             "_qianghuazhuang": "强化装备",
@@ -12168,8 +12170,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "_hanbing_gai": "寒冰-改",
                             "_hanbing_gai_info": "1.开启“属性伤害效果”的情况下，你对拥有护甲的目标造成雷属性伤害前，+1伤害值。<br>2.在你造成伤害前，若你拥有寒冰剑_技能/造成的伤害为冰属性，你可以防止此伤害并弃置目标2*X张牌，x为伤害值。与伤害效果技能配合时",
                             _yidong: "移动座位", "_yidong_info": "",
-                            tiaozhanzhuanbei: "挑战装备",
-                            "tiaozhanzhuanbei_info": "挑战锁定技，游戏开始时，你将一张【回避】【此舰种的武器】和一张【望远镜】置入你的装备区。你装备区内的武器牌和宝物牌不能被其他角色弃置。",
+                            tiaozhanzhuangbei: "挑战装备",
+                            "tiaozhanzhuangbei_info": "挑战锁定技，游戏开始时，你将一张【回避】【此舰种的武器】和一张【望远镜】置入你的装备区。你装备区内的武器牌和宝物牌不能被其他角色弃置。",
                             danzong: "增强杀",
                             "danzong_info": "每使用六张杀，你便可以在造成无属性伤害附加属性：<br>潜艇、驱逐：获得雷属性的效果，<br>战列、航母：获得雷属性与改进型冰杀的效果。<br>其他舰种时：获得火属性,点燃目标。<br>效果持续到伤害结算完成时（打不穿藤甲的高爆弹与暴击藤甲的决斗）",
                             "paohuozb_skill": "炮火准备1", "paohuozb_skill_info": "装备技能",
@@ -12321,7 +12323,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             pingduzhanhuo: "平度战火", pingduzhanhuo_info: "结束阶段，若你本回合未造成伤害，你摸一张牌；准备阶段，若你自上个结束阶段起未受到伤害，你摸一张牌",
                             mujizhengren: "目击证人", mujizhengren_info: "限定技，出牌阶段，你可以弃置3张手牌，然后令一名角色翻面。",
                             shixiangquanneng: "十项全能", shixiangquanneng_info: "锁定技，你的舰种技能无法升级，每轮开始时，你失去以此法获得的技能，然后从以下技能中选择一项获得：1、防空，2、开幕航空，3、军辅",
-                            pangguanzhe: "旁观者", pangguanzhe_info: "锁定技，你的回合开始时，失去上回合以此法获得的技能，随机获得在场角色武将牌上的一个技能。若该技能带有判定，你可以选择判定结果。(远航，强化，航母，战列，巡洋，驱逐，潜艇，开幕航空，火控雷达，先制鱼雷，十项全能除外;主公技，限定技，使命技，觉醒技除外)",
+                            pangguanzhe: "旁观者", pangguanzhe_info: "锁定技，你的回合开始时，失去上回合以此法获得的技能，随机获得在场角色武将牌上的一个技能。若该技能带有判定，你可以选择判定结果。(远航，强化，航母，战列，巡洋，驱逐，潜艇，开幕航空，火控雷达，先制鱼雷，十项全能，挑战装备除外;主公技，限定技，使命技，觉醒技除外)",
                             hangkongyazhi: "航空压制", "hangkongyazhi_info": "限定技，你可以失去开幕航空，令一名角色失去所有护甲且本轮技能失效。",
                             chuansuohongzha: "穿梭轰炸", "chuansuohongzha_info": "每轮限一次，其他角色使用伤害类牌结算结束后，若你未受伤，你可以获得此牌对应的所有实体牌。每回合限一次，你使用的伤害类牌结算结束后，你可以将其交给一名未受伤角色。",
                             chuansuohongzha_get: "穿梭轰炸", "chuansuohongzha_get_info": "每轮限一次，其他角色使用伤害类牌结算结束后，若你未受伤，你可以获得此牌对应的所有实体牌。",
@@ -13015,7 +13017,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 toself: true,
                             },
                             "qingxunpao3": {
-                                image: 'ext:舰R牌将/image/card//qingxunpao3.png',
+                                image: 'ext:舰R牌将/image/card/qingxunpao3.png',
                                 fullskin: true,
                                 type: "equip",
                                 subtype: "equip1",
@@ -13683,7 +13685,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             };
         }, help: {}, config: {//config就是配置文件，类似于minecraft的模组设置文本。无名将其可视化了....。当你进行了至少一次强化后<br>1.出牌阶段<br>你可以弃置3张不同花色的牌，提升一点血量上限。<br>2.当你濒死时，<br>你可以弃置4张不同花色的牌，回复一点体力。<br>（未开启强化，则无需强化即可使用建造。未开启建造，则强化上限仅为1级。）火杀：令目标回合结束后，受到一点火焰伤害，摸两张牌。</br>冰杀：护甲加1伤；减少对手1点防御距离。</br>雷杀：自动判断是否流失对手体力；减少对手1点手牌上限；。</br>此角色回合结束后移除所有的进水、减速、燃烧。
             jianrjinji: { "name": "禁用舰R联机武将/可自定义角色技能", "intro": "在游戏运行时，扩展通过运行一个技能，将联机武将添加至游戏内，<br>启用此技能，才能禁用联机武将。<br>禁用后，单机武将不会被联机部分覆盖。<br>进入修改武将的界面：点击上方的编辑扩展-武将。", "init": false },
-            _yuanhang: { "name": "远航-用一张牌摸一张牌，濒死可摸牌", "intro": "开启后，所有玩家受伤时手牌上限+1；<br>每轮限1/2/3次，当失去手牌后，且手牌数<手牌上限的一半时，你摸一张牌。<br>当你进入濒死状态时，你可以摸一张牌，体力上限>2时需减少一点体力上限，额外摸一张牌；死亡后，若你为忠臣，你可以令主公摸一张牌。", "init": true },
+            _yuanhang: { "name": "远航-用一张牌摸一张牌，濒死可摸牌", "intro": "开启后，所有玩家受伤时手牌上限+1；挑战模式不屈时手牌上限+1<br>每轮限1/2/3次，当失去手牌后，且手牌数<手牌上限的一半时，你摸一张牌。<br>当你进入濒死状态时，你可以摸一张牌，体力上限>2时需减少一点体力上限，额外摸一张牌；死亡后，若你为忠臣，你可以令主公摸一张牌。", "init": true },
             _jianzaochuan: { "name": "建造-用三张牌提升血量上限，用四张牌回血", "intro": "开启后，若任意玩家进行了至少一次强化：<br>1.出牌阶段，<br>你可以弃置3张不同花色的牌，提升一点血量上限。<br>2.当你濒死时，<br>你可以弃置4张不同花色的牌，回复一点体力。<br>（未开启强化，则无需强化即可使用建造。未开启建造，则强化上限仅为1级。）", "init": true },
             _qianghuazhuang: { "name": "强化-消耗牌增加自身能力", "intro": "开启后，出牌阶段限一次，所有玩家可以弃置二至四张牌或消耗经验，选择一至两个永久效果升级。<br>（如摸牌、攻击距离、手牌上限等）", "init": true },
             _wulidebuff: { "name": "火杀燃烧、雷杀穿甲、寒冰剑对甲加伤", "intro": "开启后，属性伤害会有额外效果。<br>火杀：令目标回合结束后，受到一点火焰伤害，摸两张牌（有护甲则不会触发摸牌）。</br>冰杀/寒冰剑雷杀：护甲加1伤；减少对手1点防御距离。</br>雷杀：有护甲时改为造成对手流失体力；减少对手1点手牌上限；。</br>此角色回合结束后/濒死时移除进水、减速、燃烧。", "init": true },
