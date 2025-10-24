@@ -971,6 +971,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             mist_shanhuhai: ["female", "USN", 4, ["hangmucv", "buxiuzhanshi"], ["des:Nice to meet you~航空母舰珊瑚海~。经历比较丰富，现在担任指导员工作。海战不用说，陆战也很在行~。啊，当然陆战的时候要卸掉舰装，拿枪战斗。"]],
                             "u96": ["female", "KMS", 3, ["qianting", "hailangchuji"], ["des:德国U-96潜艇是一艘VIIC型中型潜艇。在战争期间U-96一共完成了11次战斗巡航，战绩为18万吨，是一艘王牌潜艇，一位德国战地记者随着潜艇出航，拍摄了大量照片，使其广为出名。不过，让U-96彻底出名的是《从海底出击》电影。电影中的主角艇，即以U-96为原型，和电影结尾不同，U-96的艇长并没有因空袭阵亡，而是幸存到战后，还参与并指导了电影拍摄。这部长约5个多小时的电影真实地反应了残酷的潜艇战，是一部载入史册的佳作。"]],
                             lundun: ["female", "RN", 3, ["huokongld", "zhongxunca", "guochuan", "yangwangxingkong"], ["des:伦敦级巡洋舰首舰。该级是肯特级的后续级别，防护薄弱的缺陷也被继承。伦敦号在1939年左右进行了一次彻底的改装。使得伦敦号外观同其余重巡姐妹差别很大，外形更接近爱丁堡级轻巡洋舰。二战中的伦敦号主要执行拦截德军和护航任务。让伦敦号出名的事情并不在二战而是发生在中国：在1949年4月的长江紫石英号事件中，试图支援紫石英号的伦敦号被解放军火炮痛击，三座主炮塔被击毁，舰长重伤，只得撤退。"]],
+                            aisijimoren: ["female", "RN", 3, ["dajiaoduguibi", "quzhudd", "zhengzhansifang", "binghaihuhang"], ["des:　部族级驱逐舰的5号舰，该级以世界各个民族命名。爱斯基摩人号参加了纳尔维克海战，在海战中被德军驱逐舰打掉了舰首。修复之后主要执行护航任务，并在战斗中击沉过德军潜艇，也曾进行过一次接舷跳帮作战。战后于1949年退役。"]],
 
 
                             skilltest: ["male", "OTHER", 9, [], ["forbidai", "des:测试用"]],
@@ -12171,6 +12172,59 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 sub: true,
                                 "_priority": 0,
                             },
+                            zhengzhansifang: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                round: 1,
+                                trigger: {
+                                    target: "useCardToBefore",
+                                },
+                                forced: true,
+                                priority: 15,
+                                check(event, player) {
+                                    return get.effect(event.target, event.card, event.player, player) < 0;
+                                },
+                                filter(event, player) {
+                                    return (get.type(event.card, "trick") == "trick" || get.name(event.card) == "sha" || get.name(event.card) == "sheji9") && event.player != player;
+                                },
+                                content() {
+                                    trigger.cancel();
+                                },
+                                ai: {
+                                    effect: {
+                                        target(card, player, target, current) {
+                                            if ((get.type(card, "trick") == "trick" || get.name(card) == "sha" || get.name(card) == "sheji9") && target != player) return "zeroplayertarget";
+                                        },
+                                    },
+                                },
+                            },
+                            binghaihuhang: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                shaRelated: true,
+                                frequent: true,
+                                trigger: {
+                                    player: "useCardToPlayered",
+                                },
+                                check(event, player) {
+                                    return get.attitude(player, event.target) <= 0;
+                                },
+                                filter(event, player) {
+                                    return event.card.name == "sha" && event.target.countCards("e");//!player.hasEmptySlot(2)
+                                },
+                                logTarget: "target",
+                                preHidden: true,
+                                content(event, trigger, player) {
+                                    trigger.getParent().directHit.add(trigger.target);
+                                },
+                                ai: {
+                                    "directHit_ai": true,
+                                    skillTagFilter(player, tag, arg) {
+                                        if (get.attitude(player, arg.target) > 0 || arg.card.name != "sha" || !ui.cardPile.firstChild) return false;
+                                    },
+                                },
+                                "_priority": 0,
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -12256,6 +12310,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             mist_shanhuhai: "MIST珊瑚海",
                             "u96": "u96",
                             lundun: "伦敦",
+                            aisijimoren: "爱斯基摩人",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -12479,6 +12534,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             buxiuzhanshi: "不朽战士", "buxiuzhanshi_info": "出牌阶段限一次，你可以弃置任意张牌，视为对等量名角色使用决斗。下个回合摸牌阶段，你的摸牌数量+x（x为你本回合以此法对造成的伤害数）",
                             hailangchuji: "海狼出击", "hailangchuji_info": "有潜艇使用雷杀指定其他角色为目标后，你可以摸一张牌。",
                             yangwangxingkong: "仰望星空", "yangwangxingkong_info": "限定技，你可将一张手牌交给一名角色，然后该名角色选择一项：1，弃置所有手牌，2，将血量调整至濒死状态。若如此做，你在摸牌阶段的摸牌数-1。",
+                            yangwangxingkong_draw: "仰望星空", "yangwangxingkong_draw_info": "你在摸牌阶段的摸牌数-1。",
+                            zhengzhansifang: "征战四方", "zhengzhansifang_info": "锁定技，每回合你首次成为其他角色普通锦囊牌或杀的目标时，取消之。",
+                            binghaihuhang: "冰海护航", "binghaihuhang_info": "装备区有牌的角色不能响应你使用的杀。",
 
 
                             jianrbiaozhun: "舰r标准",
