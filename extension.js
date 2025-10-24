@@ -12193,7 +12193,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 ai: {
                                     effect: {
                                         target(card, player, target, current) {
-                                            if ((get.type(card, "trick") == "trick" || get.name(card) == "sha" || get.name(card) == "sheji9") && target != player) return "zeroplayertarget";
+                                            if ((get.type(card, "trick") == "trick" || get.name(card) == "sha" || get.name(card) == "sheji9") && target != player) return "zerotarget";
                                         },
                                     },
                                 },
