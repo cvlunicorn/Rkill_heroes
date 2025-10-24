@@ -26,6 +26,7 @@ try {
 //const { connect } = require("ws");///vscode生成出来的，vscodeAI检测到enable认为没导入自动添加了导入但其实enable只是一个标签。目前使用try-catch包裹起来。
 import { lib, game, ui, get, ai, _status } from '../../noname.js'
 import { checkBegin } from '../../noname/library/assembly/buildin.js';
+import { freezeButExtensible } from '../../noname/util/index.js';
 game.import("extension", function (lib, game, ui, get, ai, _status) {
 
     return {
@@ -968,6 +969,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             mist_dujiaoshou: ["female", "RN", 3, ["junfu", "shuqinzhiyin",], ["des:指挥官大人，您贵安。我是轻型航空母舰独角兽。为守护我们第四舰队那些美丽的花朵，也为了指挥官大人，我会尽心尽力工作。今后还望请多指教。"]],
                             mist_xiawu: ["female", "IJN", 3, ["quzhudd", "dajiaoduguibi", "yixinyiyi"], ["des:我是属于NeoForce第一舰队，识别号码NF001的夏霧。我是个初来乍到的新人，敬请提督指教。"]],
                             mist_shanhuhai: ["female", "USN", 4, ["hangmucv", "buxiuzhanshi"], ["des:Nice to meet you~航空母舰珊瑚海~。经历比较丰富，现在担任指导员工作。海战不用说，陆战也很在行~。啊，当然陆战的时候要卸掉舰装，拿枪战斗。"]],
+                            "u96": ["female", "KMS", 3, ["qianting", "hailangchuji"], ["des:德国U-96潜艇是一艘VIIC型中型潜艇。在战争期间U-96一共完成了11次战斗巡航，战绩为18万吨，是一艘王牌潜艇，一位德国战地记者随着潜艇出航，拍摄了大量照片，使其广为出名。不过，让U-96彻底出名的是《从海底出击》电影。电影中的主角艇，即以U-96为原型，和电影结尾不同，U-96的艇长并没有因空袭阵亡，而是幸存到战后，还参与并指导了电影拍摄。这部长约5个多小时的电影真实地反应了残酷的潜艇战，是一部载入史册的佳作。"]],
 
                             skilltest: ["male", "OTHER", 9, [], ["forbidai", "des:测试用"]],
                         },
@@ -12064,6 +12066,22 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
+                            hailangchuji: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: {
+                                    global: "useCardToPlayered",
+                                },
+                                frequent: true,
+                                filter: function (event, player) {
+                                    return event.player.hasSkill("qianting") && player != event.target && event.card.name == "sha" && event.card.nature == "thunder";
+                                },
+                                prompt: "你可以摸一张牌",
+                                content: function () {
+                                    player.draw(1);
+                                },
+                                "_priority": 0,
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -12147,6 +12165,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             mist_dujiaoshou: "MIST独角兽",
                             mist_xiawu: "MIST夏雾",
                             mist_shanhuhai: "MIST珊瑚海",
+                            "u96": "u96",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -12368,6 +12387,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             shuqinzhiyin: "竖琴之音", "shuqinzhiyin_info": "每轮限一次，其他角色技能结算后，你可以弃置两张牌，重置一名其他角色武将牌上的技能，然后其回复一点体力",
                             yixinyiyi: "一心一意", "yixinyiyi_info": "你可以将一张手牌当作雷杀使用。此杀根据主公已损失体力值:不小于一点，无距离限制，不小于两点，无次数限制，不小于三点，伤害+1。",
                             buxiuzhanshi: "不朽战士", "buxiuzhanshi_info": "出牌阶段限一次，你可以弃置任意张牌，视为对等量名角色使用决斗。下个回合摸牌阶段，你的摸牌数量+x（x为你本回合以此法对造成的伤害数）",
+                            hailangchuji: "海狼出击", "hailangchuji_info": "有潜艇使用雷杀指定其他角色为目标后，你可以摸一张牌。",
 
 
                             jianrbiaozhun: "舰r标准",
