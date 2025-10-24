@@ -11734,9 +11734,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                                 viewAsFilter(player) {
-                                    if (!player.countCards('hes')) return false;
+                                    if (!player.countCards('h')) return false;
                                 },
-                                prompt: "将一张牌当雷杀使用",
+                                prompt: "将一张手牌当雷杀使用",
                                 check(card) { return 4 - get.value(card) },
                                 ai: {
                                     threaten(player, target) {
