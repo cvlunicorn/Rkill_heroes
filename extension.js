@@ -877,7 +877,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lishizhanyi_naerweike: ["shengwang", "z17", "z18", "z21", "z22", "gesakeren", "biaoqiang", "aisijimoren"],
                                 lishizhanyi_matapanjiao: ["kewei", "shengqiaozhi", "luodeni", "boerzanuo", "jialibodi"],
                                 lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "weiershiqinwang", "z1", "z16"],
-                                lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng", "qiuyue", "weilianDbote", "xianghe", "ruihe", "yuhei"],
+                                lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng", "qiuyue", "weilianDbote", "xianghe", "ruihe", "yuhei", "guying"],
                                 lishizhanyi_haixiafujizhan: ["u47", "u81", "u505", "jinqu", "kente", "u96", "lundun"],
                                 weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan", "sp_aisaikesi", "sp_ninghai", "sp_zhongtudao"],
                                 cangqinghuanying: ["mist_dujiaoshou", "mist_xiawu", "mist_shanhuhai"],
@@ -973,6 +973,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             lundun: ["female", "RN", 3, ["huokongld", "zhongxunca", "guochuan", "yangwangxingkong"], ["des:伦敦级巡洋舰首舰。该级是肯特级的后续级别，防护薄弱的缺陷也被继承。伦敦号在1939年左右进行了一次彻底的改装。使得伦敦号外观同其余重巡姐妹差别很大，外形更接近爱丁堡级轻巡洋舰。二战中的伦敦号主要执行拦截德军和护航任务。让伦敦号出名的事情并不在二战而是发生在中国：在1949年4月的长江紫石英号事件中，试图支援紫石英号的伦敦号被解放军火炮痛击，三座主炮塔被击毁，舰长重伤，只得撤退。"]],
                             aisijimoren: ["female", "RN", 3, ["dajiaoduguibi", "quzhudd", "zhengzhansifang", "binghaihuhang"], ["des:部族级驱逐舰的5号舰，该级以世界各个民族命名。爱斯基摩人号参加了纳尔维克海战，在海战中被德军驱逐舰打掉了舰首。修复之后主要执行护航任务，并在战斗中击沉过德军潜艇，也曾进行过一次接舷跳帮作战。战后于1949年退役。"]],
                             sp_zhongtudao: ["female", "USN", '3/4', ["hangmucv", "zhuangjiajiaban", "xiandaihuagaizao"], ["des:中途岛级航母是美国海军在二战中设计的最后一型航母，也是海军第一艘真正意义上摆脱了条约限制的航母（前代埃塞克斯级由于设计时间过短而继承了很多约克城级的特征），在核心思路上大量参考了英国的装甲航母设计，而在舰体设计上则借用了蒙大拿级的设计。中途岛号在1945年3月下水时的排水量为45000吨，是此后10年内全球最大的现役航母；在长达52年的服役史中，她是海军首艘接触斜角甲板概念的航母，先后参与了越南战争（击落了战争中第一架和最后一架敌机）和海湾战争，接受了两次大规模现代化改造，最终于1997年退役，作为博物馆保存至今。"]],
+                            guying: ["female", "IJN", 4, ["huokongld", "zhongxunca", "zhanxianyuanhu"], ["des:该型是日本在八八舰队时期设计的侦查巡洋舰，由于之后海军条约的签署，根据规定古鹰型被划为重巡洋舰。在37年，两艘古鹰型进行了大改装，单装主炮换为新式连装炮，其余武备和设施也进行了更新，外形上和青叶型很相似。古鹰号在战争初期很活跃，参与了威克岛到中途岛的一系列作战。42年古鹰号编入三川的第八舰队，在萨沃岛海战中重创了美军。不过在同年10月的海战中，古鹰号好运不再，被美军击沉。"]],
 
 
                             skilltest: ["male", "OTHER", 9, [], ["forbidai", "des:测试用"]],
@@ -12319,6 +12320,63 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     trigger.effectCount++;
                                 },
                             },
+                            zhanxianyuanhu: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: {
+                                    global: "phaseBefore",
+                                    player: "enterGame",
+                                },
+                                forced: true,
+                                filter: function (event, player) {
+                                    return game.hasPlayer(current => current != player) && (event.name != "phase" || game.phaseNumber == 0);
+                                },
+                                audio: 6,
+                                content: function () {
+                                    "step 0";
+                                    player
+                                        .chooseTarget("请选择【先辅】的目标", lib.translate.zhanxianyuanhu_info, true, function (card, player, target) {
+                                            return target != player && (!player.storage.zhanxianyuanhu2 || !player.storage.zhanxianyuanhu2.includes(target));
+                                        })
+                                        .set("ai", function (target) {
+                                            var att = get.attitude(_status.event.player, target);
+                                            if (att > 0) return att + 1;
+                                            if (att == 0) return Math.random();
+                                            return att;
+                                        }).animate = false;
+                                    "step 1";
+                                    if (result.bool) {
+                                        var target = result.targets[0];
+                                        if (!player.storage.zhanxianyuanhu2) player.storage.zhanxianyuanhu2 = [];
+                                        player.storage.zhanxianyuanhu2.push(target);
+                                        player.addSkill("zhanxianyuanhu2");
+                                    }
+                                },
+                                "_priority": 0,
+                            },
+                            zhanxianyuanhu2: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: {
+                                    global: ["damageBegin4"],
+                                },
+                                forced: true,
+                                filter: function (event, player) {
+                                    if (event.player.isDead() || !player.storage.zhanxianyuanhu2 || !player.storage.zhanxianyuanhu2.includes(event.player) || event.num <= 0) return false;
+                                    if (event.name == "damage") return true;
+                                },
+                                logTarget: "player",
+                                content: function () {
+                                    "step 0";
+                                    event.num = trigger.num;
+                                    trigger.cancel();
+                                    "step 1";
+                                    player.damage(event.num - 1);
+                                },
+                                ai: {
+                                    threaten: 1.05,
+                                },
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -12406,6 +12464,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             lundun: "伦敦",
                             aisijimoren: "爱斯基摩人",
                             sp_zhongtudao: "SP中途岛",
+                            guying: "古鹰",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -12637,6 +12696,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhuangjiajiaban: "装甲甲板", "zhuangjiajiaban_info": "当你受到伤害时，你可以进行一次判定，若判定结果为红色则防止此伤害。",
                             xiandaihuagaizao: "现代化改造", "xiandaihuagaizao_info": "结束阶段，你可以弃x张牌并回复一点体力，若你以此法回复体力后体力值不小于5，则你翻面并减少一点体力上限，然后获得*先进空管（x为游戏轮数且至多为3）",
                             xianjinkongguan: "现金空管", "xianjinkongguan_info": "当你使用杀或伤害类锦囊牌时，可失去一点体力并重复执行一次此牌。",
+                            zhanxianyuanhu: "战线援护", "zhanxianyuanhu_info": "游戏开始时，你选择一名角色，其受到伤害时防止之，改为你受到此伤害值-1的伤害。",
 
 
                             jianrbiaozhun: "舰r标准",
