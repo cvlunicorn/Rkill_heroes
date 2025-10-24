@@ -878,9 +878,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lishizhanyi_matapanjiao: ["kewei", "shengqiaozhi", "luodeni", "boerzanuo", "jialibodi"],
                                 lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "weiershiqinwang", "z1", "z16"],
                                 lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng", "qiuyue", "weilianDbote", "xianghe", "ruihe", "yuhei"],
-                                lishizhanyi_haixiafujizhan: ["u47", "u81", "u505", "jinqu", "kente"],
+                                lishizhanyi_haixiafujizhan: ["u47", "u81", "u505", "jinqu", "kente", "u96", "lundun"],
                                 weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan", "sp_aisaikesi", "sp_ninghai"],
-                                cangqinghuanying: ["mist_dujiaoshou", "mist_xiawu"],
+                                cangqinghuanying: ["mist_dujiaoshou", "mist_xiawu", "mist_shanhuhai"],
                             },
 
                         },
@@ -970,6 +970,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             mist_xiawu: ["female", "IJN", 3, ["quzhudd", "dajiaoduguibi", "yixinyiyi"], ["des:我是属于NeoForce第一舰队，识别号码NF001的夏霧。我是个初来乍到的新人，敬请提督指教。"]],
                             mist_shanhuhai: ["female", "USN", 4, ["hangmucv", "buxiuzhanshi"], ["des:Nice to meet you~航空母舰珊瑚海~。经历比较丰富，现在担任指导员工作。海战不用说，陆战也很在行~。啊，当然陆战的时候要卸掉舰装，拿枪战斗。"]],
                             "u96": ["female", "KMS", 3, ["qianting", "hailangchuji"], ["des:德国U-96潜艇是一艘VIIC型中型潜艇。在战争期间U-96一共完成了11次战斗巡航，战绩为18万吨，是一艘王牌潜艇，一位德国战地记者随着潜艇出航，拍摄了大量照片，使其广为出名。不过，让U-96彻底出名的是《从海底出击》电影。电影中的主角艇，即以U-96为原型，和电影结尾不同，U-96的艇长并没有因空袭阵亡，而是幸存到战后，还参与并指导了电影拍摄。这部长约5个多小时的电影真实地反应了残酷的潜艇战，是一部载入史册的佳作。"]],
+                            lundun: ["female", "RN", 3, ["huokongld", "zhongxunca", "guochuan", "yangwangxingkong"], ["des:伦敦级巡洋舰首舰。该级是肯特级的后续级别，防护薄弱的缺陷也被继承。伦敦号在1939年左右进行了一次彻底的改装。使得伦敦号外观同其余重巡姐妹差别很大，外形更接近爱丁堡级轻巡洋舰。二战中的伦敦号主要执行拦截德军和护航任务。让伦敦号出名的事情并不在二战而是发生在中国：在1949年4月的长江紫石英号事件中，试图支援紫石英号的伦敦号被解放军火炮痛击，三座主炮塔被击毁，舰长重伤，只得撤退。"]],
+
 
                             skilltest: ["male", "OTHER", 9, [], ["forbidai", "des:测试用"]],
                         },
@@ -12082,6 +12084,74 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
                             },
+                            yangwangxingkong: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                unique: true,
+                                enable: "phaseUse",
+                                filterCard: true,
+                                lose: false,
+                                discard: false,
+                                skillAnimation: true,
+                                animationColor: "metal",
+                                mark: true,
+                                limited: true,
+                                filter: function (event, player) {
+                                    if (player.storage.yangwangxingkong) return false;
+                                    return player.countCards("h") > 0;
+                                },
+                                filterTarget: function (card, player, target) {
+                                    return true;
+                                },
+                                check: function (card) {
+                                    return 9 - get.value(card);
+                                },
+                                content: function () {
+                                    "step 0"
+                                    player.awakenSkill('yangwangxingkong');
+                                    player.give(cards[0], target);
+                                    "step 1"
+                                    target.chooseControl("yangwangxingkong_card", "yangwangxingkong_hp").ai = function (event, player) {
+                                        var cards = player.getCards("h");
+                                        if (cards.length == 1) return 0;
+                                        if (cards.length >= 2 && player.hp == 1) {
+                                            for (var i = 0; i < cards.length; i++) {
+                                                if (get.tag(cards[i], "save")) return 1;
+                                            }
+                                        }
+                                        var countValue = 0;
+                                        var saveMark = 0;
+                                        for (var i = 0; i < cards.length; i++) {
+                                            countValue += get.value(cards[i]);
+                                            if (get.tag(cards[i], "save")) { saveMark = 1; }
+                                            if (countValue >= 8 * player.hp && saveMark) return 1;
+                                        }
+                                        return 0;
+                                    };
+                                    "step 2";
+                                    if (result.control == "yangwangxingkong_card") {
+                                        target.chooseToDiscard(true, target.countCards("h"));
+                                    } else {
+                                        target.loseHp(target.hp);
+                                        event.finish();
+                                    }
+
+                                },
+                                ai: {
+                                    order: 9,
+                                    result: {
+                                        target: function (player, target) {
+                                            return -target.countCards("he") - (player.countCards("h", "du") ? 1 : 0);
+                                        },
+                                    },
+                                    threaten: 2,
+                                },
+                                intro: {
+                                    content: "limited",
+                                },
+                                init: (player, skill) => (player.storage[skill] = false),
+                                "_priority": 0,
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -12166,6 +12236,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             mist_xiawu: "MIST夏雾",
                             mist_shanhuhai: "MIST珊瑚海",
                             "u96": "u96",
+                            lundun: "伦敦",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -12388,6 +12459,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             yixinyiyi: "一心一意", "yixinyiyi_info": "你可以将一张手牌当作雷杀使用。此杀根据主公已损失体力值:不小于一点，无距离限制，不小于两点，无次数限制，不小于三点，伤害+1。",
                             buxiuzhanshi: "不朽战士", "buxiuzhanshi_info": "出牌阶段限一次，你可以弃置任意张牌，视为对等量名角色使用决斗。下个回合摸牌阶段，你的摸牌数量+x（x为你本回合以此法对造成的伤害数）",
                             hailangchuji: "海狼出击", "hailangchuji_info": "有潜艇使用雷杀指定其他角色为目标后，你可以摸一张牌。",
+                            yangwangxingkong: "仰望星空", "yangwangxingkong_info": "限定技，你可将一张手牌交给一名角色，然后该名角色选择一项：1，弃置所有手牌，2，将血量调整至濒死状态。若如此做，你在摸牌阶段的摸牌数-1。",
 
 
                             jianrbiaozhun: "舰r标准",
