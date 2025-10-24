@@ -12535,6 +12535,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             hailangchuji: "海狼出击", "hailangchuji_info": "有潜艇使用雷杀指定其他角色为目标后，你可以摸一张牌。",
                             yangwangxingkong: "仰望星空", "yangwangxingkong_info": "限定技，你可将一张手牌交给一名角色，然后该名角色选择一项：1，弃置所有手牌，2，将血量调整至濒死状态。若如此做，你在摸牌阶段的摸牌数-1。",
                             yangwangxingkong_draw: "仰望星空", "yangwangxingkong_draw_info": "你在摸牌阶段的摸牌数-1。",
+                            yangwangxingkong_card: "弃置所有手牌",
+                            yangwangxingkong_hp: "失去所有体力",
                             zhengzhansifang: "征战四方", "zhengzhansifang_info": "锁定技，每回合你首次成为其他角色普通锦囊牌或杀的目标时，取消之。",
                             binghaihuhang: "冰海护航", "binghaihuhang_info": "装备区有牌的角色不能响应你使用的杀。",
 
