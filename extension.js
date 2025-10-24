@@ -12110,6 +12110,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     "step 0"
                                     player.awakenSkill('yangwangxingkong');
                                     player.give(cards[0], target);
+                                    player.addSkill("yangwangxingkong_draw");
                                     "step 1"
                                     target.chooseControl("yangwangxingkong_card", "yangwangxingkong_hp").ai = function (event, player) {
                                         var cards = player.getCards("h");
@@ -12150,6 +12151,24 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     content: "limited",
                                 },
                                 init: (player, skill) => (player.storage[skill] = false),
+                                "_priority": 0,
+                            },
+                            yangwangxingkong_draw: {
+                                trigger: {
+                                    player: "phaseDrawBegin2",
+                                },
+                                direct: true,
+                                charlotte: true,
+                                filter(event, player) {
+                                    return !event.numFixed;
+                                },
+                                async content(event, trigger, player) {
+                                    trigger.num -= 1;
+                                },
+                                ai: {
+                                    threaten: 1.3,
+                                },
+                                sub: true,
                                 "_priority": 0,
                             },
                             //在这里添加新技能。
