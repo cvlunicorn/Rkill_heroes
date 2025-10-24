@@ -874,12 +874,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         characterSort: {
                             jianrjinji: {
                                 jianrbiaozhun: ["liekexingdun", "qixichicheng", "wufenzhongchicheng", "qiye", "bisimai", "misuli", "weineituo", "lisailiu", "1913", "changmen", "kunxi", "ougengqi", "qingye", "beianpudun", "jiujinshan", "jiujinshan", "yixian", "tianlangxing", "dadianrendian", "yatelanda", "z31", "xuefeng", "kangfusi", "47project", "guzhuyizhichuixue", "shuileizhanduichuixue", "mingsike", "yinghuochong", "u1405", "baiyanjuren", "changchun"],
-                                lishizhanyi_naerweike: ["shengwang", "z17", "z18", "z21", "z22", "gesakeren", "biaoqiang"],
+                                lishizhanyi_naerweike: ["shengwang", "z17", "z18", "z21", "z22", "gesakeren", "biaoqiang", "aisijimoren"],
                                 lishizhanyi_matapanjiao: ["kewei", "shengqiaozhi", "luodeni", "boerzanuo", "jialibodi"],
                                 lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "weiershiqinwang", "z1", "z16"],
                                 lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng", "qiuyue", "weilianDbote", "xianghe", "ruihe", "yuhei"],
                                 lishizhanyi_haixiafujizhan: ["u47", "u81", "u505", "jinqu", "kente", "u96", "lundun"],
-                                weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan", "sp_aisaikesi", "sp_ninghai"],
+                                weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan", "sp_aisaikesi", "sp_ninghai", "sp_zhongtudao"],
                                 cangqinghuanying: ["mist_dujiaoshou", "mist_xiawu", "mist_shanhuhai"],
                             },
 
@@ -971,7 +971,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             mist_shanhuhai: ["female", "USN", 4, ["hangmucv", "buxiuzhanshi"], ["des:Nice to meet you~航空母舰珊瑚海~。经历比较丰富，现在担任指导员工作。海战不用说，陆战也很在行~。啊，当然陆战的时候要卸掉舰装，拿枪战斗。"]],
                             "u96": ["female", "KMS", 3, ["qianting", "hailangchuji"], ["des:德国U-96潜艇是一艘VIIC型中型潜艇。在战争期间U-96一共完成了11次战斗巡航，战绩为18万吨，是一艘王牌潜艇，一位德国战地记者随着潜艇出航，拍摄了大量照片，使其广为出名。不过，让U-96彻底出名的是《从海底出击》电影。电影中的主角艇，即以U-96为原型，和电影结尾不同，U-96的艇长并没有因空袭阵亡，而是幸存到战后，还参与并指导了电影拍摄。这部长约5个多小时的电影真实地反应了残酷的潜艇战，是一部载入史册的佳作。"]],
                             lundun: ["female", "RN", 3, ["huokongld", "zhongxunca", "guochuan", "yangwangxingkong"], ["des:伦敦级巡洋舰首舰。该级是肯特级的后续级别，防护薄弱的缺陷也被继承。伦敦号在1939年左右进行了一次彻底的改装。使得伦敦号外观同其余重巡姐妹差别很大，外形更接近爱丁堡级轻巡洋舰。二战中的伦敦号主要执行拦截德军和护航任务。让伦敦号出名的事情并不在二战而是发生在中国：在1949年4月的长江紫石英号事件中，试图支援紫石英号的伦敦号被解放军火炮痛击，三座主炮塔被击毁，舰长重伤，只得撤退。"]],
-                            aisijimoren: ["female", "RN", 3, ["dajiaoduguibi", "quzhudd", "zhengzhansifang", "binghaihuhang"], ["des:　部族级驱逐舰的5号舰，该级以世界各个民族命名。爱斯基摩人号参加了纳尔维克海战，在海战中被德军驱逐舰打掉了舰首。修复之后主要执行护航任务，并在战斗中击沉过德军潜艇，也曾进行过一次接舷跳帮作战。战后于1949年退役。"]],
+                            aisijimoren: ["female", "RN", 3, ["dajiaoduguibi", "quzhudd", "zhengzhansifang", "binghaihuhang"], ["des:部族级驱逐舰的5号舰，该级以世界各个民族命名。爱斯基摩人号参加了纳尔维克海战，在海战中被德军驱逐舰打掉了舰首。修复之后主要执行护航任务，并在战斗中击沉过德军潜艇，也曾进行过一次接舷跳帮作战。战后于1949年退役。"]],
+                            sp_zhongtudao: ["female", "USN", '3/4', ["hangmucv", "zhuangjiajiaban", "xiandaihuagaizao"], ["des:中途岛级航母是美国海军在二战中设计的最后一型航母，也是海军第一艘真正意义上摆脱了条约限制的航母（前代埃塞克斯级由于设计时间过短而继承了很多约克城级的特征），在核心思路上大量参考了英国的装甲航母设计，而在舰体设计上则借用了蒙大拿级的设计。中途岛号在1945年3月下水时的排水量为45000吨，是此后10年内全球最大的现役航母；在长达52年的服役史中，她是海军首艘接触斜角甲板概念的航母，先后参与了越南战争（击落了战争中第一架和最后一架敌机）和海湾战争，接受了两次大规模现代化改造，最终于1997年退役，作为博物馆保存至今。"]],
 
 
                             skilltest: ["male", "OTHER", 9, [], ["forbidai", "des:测试用"]],
@@ -12225,6 +12226,99 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
                             },
+                            zhuangjiajiaban: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: {
+                                    player: ["damageBegin4"],
+                                },
+                                filter(event, player, name) {
+                                    return event.num > 0;
+                                },
+                                check: function (event, player) {
+                                    return true;
+                                },
+                                content: function () {
+                                    "step 0"
+                                    player.judge(function (result) {
+                                        return get.color(result) == "red" ? 2 : -2;
+                                    });
+                                    "step 1"
+                                    if (result.bool == true)
+                                        trigger.cancel();
+                                },
+                                ai: {
+                                    effect: {
+                                        target: function (card, player, target, current) {
+                                            if (get.tag(card, 'damage') && get.attitude(player, target) < 0) {
+                                                return 0.3;
+                                            }
+                                        },
+                                    },
+                                },
+                                "_priority": 0,
+                            },
+                            xiandaihuagaizao: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: {
+                                    player: ["phaseJieshuBegin"],
+                                },
+                                filter(event, player, name) {
+                                    return player.isDamaged() && player.countCards("hes") >= Math.min(game.roundNumber, 3);
+                                },
+                                direct: true,
+                                content: function () {
+                                    "step 0"
+                                    player
+                                        .chooseToDiscard(get.prompt2("xiandaihuagaizao"), 3, "hes")
+                                        .set("ai", card => {
+                                            if (ui.selected.cards.length == 2) return 10 - get.value(card);
+                                            if (_status.event.effect > 0) {
+                                                return 6 - get.value(card);
+                                            }
+                                            return 0;
+                                        })
+                                        .set("effect", get.effect(player, { name: "tao" }, player, player))
+                                        .set("logSkill", ["xiandaihuagaizao", player]);
+                                    "step 1"
+                                    if (result.bool == true) {
+                                        player.recover(1);
+                                    } else {
+                                        event.finish();
+                                    }
+                                    "step 2"
+                                    if (player.hp >= 5 && !player.hasSkill("xianjinkongguan")) {
+                                        player.loseMaxHp();
+                                        player.turnOver();
+                                        player.addSkill("xianjinkongguan");
+                                    }
+                                },
+                            },
+                            xianjinkongguan: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                intro: {
+                                    content: function (storage, player, skill) {
+                                        return '出牌阶段你使用杀或伤害类锦囊牌时，你可以失去一点体力令此牌额外结算一次。';
+                                    }
+                                },
+                                trigger: {
+                                    player: "useCard",
+                                },
+                                filter: function (event, player) {
+                                    var evtx = event.getParent('phaseUse');
+                                    if (!evtx || evtx.player != player) return false;
+                                    return (_status.currentPhase == player && (get.type(event.card) == 'trick' || get.name(event.card) == "sha") && get.tag(event.card, 'damage') && event.getParent('phaseUse') == evtx);
+                                },
+                                check(event, player) {
+                                    return !get.tag(event.card, 'norepeat') && get.value(event.cards) + player.hp * 2 - 14 > 0;
+                                },
+                                content: function () {
+                                    player.loseHp();
+                                    trigger.effectCount++;
+                                },
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -12311,6 +12405,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "u96": "u96",
                             lundun: "伦敦",
                             aisijimoren: "爱斯基摩人",
+                            sp_zhongtudao: "SP中途岛",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -12539,6 +12634,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             yangwangxingkong_hp: "失去所有体力",
                             zhengzhansifang: "征战四方", "zhengzhansifang_info": "锁定技，每回合你首次成为其他角色普通锦囊牌或杀的目标时，取消之。",
                             binghaihuhang: "冰海护航", "binghaihuhang_info": "装备区有牌的角色不能响应你使用的杀。",
+                            zhuangjiajiaban: "装甲甲板", "zhuangjiajiaban_info": "当你受到伤害时，你可以进行一次判定，若判定结果为红色则防止此伤害。",
+                            xiandaihuagaizao: "现代化改造", "xiandaihuagaizao_info": "结束阶段，你可以弃x张牌并回复一点体力，若你以此法回复体力后体力值不小于5，则你翻面并减少一点体力上限，然后获得*先进空管（x为游戏轮数且至多为3）",
+                            xianjinkongguan: "现金空管", "xianjinkongguan_info": "当你使用杀或伤害类锦囊牌时，可失去一点体力并重复执行一次此牌。",
 
 
                             jianrbiaozhun: "舰r标准",
