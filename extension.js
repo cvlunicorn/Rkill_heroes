@@ -9977,6 +9977,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 init: (player, skill) => (player.storage[skill] = false),
                                 "_priority": 0,
+                                ai: {
+                                    threaten: 0.3,
+                                },
                             },
                             saqijian: {
                                 nobracket: true,
