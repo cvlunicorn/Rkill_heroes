@@ -6169,13 +6169,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             player.addTempSkill('jueshengzhibing_count');
                                             player.addMark('jueshengzhibing_count', 1, false);
 
-                                            if (player.countMark('jueshengzhibing_count') >= 2) {
+                                            /* if (player.countMark('jueshengzhibing_count') >= 2) {
                                                 var evt = _status.event.getParent('phaseUse');
                                                 if (evt && evt.name == 'phaseUse') {
                                                     evt.skipped = true;
                                                     event.finish();
                                                 }
-                                            }
+                                            } */
                                         },
                                         sub: true,
                                         "_priority": 0,
@@ -6193,13 +6193,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             player.addTempSkill('jueshengzhibing_count');
                                             player.addMark('jueshengzhibing_count', 1, false);
 
-                                            if (player.countMark('jueshengzhibing_count') >= 2) {
+                                            /* if (player.countMark('jueshengzhibing_count') >= 2) {
                                                 var evt = _status.event.getParent('phaseUse');
                                                 if (evt && evt.name == 'phaseUse') {
                                                     evt.skipped = true;
                                                     event.finish();
                                                 }
-                                            }
+                                            } */
                                         },
                                         sub: true,
                                         "_priority": 0,
@@ -12633,7 +12633,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             changge: "长歌", "changge_info": "锁定技，你使用杀即将造成的伤害≥2时，或你的体力值≤2时，你的杀无视防具。",
                             xiongjiaqibin: "胸甲骑兵", "xiongjiaqibin_info": "锁定技，你计算与座次比你靠后的角色距离-1。",
                             yishisheji: "意式设计", "yishisheji_info": "每轮限一次，你首次成为其他角色普通锦囊牌或杀的目标时，取消之。你使用杀指定唯一目标时可以进行判定，若判定结果不为红桃，此杀基础伤害+1，否则此杀无效。",//每轮限一次，你可以免疫一次牌造成的伤害。
-                            jueshengzhibing: "决胜之兵", "jueshengzhibing_info": "你使用杀指定有护甲的目标时，你可以弃置其一张牌；你使用锦囊牌时，你可以摸一张牌。若你以此法摸或弃置了总计两张牌，你结束出牌阶段，反之，回合结束时你获得[智愚]直到下回合开始。",
+                            jueshengzhibing: "决胜之兵", "jueshengzhibing_info": "你使用杀指定有护甲的目标时，你可以弃置其一张牌；你使用锦囊牌时，你可以摸一张牌。若你以此法摸或弃置了总计两张牌，此技能本回合失效，反之，回合结束时你获得[智愚]直到下回合开始。",
                             zhanfu: "战斧", "zhanfu_info": "你手牌数为场上最多时，你使用杀无视距离",
                             xinqidian: "新起点", "xinqidian_info": "出牌阶段限一次，你可以选择至多3名角色，你与这些角色各展示一张牌:若展示的牌花色均不相同，每人摸1张牌;否则，参与展示牌的角色计算与其他角色距离-1直至其的下个回合结束。",
                             jilizhixin: "激励之心", 'jilizhixin_info': "若你的宝物栏为空，你视为装备着'侦察机'。你可以弃一张牌并跳过出牌阶段，令一名角色获得一个额外回合。",
