@@ -11612,7 +11612,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 ai: {
                                     effect: {
                                         target: function (card, player, target) {
-                                            if (target.hasFriend()) {
+                                            if (target.hasFriend() && target.maxHp > 1&&player.maxHp > 1) {
                                                 if ((get.tag(card, "damage") == 1 || get.tag(card, "loseHp")) && target.hp == target.maxHp) return [0, 1];
                                             }
                                         },
@@ -11620,7 +11620,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     threaten: function (player, target) {
                                         if (target.maxHp == 1) return 4;
                                         if (target.maxHp == 2) return 2;
-                                        return 1;
+                                        return 0.8;
                                     },
                                 },
                             },
