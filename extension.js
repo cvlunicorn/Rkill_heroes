@@ -12307,7 +12307,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 content: function () {
                                     "step 0"
                                     player
-                                        .chooseToDiscard(get.prompt2("xiandaihuagaizao"), 3, "hes")
+                                        .chooseToDiscard(get.prompt2("xiandaihuagaizao"), Math.min(game.roundNumber, 3), "hes")
                                         .set("ai", card => {
                                             if (ui.selected.cards.length == 2) return 10 - get.value(card);
                                             if (_status.event.effect > 0) {
@@ -12729,8 +12729,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhengzhansifang: "征战四方", "zhengzhansifang_info": "锁定技，每回合你首次成为其他角色普通锦囊牌或杀的目标时，取消之。",
                             binghaihuhang: "冰海护航", "binghaihuhang_info": "装备区有牌的角色不能响应你使用的杀。",
                             zhuangjiajiaban: "装甲甲板", "zhuangjiajiaban_info": "当你受到伤害时，你可以进行一次判定，若判定结果为红色则防止此伤害。",
-                            xiandaihuagaizao: "现代化改造", "xiandaihuagaizao_info": "结束阶段，你可以弃x张牌并回复一点体力，若你以此法回复体力后体力值不小于5，则你翻面并减少一点体力上限，然后获得*先进空管（x为游戏轮数且至多为3）",
-                            xianjinkongguan: "现金空管", "xianjinkongguan_info": "当你使用杀或伤害类锦囊牌时，可失去一点体力并重复执行一次此牌。",
+                            xiandaihuagaizao: "现代化改造", "xiandaihuagaizao_info": "结束阶段，你可以弃x张牌并回复一点体力，若你以此法回复体力后体力值不小于5，则你翻面并减少一点体力上限，然后获得*先进空管（x为游戏轮数且至多为3）（先进空管当你使用杀或伤害类锦囊牌时，可失去一点体力并重复执行一次此牌。）",
+                            xianjinkongguan: "先进空管", "xianjinkongguan_info": "当你使用杀或伤害类锦囊牌时，可失去一点体力并重复执行一次此牌。",
                             zhanxianyuanhu: "战线援护", "zhanxianyuanhu_info": "游戏开始时，你选择一名角色，其受到伤害时防止之，改为你受到此伤害值-1的伤害。",
 
 
