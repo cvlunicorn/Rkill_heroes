@@ -10834,25 +10834,48 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 enable: "phaseUse",
                                 usable: 1,
                                 filter: function (event, player) {
-                                    return player.countCards("h") > 0 && game.hasPlayer(current => lib.skill.spshangyi.filterTarget(null, player, current));
+                                    return player.countCards("h") > 0;
                                 },
                                 filterTarget: function (card, player, target) {
                                     return target != player && target.countCards("h") > 0;
                                 },
                                 content: function () {
-                                    player.viewHandcards(target);
-                                    var handcards1 = player.getCards("h");
-                                    var handcards2 = target.getCards("h");
-                                    var list1 = [], list2 = [];
-                                    for (var i of handcards1) {
-                                        list1.add(get.type2(i, player));
-                                        if (list1.length >= 3) break;
+                                    "step 0"
+                                    event.target = target;
+                                    var list = [];
+                                    var dialog = ["舰队训练：与" + get.translation(target) + "交换一种花色的所有手牌"];
+                                    for (var suit of lib.suit.concat("none")) {
+                                        if (target.countCards("h", { suit: suit })) {
+                                            dialog.push('<div class="text center">' + get.translation(suit + "2") + "牌</div>");
+                                            dialog.push(target.getCards("h", { suit: suit }));
+                                            if (player.countCards("h", { suit: suit })) {
+                                                list.push(suit);
+                                            }
+                                        }
                                     }
-                                    for (var i of handcards2) {
-                                        list2.add(get.type2(i, player));
-                                        if (list2.length >= 3) break;
+                                    if (list.length) {
+                                        player
+                                            .chooseControl(list)
+                                            .set("dialog", dialog)
+                                            .set("ai", () => {
+                                                return _status.event.control;
+                                            })
+                                            .set(
+                                                "control",
+                                                (() => {
+                                                    var getv = cards => cards.map(i => get.value(i)).reduce((p, c) => p + c, 0);
+                                                    return list.sort((a, b) => {
+                                                        return (getv(target.getCards("h", { suit: b })) - getv(player.getCards("h", { suit: b }))) - (getv(target.getCards("h", { suit: a })) - getv(player.getCards("h", { suit: a })));
+                                                    })[0];
+                                                })()
+                                            );
                                     }
-                                    if (list1.length != list2.length) { player.draw(2); }
+                                    "step 1"
+                                    event.cards2 = target.getCards("h", { suit: result.control });
+                                    event.cards1 = player.getCards("h", { suit: result.control });
+                                    game.log(get.translation(target) + "该花色的牌" + get.translation(event.cards2));
+                                    game.log(get.translation(player) + "该花色的牌" + get.translation(event.cards1));
+                                    player.swapHandcards(target, event.cards1, event.cards2);
                                 },
                                 ai: {
                                     order: 6,
@@ -10860,7 +10883,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player: 1,
                                         target: function (player, target) {
                                             if (target.hasSkillTag("noh")) return 0;
-                                            return -0.5;
+                                            return -0.2 * target.countCards("h");
                                         },
                                     },
                                 },
@@ -11612,7 +11635,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 ai: {
                                     effect: {
                                         target: function (card, player, target) {
-                                            if (target.hasFriend() && target.maxHp > 1&&player.maxHp > 1) {
+                                            if (target.hasFriend() && target.maxHp > 1 && player.maxHp > 1) {
                                                 if ((get.tag(card, "damage") == 1 || get.tag(card, "loseHp")) && target.hp == target.maxHp) return [0, 1];
                                             }
                                         },
@@ -12729,7 +12752,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             tebiekongxi: "特别空袭", "tebiekongxi_info": "转换技，阳:你的回合外；阴:你的回合内，当你因使用打出或弃置而一次性失去两张或更多牌时，你可以将其中一张牌置于武将牌上，称为“战”(至多三张)。你可以将“战”当作无懈可击使用或如手牌般使用打出。",
                             beijixingweishe: "北极星威慑", "beijixingweishe_info": "你使用杀对其他角色造成伤害后，目标不能使用或打出杀直到其回合结束。",
                             beijixingweishe_effect: "北极星威慑效果", "beijixingweishe_info": "不能使用或打出杀直到回合结束。",
-                            jianduixunlian: "舰队训练", "jianduixunlian_info": "出牌阶段限一次，你可以观看一名角色的手牌，若你与其手牌包含的类型数不同则你摸两张牌",
+                            jianduixunlian: "舰队训练", "jianduixunlian_info": "出牌阶段限一次，你可以观看一名角色的手牌，然后交换一种花色的所有牌。",
                             aizhi: "爱知", "aizhi_info": "出牌阶段限一次，你可以观看并弃置你攻击范围外玩家的一张手牌，若为锦囊牌此技能视为未发动过。然后你可以弃置一张牌，视为使用之。",
                             longgu: "龙崮", "longgu_info": "你存活时，与你同势力的角色和主公准备阶段时，可以跳过摸牌阶段并选择一项：不能成为基本牌/普通锦囊牌和延时锦囊牌的目标，直至其下一次使用基本牌/普通锦囊牌和延时锦囊牌。",
                             longgu_skill: "龙崮", "longgu_skill_info": "准备阶段时，你可以跳过摸牌阶段并选择一项：不能成为基本牌/普通锦囊牌和延时锦囊牌的目标，直至其下一次使用基本牌/普通锦囊牌和延时锦囊牌。",
