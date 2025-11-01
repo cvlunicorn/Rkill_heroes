@@ -945,7 +945,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             rangbaer: ["female", "MN", 4, ["zhanliebb", "zhuangjiafh", "pangguanzhe"], ["des:让巴尔号战列舰是黎塞留级2号舰。在陆地战场失利时，黎塞留接近完工并撤退到海外，而让巴尔仅完成了一座炮塔，且具备航行能力，撤退到了达喀尔。在停泊期间，她还受到了马萨诸塞炮击和突击者的轰炸。两舰在后来都加入盟军作战，但由于让巴尔完工程度不高，并未参加战斗。在战争胜利后，考虑到战列舰巨大的象征意义，让巴尔以战列舰状态建造完工。她的电子设备和防空能力比黎塞留更强，船体也修改了设计，有更好的水下防护系统。在运河冲突中，让巴尔也曾开火支援。"]],
                             dafeng: ["female", "IJN", 4, ["hangmucv", "chuansuohongzha", "hangkongyazhi"], ["des:　大凤号是日本设计建造的装甲航空母舰。与其它日本海军航空母舰不同的是，大凤号预备在舰队中承担起支援其他航母作战的功能，因此大凤号将船舰的防护性摆在首位，重点增强装甲。竣工后被编入第三舰队第一航空战队，担任旗舰参加了马里亚纳海战。6月19日，大凤号在飞机起飞作业时，被美国潜艇大青花鱼号发射鱼雷并命中其右舷，最终因损管不当而沉没。"]],
                             dahuangfeng: ["female", "USN", 4, ["hangmucv", "yuanyangpoxi"], ["des:　　大黄蜂号是约克城级航母3号舰。她服役后第一项作战任务就是搭载B25轰炸机轰炸东京。在4月18日，杜立特带领的B25机群从大黄蜂号上起飞，完成了轰炸任务并在中国迫降。5月中旬，大黄蜂号在内的全部约克级航母作为主力参加了中途岛海战并击溃了日本机动部队，可以说正是她们三位扭转了太平洋的局势。在42年10月的圣克鲁斯海战中，大黄蜂号击伤了翔鹤号和筑摩号，但是自身也被重创，之后被驱逐舰击沉。"]],
-                            biaoqiang: ["female", "RN", 14, ["dajiaoduguibi", "quzhudd", "juejingfengsheng"], ["des:　标枪级驱逐舰首舰。英国于部族级之后建造的驱逐舰，其设计也成为战时应急驱逐舰的范本。二战中标枪号参加了纳尔维克海战，战斗中标枪号被德国驱逐舰击伤了船首。修复之后主要在地中海作战，并于1949年退役。"]],
+                            biaoqiang: ["female", "RN", 1, ["dajiaoduguibi", "quzhudd", "juejingfengsheng"], ["des:　标枪级驱逐舰首舰。英国于部族级之后建造的驱逐舰，其设计也成为战时应急驱逐舰的范本。二战中标枪号参加了纳尔维克海战，战斗中标枪号被德国驱逐舰击伤了船首。修复之后主要在地中海作战，并于1949年退役。"]],
                             yuekecheng: ["female", "USN", 4, ["hangmucv", "saqijian", "fangkong"], ["des:　　约克城级是美国二战前期的主力航母，她的设计吸取了之前级别的经验，布局更加合理。约克城号同列克星敦号一起参加了珊瑚海海战，在海战中被击伤。因为前线急需航母应对中途岛战事，在短短72小时内她就修复完毕。中途岛战役中，三艘约克城级航母联手将日军最精锐的航母部队歼灭，但约克城号自己也被飞龙号两波攻击击伤，最后被I168号潜艇击沉。值得一提的是著名的萨奇少校当时就在约克城号上，他发明的萨奇剪战术使得美军战机可以发挥优势对付零战。"]],
                             shengqiaozhi: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "jupaohuoli"], ["des:针对日德兰和之前经验设计的皇家海军新式战列舰N3型。和之前战舰不同，该级战列舰在设计上有很多创新，圣乔治采用了独特的前中置主炮塔布局。优点是可以缩短主装甲带，集中更多的防护在武器系统。圣乔治的主炮也远大于之前的战列舰，达到了18英寸。由于华盛顿条约的签订，明显超出规格的N3型战列舰受到限制，圣乔治从未完工。"]],
                             weiershiqinwang: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "guanjianyiji"], ["des:英王乔治五世级2号舰。服役之后同胡德号一同参与了截击俾斯麦号的战斗，在战斗中被击伤撤退，不过她也击伤了俾斯麦号的油舱。修复之后威尔士亲王号搭载英国首相与美国总统进行了会晤，之后双方发表了著名的《大西洋宪章》。41年年末，威尔士亲王号编入Z舰队被派往远东对日本作战，在海战中包括反击号与威尔士亲王号在内的Z舰队被日本空袭击沉。"]],
@@ -10129,34 +10129,45 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             juejingfengsheng: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
-                                unique: true,
-                                juexingji: true,
-                                forced: true,
+                                init: function (player) {
+                                    player.storage.juejingfengsheng = [];
+                                },
                                 trigger: {
-                                    player: "damageBefore",
+                                    global: "roundStart",
+                                    player: "dying",
                                 },
-                                skillAnimation: true,
-                                animationColor: "wood",
-                                mark: true,
                                 filter: function (event, player) {
-                                    if (player.storage.juejingfengsheng) return false;
-                                    return player.hp <= event.num;
+                                    if (player.storage.juejingfengsheng.length >= 13) return false;
+                                    return player.countCards("hes");
                                 },
-                                filterTarget: function (card, player, target) {
-                                    return true;
-                                },
+                                frequent: true,
                                 content: function () {
-                                    player.awakenSkill('juejingfengsheng');
-                                    trigger.cancel();
-                                    game.log(player, "免疫了一次伤害。");
+                                    "step 0"
+                                    player
+                                        .chooseCard("hes", true, [1, Infinity], "瞑昡：请选择点数各不相同的牌", function (card, player) {
+                                            if (player.storage.juejingfengsheng.includes(get.number(card))) return false;
+                                            if (!ui.selected.cards.length) return true;
+                                            var number = get.number(card);
+                                            for (var i of ui.selected.cards) {
+                                                if (get.number(i, player) == number) return false;
+                                            }
+                                            return true;
+                                        })
+                                        .set("complexCard", true)
+                                        .set("ai", card => 6 - get.value(card));
+                                    "step 1"
+                                    //game.log(result.cards);
+                                    event.num = result.cards.length;
+                                    for (var i = 0; i < event.num; i++) {
+                                        player.markAuto("juejingfengsheng", get.number(result.cards[i]));
+                                    }
+                                    player.gainMaxHp(event.num);
+                                    player.recover(event.num);
+                                    player.draw(event.num);
                                 },
-                                intro: {
-                                    content: "limited",
-                                },
-                                init: (player, skill) => (player.storage[skill] = false),
                                 "_priority": 0,
                                 ai: {
-                                    threaten: 0.3,
+                                    threaten: 1.5,
                                 },
                             },
                             saqijian: {
@@ -12848,7 +12859,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             chuansuohongzha_send: "穿梭轰炸", "chuansuohongzha_send_info": "每回合限一次，你使用的伤害类牌结算结束后，你可以将其交给一名未受伤角色。",
                             hangkongyazhi_fengyin: "航空压制_封印",
                             yuanyangpoxi: "远洋破袭", "yuanyangpoxi_info": "锁定技，你使用锦囊牌对攻击范围内的角色造成伤害+1；你出牌阶段使用杀的次数-1.",
-                            juejingfengsheng: "绝境逢生", juejingfengsheng_info: "锁定技，你的最大耐久增加11。免疫一次致命伤害。",
+                            juejingfengsheng: "绝境逢生", juejingfengsheng_info: "每轮开始时或你进入濒死状态时，你可以弃置任意张未记录点数的牌并记录其点数，然后你获得X点体力上限并恢复X点体力，摸X张牌（X为以此法弃置的手牌数量）",
                             saqijian: "萨奇剪", "saqijian_info": "你获得【防空】。你可以将一张黑色牌当无懈可击使用",
                             jupaohuoli: "巨炮火力", "jupaohuoli_info": "你使用杀造成伤害时，若你手牌数大于目标手牌数，此伤害+1。",
                             guanjianyiji: "关键一击", "guanjianyiji_info": "每回合限一次，有牌指定目标后，你可以扣置目标的一张牌于武将牌上，此回合结束后再获得之。若此时是你的回合内且指定战列舰为目标，不计入发动次数限制。",
