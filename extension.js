@@ -879,7 +879,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "weiershiqinwang", "z1", "z16"],
                                 lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng", "qiuyue", "weilianDbote", "xianghe", "ruihe", "yuhei", "guying"],
                                 lishizhanyi_haixiafujizhan: ["u47", "u81", "u505", "jinqu", "kente", "u96", "lundun"],
-                                weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan", "sp_aisaikesi", "sp_ninghai", "sp_zhongtudao"],
+                                weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan", "sp_aisaikesi", "sp_ninghai", "sp_zhongtudao", "xukufu"],
                                 cangqinghuanying: ["mist_dujiaoshou", "mist_xiawu", "mist_shanhuhai"],
                             },
 
@@ -9864,7 +9864,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     //if (player.storage.pangguanzhe.length) return false;
                                     return true;
                                 },
-                                bannedList: ["pangguanzhe", "zhanliebb", "hangmucv", "zhongxunca", "qingxuncl", "quzhudd", "qianting", "junfu", "daoqu", "fangqu", "zhuangjiafh", "dajiaoduguibi", "huokongld", "fangkong2", "shixiangquanneng", "tiaozhanzhuangbei"],
+                                bannedList: ["pangguanzhe", "zhanliebb", "hangmucv", "zhongxunca", "qingxuncl", "quzhudd", "qianting", "junfu", "daoqu", "fangqu", "zhuangjiafh", "dajiaoduguibi", "huokongld", "fangkong2", "shixiangquanneng", "tiaozhanzhuangbei", "zhongleizhuangjiantuxi"],
                                 content: function () {
                                     "step 0"
                                     if (player.storage.pangguanzhe.length) {
@@ -11335,7 +11335,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 skillAnimation: true,
                                 animationColor: "wood",
-                                juexingji: true,
+                                limited: true,
                                 unique: true,
                                 trigger: {
                                     player: "phaseZhunbeiBegin",
@@ -11343,7 +11343,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter(event, player) {
                                     return player.hp <= 1 && !player.storage.zhongleizhuangjiantuxi;
                                 },
-                                forced: true,
                                 content() {
                                     "step 0"
                                     player.awakenSkill(event.name);
@@ -11360,7 +11359,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (result.bool) {
                                         var target = result.targets[0];
                                         for (var i = 0; i < 3; i++) {
-                                            player.useCard({ name: "sha", isCard: true }, target);
+                                            player.useCard({ name: "sha", nature: "thunder", isCard: true }, target);
                                         }
                                     } else event.finish();
                                     "step 2"
@@ -12915,7 +12914,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             longgu_trick: "龙崮_锦囊", "longgu_trick_info": "锁定技，你不能成为锦囊牌和延时锦囊牌的目标，直至其下一次使用普通锦囊牌和延时锦囊牌。",
                             jianghun: "江魂", "jianghun_info": "你阵亡时，令其他角色与全部C势力计算距离时始终+1。",
                             zhizhanzhige: "止战之戈", "zhizhanzhige_info": "准备阶段，你可以摸两张牌，额外执行一个出牌阶段，然后翻面。",
-                            zhongleizhuangjiantuxi: "重雷装舰突袭", "zhongleizhuangjiantuxi_info": "觉醒技，准备阶段若你体力值为一，你可以视为对一名角色使用三张无次数限制的雷杀，若此技能结算流程中目标未进入过濒死状态，你弃置所有手牌与装备牌",
+                            zhongleizhuangjiantuxi: "重雷装舰突袭", "zhongleizhuangjiantuxi_info": "限定技，准备阶段若你体力值为一，你可以视为对一名角色使用三张无次数限制的雷杀，若此技能结算流程中目标未进入过濒死状态，你弃置所有手牌与装备牌",
                             jianjianleiji: "渐减雷击", "jianjianleiji_info": "每回合限一次，你可以将一张装备牌当作无距离次数限制的雷杀使用",
                             fenzhandaodi: "奋战到底", "fenzhandaodi_info": "你的手牌上限基数为你的体力上限。你可以将红色牌当作雷杀使用。你使用杀指定的目标不能使用花色与此杀不相同的牌响应。",
                             huofu: "祸福", "huofu_info": "锁定技，若你于回合内弃置了红色基本牌，则防止你受到由红色牌造成的伤害直至你下回合开始。",
