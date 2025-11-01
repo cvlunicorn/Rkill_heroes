@@ -11885,7 +11885,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 enable: ["chooseToRespond", "chooseToUse"],
                                 mod: {
                                     cardUsable: function (card) {
-                                        var check1 = game.countPlayer(function (current) {
+                                        /* var check1 = game.countPlayer(function (current) {
                                             let zhu = false;
                                             switch (get.mode()) {
                                                 case "identity": {
@@ -11907,9 +11907,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             }
                                             return zhu && current.getDamagedHp() >= 2;
                                         });
-                                        if (card.storage && card.storage.yixinyiyi && check1) return Infinity;
+                                        if 1(card.storage && card.storage.yixinyiyi && check1) return Infinity; */
+                                        return Infinity;
                                     },
-                                    targetInRange(card, player, target, now) {
+                                    /* targetInRange(card, player, target, now) {
                                         var check2 = game.countPlayer(function (current) {
                                             let zhu = false;
                                             switch (get.mode()) {
@@ -11933,7 +11934,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return zhu && current.getDamagedHp() >= 1;
                                         });
                                         if (card.storage && card.storage.yixinyiyi && check2) return true;
-                                    },
+                                    }, */
                                 },
                                 filterCard(card) {
                                     return true;
@@ -11948,6 +11949,35 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 viewAsFilter(player) {
                                     if (!player.countCards('h')) return false;
+                                    var zhunbei_damaged = game.filterPlayer(function (current) {
+                                        let zhu = false;
+                                        switch (get.mode()) {
+                                            case "identity": {
+                                                zhu = current.isZhu;
+                                                break;
+                                            }
+                                            case "guozhan": {
+                                                zhu = get.is.jun(current);
+                                                break;
+                                            }
+                                            case "versus": {
+                                                zhu = current.identity == "zhu";
+                                                break;
+                                            }
+                                            case "doudizhu": {
+                                                zhu = current == game.zhu;
+                                                break;
+                                            }
+                                        }
+                                        return zhu && current.getDamagedHp();
+                                    });
+                                    var num = player.getHistory("useSkill", function (evt) {
+                                        return evt.skill == "yixinyiyi";
+                                    }).length;
+                                    for (var i = 0; i < zhunbei_damaged.length; i++) {
+                                        if (num < zhunbei_damaged[i].getDamagedHp()) return true;
+                                    }
+                                    return false;
                                 },
                                 prompt: "将一张手牌当雷杀使用",
                                 check(card) { return 4 - get.value(card) },
