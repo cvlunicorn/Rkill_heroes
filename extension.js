@@ -10156,15 +10156,16 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         .set("complexCard", true)
                                         .set("ai", card => 11 - get.value(card));
                                     "step 1"
-                                    //game.log(result.cards);
-                                    event.num = result.cards.length;
-                                    for (var i = 0; i < event.num; i++) {
-                                        player.markAuto("juejingfengsheng", get.number(result.cards[i]));
+                                    if (result.bool) {
+                                        event.num = result.cards.length;
+                                        for (var i = 0; i < event.num; i++) {
+                                            player.markAuto("juejingfengsheng", get.number(result.cards[i]));
+                                        }
+                                        player.discard(result.cards);
+                                        player.gainMaxHp(event.num);
+                                        player.recover(event.num);
+                                        player.draw(event.num);
                                     }
-                                    player.discard(result.cards);
-                                    player.gainMaxHp(event.num);
-                                    player.recover(event.num);
-                                    player.draw(event.num);
                                 },
                                 "_priority": 0,
                                 ai: {
