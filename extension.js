@@ -10144,7 +10144,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 content: function () {
                                     "step 0"
                                     player
-                                        .chooseCard("hes", true, [1, Infinity], "瞑昡：请选择点数各不相同的牌", function (card, player) {
+                                        .chooseCard("hes", false, [1, Infinity], get.prompt2("juejingfengsheng"), function (card, player) {
                                             if (player.storage.juejingfengsheng.includes(get.number(card))) return false;
                                             if (!ui.selected.cards.length) return true;
                                             var number = get.number(card);
@@ -10154,13 +10154,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return true;
                                         })
                                         .set("complexCard", true)
-                                        .set("ai", card => 6 - get.value(card));
+                                        .set("ai", card => 11 - get.value(card));
                                     "step 1"
                                     //game.log(result.cards);
                                     event.num = result.cards.length;
                                     for (var i = 0; i < event.num; i++) {
                                         player.markAuto("juejingfengsheng", get.number(result.cards[i]));
                                     }
+                                    player.discard(result.cards);
                                     player.gainMaxHp(event.num);
                                     player.recover(event.num);
                                     player.draw(event.num);
