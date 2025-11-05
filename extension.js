@@ -11175,6 +11175,51 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
+                                    player: "phaseJieshuBegin",
+                                },
+                                check: function (event, player) {
+                                    if ((player.getHistory("useCard", function (evt) {
+                                        return evt.isPhaseUsing() && ["tao", "taoyuan", "kuaixiu9", "jinjixiuli9"].includes(get.name(evt.card));
+                                    }).length > 0) && (player.hp == player.maxHp)) return false;
+                                    return player.getHistory("useCard", function (evt) {
+                                        return evt.isPhaseUsing() && ["basic", "trick"].includes(get.type(evt.card));
+                                    }).length > 1;
+                                },
+                                filter: function (event, player) {
+                                    return (
+                                        player.getHistory("useCard", function (evt) {
+                                            return evt.isPhaseUsing() && ["basic", "trick"].includes(get.type(evt.card));
+                                        }).length > 0
+                                    );
+                                },
+                                content: function () {
+                                    "step 0";
+                                    event.count = 3;
+                                    event.history = player.getHistory("useCard", function (evt) {
+                                        return evt.isPhaseUsing() && ["basic", "trick"].includes(get.type(evt.card));
+                                    });
+                                    player.turnOver();
+                                    "step 1";
+                                    event._result = {};
+                                    if (event.count && event.history.length && player.countCards("hs")) {
+                                        event.count--;
+                                        var card = event.history.shift().card;
+                                        card = { name: card.name, nature: card.nature };
+                                        if (player.hasUseTarget(card, true, true)) {
+                                            if (
+                                                game.hasPlayer(function (current) {
+                                                    return player.canUse(card, current);
+                                                })
+                                            ) {
+                                                player.chooseUseTarget(true, card);
+                                            }
+                                        }
+                                    }
+                                    "step 2";
+                                    if (result && result.bool) event.goto(1);
+
+                                },
+                                /* trigger: {
                                     player: "phaseZhunbeiBegin",
                                 },
                                 check: function (event, player) {
@@ -11184,7 +11229,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.draw(2);
                                     player.turnOver();
                                     trigger.getParent("phase").phaseList.splice(trigger.getParent("phase").num + 1, 0, "phaseUse");
-                                },
+                                }, */
                             },
                             jianjianleiji: {
                                 nobracket: true,
@@ -12913,7 +12958,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             longgu_basic: "龙崮_基本", "longgu_basic_info": "锁定技，你不能成为基本牌的目标，直至其下一次使用基本牌。",
                             longgu_trick: "龙崮_锦囊", "longgu_trick_info": "锁定技，你不能成为锦囊牌和延时锦囊牌的目标，直至其下一次使用普通锦囊牌和延时锦囊牌。",
                             jianghun: "江魂", "jianghun_info": "你阵亡时，令其他角色与全部C势力计算距离时始终+1。",
-                            zhizhanzhige: "止战之戈", "zhizhanzhige_info": "准备阶段，你可以摸两张牌，额外执行一个出牌阶段，然后翻面。",
+                            zhizhanzhige: "止战之戈", "zhizhanzhige_info": "结束阶段，你可以依次视为使用至多三张本回合出牌阶段使用的基本牌或普通锦囊牌，然后翻面。",
                             zhongleizhuangjiantuxi: "重雷装舰突袭", "zhongleizhuangjiantuxi_info": "限定技，准备阶段若你体力值为一，你可以视为对一名角色使用三张无次数限制的雷杀，若此技能结算流程中目标未进入过濒死状态，你弃置所有手牌与装备牌",
                             jianjianleiji: "渐减雷击", "jianjianleiji_info": "每回合限一次，你可以将一张装备牌当作无距离次数限制的雷杀使用",
                             fenzhandaodi: "奋战到底", "fenzhandaodi_info": "你的手牌上限基数为你的体力上限。你可以将红色牌当作雷杀使用。你使用杀指定的目标不能使用花色与此杀不相同的牌响应。",
