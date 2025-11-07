@@ -9864,7 +9864,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     //if (player.storage.pangguanzhe.length) return false;
                                     return true;
                                 },
-                                bannedList: ["pangguanzhe", "zhanliebb", "hangmucv", "zhongxunca", "qingxuncl", "quzhudd", "qianting", "junfu", "daoqu", "fangqu", "zhuangjiafh", "dajiaoduguibi", "huokongld", "fangkong2", "shixiangquanneng", "tiaozhanzhuangbei", "zhongleizhuangjiantuxi"],
+                                bannedList: ["pangguanzhe", "zhanliebb", "hangmucv", "zhongxunca", "qingxuncl", "quzhudd", "qianting", "junfu", "daoqu", "fangqu", "zhuangjiafh", "dajiaoduguibi", "huokongld", "fangkong2", "shixiangquanneng", "tiaozhanzhuangbei", "zhongleizhuangjiantuxi", "juejingfengsheng"],
                                 content: function () {
                                     "step 0"
                                     if (player.storage.pangguanzhe.length) {
@@ -10134,7 +10134,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 trigger: {
                                     global: "roundStart",
-                                    player: "dying",
+                                    //player: "dying",
                                 },
                                 filter: function (event, player) {
                                     if (player.storage.juejingfengsheng.length >= 13) return false;
@@ -10154,7 +10154,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return true;
                                         })
                                         .set("complexCard", true)
-                                        .set("ai", card => 11 - get.value(card));
+                                        .set("ai", card => 8 - get.value(card));
                                     "step 1"
                                     if (result.bool) {
                                         event.num = result.cards.length;
@@ -10164,7 +10164,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player.discard(result.cards);
                                         player.gainMaxHp(event.num);
                                         player.recover(event.num);
-                                        player.draw(event.num);
+                                        //player.draw(event.num);
                                     }
                                 },
                                 "_priority": 0,
@@ -12927,7 +12927,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             pingduzhanhuo: "平度战火", pingduzhanhuo_info: "结束阶段，若你本回合未造成伤害，你摸一张牌；准备阶段，若你自上个结束阶段起未受到伤害，你摸一张牌",
                             mujizhengren: "目击证人", mujizhengren_info: "限定技，出牌阶段，你可以弃置3张手牌，然后令一名角色翻面。",
                             shixiangquanneng: "十项全能", shixiangquanneng_info: "锁定技，你的舰种技能无法升级，每轮开始时，你失去以此法获得的技能，然后从以下技能中选择一项获得：1、防空，2、开幕航空，3、军辅",
-                            pangguanzhe: "旁观者", pangguanzhe_info: "锁定技，你的回合开始时，失去上回合以此法获得的技能，随机获得在场角色武将牌上的一个技能。若该技能带有判定，你可以选择判定结果。(远航，强化，航母，战列，巡洋，驱逐，潜艇，开幕航空，火控雷达，先制鱼雷，十项全能，挑战装备除外;主公技，限定技，使命技，觉醒技除外)",
+                            pangguanzhe: "旁观者", pangguanzhe_info: "锁定技，你的回合开始时，失去上回合以此法获得的技能，随机获得在场角色武将牌上的一个技能。若该技能带有判定，你可以选择判定结果。(远航，强化，航母，战列，巡洋，驱逐，潜艇，开幕航空，火控雷达，先制鱼雷，十项全能，挑战装备除外;主公技，限定技，使命技，觉醒技除外;绝境逢生除外。)",
                             hangkongyazhi: "航空压制", "hangkongyazhi_info": "限定技，你可以失去开幕航空，令一名角色失去所有护甲且本轮技能失效。",
                             chuansuohongzha: "穿梭轰炸", "chuansuohongzha_info": "每轮限一次，其他角色使用伤害类牌结算结束后，若你未受伤，你可以获得此牌对应的所有实体牌。每回合限一次，你使用的伤害类牌结算结束后，你可以将其交给一名未受伤角色。",
                             chuansuohongzha_get: "穿梭轰炸", "chuansuohongzha_get_info": "每轮限一次，其他角色使用伤害类牌结算结束后，若你未受伤，你可以获得此牌对应的所有实体牌。",
