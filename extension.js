@@ -12941,6 +12941,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             duikongzhiwei: "对空直卫", "duikongzhiwei_info": "每轮限一次，当一名角色使用锦囊牌指定至少两名角色为目标时，你可以弃置一张牌，令此牌对你和距离1的角色无效。",
                             bigseven: "BIGSEVEN", "bigseven_info": "你使用基本牌和非延时锦囊牌指定唯一目标后，可以进行判定。若结果与使用的牌类型相同，你可以额外指一名角色为目标。(场上每有一名自己以外拥有bigseven的角色，目标+1)",
                             saobaxing: "扫把星", "saobaxing_info": "锁定技，每回合限一次，当一名角色的判定牌生效前，若判定结果为红色，你须令其重新判定。",
+                            //第一次配音到这里
                             shaojie: "哨戒", "shaojie_info": "锁定技，你无法打出闪响应万箭齐发/近距支援。当你受到万箭齐发/近距支援伤害时，你获得一点护甲。",
                             zhiyu_R: "智愚", "zhiyu_R_info": "当你受到伤害后你可以摸一张牌，然后展示所有手牌。若颜色均相同，你令伤害来源弃置一张手牌。",
                             beihaidandang: "被害担当", "beihaidandang_info": "每回合限一次，其他角色受到伤害时，你可以代替其受此伤害，然后摸x张牌，将x张手牌交给一名其他角色或弃置(x为你已损失的体力值)。若目标为航母，此伤害值-1。",
@@ -12980,6 +12981,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             xiandaihuagaizao: "现代化改造", "xiandaihuagaizao_info": "结束阶段，你可以弃x张牌并回复一点体力，若你以此法回复体力后体力值不小于5，则你翻面并减少一点体力上限，然后获得*先进空管（x为游戏轮数且至多为3）（先进空管当你使用杀或伤害类锦囊牌时，可失去一点体力并重复执行一次此牌。）",
                             xianjinkongguan: "先进空管", "xianjinkongguan_info": "当你使用杀或伤害类锦囊牌时，可失去一点体力并重复执行一次此牌。",
                             zhanxianyuanhu: "战线援护", "zhanxianyuanhu_info": "游戏开始时，你选择一名角色，其受到伤害时防止之，改为你受到此伤害值-1的伤害。",
+                            //第二次配音到这里
 
 
                             jianrbiaozhun: "舰r标准",
