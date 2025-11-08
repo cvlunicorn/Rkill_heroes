@@ -5304,7 +5304,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 content: function () {
                                     "step 0"
                                     player.addTempSkill("dajiaoduguibi", "roundstart");
-                                    trigger.player.addTempSkill("qianxingtuxi_debuff", 'phaseEnd');
+                                    trigger.player.addTempSkill("qianxingtuxi_debuff", { player: "phaseEnd" });
                                 },
                                 "_priority": 0,
                             },
@@ -5315,7 +5315,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 forced: true,
                                 content: function () {
-                                    "step 0"
                                     player.judge(function (card) {
                                         if (get.suit(card) == 'spade') {
                                             trigger.num--;
