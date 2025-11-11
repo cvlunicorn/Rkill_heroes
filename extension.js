@@ -3357,7 +3357,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         if (!event.targets[i].hasSkill("fangkong2_aibiexuan")) return true;
                                     } return false;
                                 },
-                                frequent: true,
+                                direct: true,
                                 content: function () {
                                     'step 0'
                                     var next = player.chooseCardTarget({
