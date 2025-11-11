@@ -3366,8 +3366,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         position: 'hejs',//hej代指牌的位置，加个s即可用木流流马的牌。
                                         selectCard: function () {
                                             var player = get.player();/*if(ui.selected.targets)return [1,Math.min(trigger.targets.length,Math.floor(player.countCards('he')))];*///取消弃牌数与选择目标数相等改为固定弃置两张牌2023.8.7
-                                            if (player.hasSkill('duikongfangyu')) {
-                                                return 1;//对空防御的技能效果。若玩家拥有对空防御，则视为满级强化。
+                                            if (player.hasSkill('duikongfangyu')||player.hasSkill("fangkongdanmu9_skill")) {
+                                                return 1;//对空防御的技能效果。若玩家拥有对空防御，则弃牌1。&&防空弹幕的装备效果，若玩家拥有防空弹幕则弃牌1。
                                             }
                                             return 2;
                                         },//要气质的卡牌，可以return[1,3]if(ui.selected.cards)return [ui.selected.cards.length,ui.selected.cards.length+player.countMark('jinengup')];return 1;-player.countMark('jinengup')
