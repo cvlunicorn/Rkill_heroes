@@ -7921,13 +7921,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         check: function (event, player) {
                                             return get.attitude(player, event.target) < 0;
                                         },
-                                        prompt: "你可以令其随机弃置一张牌并弃置一张Z",
+                                        frequent: true,
                                         content: function () {
-
                                             'step 0'
                                             var cards = player.getExpansions('Z'), count = cards.length;
                                             if (count > 0) {
-                                                player.chooseCardButton('移去一张Z', true, cards).set('ai', function (button) {
+                                                player.chooseCardButton('你可以令' + get.translation(trigger.target) + '随机弃置一张牌并弃置一张Z', true, cards).set('ai', function (button) {
                                                     return 1;
                                                 });
                                             }
@@ -7998,12 +7997,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         check: function (event, player) {
                                             return get.attitude(player, event.source) < 0;
                                         },
-                                        prompt: "你可以令其进行一次判定，本回合无法使用或打出与判定牌相同颜色的牌",
                                         content: function () {
                                             'step 0'
                                             var cards = player.getExpansions('Z'), count = cards.length;
                                             if (count > 0) {
-                                                player.chooseCardButton('移去一张Z', true, cards).set('ai', function (button) {
+                                                player.chooseCardButton('你可以移去一张Z令' + get.translation(event.source) + '进行一次判定，本回合无法使用或打出与判定牌相同颜色的牌', true, cards).set('ai', function (button) {
                                                     return 1;
                                                 });
                                             }
