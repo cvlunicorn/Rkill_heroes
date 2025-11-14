@@ -2955,8 +2955,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             dajiaoduguibi: {
                                 //inherit: "bagua_skill",//继承：八卦
                                 audio: "bagua_skill",
-                                firstDo: true,
-                                content: function () {//已经有一个给牌技能了
+                                trigger: {
+                                    player: ["damageBegin4"],
+                                },
+                                filter(event, player, name) {
+                                    if (!player.isEmpty(2)) return false;
+                                    return event.num > 0;
+                                },
+                                check: function (event, player) {
+                                    return true;
+                                },
+                                content: function () {
                                     "step 0"
                                     event.cards = [];
                                     player.judge('dajiaoduguibi', function (card) {
@@ -2981,40 +2990,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     };*/
                                     "step 1"
                                     if (result.judge > 0) {
-                                        trigger.untrigger(); player.removeMark('dajiaoduguibi', player.countMark('dajiaoduguibi'));
-                                        trigger.set('responded', true);
-                                        trigger.result = { bool: true, card: { name: 'shan' } }
+                                        trigger.cancel();
                                     };
-                                },
-                                trigger: {
-                                    player: ["chooseToRespondBegin", "chooseToUseBegin"],
-                                },
-                                filter: function (event, player) {
-                                    if (event.responded) return false;
-                                    if (event.dajiaoduguibi) return false;
-                                    if (!player.isEmpty(2)) return false;
-                                    if (!event.filterCard || !event.filterCard({ name: 'shan' }, player, event)) return false;
-                                    if (event.filterCard({ name: 'tao' }, player, event)) return false;
-                                    if (event.name == 'chooseToRespond' && !lib.filter.cardRespondable({ name: 'shan' }, player, event)) return false;
-                                    if (player.hasSkillTag('unequip2')) return false;
-                                    var evt = event.getParent();
-                                    if (evt.player && evt.player.hasSkillTag('unequip', false, {
-                                        name: evt.card ? evt.card.name : null,
-                                        target: player,
-                                        card: evt.card
-                                    })) return false;
-                                    return true;
-                                },
-                                check: function (event, player) {
-                                    if (event && (event.ai || event.ai1)) {
-                                        var ai = event.ai || event.ai1;
-                                        var tmp = _status.event;
-                                        _status.event = event;
-                                        var result = ai({ name: 'shan' }, _status.event.player, event);
-                                        _status.event = tmp;
-                                        return result > 0;
-                                    }
-                                    return true;
                                 },
                                 ai: {
                                     respondShan: true,
@@ -12739,7 +12716,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "danzong_info": "每使用六张杀，你便可以在造成无属性伤害附加属性：<br>潜艇、驱逐：获得雷属性的效果，<br>战列、航母：获得雷属性与改进型冰杀的效果。<br>其他舰种时：获得火属性,点燃目标。<br>效果持续到伤害结算完成时（打不穿藤甲的高爆弹与暴击藤甲的决斗）",
                             /* "paohuozb_skill": "炮火准备1", "paohuozb_skill_info": "装备技能", */
                             dajiaoduguibi: "规避",
-                            "dajiaoduguibi_info": "（可强化）你需要打出闪时可以进行一次判定，判定结果为：零级强化，方块/一级强化，桃、闪、方块/二级强化，红桃或方块，视为你打出了一张闪。",
+                            "dajiaoduguibi_info": "（可强化）你受到伤害时可以进行一次判定，判定结果为：零级强化，方块/一级强化，桃、闪、方块/二级强化，红桃或方块，防止此伤害。",
                             "rendeonly2": "仁德界改",
                             "rendeonly2_info": "给实际距离为2的队友最多两张牌，一回合限2次，给出第二张牌时，你视为使用一张基本牌。可强化",
                             zhiyangai: "直言",
