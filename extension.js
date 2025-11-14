@@ -1627,102 +1627,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 intro: { marktext: "摸牌", content: function (player) { return ('获得一个技能时的标记'); }, },
                             },
-                            huokongld_equip_skill: {
-                                equipSkill: true,
-                                firstDo: true,
-                                direct: true,
-                                trigger: { player: ["shaMiss", "eventNeutralized"], },
-                                audio: "ext:舰R牌将/audio/skill:true",
-                                filter: function (event, player) {
-                                    if (event.type != 'card' || event.card.name != 'sha') return false;
-
-                                    return player.countCards('he', function (card) { return card != player.getEquip('guanshi'); }) >= 1 && event.target.isAlive();
-                                },
-                                content: function () {
-                                    "step 0"
-                                    //get.prompt2('huokongld')Math.max(0,2-player.countMark('jinengup'))player.chooseToCompare(trigger.player);if(player.countMark('jinengup')>1){player.chooseToCompare(trigger.target);event.goto(2);};else if(player.countMark('jinengup')>1){player.}
-                                    var evt = _status.event.getTrigger(), num = evt.baseDamage + evt.extraDamage, a = player.countMark('jinengup'); if (player.countMark('jinengup') > 1) { a = 1 };
-                                    /*if(player.hasSkill('guanshi_skill')||player.getEquip('shangyouyh9')){
-                                   player.chooseControl('<span class=yellowtext>强制命中'+'</span>','cancel2').set('prompt',get.prompt('huokongld')).set('prompt2','令本次攻击命中对手,<br>装备贯石斧时，此技能反转了贯石斧的效果，使其更为强悍，<br>根据技能强化等级*此次伤害量：对面摸2/1/0*'+num+'张牌。').set('ai',function(card){
-                                   var evt=_status.event.getTrigger();
-                                        if(get.attitude(evt.player,evt.target)<0){
-                                            if(evt.baseDamage+evt.extraDamage>=Math.min(2,evt.target.hp)){
-                                                return 1.1}return 1}return -1;});
-                                    }else {*///以上是同时拥有火控技能与贯石斧时的处理方法。2023.8.6移除。
-                                    var next = player.chooseToDiscard('令本次攻击改为命中对手,<br>0级，你弃置一张杀，一级，你弃置一张黑色牌，二级，你弃置1张牌。', 'he', function (card) {
-                                        if (player.countMark('jinengup') <= 0) {
-                                            return get.name(card) == 'sha';
-                                        } else if (player.countMark('jinengup') == 1) {
-                                            return (get.suit(card) == 'spade' || get.suit(card) == 'club') && _status.event.player.getEquip('guanshi') != card;
-                                        } else if (player.countMark('jinengup') >= 2) {
-                                            return _status.event.player.getEquip('guanshi') != card;
-                                        }
-                                    });
-                                    next.logSkill = 'guanshi_skill';
-                                    next.set('ai', function (card) {
-                                        var evt = _status.event.getTrigger();
-                                        if (get.attitude(evt.player, evt.target) < 0) {
-                                            if (evt.baseDamage + evt.extraDamage >= Math.min(2, evt.target.hp)) {
-                                                return 7 - get.value(card)
-                                            } return 5 - get.value(card)
-                                        } return -1;
-                                    });
-                                    "step 1"
-                                    if (result.bool || result.index == 0) {
-                                        if (event.triggername == 'shaMiss') {
-                                            var evt = _status.event.getTrigger();
-                                            /*if(!player.hasSkill('guanshi_skill')&&!player.getEquip('huokongld_equip')){if(player.countMark('jinengup')=1){trigger.target.draw((evt.baseDamage+evt.extraDamage));};}else{evt.target.draw((2-player.countMark('jinengup'))*(evt.baseDamage+evt.extraDamage));};*///移除对方摸牌的部分，2023.8.6
-                                            trigger.untrigger(); trigger.trigger('shaHit');
-                                            trigger._result.bool = false; trigger._result.result = null;
-                                        }
-                                        else { trigger.unneutralize(); }
-                                    }
-                                    "step 2"
-                                    if (result.bool) {
-                                        trigger.untrigger(); trigger.trigger('shaHit');
-                                        trigger._result.bool = false; trigger._result.result = null;
-                                    };
-                                },
-                                ai: {
-                                    "directHit_ai": true,
-                                    skillTagFilter: function (player, tag, arg) {
-                                        if (player._guanshi_temp) return;
-                                        player._guanshi_temp = true;
-                                        var bool = (get.attitude(player, arg.target) < 0 && arg.card.name == 'sha' && player.countCards('he', function (card) {
-                                            return card != player.getEquip('guanshi') && card != arg.card && (!arg.card.cards || !arg.card.cards.includes(card)) && get.value(card) < 5;
-                                        }) > 1);
-                                        delete player._guanshi_temp;
-                                        return bool;
-                                    },
-                                },
-                                intro: {
-                                    content: function () {
-                                        return get.translation(skill + '_info');
-                                    },
-                                },
-                            },
-                            "paohuozb_skill": {
-                                mod: {
-                                    maxHandcard: function (player, num) { return num - 1; },
-                                    cardUsable: function (card, player, num) { if (card.name == 'sha') return num + 1; },
-                                },
-                                trigger: {
-                                    player: "equipAfter",
-                                },
-                                forced: true,
-                                equipSkill: true,
-                                filter: function (event, player) {
-                                    return event.card.name == 'paohuozb';
-                                },
-                                content: function () {
-                                    player.loseHp();
-                                },
-                                intro: {
-                                    content: function () {
-                                        return get.translation(skill);
-                                    },
-                                },
-                            },
                             zhongpaoduijue: {
                                 enable: "phaseUse", usable: 1, position: "hejs", complexCard: true,
                                 selectCard: function (card, player) { var player = get.player(); return [2, player.countMark('jinengup') + 2] },
@@ -12838,7 +12742,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "tiaozhanzhuangbei_info": "挑战锁定技，游戏开始时，你将一张【回避】【此舰种的武器】和一张【望远镜】置入你的装备区。你装备区内的武器牌和宝物牌不能被其他角色弃置。",
                             danzong: "增强杀",
                             "danzong_info": "每使用六张杀，你便可以在造成无属性伤害附加属性：<br>潜艇、驱逐：获得雷属性的效果，<br>战列、航母：获得雷属性与改进型冰杀的效果。<br>其他舰种时：获得火属性,点燃目标。<br>效果持续到伤害结算完成时（打不穿藤甲的高爆弹与暴击藤甲的决斗）",
-                            "paohuozb_skill": "炮火准备1", "paohuozb_skill_info": "装备技能",
+                            /* "paohuozb_skill": "炮火准备1", "paohuozb_skill_info": "装备技能", */
                             dajiaoduguibi: "规避",
                             "dajiaoduguibi_info": "（可强化）你需要打出闪时可以进行一次判定，判定结果为：零级强化，方块/一级强化，桃、闪、方块/二级强化，红桃或方块，视为你打出了一张闪。",
                             "rendeonly2": "仁德界改",
@@ -14316,20 +14220,20 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                         },
                         translate: {
-                            jinjuzy: "近距支援",
+                            /* jinjuzy: "近距支援",
                             "jinjuzy_info": "出牌阶段，对所有其他角色使用。每名目标角色需打出一张【闪】，否则受到1点伤害。",
                             jiakongls: "架空历史",
                             "jiakongls_info": "群星璀璨，欧陆风云，该武将首次使用会有两轮1.5展示牌量的五谷丰登，再次使用仅有一轮。",
                             mingzuyq: "民族乐器",
                             "mingzuyq_info": "北境之地的文化艺术。锁定技，你视为拥有技能国战“制衡”，若你已经有“制衡”，则改为取消可弃置牌数的限制。",
                             hangkongzhan: "航空战",
-                            "hangkongzhan_info": "建树丰厚，参与每轮开始时的三连杀战斗吗，每轮最多弃置三张牌。",
+                            "hangkongzhan_info": "建树丰厚，参与每轮开始时的三连杀战斗吗，每轮最多弃置三张牌。", 
                             paohuozb: "炮火准备",
-                            "paohuozb_info": "试试就逝世，扣一血得属性杀增强效果，然而现在所有舰船都有这个，可以图加一杀次数。",
+                            "paohuozb_info": "试试就逝世，扣一血得属性杀增强效果，然而现在所有舰船都有这个，可以图加一杀次数。", 
                             xingyun: "强力规避",
                             "xingyun_info": "可以进行一次判定，为桃、闪则视为打出闪。<br>若判定未生效,会获得判定牌。<br>若武将为驱逐且没有判定成功，可以额外触发一次。",
                             lianxugongji: "连续攻击",
-                            "lianxugongji_info": "其实就是杀，但此杀能连打两次。。",
+                            "lianxugongji_info": "其实就是杀，但此杀能连打两次。。",*/
                             "sushepao3": "速射炮",
                             "sushepao3_info": "射速与精度很吓人，当然消耗也很惊人（没有特殊效果）",
                             "quzhupao3": "速射炮",
