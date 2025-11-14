@@ -7051,7 +7051,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             'step 0'
                                             var cards = player.getExpansions('Z'), count = cards.length;
                                             if (count > 0) {
-                                                game.log("chooseCardButton");
                                                 player.chooseCardButton('移去任意张Z', true, cards).set('ai', function (button) {
                                                     return 1;
                                                 }).set('selectButton', [0, cards.length]);
@@ -7060,7 +7059,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             'step 1'
                                             event.cards = result.links;
                                             event.num = event.cards.length;
-                                            game.log("loseToDiscardpile");
                                             player.loseToDiscardpile(event.cards);
                                             player.chooseTarget(get.prompt("z1_Zqulingjian_draw"), "令一名角色摸" + get.translation(event.num) + "张牌。", function (card, player, target) {
                                                 return !target.hasSkill("z1_Zqulingjian_draw_used");
@@ -7069,7 +7067,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             });
                                             "step 2";
                                             if (result.bool) {
-                                                game.log("target");
                                                 var target = result.targets[0];
                                                 event.bool = false;
                                                 target.draw(event.num);
@@ -7848,7 +7845,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 direct: true,
                                 charlotte: true,
                                 trigger: {
-                                    player: "damageEnd",
+                                    player: "damageBegin3",
                                 },
                                 filter: function (event, player) {
                                     return event.source && event.source.isIn()
