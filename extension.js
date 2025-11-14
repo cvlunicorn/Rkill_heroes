@@ -905,7 +905,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             dadianrendian: ["female", "IJN", 3, ["fangkong2", "qingxuncl", "jilizhixin"], ["des:丙型巡洋舰设计要求有着很强的侦察和通讯能力。在早期的设计中，巡洋舰W105搭载有两座弹射器，全部集中在后部。舰载机除了机库外，两架系留于弹射器上。在W105阶段，丙型巡洋舰也并未强调对海火力，主要武器以127高炮为主。虽然一度考虑过鱼雷装备，但最终取消这个要求。W105案提交后，又增加了对海火力要求，安装之前巡洋舰拆下来的三联155主炮，这个设计最终演变为正式的丙型巡洋舰。"]],
                             //degelasi: ["female", "MN", 3, ["fangkong2", "qingxuncl"], ["des:。"]],
                             yatelanda: ["female", "USN", 3, ["fangkong2", "qingxuncl", "duikongfangyu"], ["des:　30年代末期设计的一级轻巡洋舰，最大特点是主炮数量极多，共安装了八座双联5吋炮。亚特兰大级初衷是作为驱逐舰旗舰使用，后来发现这种设计亦适合作为防空舰使用。战争中亚特兰大号护卫大黄蜂号参加了中途岛海战，战役结束后又参加了惨烈的瓜岛战役。1942年10月参加了圣克鲁斯海战，11月在瓜岛以北的海战中，亚特兰大号被日本晓号驱逐舰的鱼雷击中，13日被放弃。"]],
-                            "z31": ["female", "KMS", 3, ["dajiaoduguibi", "quzhudd", "Z_qianghua", "Zqujingying"], ["des:1936年AM型驱逐舰首舰，该级建造于战争爆发后，相比1936A型改动很少。该舰装备150毫米主炮，强于一般驱逐舰。Z-31主要参与海峡和北欧的战斗，幸存到了战后并赔偿给法国。"]],
+                            "z31": ["female", "KMS", 3, ["dajiaoduguibi", "quzhudd", "Z", "Z_qianghua", "Zqujingying"], ["des:1936年AM型驱逐舰首舰，该级建造于战争爆发后，相比1936A型改动很少。该舰装备150毫米主炮，强于一般驱逐舰。Z-31主要参与海峡和北欧的战斗，幸存到了战后并赔偿给法国。"]],
                             xuefeng: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "xiangrui", "yumian"], ["des:雪风号是日本名气最大的驱逐舰，出名的原因是她玄幻般的运气。雪风号参加了日军几乎所有恶战：包括中途岛，瓜岛战役，莱特湾海战和菊水特攻等，也曾为金刚号，大和号，信浓号等大舰护航。神奇的是不管战况多激烈，同行的军舰损失多惨重，但是雪风号却屡屡无损生还，连中破都不曾有过。战争结束后，美国抽到雪风作为赔偿，但是却转交给了民国，改名为丹阳号。三年后，丹阳随校长一起撤到了台湾。作为台湾少有的可用大舰，台湾时期的丹阳还进行了美式装备改装，一直服役到60年代。"]],
                             kangfusi: ["female", "USN", 3, ["dajiaoduguibi", "quzhudd", "31jiezhongdui"], ["des:康弗斯属弗莱彻级驱逐舰，她也是著名的第23驱逐舰中队的一员，该中队在圣乔治角海战等一系列战斗中表现出色，指挥官阿利伯克也因此有着31节伯克的外号。康弗斯参加了后期的诸多重大战役，曾救援了遭遇神风的友军。战争胜利后整个中队被授予总统集体嘉奖，康弗斯于59年转交西班牙海军。"]],
                             "47project": ["female", "ΒΜΦCCCP", 3, ["dajiaoduguibi", "quzhudd", "xinqidian"], ["des:　海军计划的一级大型驱逐舰，与传统驱逐舰不同的是她设计有装甲带与舰载机，由于工业不足与设计指标过高，47工程修改设计后才具备可行性，但战争爆发打断了建造。战后47工程修改了设计，并且延续到41型驱逐舰不惧号上。"]],
@@ -921,10 +921,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "u81": ["female", "KMS", 3, ["qianting", "u81_langben", /* "u81_zonglie", */ "u81_xunyi"], ["des:U-81号潜艇最著名的战例发生在1941年的地中海。当时皇家方舟号航母从马耳他驶出后，遭到了U-81的雷击，尽管U-81只命中了皇家方舟号一枚鱼雷，但是处置不当导致这艘在追歼俾斯麦中立下功劳的航母最终沉没。此后的U-81在破交作战中击沉了不少商船。1944年1月，U-81遭到空袭沉没。"]],
                             "z1": ["female", "KMS", 3, ["dajiaoduguibi", "quzhudd", "Z", "z1_Zqulingjian"], ["des:1934型舰队驱逐舰首舰。德国突破条约之后开始建造大型驱逐舰，吨位比他国驱逐舰都略大一些，装备5门单装127毫米炮。由于高温锅炉的技术问题，她动力系统稳定性不高。Z1号（莱伯勒希特·马斯号）的服役生涯很短暂，1939年执行了布雷任务，在1940年破交战中遭到己方HE111轰炸机误击沉没。"]],
                             "z16": ["female", "KMS", 3, ["dajiaoduguibi", "quzhudd", "Z", "z16_lianhuanbaopo", "z16_shuileibuzhi"], ["des:1934A型驱逐舰11号舰，1934A是1934的改良型，改进了适航性与动力系统设计。Z16号（弗里德里希·埃科尔特号）开战之后主要执行对英国的布雷任务。在巴伦支海海战中被英国轻巡洋舰谢菲尔德号击沉。"]],
-                            "z18": ["female", "KMS", 3, ["dajiaoduguibi", "quzhudd", "z18_weisebaoxingdong"], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
-                            "z17": ["female", "KMS", 3, ["dajiaoduguibi", "quzhudd", "z17_naerweikejingjie"], ["des:　德国1936型驱逐舰总体上加大了吨位，改善了舰艏设计以提高适航性。Z17（迪特尔·冯·勒德尔）号驱逐舰在纳尔维克海战中击伤了哥萨克人号，最终被英军击沉。"]],
-                            "z21": ["female", "KMS", 3, ["dajiaoduguibi", "quzhudd", "z21_tuxi"], ["des:1936型驱逐舰5号舰，1936年型是是1934型的放大改良型，表现出了不俗的性能，可以与英国部族级对攻而不落下风。Z21号（威廉·海德坎姆号）于1939年服役，1940年参与了攻击北欧行动，并占领了纳尔维克，之后英军驱逐舰突袭了港内的德国驱逐舰，旗舰Z21号遭到英军厌战号战列舰的炮击沉没。"]],
-                            "z22": ["female", "KMS", 3, ["dajiaoduguibi", "quzhudd", "z22_tuxixiawan"], ["des:1936型驱逐舰6号舰。1940年6艘1936型驱逐舰都参加了攻击北欧行动，在纳尔维克海战中，Z22号（安东·施米特号）被英国海军击沉，而这次海战中，参战的6艘1936型全部被击沉。"]],
+                            "z18": ["female", "KMS", 3, ["dajiaoduguibi", "quzhudd", "Z", "z18_weisebaoxingdong"], ["des:德国1936型驱逐舰六艘都参加了挪威战役，并在战役中损失了五艘。Z18（汉斯·吕德曼）在纳尔维克海战中被击伤，之后在海岸搁浅。"]],
+                            "z17": ["female", "KMS", 3, ["dajiaoduguibi", "quzhudd", "Z", "z17_naerweikejingjie"], ["des:　德国1936型驱逐舰总体上加大了吨位，改善了舰艏设计以提高适航性。Z17（迪特尔·冯·勒德尔）号驱逐舰在纳尔维克海战中击伤了哥萨克人号，最终被英军击沉。"]],
+                            "z21": ["female", "KMS", 3, ["dajiaoduguibi", "quzhudd", "Z", "z21_tuxi"], ["des:1936型驱逐舰5号舰，1936年型是是1934型的放大改良型，表现出了不俗的性能，可以与英国部族级对攻而不落下风。Z21号（威廉·海德坎姆号）于1939年服役，1940年参与了攻击北欧行动，并占领了纳尔维克，之后英军驱逐舰突袭了港内的德国驱逐舰，旗舰Z21号遭到英军厌战号战列舰的炮击沉没。"]],
+                            "z22": ["female", "KMS", 3, ["dajiaoduguibi", "quzhudd", "Z", "z22_tuxixiawan"], ["des:1936型驱逐舰6号舰。1940年6艘1936型驱逐舰都参加了攻击北欧行动，在纳尔维克海战中，Z22号（安东·施米特号）被英国海军击沉，而这次海战中，参战的6艘1936型全部被击沉。"]],
                             kewei: ["female", "RN", 4, ["hangmucv", "matapanjiaozhijian", "zhongbangtuxi"], ["des:      装甲航母可畏号在地中海战场有着出色的表现，在马塔潘角海战中，可畏出色的航空掩护有力支援了英国舰队的作战，她的鱼雷机击伤了维内托和意大利巡洋舰，直接助攻了厌战等主力舰的战绩。尽管在克里特战役期间可畏号遭到轰炸，但由于防护出色，可畏号并未战沉。在战争末期的太平洋战场，受到神风攻击的可畏号受损程度也明显小于美式航母，证明了自身设计的价值。可畏号在战争胜利后，于47年退役。"]],
                             hude: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "huangjiahaijunderongyao", "huangjiaxunyou", "tianshi"], ["zhu", "des:      英国史上最著名的战列巡洋舰。在20至30年代，胡德号长期作为英国海军的象征，频繁出访世界各地。胡德号在40年参与了针对投降后法国舰队的抛石机行动，重创了法国海军。41年的海战中，胡德号同威尔士亲王号一同拦截俾斯麦号和欧根亲王号。"]],
                             gesakeren: ["female", "RN", 3, ["dajiaoduguibi", "quzhudd", "tiaobangzuozhan"], ["des:部族级驱逐舰的4号舰，该级驱逐舰是最著名的英国驱逐舰。哥萨克人号参加了第二次纳尔维克海战，痛击了德军驱逐舰。41年参与过围歼俾斯麦号的行动。1941年10月哥萨克人号被德军潜艇击沉。"]],
@@ -7079,9 +7079,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     "step 0"
                                     player.addToExpansion(trigger.cards, 'gain2').gaintag.add('Z');
                                 },
-                                group: ["z1_Zqulingjian_source", "z1_Zqulingjian_damage", "z1_Zqulingjian_move"],
+                                group: [/* "z1_Zqulingjian_source", "z1_Zqulingjian_damage", */ "z1_Zqulingjian_move", "z1_Zqulingjian_draw"],
                                 subSkill: {
-                                    source: {
+                                    /* source: {
                                         trigger: {
                                             source: "damageBegin4",
                                         },
@@ -7135,6 +7135,51 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             player.loseToDiscardpile(cards);
                                             'step 2'
                                             trigger.num -= 1;
+                                        },
+
+                                    }, */
+                                    draw: {
+                                        enable: "phaseUse",
+                                        filter: function (event, player) {
+                                            return player.getExpansions('Z').length;;
+                                        },
+                                        content: function () {
+                                            'step 0'
+                                            var cards = player.getExpansions('Z'), count = cards.length;
+                                            if (count > 0) {
+                                                game.log("chooseCardButton");
+                                                player.chooseCardButton('移去任意张Z', true, cards).set('ai', function (button) {
+                                                    return 1;
+                                                }).set('selectButton', [0, cards.length]);
+                                            }
+                                            else event.finish();
+                                            'step 1'
+                                            event.cards = result.links;
+                                            event.num = event.cards.length;
+                                            game.log("loseToDiscardpile");
+                                            player.loseToDiscardpile(event.cards);
+                                            player.chooseTarget(get.prompt("z1_Zqulingjian_draw"), "令一名角色摸" + get.translation(event.num) + "张牌。", function (card, player, target) {
+                                                return !target.hasSkill("z1_Zqulingjian_draw_used");
+                                            }).set("ai", function (target) {
+                                                return get.attitude(_status.event.player, target);
+                                            });
+                                            "step 2";
+                                            if (result.bool) {
+                                                game.log("target");
+                                                var target = result.targets[0];
+                                                event.bool = false;
+                                                target.draw(event.num);
+                                                target.addTempSkill("z1_Zqulingjian_draw_used", { global: "phaseEnd" });
+                                            } else {
+                                                event.finish();
+                                            }
+
+                                        },
+                                        ai: {
+                                            order: 7.2,
+                                            result: {
+                                                player: 1,
+                                            },
                                         },
 
                                     },
@@ -12890,6 +12935,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             u81_zonglie: "纵猎", u81_zonglie_info: "每回每名角色限一次，你对其他角色造成伤害时，若其手牌与你不相等，其可以交给你一张手牌并摸一张牌，防止此伤害，如此做，其本回合不能响应你的牌。",
                             u81_xunyi: "巡弋", u81_xunyi_info: "每回合限一次，你的攻击范围内，有角色在回合外获得牌时，若其不处于濒死状态，你可以令全场角色选择是否对其使用一张牌。",
                             z1_Zqulingjian: "Z驱领舰", z1_Zqulingjian_info: "当G国驱逐舰受到/造成伤害后，你可以将造成伤害的牌置于武将牌上称为“Z”。有其他角色受到雷属性伤害时，你可以弃置一张“Z”，令此伤害-1；当你造成雷属性伤害时，你可以弃置一张“Z”，令此伤害+1。准备阶段，你可以移动一张“Z”。(全局)有Z的角色受到伤害时，可以移去所有Z，防止此伤害。",
+                            z1_Zqulingjian_draw: "Z驱领舰_摸牌", "z1_Zqulingjian_draw_info": "出牌阶段每名角色限一次，你可以移去你武将牌上任意张z并令一名角色摸等量的牌。",
                             z1_Zqulingjian_source: "Z驱领舰_加伤", z1_Zqulingjian_source_info: "当你造成雷属性伤害时，你可以弃置一张“Z”，令此伤害+1。",
                             z1_Zqulingjian_damage: "Z驱领舰_减伤", z1_Zqulingjian_damage_info: "有其他角色受到雷属性伤害时，你可以弃置一张“Z”，令此伤害-1。",
                             z1_Zqulingjian_move: "Z驱领舰_移动Z", z1_Zqulingjian_move_info: "准备阶段，你可以移动一张“Z”。",
