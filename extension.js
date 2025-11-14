@@ -3366,7 +3366,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         position: 'hejs',//hej代指牌的位置，加个s即可用木流流马的牌。
                                         selectCard: function () {
                                             var player = get.player();/*if(ui.selected.targets)return [1,Math.min(trigger.targets.length,Math.floor(player.countCards('he')))];*///取消弃牌数与选择目标数相等改为固定弃置两张牌2023.8.7
-                                            if (player.hasSkill('duikongfangyu')||player.hasSkill("fangkongdanmu9_skill")) {
+                                            if (player.hasSkill('duikongfangyu') || player.hasSkill("fangkongdanmu9_skill")) {
                                                 return 1;//对空防御的技能效果。若玩家拥有对空防御，则弃牌1。&&防空弹幕的装备效果，若玩家拥有防空弹幕则弃牌1。
                                             }
                                             return 2;
@@ -12456,25 +12456,44 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhengzhansifang: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
-                                round: 1,
                                 trigger: {
-                                    target: "useCardToBefore",
+                                    player: "damageEnd",
                                 },
-                                forced: true,
-                                priority: 15,
-                                check(event, player) {
-                                    return get.effect(event.target, event.card, event.player, player) < 0;
-                                },
-                                filter(event, player) {
-                                    return (get.type(event.card, "trick") == "trick" || get.name(event.card) == "sha" || get.name(event.card) == "sheji9") && event.player != player;
-                                },
+                                frequent: true,
                                 content() {
-                                    trigger.cancel();
+                                    "step 0";
+                                    player
+                                        .chooseControl("basic", "trick", "equip")
+                                        .set("prompt", "选择获得一种类型的牌")
+                                        .set("ai", function () {
+                                            var player = _status.event.player;
+                                            if (player.hp <= 2 && !player.countCards("h", { name: ["shan", "tao"] })) return "basic";
+                                            if (player.countCards("he", { type: "equip" }) < 2) return "equip";
+                                            return "trick";
+                                        });
+                                    "step 1";
+                                    var card = get.cardPile2(function (card) {
+                                        return get.type(card, "trick") == result.control;
+                                    });
+                                    if (card) player.gain(card, "gain2", "log");
                                 },
                                 ai: {
+                                    maixie: true,
+                                    "maixie_hp": true,
                                     effect: {
-                                        target(card, player, target, current) {
-                                            if ((get.type(card, "trick") == "trick" || get.name(card) == "sha" || get.name(card) == "sheji9") && target != player) return "zerotarget";
+                                        target: function (card, player, target) {
+                                            if (get.tag(card, "damage")) {
+                                                if (player.hasSkillTag("jueqing", false, target)) return [1, -2];
+                                                if (!target.hasFriend()) return;
+                                                var num = 1;
+                                                if (get.attitude(player, target) > 0) {
+                                                    if (player.needsToDiscard()) num = 0.7;
+                                                    else num = 0.5;
+                                                }
+                                                if (target.hp >= 4) return [1, num * 2];
+                                                if (target.hp == 3) return [1, num * 1.5];
+                                                if (target.hp == 2) return [1, num * 0.5];
+                                            }
                                         },
                                     },
                                 },
@@ -12974,7 +12993,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             yangwangxingkong_draw: "仰望星空", "yangwangxingkong_draw_info": "你在摸牌阶段的摸牌数-1。",
                             yangwangxingkong_card: "弃置所有手牌",
                             yangwangxingkong_hp: "失去所有体力",
-                            zhengzhansifang: "征战四方", "zhengzhansifang_info": "锁定技，每轮限一次，你首次成为其他角色普通锦囊牌或杀的目标时，取消之。",
+                            zhengzhansifang: "征战四方", "zhengzhansifang_info": "你受到伤害后，你可以从获得牌堆中你选择的类型的一张牌。",
                             binghaihuhang: "冰海护航", "binghaihuhang_info": "装备区有牌的角色不能响应你使用的杀。",
                             zhuangjiajiaban: "装甲甲板", "zhuangjiajiaban_info": "当你受到伤害时，你可以进行一次判定，若判定结果为红色则防止此伤害。",
                             xiandaihuagaizao: "现代化改造", "xiandaihuagaizao_info": "结束阶段，你可以弃x张牌并回复一点体力，若你以此法回复体力后体力值不小于5，则你翻面并减少一点体力上限，然后获得*先进空管（x为游戏轮数且至多为3）（先进空管当你使用杀或伤害类锦囊牌时，可失去一点体力并重复执行一次此牌。）",
