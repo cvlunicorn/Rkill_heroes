@@ -9553,7 +9553,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content() {
                                     player.awakenSkill("dananbusi");
-                                    player.storage.oldniepan = true;
+                                    player.storage.dananbusi = true;
                                     trigger.cancel();
                                 },
                                 ai: {
