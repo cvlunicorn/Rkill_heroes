@@ -617,7 +617,18 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             forced: true, priority: 1, trigger: { player: ["phaseJieshuBegin", "dying"], },
                             filter: function (event, player) { return player.hasMark('_wulidebuff_ranshao') },
                             content: function () {
-                                if (player.hasSkill('_wulidebuff_ranshao')) { if (event.triggername != 'dying') { if (player.hujia == 0) { player.draw(2); } else player.draw(1); player.damage(1, 'fire'); }; player.removeSkill('_wulidebuff_ranshao'); player.removeMark('_wulidebuff_ranshao', player.countMark('_wulidebuff_ranshao')); };
+                                if (player.hasSkill('_wulidebuff_ranshao')) {
+                                    if (event.triggername != 'dying') {
+                                        if (player.hujia == 0) {
+                                            player.draw(2);
+
+                                        } else {
+                                            player.draw(1);
+                                        } player.damage(1, 'fire', "nosource");
+                                    };
+                                    player.removeSkill('_wulidebuff_ranshao');
+                                    player.removeMark('_wulidebuff_ranshao', player.countMark('_wulidebuff_ranshao'));
+                                };
                             },
                             intro: {
                                 marktext: "燃烧", content: function (player) {//+player.countMark('_wulidebuff_ranshao')+'次，'+tishi
