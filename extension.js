@@ -12490,21 +12490,29 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             xiandaihuagaizao: {
+                                intro: {
+                                    content: "已发动#次",
+                                },
+                                onremove: true,
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
                                     player: ["phaseJieshuBegin"],
                                 },
                                 filter(event, player, name) {
-                                    return player.isDamaged() && player.countCards("hes") >= Math.min(game.roundNumber, 3);
+                                    return player.countCards("hes") >= Math.min(player.countMark("xiandaihuagaizao") + 1, 3);
                                 },
                                 direct: true,
                                 content: function () {
                                     "step 0"
+                                    num = player.countMark("xiandaihuagaizao") + 1;
                                     player
-                                        .chooseToDiscard(get.prompt2("xiandaihuagaizao"), Math.min(game.roundNumber, 3), "hes")
+                                        .chooseToDiscard(get.prompt2("xiandaihuagaizao"), Math.min(num, 3), "hes")
                                         .set("ai", card => {
                                             if (ui.selected.cards.length == 2) return 10 - get.value(card);
+                                            if (player.maxHp < 5) {
+                                                return 7.5 - get.value(card);
+                                            }
                                             if (_status.event.effect > 0) {
                                                 return 6 - get.value(card);
                                             }
@@ -12514,13 +12522,25 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         .set("logSkill", ["xiandaihuagaizao", player]);
                                     "step 1"
                                     if (result.bool == true) {
-                                        player.recover(1);
+                                        player.addMark("xiandaihuagaizao", 1, false);
+                                        player.chooseControl().set('choiceList', [
+                                            '回复一点体力',
+                                            '增加一点体力上限',
+                                        ]).set('ai', function () {
+                                            if (player.hp != player.maxHp) return 0;
+                                            return 1;
+                                        });
                                     } else {
                                         event.finish();
                                     }
                                     "step 2"
-                                    if (player.hp >= 5 && !player.hasSkill("xianjinkongguan")) {
-                                        player.loseMaxHp();
+                                    if (result.index == 1) {
+                                        player.gainMaxHp(1);
+                                    }
+                                    else player.recover(1);
+                                    "step 3"
+                                    if (player.maxHp >= 5 && !player.hasSkill("xianjinkongguan")) {
+                                        player.recover();
                                         player.turnOver();
                                         player.addSkill("xianjinkongguan");
                                     }
@@ -12531,7 +12551,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 intro: {
                                     content: function (storage, player, skill) {
-                                        return '出牌阶段你使用杀或伤害类锦囊牌时，你可以失去一点体力令此牌额外结算一次。';
+                                        return '出牌阶段你使用杀或伤害类锦囊牌时，你可以受到一点无来源伤害令此牌额外结算一次。';
                                     }
                                 },
                                 trigger: {
@@ -12546,7 +12566,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return !get.tag(event.card, 'norepeat') && get.value(event.cards) + player.hp * 2 - 14 > 0;
                                 },
                                 content: function () {
-                                    player.loseHp();
+                                    player.damage("noSource");
                                     trigger.effectCount++;
                                 },
                             },
@@ -12929,7 +12949,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhengzhansifang: "征战四方", "zhengzhansifang_info": "你受到伤害后，你可以从获得牌堆中你选择的类型的一张牌。",
                             binghaihuhang: "冰海护航", "binghaihuhang_info": "装备区有牌的角色不能响应你使用的杀。",
                             zhuangjiajiaban: "装甲甲板", "zhuangjiajiaban_info": "当你受到伤害时，你可以进行一次判定，若判定结果为红色则防止此伤害。",
-                            xiandaihuagaizao: "现代化改造", "xiandaihuagaizao_info": "结束阶段，你可以弃x张牌并回复一点体力，若你以此法回复体力后体力值不小于5，则你翻面并减少一点体力上限，然后获得*先进空管（x为游戏轮数且至多为3）（先进空管当你使用杀或伤害类锦囊牌时，可失去一点体力并重复执行一次此牌。）",
+                            xiandaihuagaizao: "现代化改造", "xiandaihuagaizao_info": "结束阶段，你可以弃x张牌并回复一点体力或体力上限，若你以此法回复体力后体力上限不小于5，则你翻面并恢复一点体力，然后获得*先进空管（x为游戏轮数且至多为3）（先进空管当你使用杀或伤害类锦囊牌时，可受到一点伤害并重复执行一次此牌。）",
                             xianjinkongguan: "先进空管", "xianjinkongguan_info": "当你使用杀或伤害类锦囊牌时，可失去一点体力并重复执行一次此牌。",
                             zhanxianyuanhu: "战线援护", "zhanxianyuanhu_info": "游戏开始时，你选择一名角色，其受到伤害时防止之，改为你受到此伤害值-1的伤害。",
                             //第二次配音到这里
