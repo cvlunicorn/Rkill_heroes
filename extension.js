@@ -8713,7 +8713,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     nofire: true,
                                     effect: {
                                         target: function (card, player, target, current) {
-                                            if (get.tag(card, 'fireDamage')) return 'zerotarget';
+                                            if (get.tag(card, 'thunderDamage')) return 'zerotarget';
                                         },
                                     },
                                 },
@@ -8755,9 +8755,18 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     "step 3"
                                     if (result.bool) {
                                         var target = result.targets[0];
-                                        target.damage(event.num);
+                                        target.damage(event.num, trigger.source || "nosource", "nocard");
                                         target.draw(event.num);
                                     }
+                                },
+                                ai: {
+                                    "maixie_defend": true,
+                                    effect: {
+                                        target(card, player, target) {
+                                            if (player.hasSkillTag("jueqing", false, target)) return;
+                                            if (get.tag(card, "damage")) return 0.7;
+                                        },
+                                    },
                                 },
                                 "_priority": 0,
                             },
@@ -12359,7 +12368,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return -target.countCards("he") - (player.countCards("h", "du") ? 1 : 0);
                                         },
                                     },
-                                    threaten: 2,
+                                    threaten: 1.1,
                                 },
                                 intro: {
                                     content: "limited",
