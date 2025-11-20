@@ -11693,7 +11693,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
                             },
-                            jinyangmaozhishi: {
+                            /* jinyangmaozhishi: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: { player: "dying", },
@@ -11723,8 +11723,66 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                     },
                                 },
+                            }, */
+                            jinyangmaozhishi: {
+                                nobracket: true,
+                                unique: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: {
+                                    target: "useCardToBefore",
+                                },
+                                mark: true,
+                                skillAnimation: true,
+                                limited: true,
+                                animationColor: "orange",
+                                init(player) {
+                                    player.storage.jinyangmaozhishi = false;
+                                },
+                                check(event, player) {
+                                    if (player.hp <= 1) {
+                                        let evt = event.getParent(),
+                                            directHit = (evt.nowuxie && get.type(event.card, "trick") === "trick") || (evt.directHit && evt.directHit.includes(player)) || (evt.customArgs && evt.customArgs.default && evt.customArgs.default.directHit2);
+                                        if (get.tag(event.card, "respondSha")) {
+                                            if (directHit || player.countCards("h", { name: "sha" }) === 0) return true;
+                                        } else if (get.tag(event.card, "respondShan")) {
+                                            if (directHit || player.countCards("h", { name: "shan" }) === 0) return true;
+                                        } else if (get.tag(event.card, "damage")) {
+                                            if (event.card.name === "huogong") return event.player.countCards("h") > 4 - player.hp - player.hujia;
+                                            if (event.card.name === "shuiyanqijunx") return player.countCards("e") === 0;
+                                            return true;
+                                        }
+                                    } else return false;
+                                },
+                                filter(event, player) {
+                                    return event.player != player && player.isDamaged();
+                                },
+                                content() {
+                                    player.awakenSkill("jinyangmaozhishi");
+                                    player.storage.jinyangmaozhishi = true;
+                                    //trigger.getParent().targets.remove(player);
+                                    trigger.cancel();
+                                },
+                                ai: {
+                                    order: 1,
+                                    skillTagFilter(player, arg, target) {
+                                        if (player != target || player.storage.jinyangmaozhishi) return false;
+                                    },
+                                    save: true,
+                                    result: {
+                                        player(player) {
+                                            return 10;
+                                        },
+                                    },
+                                    threaten(player, target) {
+                                        if (!target.storage.jinyangmaozhishi) return 0.8;
+                                    },
+                                },
+                                intro: {
+                                    content: "limited",
+                                },
+                                "_priority": 0,
                             },
-                            zhengzhansihai: {
+                            /* zhengzhansihai: {
                                 nobracket: true,
                                 force: true,
                                 mod: {
@@ -11751,6 +11809,25 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         if (target.maxHp == 2) return 2;
                                         return 0.8;
                                     },
+                                },
+                            }, */
+                            zhengzhansihai: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: {
+                                    player: "damageEnd",
+                                    source: "damageSource",
+                                },
+                                usable: 1,
+                                filter: function (event, player) {
+                                    if (event._notrigger.includes(event.player)) return false;
+                                    return event.num && event.source && event.player && event.player.isIn() && event.source.isIn();
+                                },
+                                content: function () {
+                                    player.draw(player.maxHp - player.hp);
+                                },
+                                ai: {
+                                    maixie: true,
                                 },
                             },
                             shuqinzhiyin: {
@@ -12945,8 +13022,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             fenzhandaodi: "奋战到底", "fenzhandaodi_info": "你的手牌上限基数为你的体力上限。你可以将红色牌当作雷杀使用。你使用杀指定的目标不能使用花色与此杀不相同的牌响应。",
                             huofu: "祸福", "huofu_info": "锁定技，若你于回合内弃置了红色基本牌，则防止你受到由红色牌造成的伤害直至你下回合开始。",
                             xunqian: "巡潜", "xunqian_info": "你使用锦囊牌时，你可以摸一张牌，然后你选择：1.弃置一张牌；2.将任意张牌交给一名其他角色。",
-                            jinyangmaozhishi: "金羊毛之誓", "jinyangmaozhishi_info": "锁定技，你进入濒死时，若你体力上限大于一，你扣减一点体力上限并回复一点体力。",
-                            zhengzhansihai: "征战四海", "zhengzhansihai_info": "锁定技，你的手牌上限+X，你造成的伤害+X（X为你损失的体力上限数）",
+                            jinyangmaozhishi: "金羊毛之誓", "jinyangmaozhishi_info": "限定技，当你成为其他角色使用牌的目标时，若你已受伤，你可以令此牌对你无效。",
+                            zhengzhansihai: "征战四海", "zhengzhansihai_info": "每回合限一次，当你造成或受到伤害后，你可以摸x张牌，x为你已损失的体力值。",
                             shuqinzhiyin: "竖琴之音", "shuqinzhiyin_info": "每轮限一次，其他角色技能结算后，你可以弃置两张牌，重置一名其他角色武将牌上的技能，然后其回复一点体力",
                             yixinyiyi: "一心一意", "yixinyiyi_info": "你可以将一张手牌当作雷杀使用。此杀根据主公已损失体力值:不小于一点，无距离限制，不小于两点，无次数限制，不小于三点，伤害+1。",
                             buxiuzhanshi: "不朽战士", "buxiuzhanshi_info": "出牌阶段限一次，你可以弃置任意张牌，视为对等量名角色使用决斗。下个回合摸牌阶段，你的摸牌数量+x（x为你本回合以此法对造成的伤害数）",
