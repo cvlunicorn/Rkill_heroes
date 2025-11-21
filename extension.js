@@ -5224,6 +5224,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     global: "useCardToPlayered",
                                 },
+                                check: function (event, player) {
+                                    return get.attitude(player, event.target) > 0;
+                                },
                                 filter: function (event, player) {
                                     return (event.card.name == 'sha' || event.card.name == 'sheji9') && !player.countMark('31jiezhongdui') && _status.currentPhase.hp <= event.target.hp;
                                 },
