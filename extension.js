@@ -7043,7 +7043,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             var cards = player.getExpansions('Z'), count = cards.length;
                                             if (count > 0) {
                                                 player.chooseCardButton('移去任意张Z', true, cards).set('ai', function (button) {
-                                                    game.log("Z驱1");
                                                     return 1;
                                                 }).set('selectButton', [0, cards.length]);
                                             }
@@ -7052,11 +7051,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             event.cards = result.links;
                                             event.num = event.cards.length;
                                             player.loseToDiscardpile(event.cards);
-                                            player.chooseTarget(get.prompt("z1_Zqulingjian_draw"), "令一名角色摸" + get.translation(event.num) + "张牌。", function (card, player, target) {
+                                            player.chooseTarget(get.prompt("z1_Zqulingjian_draw"), "令一名角色摸" + get.translation(event.num) + "张牌。", true, function (card, player, target) {
                                                 return !target.hasSkill("z1_Zqulingjian_draw_used");
                                             }).set("ai", function (target) {
-                                                game.log("Z驱2");
-                                                return get.attitude(_status.event.player, target);
+                                                var player = _status.event.player;
+                                                return get.attitude(player, target);
                                             });
                                             "step 2";
                                             if (result.bool) {
