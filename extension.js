@@ -7043,6 +7043,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             var cards = player.getExpansions('Z'), count = cards.length;
                                             if (count > 0) {
                                                 player.chooseCardButton('移去任意张Z', true, cards).set('ai', function (button) {
+                                                    game.log("Z驱1");
                                                     return 1;
                                                 }).set('selectButton', [0, cards.length]);
                                             }
@@ -7054,6 +7055,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             player.chooseTarget(get.prompt("z1_Zqulingjian_draw"), "令一名角色摸" + get.translation(event.num) + "张牌。", function (card, player, target) {
                                                 return !target.hasSkill("z1_Zqulingjian_draw_used");
                                             }).set("ai", function (target) {
+                                                game.log("Z驱2");
                                                 return get.attitude(_status.event.player, target);
                                             });
                                             "step 2";
@@ -9368,36 +9370,38 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return res;
                                         },
                                         target(player, target) {
-                                            let zhu = (get.mode() === "identity" && isZhu(target)) || target.identity === "zhu";
-                                            if (!lib.filter.cardRespondable({ name: "shan" }, target)) {
-                                                if (zhu) {
-                                                    if (target.hp < 2) return -99;
-                                                    if (target.hp === 2) return -3.6;
+                                            if (target && target != "undefined") {
+                                                let zhu = (get.mode() === "identity" && target.isZhu) || target.identity === "zhu";
+                                                if (!lib.filter.cardRespondable({ name: "shan" }, target)) {
+                                                    if (zhu) {
+                                                        if (target.hp < 2) return -99;
+                                                        if (target.hp === 2) return -3.6;
+                                                    }
+                                                    return -2;
                                                 }
-                                                return -2;
+                                                let known = target.getKnownCards(player);
+                                                if (
+                                                    known.some((card) => {
+                                                        let name = get.name(card, target);
+                                                        if (name === "shan" || name === "hufu")
+                                                            return lib.filter.cardRespondable(card, target);
+                                                        if (name === "wuxie")
+                                                            return lib.filter.cardEnabled(card, target, "forceEnable");
+                                                    })
+                                                )
+                                                    return -1.2;
+                                                let nh = target.countCards("hs", (i) => !known.includes(i));
+                                                if (zhu && target.hp <= 1) {
+                                                    if (nh === 0) return -99;
+                                                    if (nh === 1) return -60;
+                                                    if (nh === 2) return -36;
+                                                    if (nh === 3) return -8;
+                                                    return -5;
+                                                }
+                                                if (target.hasSkillTag("respondShan", true, "respond", true)) return -1.35;
+                                                if (!nh) return -2;
+                                                if (nh === 1) return -1.65;
                                             }
-                                            let known = target.getKnownCards(player);
-                                            if (
-                                                known.some((card) => {
-                                                    let name = get.name(card, target);
-                                                    if (name === "shan" || name === "hufu")
-                                                        return lib.filter.cardRespondable(card, target);
-                                                    if (name === "wuxie")
-                                                        return lib.filter.cardEnabled(card, target, "forceEnable");
-                                                })
-                                            )
-                                                return -1.2;
-                                            let nh = target.countCards("hs", (i) => !known.includes(i));
-                                            if (zhu && target.hp <= 1) {
-                                                if (nh === 0) return -99;
-                                                if (nh === 1) return -60;
-                                                if (nh === 2) return -36;
-                                                if (nh === 3) return -8;
-                                                return -5;
-                                            }
-                                            if (target.hasSkillTag("respondShan", true, "respond", true)) return -1.35;
-                                            if (!nh) return -2;
-                                            if (nh === 1) return -1.65;
                                             return -1.5;
                                         },
                                     },
