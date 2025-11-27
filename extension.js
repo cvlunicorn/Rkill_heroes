@@ -13122,7 +13122,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             maliyanaliehuoji: "马里亚纳猎火鸡", "maliyanaliehuoji_info": "每名角色的弃牌阶段结束时，你可以本阶段进入弃牌堆的牌中选择至多3张牌，令一名其他角色用自己区域内任意张花色数相等的牌置换之。若其置换后手牌数增加，则其受到X点火属性伤害，X=增加的手牌数。",
                             tebiekongxi: "特别空袭", "tebiekongxi_info": "转换技，阳:你的回合外；阴:你的回合内，当你因使用打出或弃置而一次性失去两张或更多牌时，你可以将其中一张牌置于武将牌上，称为“战”(至多三张)。你可以将“战”当作无懈可击使用或如手牌般使用打出。",
                             beijixingweishe: "北极星威慑", "beijixingweishe_info": "你使用杀对其他角色造成伤害后，目标不能使用或打出杀直到其回合结束。",
-                            beijixingweishe_effect: "北极星威慑效果", "beijixingweishe_info": "不能使用或打出杀直到回合结束。",
+                            beijixingweishe_effect: "北极星威慑效果", "beijixingweishe_effect_info": "不能使用或打出杀直到回合结束。",
                             jianduixunlian: "舰队训练", "jianduixunlian_info": "出牌阶段限一次，你可以观看一名角色的手牌，然后交换一种花色的所有牌。",
                             aizhi: "爱知", "aizhi_info": "出牌阶段限一次，你可以观看并弃置你攻击范围外玩家的一张手牌，若为锦囊牌此技能视为未发动过。然后你可以弃置一张牌，视为使用之。",
                             longgu: "龙崮", "longgu_info": "你存活时，与你同势力的角色和主公准备阶段时，可以跳过摸牌阶段并选择一项：不能成为基本牌/普通锦囊牌和延时锦囊牌的目标，直至其下一次使用基本牌/普通锦囊牌和延时锦囊牌。",
