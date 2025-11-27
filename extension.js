@@ -229,7 +229,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "你死亡后，若你为忠臣，你可以令主公摸一张牌。<br><br>" +
                             "<b>建造:</b>若你进行了至少一次强化：出牌阶段" +
                             "你可以弃置3张不同花色的牌，提升一点血量上限，解锁强化二级效果。<br>" +
-                            "<b>强化:</b>出牌阶段限一次，你可以弃置二至四张牌，选择一至两个效果升级。（如摸牌、攻击距离、手牌上限等）<br><br>" +
+                            "<b>强化:</b>出牌阶段限一次，你可以弃置二至四张牌，选择一至两个效果升级。（如摸牌、攻击距离、手牌上限等）。一级效果需要两张牌；二级效果需要3张牌。<br><br>" +
                             "<b>属性伤害:</b>火杀燃烧:令目标回合结束后，受到一点火焰伤害，摸两张张牌。<br>" +
                             "冰杀减速:对有护甲的目标加1伤害；减少1点其他角色计算与目标的距离。<br>" +
                             "雷杀进水:有护甲时改为造成目标流失体力；减少目标1点手牌上限。<br>" +
@@ -397,7 +397,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
             if (config._qianghuazhuang) {//优化摸牌时牌的质量的技能
                 lib.skill._qianghuazhuang = {
-                    name: "强化装备", prompt: "每回合限一次，你可以弃置二至四张牌，将手牌转化为强化点数，<br>每2点强化点数换一个永久的效果升级。<br>（可选择如减少技能消耗、增加武器攻击距离、提高手牌上限等）<br>强化上限为建造的次数，最高强化至2级。<br>已存储的经验会降低弃牌最低牌数", mark: true, intro: {
+                    name: "强化装备", prompt: "每回合限一次，你可以弃置二至四张牌，将手牌转化为强化点数，<br>每2点强化点数换一级永久的效果升级。二级需要3点。<br>（可选择如减少技能消耗、增加武器攻击距离、提高手牌上限等）<br>建造前强化上限一级，建造后强化上限2级。<br>已存储的经验会降低弃牌最低牌数", mark: true, intro: {
                         marktext: "装备", content: function (storage, player) {//只有content与mark可以function吧，内容，介绍的文字与内容。
                             var info = lib.skill._qianghuazhuang.getInfo(player);
                             return '<div class="text center"><span class=greentext>用一摸一:' + info[0] + '<br>技能耗牌：' + info[1] + '</span><br><span class=firetext>出杀距离：-' + info[2] + '<br>攻击次数:' + info[3] + '</span><br><span class=thundertext>被杀距离：+' + info[4] + '<br>手牌上限:' + info[5] + '<br>Exp:' + info[7] + '</span></div>';
@@ -495,7 +495,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         var xuanze = Math.max(Math.floor(event.cao.length / 2 + info[7]), 1);
                         //game.log("xuanze" + xuanze);
                         player.chooseButton([
-                            '将手牌转化为强化点数强化以下能力；取消将返还卡牌，<br>未使用完的点数将保留，上限默认为1，发动建造技能后提高。',
+                            '将手牌转化为强化点数强化以下能力；取消将返还卡牌，未使用完的点数将保留。<br>强化上限默认为1，发动建造技能后提高。<br>一级强化需要2点，二级强化需要3点强化点数。<br>鼠标滚轮或下拉查看所有选项。',
                             [choiceList, 'textbutton'],
                         ]).set('filterButton', button => {
                             var event = _status.event;
@@ -1138,7 +1138,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 mark: false, intro: { content: function () { return get.translation('建造的次数，用于提升升级上限。'); }, },
                             },
                             _qianghuazhuang: {
-                                name: "强化装备", prompt: "每回合限一次，你可以弃置二至四张牌，将手牌转化为强化点数，<br>每2点强化点数换一个永久的效果升级。<br>（可选择如减少技能消耗、增加武器攻击距离、提高手牌上限等）<br>强化上限为建造的次数，最高强化至2级。<br>已存储的经验会降低弃牌最低牌数", mark: true, intro: {
+                                name: "强化装备", prompt: "每回合限一次，你可以弃置二至四张牌，将手牌转化为强化点数，<br>每2点强化点数换一级永久的效果升级。二级需要3点。<br>（可选择如减少技能消耗、增加武器攻击距离、提高手牌上限等）<br>建造前强化上限一级，建造后强化上限2级。<br>已存储的经验会降低弃牌最低牌数", mark: true, intro: {
                                     marktext: "装备", content: function (storage, player) {//只有content与mark可以function吧，内容，介绍的文字与内容。
                                         var info = lib.skill._qianghuazhuang.getInfo(player);
                                         return '<div class="text center"><span class=greentext>用一摸一:' + info[0] + '<br>技能耗牌：' + info[1] + '</span><br><span class=firetext>出杀距离：-' + info[2] + '<br>攻击次数:' + info[3] + '</span><br><span class=thundertext>被杀距离：+' + info[4] + '<br>手牌上限:' + info[5] + '<br>Exp:' + info[7] + '</span></div>';
@@ -1236,7 +1236,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     var xuanze = Math.max(Math.floor(event.cao.length / 2), 1);
                                     //game.log("xuanze" + xuanze);
                                     player.chooseButton([
-                                        '将手牌转化为强化点数强化以下能力；取消将返还卡牌，<br>未使用完的点数将保留，上限默认为1，发动建造技能后提高。',
+                                        '将手牌转化为强化点数强化以下能力；取消将返还卡牌，未使用完的点数将保留。<br>强化上限默认为1，发动建造技能后提高。<br>一级强化需要2点，二级强化需要3点强化点数。<br>鼠标滚轮或下拉查看所有选项。',
                                         [choiceList, 'textbutton'],
                                     ]).set('filterButton', button => {
                                         var event = _status.event;
@@ -4855,7 +4855,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     var xuanze = Math.max(h + 1, 1);
                                     //game.log("xuanze" + xuanze);
                                     player.chooseButton([
-                                        '将手牌转化为强化点数强化以下能力；取消将返还卡牌，<br>未使用完的点数将保留，上限默认为1，发动建造技能后提高。',
+                                        '将手牌转化为强化点数强化以下能力；取消将返还卡牌，未使用完的点数将保留。<br>强化上限默认为1，发动建造技能后提高。<br>一级强化需要2点，二级强化需要3点强化点数。<br>鼠标滚轮或下拉查看所有选项。',
                                         [choiceList, 'textbutton'],
                                     ]).set('filterButton', button => {
                                         var event = _status.event;
