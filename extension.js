@@ -892,8 +892,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lishizhanyi_haixiafujizhan: ["u47", "u81", "u505", "jinqu", "kente", "u96", "lundun"],
                                 weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan", "sp_aisaikesi", "sp_ninghai", "sp_zhongtudao", "xukufu"],
                                 cangqinghuanying: ["mist_dujiaoshou", "mist_xiawu", "mist_shanhuhai"],
+                                shixinrumoR_tan: [],
+                                shixinrumoR_chen: [],
+                                shixinrumoR_chi: ["pachina"],
+                                shixinrumoR_man: [],
+                                shixinrumoR_yi: [],
                             },
-
                         },
                         character: {
                             liekexingdun: ["female", "USN", 4, ["hangmucv", "hangkongzhanshuxianqu"], ["zhu", "des:　由列克星敦级战列巡洋舰改装而来。1927年服役之后同姐妹舰萨拉托加号多次参加美国海军的各种演习，为航母的使用和发展积累了大量经验。日军偷袭珍珠港时列克星敦号因正向威克岛运输飞机而躲过一劫。1942年的珊瑚海海战中，列克星敦号击沉击伤日军航母各一艘，但自身也被日本航母重创，后因损管不利，油气爆炸而沉没。"]],
@@ -985,6 +989,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             aisijimoren: ["female", "RN", 3, ["dajiaoduguibi", "quzhudd", "zhengzhansifang", "binghaihuhang"], ["des:部族级驱逐舰的5号舰，该级以世界各个民族命名。爱斯基摩人号参加了纳尔维克海战，在海战中被德军驱逐舰打掉了舰首。修复之后主要执行护航任务，并在战斗中击沉过德军潜艇，也曾进行过一次接舷跳帮作战。战后于1949年退役。"]],
                             sp_zhongtudao: ["female", "USN", '3/4', ["hangmucv", "zhuangjiajiaban", "xiandaihuagaizao"], ["des:中途岛级航母是美国海军在二战中设计的最后一型航母，也是海军第一艘真正意义上摆脱了条约限制的航母（前代埃塞克斯级由于设计时间过短而继承了很多约克城级的特征），在核心思路上大量参考了英国的装甲航母设计，而在舰体设计上则借用了蒙大拿级的设计。中途岛号在1945年3月下水时的排水量为45000吨，是此后10年内全球最大的现役航母；在长达52年的服役史中，她是海军首艘接触斜角甲板概念的航母，先后参与了越南战争（击落了战争中第一架和最后一架敌机）和海湾战争，接受了两次大规模现代化改造，最终于1997年退役，作为博物馆保存至今。"]],
                             guying: ["female", "IJN", 4, ["huokongld", "zhongxunca", "zhanxianyuanhu"], ["des:该型是日本在八八舰队时期设计的侦查巡洋舰，由于之后海军条约的签署，根据规定古鹰型被划为重巡洋舰。在37年，两艘古鹰型进行了大改装，单装主炮换为新式连装炮，其余武备和设施也进行了更新，外形上和青叶型很相似。古鹰号在战争初期很活跃，参与了威克岛到中途岛的一系列作战。42年古鹰号编入三川的第八舰队，在萨沃岛海战中重创了美军。不过在同年10月的海战中，古鹰号好运不再，被美军击沉。"]],
+
+                            pachina: ["female", "RM", 6, ["yaosai", "xinao"], ["des:位于意大利西西里的帕基罗角（Pachino）。实际上意大利的海军并未在这里修建要塞，反而是英军的次要登陆场，英军在该地登陆后还建立了临时机场。"]],
 
 
                             skilltest: ["male", "OTHER", 9, [], ["forbidai", "des:测试用"]],
@@ -12719,6 +12725,76 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     threaten: 1.05,
                                 },
                             },
+                            xinao: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                round: 1,
+                                trigger: {
+                                    player: "damageEnd",
+                                },
+                                check: function (event, player) {
+                                    if (player.countCards("h", { tag: "recover" }) < 0) { return player.hp <= 2; }
+                                    return player.isDamaged() && Math.floor(player.countCards("h") / 2) < (player.maxHp - player.hp);
+                                },
+                                filter: function (event, player) {
+                                    if (player.storage.xinao && player.storage.xinao[0]) { return false; }
+                                    return !player.isTurnedOver() && player.countCards("h");
+                                },
+                                content: function () {
+                                    "step 0"
+                                    player.chooseTarget(get.prompt2("xinao"), function (card, player, target) {
+                                        return player != target;
+                                    }).set("ai", function (target) {
+                                        let player = _status.event.player;
+                                        if (player.hp <= 2) return get.attitude(player, target) + 2;
+                                        return get.attitude(player, target) - 1;
+                                    });
+                                    "step 1"
+                                    if (result.bool) {
+                                        var target = result.targets[0];
+                                        var num = player.countCards("h");
+                                        player.give(player.getCards("h"), target);
+                                        player.storage.xinao = [target];
+                                        player.turnOver();
+                                        player.recover(Math.floor(num / 2));
+                                        player.addTempSkill("zhuangjiafh", { player: "phaseBegin" });
+                                    }
+                                },
+                                ai: {
+                                    "maixie_defend": true,
+                                    effect: {
+                                        target: function (card, player, target) {
+                                            if (player.countCards("he") > 1 && get.tag(card, "damage")) {
+                                                if (player.hasSkillTag("jueqing", false, target)) return [1, -1.5];
+                                                if (target.hp <= 1) return;
+                                                if (!target.hasFriend()) return;
+                                                if (get.attitude(target, player) < 0 && target.countCards("h") >= 1) return [1, 1];
+                                            }
+                                        },
+                                    },
+                                },
+                                group: ["xinao_back"],
+                                subSkill: {
+                                    back: {
+                                        nobracket: true,
+                                        audio: "ext:舰R牌将/audio/skill:true",
+                                        trigger: {
+                                            player: "phaseUseBegin",
+                                        },
+                                        frequent: true,
+                                        filter: function (event, player) {
+                                            game.log(player.storage.xinao);
+                                            return player.storage.xinao && player.storage.xinao[0].isAlive;
+                                        },
+                                        content: function () {
+                                            "step 0";
+                                            event.target = player.storage.xinao[0];
+                                            event.target.give(event.target.getCards("h"), player);
+                                            delete player.storage.xinao;
+                                        },
+                                    },
+                                },
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -12808,6 +12884,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             sp_zhongtudao: "SP中途岛",
                             guying: "古鹰",
 
+                            pachina: "要塞姬",
+
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
                             zhongxunca: "重巡", "zhongxunca_info": "",
@@ -12816,6 +12894,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             fangqu: "防驱",
                             daodan: "防空导弹",
                             zhandouji: "战斗机",
+                            yaosai: "要塞",
                             "fangqu_info": "游戏开始时/出牌阶段开始时，将至多1/2/3张手牌放到武将牌上.称为防空导弹。锦囊牌被使用时，你可以移去一枚防空导弹，令其无效。",
                             "fangqu_wuxie": "发射防空导弹",
                             hangmucv: "航母", "hangmucv_info": "(可强化)你的出牌阶段开始时，<br>你可以将任意张：零级强化，黑桃或梅花手牌；一级强化，黑桃或梅花或红桃手牌；二级强化，任意手牌。当作万箭齐发对等量个目标使用",
@@ -13046,6 +13125,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhanxianyuanhu: "战线援护", "zhanxianyuanhu_info": "游戏开始时，你选择一名角色，其受到伤害时防止之，改为你受到此伤害值-1的伤害。",
                             //第二次配音到这里
 
+                            xinao: "嬉闹", "xinao_info": "每轮限一次，你受到伤害后,若你正面朝上且没有嬉闹对象，你可以将所有手牌交给一名其他角色并记录，然后你翻面。若如此做，你回复X点体力然后获得“装甲”直到下回合开始。(x为你交出的手牌数/2向下取整)。你的出牌阶段开始时，你令嬉闹对象交给你所有手牌并清空记录。",
+                            xinao_back: "嬉闹",
+
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
@@ -13054,6 +13136,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             lishizhanyi_danmaihaixia: '历史战役-丹麦海峡',
                             lishizhanyi_shanhuhai: '历史战役-珊瑚海',
                             lishizhanyi_haixiafujizhan: '历史战役-海峡伏击战',
+                            shixinrumoR: "蚀心入魔",
+                            shixinrumoR_tan: "蚀心入魔-贪",
+                            shixinrumoR_chen: "蚀心入魔-嗔",
+                            shixinrumoR_chi: "蚀心入魔-痴",
+                            shixinrumoR_man: "蚀心入魔-慢",
+                            shixinrumoR_yi: "蚀心入魔-疑",
                             weijingzhizhi: '未竟之志',
                             cangqinghuanying: '苍青幻影',
                         },
