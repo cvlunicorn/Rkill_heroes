@@ -6971,16 +6971,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     } else if (event.player.group == "KMS" && event.player.hasSkill("quzhudd")) {
                                         //game.log("受到伤害是德驱");
                                         return true;
-                                    } else {
-                                        //game.log("不满足发动条件");
-                                        return false;
-                                    }
+                                    } //game.log("不满足发动条件");
+                                    return false;
                                 },
                                 content: function () {
                                     "step 0"
                                     player.addToExpansion(trigger.cards, 'gain2').gaintag.add('Z');
                                 },
-                                group: [/* "z1_Zqulingjian_source", "z1_Zqulingjian_damage", */ "z1_Zqulingjian_move", "z1_Zqulingjian_draw"],
+                                group: ["z1_Zqulingjian_move", "z1_Zqulingjian_draw"],/* "z1_Zqulingjian_source", "z1_Zqulingjian_damage", */
                                 subSkill: {
                                     /* source: {
                                         trigger: {
@@ -7042,45 +7040,50 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     draw: {
                                         enable: "phaseUse",
                                         filter: function (event, player) {
-                                            return player.getExpansions('Z').length;;
+                                            return player.getExpansions('Z').length > 0;
                                         },
                                         content: function () {
                                             'step 0'
-                                            var cards = player.getExpansions('Z'), count = cards.length;
+                                            var cards = player.getExpansions('Z');
+                                            var count = cards.length;
                                             if (count > 0) {
                                                 player.chooseCardButton('移去任意张Z', true, cards).set('ai', function (button) {
                                                     return 1;
                                                 }).set('selectButton', [0, cards.length]);
                                             }
-                                            else event.finish();
+                                            else { event.finish(); }
                                             'step 1'
-                                            event.cards = result.links;
-                                            event.num = event.cards.length;
-                                            player.loseToDiscardpile(event.cards);
-                                            player.chooseTarget(get.prompt("z1_Zqulingjian_draw"), "令一名角色摸" + get.translation(event.num) + "张牌。", true, function (card, player, target) {
-                                                return !target.hasSkill("z1_Zqulingjian_draw_used");
-                                            }).set("ai", function (target) {
-                                                var player = _status.event.player;
-                                                return get.attitude(player, target);
-                                            });
+                                            if (result.bool) {
+                                                event.cards = result.links;
+                                                event.num = event.cards.length;
+                                                player.loseToDiscardpile(event.cards);
+                                                player.chooseTarget(get.prompt("z1_Zqulingjian_draw"), "令一名角色摸" + get.translation(event.num) + "张牌。", true, function (card, player, target) {
+                                                    return 1;
+                                                }).set("ai", function (target) {
+                                                    var player = _status.event.player;
+                                                    return get.attitude(player, target);
+                                                });
+                                            } else { event.finish(); }
                                             "step 2";
                                             if (result.bool) {
                                                 var target = result.targets[0];
-                                                event.bool = false;
                                                 target.draw(event.num);
-                                                target.addTempSkill("z1_Zqulingjian_draw_used", { global: "phaseEnd" });
                                             } else {
                                                 event.finish();
                                             }
 
                                         },
                                         ai: {
-                                            order: 7.2,
+                                            order: 7.5,
+                                            basic: {
+                                                order: 2,
+                                                useful: 1,
+                                                value: 4,
+                                            },
                                             result: {
                                                 player: 1,
                                             },
                                         },
-
                                     },
                                     move: {
                                         trigger: {
@@ -7092,7 +7095,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         content: function* (event, map) {
                                             "step 0"
                                             var player = map.player;
-                                            var result = yield player.chooseTarget('Z驱领舰：请选择移动一张Z', true, 2, (card, player, target) => {
+                                            var result = yield player.chooseTarget('Z驱领舰：请选择移动一张Z', 2, (card, player, target) => {
                                                 if (ui.selected.targets.length) {
                                                     return true;
                                                 }
@@ -7100,8 +7103,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             }).set('targetprompt', ['移走Z', '获得Z']).set('multitarget', true).set('ai', target => {
                                                 if (!ui.selected.targets.length) {
                                                     if (get.attitude(player, target) < 0) { return -get.attitude(player, target) }
-                                                    else if (player.getExpansions('Z').length > 1 && target.getExpansions('Z').length < 1) {
+                                                    else if (target.getExpansions('Z').length > 1 && player.getExpansions('Z').length < 1) {
                                                         return 4 - get.attitude(player, target);
+                                                    } else if (player.getExpansions('Z').length && game.filterPlayer(function (current) {
+                                                        return current.hp <= 2 && current.getExpansions('Z').length < 1;
+                                                    })) {
+                                                        return player == target;
+
+                                                    } else {
+                                                        return "cancel2";
                                                     }
                                                 }
                                                 else return get.attitude(player, target);
@@ -7124,13 +7134,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 var result1 = yield player.chooseCardButton('Z驱领舰：选择一张“Z”移动', true, cards).set('ai', function (button) {
                                                     return 1;
                                                 });
-                                            }
+                                            } else { event.finish(); }
                                             "step 2"
-                                            //game.log(result1.links);
-                                            //game.log(result.targets[0]);
-                                            var cards = result1.links;
-                                            result.targets[0].loseToDiscardpile(cards);
-                                            result.targets[1].addToExpansion(cards, 'gain2').gaintag.add('Z');
+                                            if (result.bool) {
+                                                var cards = result1.links;
+                                                result.targets[0].loseToDiscardpile(cards);
+                                                result.targets[1].addToExpansion(cards, 'gain2').gaintag.add('Z');
+                                            } else { event.finish(); }
                                             "step 3"
                                             player.logSkill("z1_Zqulingjian_move");
                                             event.finish();
@@ -11852,7 +11862,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter: function (event, player) {
                                     //game.log(get.translation(event.type));
                                     //game.log(get.translation(event.player));
-                                    return event.type == "player" && event.player != player;
+                                    return event.type == "player" && event.player != player && player.countCards("h") >= 2;
                                 },
                                 check(event, player) {
                                     return get.attitude(player, event.player) > 0;
@@ -11874,7 +11884,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 var skills = target.getOriginalSkills();
                                                 var list = [];
                                                 for (var i = 0; i < skills.length; i++) {
+                                                    var skillKey = skills[i];
+                                                    if (!skillKey || typeof skillKey !== "string") {
+                                                        continue;
+                                                    }
                                                     var info = get.info(skills[i]);
+                                                    if (!info || typeof info !== "object") {
+                                                        continue;
+                                                    }
                                                     if (typeof info.usable == "number") {
                                                         if (target.hasSkill("counttrigger") && target.storage.counttrigger[skills[i]] && target.storage.counttrigger[skills[i]] >= 1) {
                                                             list.push(skills[i]);
@@ -11905,10 +11922,20 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         var target = result.targets[0];
                                         var skills = target.getStockSkills(true, true);
                                         game.expandSkills(skills);
+                                        //game.log(skills);
                                         var resetSkills = [];
                                         var suffixs = ["used", "round", "block", "blocker"];
                                         for (var skill of skills) {
+                                            //game.log(skill);
+                                            var skillKey = skill;
+                                            if (!skillKey || typeof skillKey !== "string") {
+                                                continue;
+                                            }
                                             var info = get.info(skill);
+                                            //game.log(JSON.stringify(info));
+                                            if (!info || typeof info !== "object") {
+                                                continue;
+                                            }
                                             if (typeof info.usable == "number") {
                                                 if (target.hasSkill("counttrigger") && target.storage.counttrigger[skill] && target.storage.counttrigger[skill] >= 1) {
                                                     delete target.storage.counttrigger[skill];
@@ -11944,8 +11971,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             }
                                             game.log(target, "重置了技能", "#g" + str.slice(0, -1));
                                         }
-
-                                        target.recover(1);
+                                        if (target.isDamaged()) {
+                                            target.recover(1);
+                                        }
                                     }
                                 },
                                 "_priority": 0,
@@ -13012,11 +13040,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             u81_zonglie_shanghai: "纵猎", u81_zonglie_shanghai_info: "",
                             u81_zonglie: "纵猎", u81_zonglie_info: "每回每名角色限一次，你对其他角色造成伤害时，若其手牌与你不相等，其可以交给你一张手牌并摸一张牌，防止此伤害，如此做，其本回合不能响应你的牌。",
                             u81_xunyi: "巡弋", u81_xunyi_info: "每回合限一次，你的攻击范围内，有角色在回合外获得牌时，若其不处于濒死状态，你可以令全场角色选择是否对其使用一张牌。",
-                            z1_Zqulingjian: "Z驱领舰", z1_Zqulingjian_info: "当G国驱逐舰受到/造成伤害后，你可以将造成伤害的牌置于武将牌上称为“Z”。有其他角色受到雷属性伤害时，你可以弃置一张“Z”，令此伤害-1；当你造成雷属性伤害时，你可以弃置一张“Z”，令此伤害+1。准备阶段，你可以移动一张“Z”。(全局)有Z的角色受到伤害时，可以移去所有Z，防止此伤害。",
-                            z1_Zqulingjian_draw: "Z驱领舰_摸牌", "z1_Zqulingjian_draw_info": "出牌阶段每名角色限一次，你可以移去你武将牌上任意张z并令一名角色摸等量的牌。",
-                            z1_Zqulingjian_source: "Z驱领舰_加伤", z1_Zqulingjian_source_info: "当你造成雷属性伤害时，你可以弃置一张“Z”，令此伤害+1。",
-                            z1_Zqulingjian_damage: "Z驱领舰_减伤", z1_Zqulingjian_damage_info: "有其他角色受到雷属性伤害时，你可以弃置一张“Z”，令此伤害-1。",
-                            z1_Zqulingjian_move: "Z驱领舰_移动Z", z1_Zqulingjian_move_info: "准备阶段，你可以移动一张“Z”。",
+                            z1_Zqulingjian: "Z驱领舰", "z1_Zqulingjian_info": "当G国驱逐舰受到/造成伤害后，你可以将造成伤害的牌置于武将牌上称为“Z”。有其他角色受到雷属性伤害时，你可以弃置一张“Z”，令此伤害-1；当你造成雷属性伤害时，你可以弃置一张“Z”，令此伤害+1。准备阶段，你可以移动一张“Z”。(全局)有Z的角色受到伤害时，可以移去所有Z，防止此伤害。",
+                            z1_Zqulingjian_draw: "Z驱领舰_摸牌", "z1_Zqulingjian_draw_info": "出牌阶段，你可以移去你武将牌上任意张z并令一名角色摸等量的牌。",
+                            z1_Zqulingjian_source: "Z驱领舰_加伤", "z1_Zqulingjian_source_info": "当你造成雷属性伤害时，你可以弃置一张“Z”，令此伤害+1。",
+                            z1_Zqulingjian_damage: "Z驱领舰_减伤", "z1_Zqulingjian_damage_info": "有其他角色受到雷属性伤害时，你可以弃置一张“Z”，令此伤害-1。",
+                            z1_Zqulingjian_move: "Z驱领舰_移动Z", "z1_Zqulingjian_move_info": "准备阶段，你可以移动一张“Z”。",
 
                             z16_shuileibuzhi: "水雷布置", z16_shuileibuzhi_info: "出牌阶段限一次，你可以将一张手牌置于一名角色的武将牌上，称为Z。(全局)判定阶段开始时，你可以弃置一张Z，然后执行一次兵粮寸断判定。",
                             z16_lianhuanbaopo: "连环爆破", z16_lianhuanbaopo_info: "出牌阶段限一次，你可以从下家开始将除你外的所有角色武将牌上的z当作雷杀对其使用。",
