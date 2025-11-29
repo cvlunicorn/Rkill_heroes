@@ -6169,7 +6169,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     const targets = event.targets.sortBySeat();
                                     //game.log(targets);
                                     targets.push(player);
-                                    //game.log(targets);
+                                    game.log(targets);
                                     const next = player.chooseCardOL(targets, '请展示一张手牌', true).set('ai', card => {
                                         return -get.value(card);
                                     }).set('aiCard', target => {
@@ -6179,15 +6179,20 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     //game.log(next);
                                     next._args.remove('glow_result');
                                     const { result } = await next;
-                                    const cards = [];
+                                    game.log(JSON.stringify(result));
+                                    const cardsA = [];
                                     const videoId = lib.status.videoId++;
+                                    if (typeof result == 'object') {
+                                        game.log("出现错误：选牌结果只有一张牌");
+                                        event.finish();
+                                    }
                                     for (let i = 0; i < targets.length; i++) {
-                                        cards.push(result[i].cards[0]);
+                                        cardsA.push(result[i].cards[0]);
                                         game.log(targets[i], '展示了', result[i].cards[0]);
                                     }
                                     //game.log(JSON.stringify(result));
-                                    game.broadcastAll((targets, cards, id, player) => {
-                                        var dialog = ui.create.dialog(get.translation(player) + '发动了【新起点】', cards);
+                                    game.broadcastAll((targets, cardsA, id, player) => {
+                                        var dialog = ui.create.dialog(get.translation(player) + '发动了【新起点】', cardsA);
                                         dialog.videoId = id;
                                         const getName = (target) => {
                                             if (target._tempTranslate) return target._tempTranslate;
@@ -6196,19 +6201,19 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return get.translation(name);
                                         }
                                         for (let i = 0; i < targets.length; i++) {
-                                            dialog.buttons[i].querySelector('.info').innerHTML = getName(targets[i]) + '|' + get.translation(cards[i].suit);
+                                            dialog.buttons[i].querySelector('.info').innerHTML = getName(targets[i]) + '|' + get.translation(cardsA[i].suit);
                                         }
-                                    }, targets, cards, videoId, player);
+                                    }, targets, cardsA, videoId, player);
                                     await game.asyncDelay(4);
                                     game.broadcastAll('closeDialog', videoId);
 
 
-                                    const suit = get.suit(cards[0], false);
+                                    const suit = get.suit(cardsA[0], false);
                                     //game.log("flag0" + suit);
                                     let flag = false;
                                     for (let i = 0; i < targets.length; i++) {
                                         for (let j = 0; j < i; j++) {
-                                            if (get.suit(cards[j], false) != get.suit(cards[i], false)) {
+                                            if (get.suit(cardsA[j], false) != get.suit(cardsA[i], false)) {
                                                 //game.log("flag=true" + get.suit(cards[i], false));
                                                 flag = true;
                                             }
