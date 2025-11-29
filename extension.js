@@ -894,7 +894,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 cangqinghuanying: ["mist_dujiaoshou", "mist_xiawu", "mist_shanhuhai"],
                                 shixinrumoR_tan: [],
                                 shixinrumoR_chen: [],
-                                shixinrumoR_chi: ["pachina"],
+                                shixinrumoR_chi: ["pachina", "loki"],
                                 shixinrumoR_man: [],
                                 shixinrumoR_yi: [],
                             },
@@ -991,6 +991,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             guying: ["female", "IJN", 4, ["huokongld", "zhongxunca", "zhanxianyuanhu"], ["des:该型是日本在八八舰队时期设计的侦查巡洋舰，由于之后海军条约的签署，根据规定古鹰型被划为重巡洋舰。在37年，两艘古鹰型进行了大改装，单装主炮换为新式连装炮，其余武备和设施也进行了更新，外形上和青叶型很相似。古鹰号在战争初期很活跃，参与了威克岛到中途岛的一系列作战。42年古鹰号编入三川的第八舰队，在萨沃岛海战中重创了美军。不过在同年10月的海战中，古鹰号好运不再，被美军击沉。"]],
 
                             pachina: ["female", "RM", 6, ["yaosai", "xinao"], ["des:位于意大利西西里的帕基罗角（Pachino）。实际上意大利的海军并未在这里修建要塞，反而是英军的次要登陆场，英军在该地登陆后还建立了临时机场。"]],
+                            loki: ["female", "KMS", 4, ["hangmucv", "xiance"], ["des:深海版的装甲航空母舰彼得·施特拉塞尔。"]],
 
 
                             skilltest: ["male", "OTHER", 9, [], ["forbidai", "des:测试用"]],
@@ -12812,7 +12813,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         frequent: true,
                                         filter: function (event, player) {
-                                            game.log(player.storage.xinao);
                                             return player.storage.xinao && player.storage.xinao[0].isAlive;
                                         },
                                         content: function () {
@@ -12823,6 +12823,182 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                     },
                                 },
+                            },
+                            xiance: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                round: 1,
+                                init: function (player) {
+                                    player.storage.xiance = [];
+                                },
+                                trigger: {
+                                    global: "phaseUseBegin",
+                                },
+                                filter: function (event, player) {
+                                    return event.player != player && player.countCards("hes") >= 2;
+                                },
+                                logTarget: "player",
+                                check: function (event, player) {
+                                    if (get.attitude(player, event.player) < 4 && event.player.countCards("h") > 4) return false;
+                                    if (get.attitude(player, event.player) > 4 && player.isDamaged() && event.player.hp > 1) return true;
+                                    if (player.hp < 2 && player.countCards("h" < 4)) return false;
+                                    return true;
+                                },
+                                content: function () {
+                                    "step 0";
+                                    if (get.mode() !== "identity" || player.identity !== "nei") player.addExpose(0.2);
+                                    "step 1";
+                                    player.chooseCard(2, "he", false, "交给" + get.translation(trigger.player) + "两张牌").set("ai", function (card) {
+                                        return 8 - get.value(card);
+                                    });
+                                    "step 2";
+                                    if (result.bool) {
+                                        player.give(result.cards, trigger.player).gaintag.add("xiance");;
+                                        if (!trigger.player.hasSkill("xiance2")) {
+                                            trigger.player.addTempSkill("xiance2", { global: "phaseEnd" });
+                                        }
+                                        trigger.player.storage.xiance2 = [];
+                                        trigger.player.storage.xiance2.push(player);
+
+                                        if (!trigger.player.hasSkill("xiance4")) {
+                                            trigger.player.addSkill("xiance4");
+                                        }
+                                        trigger.player.storage.xiance4 = [];
+                                        trigger.player.storage.xiance4.push(player);
+                                    }
+                                },
+                                ai: {
+                                    threaten: 1.4,
+                                },
+                            },
+                            xiance2: {
+                                enable: ["chooseToUse", "chooseToRespond"],
+                                onremove: function (player) {
+                                    player.removeGaintag("xiance");
+                                },
+                                filter: function (event, player) {
+                                    if (!player.storage.xiance2 || player.storage.xiance2 == [] || !player.getStorage('xiance2')[0].isAlive()) return false;
+                                    if (player.countCards("h", function (card) {
+                                        return card.hasGaintag("xiance");
+                                    }) == 0) return false;
+                                    for (var i of lib.inpile) {
+                                        var type = get.type2(i);
+                                        if ((type == "basic" || type == "trick") && event.filterCard(get.autoViewAs({ name: i }, "unsure"), player, event)) return true;
+                                    }
+                                    return false;
+                                },
+                                chooseButton: {
+                                    dialog: function (event, player) {
+                                        var list = [];
+                                        for (var i = 0; i < lib.inpile.length; i++) {
+                                            var name = lib.inpile[i];
+                                            var xiancePlayer = player.getStorage('xiance2');
+                                            if (xiancePlayer[0].getStorage('xiance').includes(name)) { continue; }
+                                            if (name == "sha") {
+                                                if (event.filterCard(get.autoViewAs({ name }, "unsure"), player, event)) list.push(["基本", "", "sha"]);
+                                                for (var nature of lib.inpile_nature) {
+                                                    if (event.filterCard(get.autoViewAs({ name, nature }, "unsure"), player, event)) list.push(["基本", "", "sha", nature]);
+                                                }
+                                            } else if (get.type2(name) == "trick" && event.filterCard(get.autoViewAs({ name }, "unsure"), player, event)) list.push(["锦囊", "", name]);
+                                            else if (get.type(name) == "basic" && event.filterCard(get.autoViewAs({ name }, "unsure"), player, event)) list.push(["基本", "", name]);
+                                        }
+                                        return ui.create.dialog("献策", [list, "vcard"]);
+                                    },
+                                    check: function (button) {
+                                        if (_status.event.getParent().type != "phase") return 1;
+                                        var player = _status.event.player;
+                                        if (["wugu", "zhulu_card", "yiyi", "lulitongxin", "lianjunshengyan", "diaohulishan"].includes(button.link[2])) return 0;
+                                        return player.getUseValue({
+                                            name: button.link[2],
+                                            nature: button.link[3],
+                                        });
+                                    },
+                                    backup: function (links, player) {
+                                        return {
+                                            filterCard: function (card) {
+                                                return card.hasGaintag("xiance");
+                                            },
+                                            audio: "xiance2",
+                                            popname: true,
+                                            check: function (card) {
+                                                return 8 - get.value(card);
+                                            },
+                                            position: "hse",
+                                            viewAs: { name: links[0][2], nature: links[0][3] },
+                                            onuse: function () {
+                                                var xiancePlayer = player.getStorage('xiance2');
+                                                if (xiancePlayer[0].isAlive()) {
+                                                    xiancePlayer[0].markAuto('xiance', [links[0][2]]);
+                                                }
+                                            },
+                                        };
+                                    },
+                                    prompt: function (links, player) {
+                                        return "将一张牌当做" + (get.translation(links[0][3]) || "") + get.translation(links[0][2]) + "使用";
+                                    },
+                                },
+                                hiddenCard: function (player, name) {
+                                    if (!lib.inpile.includes(name)) return false;
+                                    var type = get.type2(name);
+                                    return (type == "basic" || type == "trick") && player.countCards("she") > 0 && !player.hasSkill("spmiewu2");
+                                },
+                                ai: {
+                                    fireAttack: true,
+                                    respondSha: true,
+                                    respondShan: true,
+                                    skillTagFilter: function (player) {
+                                        if (player.countCards("h", function (card) {
+                                            return card.hasGaintag("xiance");
+                                        }) == 0) return false;
+                                    },
+                                    order: 1,
+                                    result: {
+                                        player: function (player) {
+                                            if (_status.event.dying) return get.attitude(player, _status.event.dying);
+                                            return 1;
+                                        },
+                                    },
+                                },
+                                "_priority": 0,
+                            },
+                            xiance3: {
+                                trigger: {
+                                    source: "dieAfter",
+                                },
+                                forced: true,
+                                audio: false,
+                                content: function () {
+                                    player.removeSkill("xiance4");
+                                },
+                                "_priority": 0,
+                            },
+                            xiance4: {
+                                trigger: {
+                                    player: "phaseUseEnd",
+                                },
+                                forced: true,
+                                audio: false,
+                                onremove: true,
+                                init: function (player, skill) {
+                                    if (!player.storage[skill]) player.storage[skill] = [];
+                                },
+                                charlotte: true,
+                                content: function () {
+                                    while (player.storage.xiance4.length) {
+                                        var current = player.storage.xiance4.shift();
+                                        if (current.isDead()) continue;
+                                        current.logSkill("xiance");
+                                        current.gainPlayerCard(player, 'ej', [1, 2], 'visible').set('ai', function (card) {
+                                            if (get.type(card) == "delay") return 1;
+                                            return -get.value(card);
+                                        });
+                                        player.damage(current, "nocard");
+                                        current.recover(1);
+                                    }
+                                    player.removeSkill("xiance4");
+                                },
+                                group: "xiance3",
+                                "_priority": 0,
                             },
                             //在这里添加新技能。
 
@@ -12914,6 +13090,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             guying: "古鹰",
 
                             pachina: "要塞姬",
+                            loki: "洛基",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -13156,7 +13333,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                             xinao: "嬉闹", "xinao_info": "每轮限一次，你受到伤害后,若你正面朝上且没有嬉闹对象，你可以将所有手牌交给一名其他角色并记录，然后你翻面。若如此做，你回复X点体力然后获得“装甲”直到下回合开始。(x为你交出的手牌数/2向下取整)。你的出牌阶段开始时，你令嬉闹对象交给你所有手牌并清空记录。",
                             xinao_back: "嬉闹",
-
+                            xiance: "献策", "xiance_info": "每轮限一次，其他角色的出牌阶段开始时，你可以将两张牌交给该角色。本回合内，其可将“献策”牌当做任意未以此法使用或打出的非延时锦囊牌或基本牌使用或打出（所有角色每局每种牌名限一次）。此阶段结束时，若其没有杀死过角色，则你可以获得其区域两张牌，并对其造成1点伤害，然后你恢复1点体力",
+                            xiance2: "献策", "xiance2_info": "你可以将献策牌当做任意未以此法使用或打出的非延时锦囊牌或基本牌使用或打出（所有角色每局每种牌名限一次）",
+                            xiance3: "献策",
+                            xiance4: "献策",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
