@@ -16,6 +16,16 @@ yield需要无名杀版本1.10.10或更高版本的支持
 
 //nobracket:true,该属性可以让技能显示完整名称（而不是只有前两个字）
 //var player = get.player();指的是当前正在做选择的角色，如果是玩家让其他角色选择，这个选择的ai里get.player()就是“其他角色“。此写法中获取到的player等价于_status.event.player但不包含对客机的广播（也就是_status.event.player在单机中可用，联机时可能出错）
+//useCard时机牌已经离开手牌区，牌上的tag已经清除。如果需要让特定标签的牌无法响应，参考国战刘琦问计：
+/*return (
+                    player.getHistory("lose", function (evt) {
+                        if (evt.getParent() != event) return false;
+                        for (var i in evt.gaintag_map) {
+                            if (evt.gaintag_map[i].includes("gzwenji")) return true;
+                        }
+                        return false;
+                    }).length > 0
+                ); */
 let connect;
 try {
     const ws = require("ws");
@@ -894,7 +904,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 cangqinghuanying: ["mist_dujiaoshou", "mist_xiawu", "mist_shanhuhai"],
                                 shixinrumoR_tan: [],
                                 shixinrumoR_chen: [],
-                                shixinrumoR_chi: ["pachina", "loki"],
+                                shixinrumoR_chi: ["southdakota", "pachina", "loki"],
                                 shixinrumoR_man: [],
                                 shixinrumoR_yi: [],
                             },
@@ -992,7 +1002,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                             pachina: ["female", "RM", 6, ["yaosai", "xinao"], ["des:位于意大利西西里的帕基罗角（Pachino）。实际上意大利的海军并未在这里修建要塞，反而是英军的次要登陆场，英军在该地登陆后还建立了临时机场。"]],
                             loki: ["female", "KMS", 4, ["hangmucv", "xiance"], ["des:深海版的装甲航空母舰彼得·施特拉塞尔。"]],
-
+                            southdakota: ["female", "USN", 4, ["zhanliebb", "zhuangjiafh", "gumei", "jianmiemoshi", "zhaopin"], ["des:原型为美国海军南达科他级战列舰南达科他（BB-57）。"]],
 
                             skilltest: ["male", "OTHER", 9, [], ["forbidai", "des:测试用"]],
                         },
@@ -13005,6 +13015,199 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 group: "xiance3",
                                 "_priority": 0,
                             },
+                            gumei: {
+                                global: ["gumei_phaseUse"],
+                                nobracket: true,
+                                init: function (player) {
+                                    player.storage.temp_ban_gumei = false;
+
+                                },
+                                trigger: {
+                                    player: "damageBegin2",
+                                },
+                                forced: true,
+                                filter: function (event, player) {
+                                    var evt = event.getParent("gumei_phaseUse");
+                                    return evt && evt == "gumei_phaseUse" && evt.targets[1] == player;
+                                },
+                                content: function () {
+                                    if (typeof player.storage.temp_ban_gumei === 'undefined') player.storage.temp_ban_gumei = false;
+                                    player.player.storage.temp_ban_gumei == true;
+                                },
+                                group: ["gumei_reflash"],
+                                subSkill: {
+                                    reflash: {
+                                        trigger: {
+                                            player: ["phaseZhunbeiBegin"],
+                                        },
+                                        forced: true,
+                                        filter: function (event, player) {
+                                            return player.storage.temp_ban_gumei == true;
+                                        },
+                                        content: function () {
+                                            player.storage.temp_ban_gumei = false;
+                                        },
+                                        sub: true,
+                                        "_priority": 0,
+                                    },
+                                },
+                            },
+                            gumei_phaseUse: {
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                enable: "phaseUse",
+                                usable: 1,
+                                selectCard: 1,
+                                filterCard: true,
+                                position: "h",
+                                check(card) {
+                                    return 10 - get.value(card);
+                                },
+                                discard: false,
+                                lose: false,
+                                targetprompt: ["决斗目标", "获得牌"],
+                                selectTarget: 2,
+                                multitarget: true,
+                                filterTarget: function (card, player, target) {
+                                    if (ui.selected.targets.length == 1) {
+                                        return (target.hasSkill("gumei") && target.getStorage('temp_ban_gumei') != true) && target.canUse({ name: "juedou" }, ui.selected.targets[0]);
+                                    }
+                                    return true;
+                                },
+                                filter: function (event, player) {
+                                    if (player.hasSkill("gumei") || (!player.countCards("h"))) { return false; }
+                                    return game.countPlayer(current => current != player && current.hasSkill("gumei") && current.getStorage('temp_ban_gumei') != true) >= 1;
+                                },
+                                content: function () {
+                                    player.give(cards[0], event.targets[1]);
+                                    event.targets[1].useCard({ name: "juedou", isCard: true }, event.targets[0], "noai");
+                                },
+                                ai: {
+                                    order: 8,
+                                    result: {
+                                        target(player, target) {
+                                            if (ui.selected.targets.length == 0) {
+                                                return -3;
+                                            } else {
+                                                return get.effect(target, { name: "juedou" }, ui.selected.targets[0], target);
+                                            }
+                                        },
+                                    },
+                                },
+                            },
+                            jianmiemoshi: {
+                                direct: true,
+                                trigger: {
+                                    player: "useCard",
+                                },
+                                direct: true,
+                                filter(event, player) {
+                                    return (
+                                        player.getHistory("lose", function (evt) {
+                                            if (evt.getParent() != event) return false;
+                                            for (var i in evt.gaintag_map) {
+                                                if (evt.gaintag_map[i].includes("jianmiemoshi")) return false;
+                                            }
+                                            return true;
+                                        }).length > 0
+                                    );
+                                },
+                                preHidden: true,
+                                async content(event, trigger, player) {
+                                    trigger.nowuxie = true;
+                                    trigger.directHit.addArray(game.players);
+                                },
+                                group: ["jianmiemoshi_end"],
+                                subSkill: {
+                                    end: {
+                                        trigger: {
+                                            player: "phaseEnd",
+                                        },
+                                        direct: true,
+                                        content: function () {
+                                            player.addGaintag(player.getCards("h"), "jianmiemoshi");
+                                        },
+                                    },
+                                },
+                                "_priority": 0,
+                            },
+                            zhaopin: {
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                skillAnimation: true,
+                                animationColor: "thunder",
+                                trigger: {
+                                    player: "dying",
+                                },
+                                zhuSkill: true,
+                                filter: function (event, player) {
+                                    if (player.hp > 0) return false;
+                                    if (!player.hasZhuSkill("zhaopin")) return false;
+                                    return true;
+                                },
+                                mark: true,
+                                unique: true,
+                                limited: true,
+                                check(event, player) {
+                                    return true;
+                                },
+                                content: function () {
+                                    "step 0";
+                                    player.awakenSkill("zhaopin");
+                                    player.discard(player.getCards("hej"));
+                                    var targets = game.filterPlayer();
+                                    targets.remove(player);
+                                    event.targets = targets;
+                                    "step 1";
+                                    if (event.targets.length) {
+                                        var current = event.targets.shift();
+                                        current
+                                            .chooseBool("是否与" + get.translation(player) + "互换身份牌，成为主公？")
+                                            .set("ai", function () {
+                                                return get.attitude(_status.event.player, _status.event.target) > 2;
+                                            })
+                                            .set("target", player);
+                                        event.current = current;
+                                    } else {
+                                        event.goto(3);
+                                    }
+                                    "step 2";
+                                    if (result.bool) {
+                                        game.broadcastAll(
+                                            function (player, target, shown) {
+                                                var identity = player.identity;
+                                                player.identity = target.identity;
+                                                if (shown || player == game.me) {
+                                                    player.setIdentity();
+                                                }
+                                                target.identity = identity;
+                                                if (identity == "zhu") {
+                                                    delete player.isZhu;
+                                                    game.zhu = target;
+                                                    target.showIdentity();
+                                                }
+                                            },
+                                            player,
+                                            event.current,
+                                            event.current.identityShown
+                                        );
+                                        player.line(event.current, "green");
+                                        event.current.gainMaxHp();
+                                        event.current.recover();
+                                        player.loseMaxHp();
+                                        player.draw(4);
+                                        player.recover(1 - player.hp);
+                                    } else {
+                                        if (event.targets.length) {
+                                            event.goto(1);
+                                        }
+                                    }
+
+                                },
+                                intro: {
+                                    content: "limited",
+                                },
+                                init: (player, skill) => (player.storage[skill] = false),
+                                "_priority": 0,
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -13096,6 +13299,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                             pachina: "要塞姬",
                             loki: "洛基",
+                            southdakota: "南达科他",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -13342,6 +13546,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             xiance2: "献策", "xiance2_info": "你可以将献策牌当做任意未以此法使用或打出的非延时锦囊牌或基本牌使用或打出（所有角色每局每种牌名限一次）",
                             xiance3: "献策",
                             xiance4: "献策",
+                            gumei: "蛊魅", "gumei_info": "其他角色出牌阶段限一次，其可以选择除你以外的一名角色并交给你一张牌，若如此做，视作你对选择的角色使用一张“决斗”。如果你因此技能受到伤害，此技能失效直到本轮结束。",
+                            gumei_phaseUse: "蛊魅_出牌阶段", "gumei_phaseUse_info": "出牌阶段限一次，你可以选择除蛊魅拥有者以外的一名角色并交给拥有者一张牌，若如此做，视作拥有者对选择的角色使用一张“决斗”。",
+                            jianmiemoshi: "歼灭模式", "jianmiemoshi_info": "你的回合内，其他角色无法对非“歼灭”牌进行响应。回合结束时，你的手牌标记为“歼灭”牌。",
+                            zhaopin: "招聘", "zhaopin_info": "限定技，主公技，你进入濒死状态时，可以弃置自己区域所有牌选择令其他角色依次选择是否响应，若有角色响应，则你与其互换身份牌，然后其可以获得一点体力上限并恢复一点体力，你失去一点体力上限，摸4张手牌，并将体力恢复至1点。",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
