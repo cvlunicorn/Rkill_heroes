@@ -12845,6 +12845,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 round: 1,
                                 init: function (player) {
                                     player.storage.xiance = [];
+                                    player.storage.xiance2 = [];
+                                    player.storage.xiance2.push(player);
                                 },
                                 trigger: {
                                     global: "phaseUseBegin",
@@ -12868,7 +12870,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     });
                                     "step 2";
                                     if (result.bool) {
-                                        player.give(result.cards, trigger.player).gaintag.add("xiance");;
+                                        player.give(result.cards, trigger.player);
                                         if (!trigger.player.hasSkill("xiance2")) {
                                             trigger.player.addTempSkill("xiance2", { global: "phaseEnd" });
                                         }
@@ -12882,23 +12884,21 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger.player.storage.xiance4.push(player);
                                     }
                                 },
+                                group: ["xiance2"],
                                 ai: {
                                     threaten: 1.4,
                                 },
                             },
                             xiance2: {
-                                enable: ["chooseToUse", "chooseToRespond"],
-                                onremove: function (player) {
-                                    player.removeGaintag("xiance");
-                                },
+                                enable: "phaseUse",
+                                usable: 1,
                                 filter: function (event, player) {
-                                    if (!player.storage.xiance2 || player.storage.xiance2 == [] || !player.getStorage('xiance2')[0].isAlive()) return false;
-                                    if (player.countCards("h", function (card) {
-                                        return card.hasGaintag("xiance");
-                                    }) == 0) return false;
-                                    for (var i of lib.inpile) {
-                                        var type = get.type2(i);
-                                        if ((type == "basic" || type == "trick") && event.filterCard(get.autoViewAs({ name: i }, "unsure"), player, event)) return true;
+                                    if (!player.storage.xiance2 || player.storage.xiance2 == [] || !player.getStorage('xiance2')[0].isAlive()) { return false; }
+                                    if (player.countCards("h") >= 2) {
+                                        for (var i of lib.inpile) {
+                                            var type = get.type2(i);
+                                            if ((type == "basic" || type == "trick") && event.filterCard(get.autoViewAs({ name: i }, "unsure"), player, event)) return true;
+                                        }
                                     }
                                     return false;
                                 },
@@ -12931,14 +12931,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     backup: function (links, player) {
                                         return {
                                             filterCard: function (card) {
-                                                return card.hasGaintag("xiance");
+                                                return 1;
                                             },
                                             audio: "xiance2",
                                             popname: true,
                                             check: function (card) {
                                                 return 8 - get.value(card);
                                             },
-                                            position: "hse",
+                                            selectCard: 2,
+                                            position: "h",
                                             viewAs: { name: links[0][2], nature: links[0][3] },
                                             onuse: function () {
                                                 var xiancePlayer = player.getStorage('xiance2');
@@ -12949,22 +12950,18 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         };
                                     },
                                     prompt: function (links, player) {
-                                        return "将一张牌当做" + (get.translation(links[0][3]) || "") + get.translation(links[0][2]) + "使用";
+                                        return "将两张牌当做" + (get.translation(links[0][3]) || "") + get.translation(links[0][2]) + "使用";
                                     },
                                 },
                                 hiddenCard: function (player, name) {
                                     if (!lib.inpile.includes(name)) return false;
                                     var type = get.type2(name);
-                                    return (type == "basic" || type == "trick") && player.countCards("she") > 0 && !player.hasSkill("spmiewu2");
+                                    return (type == "basic" || type == "trick") && player.countCards("h") > 0 && !player.hasSkill("xiance2");
                                 },
                                 ai: {
                                     fireAttack: true,
-                                    respondSha: true,
-                                    respondShan: true,
                                     skillTagFilter: function (player) {
-                                        if (player.countCards("h", function (card) {
-                                            return card.hasGaintag("xiance");
-                                        }) == 0) return false;
+                                        if (player.countCards("h") < 2) return false;
                                     },
                                     order: 1,
                                     result: {
@@ -13003,12 +13000,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         var current = player.storage.xiance4.shift();
                                         if (current.isDead()) continue;
                                         current.logSkill("xiance");
-                                        current.gainPlayerCard(player, 'ej', [1, 2], 'visible').set('ai', function (card) {
+                                        /* current.gainPlayerCard(player, 'ej', [1, 2], 'visible').set('ai', function (card) {
                                             if (get.type(card) == "delay") return 1;
                                             return -get.value(card);
-                                        });
+                                        }); */
                                         player.damage(current, "nocard");
-                                        current.recover(1);
                                     }
                                     player.removeSkill("xiance4");
                                 },
@@ -13542,8 +13538,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                             xinao: "嬉闹", "xinao_info": "每轮限一次，你受到伤害后,若你正面朝上且没有嬉闹对象，你可以将所有手牌交给一名其他角色并记录，然后你翻面。若如此做，你回复X点体力然后获得“装甲”直到下回合开始。(x为你交出的手牌数/2向下取整)。你的出牌阶段开始时，你令嬉闹对象交给你所有手牌并清空记录。",
                             xinao_back: "嬉闹",
-                            xiance: "献策", "xiance_info": "每轮限一次，其他角色的出牌阶段开始时，你可以将两张牌交给该角色。本回合内，其可将“献策”牌当做任意未以此法使用或打出的非延时锦囊牌或基本牌使用或打出（所有角色每局每种牌名限一次）。此阶段结束时，若其没有杀死过角色，则你可以获得其区域两张牌，并对其造成1点伤害，然后你恢复1点体力",
-                            xiance2: "献策", "xiance2_info": "你可以将献策牌当做任意未以此法使用或打出的非延时锦囊牌或基本牌使用或打出（所有角色每局每种牌名限一次）",
+                            xiance: "献策", "xiance_info": "你拥有决策：出牌阶段限一次，你可以将两张手牌当作一张基本牌或非延时锦囊牌使用，本局每种牌名的牌限一次。每轮限一次，其他角色的出牌阶段开始时，你可以交给其两张牌并令其本阶段获得“决策”。本阶段结束时，若其没有杀死过角色，则你对其造成一点伤害。",
+                            xiance2: "决策", "xiance2_info": "出牌阶段限一次，你可以将两张手牌当作一张基本牌或非延时锦囊牌使用，本局每种牌名的牌限一次。",
                             xiance3: "献策",
                             xiance4: "献策",
                             gumei: "蛊魅", "gumei_info": "其他角色出牌阶段限一次，其可以选择除你以外的一名角色并交给你一张牌，若如此做，视作你对选择的角色使用一张“决斗”。如果你因此技能受到伤害，此技能失效直到本轮结束。",
