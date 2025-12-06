@@ -1004,7 +1004,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             loki: ["female", "KMS", 4, ["hangmucv", "xiance"], ["des:深海版的装甲航空母舰彼得·施特拉塞尔。"]],
                             southdakota: ["female", "USN", 4, ["zhanliebb", "zhuangjiafh", "gumei", "jianmiemoshi", "zhaopin"], ["des:原型为美国海军南达科他级战列舰南达科他（BB-57）。"]],
 
-                            skilltest: ["male", "OTHER", 9, [], ["forbidai", "des:测试用"]],
+                            skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
                             _yuanhang: {
@@ -13204,6 +13204,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 init: (player, skill) => (player.storage[skill] = false),
                                 "_priority": 0,
                             },
+                            huodezhuangbei: {
+                                enable: "phaseUse",
+                                content: function () {
+                                    var card = get.cardPile2(function (card) {
+                                        return get.type(card, "trick") == "equip";
+                                    });
+                                    if (card) player.gain(card, "gain2", "log");
+                                },
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -13546,6 +13555,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             gumei_phaseUse: "蛊魅_出牌阶段", "gumei_phaseUse_info": "出牌阶段限一次，你可以选择除蛊魅拥有者以外的一名角色并交给拥有者一张牌，若如此做，视作拥有者对选择的角色使用一张“决斗”。",
                             jianmiemoshi: "歼灭模式", "jianmiemoshi_info": "你的回合内，其他角色无法对非“歼灭”牌进行响应。回合结束时，你的手牌标记为“歼灭”牌。",
                             zhaopin: "招聘", "zhaopin_info": "限定技，主公技，你进入濒死状态时，可以弃置自己区域所有牌选择令其他角色依次选择是否响应，若有角色响应，则你与其互换身份牌，然后其可以获得一点体力上限并恢复一点体力，你失去一点体力上限，摸4张手牌，并将体力恢复至1点。",
+                            huodezhuangbei: "获得装备", "huodezhuangbei_info": "从牌堆中获得一张装备。测试用。",
+
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
