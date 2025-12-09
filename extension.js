@@ -10955,6 +10955,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }
                                     }
                                     if (list.length) {
+                                        list.push('cancel2');
                                         player
                                             .chooseControl(list)
                                             .set("dialog", dialog)
@@ -10972,11 +10973,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             );
                                     }
                                     "step 1"
-                                    event.cards2 = target.getCards("h", { suit: result.control });
-                                    event.cards1 = player.getCards("h", { suit: result.control });
-                                    game.log(get.translation(target) + "该花色的牌" + get.translation(event.cards2));
-                                    game.log(get.translation(player) + "该花色的牌" + get.translation(event.cards1));
-                                    player.swapHandcards(target, event.cards1, event.cards2);
+                                    if (result.control == "cancel2") {
+                                        event.finish();
+                                    } else {
+                                        event.cards2 = target.getCards("h", { suit: result.control });
+                                        event.cards1 = player.getCards("h", { suit: result.control });
+                                        game.log(get.translation(target) + "该花色的牌" + get.translation(event.cards2));
+                                        game.log(get.translation(player) + "该花色的牌" + get.translation(event.cards1));
+                                        player.swapHandcards(target, event.cards1, event.cards2);
+                                    }
                                 },
                                 ai: {
                                     order: 6,
