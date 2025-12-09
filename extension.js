@@ -900,7 +900,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lishizhanyi_danmaihaixia: ["hude", "shenluopujun", "weiershiqinwang", "z1", "z16"],
                                 lishizhanyi_shanhuhai: ["lafei", "shiyu", "salemu", "dahuangfeng", "yuekecheng", "qiuyue", "weilianDbote", "xianghe", "ruihe", "yuhei", "guying"],
                                 lishizhanyi_haixiafujizhan: ["u47", "u81", "u505", "jinqu", "kente", "u96", "lundun"],
-                                weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan", "sp_aisaikesi", "sp_ninghai", "sp_zhongtudao", "xukufu"],
+                                weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan", "sp_aisaikesi", "sp_ninghai", "sp_zhongtudao", "xukufu", "lingbo"],
                                 cangqinghuanying: ["mist_dujiaoshou", "mist_xiawu", "mist_shanhuhai"],
                                 shixinrumoR_tan: [],
                                 shixinrumoR_chen: [],
@@ -1003,6 +1003,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             pachina: ["female", "RM", 6, ["yaosai", "xinao"], ["des:位于意大利西西里的帕基罗角（Pachino）。实际上意大利的海军并未在这里修建要塞，反而是英军的次要登陆场，英军在该地登陆后还建立了临时机场。"]],
                             loki: ["female", "KMS", 4, ["hangmucv", "xiance"], ["des:深海版的装甲航空母舰彼得·施特拉塞尔。"]],
                             southdakota: ["female", "USN", 4, ["zhanliebb", "zhuangjiafh", "gumei", "jianmiemoshi", "zhaopin"], ["des:原型为美国海军南达科他级战列舰南达科他（BB-57）。"]],
+                            lingbo: ["female", "IJN", 3, ["quzhudd", "dajiaoduguibi", "zhanxian", "guishen"], ["des:吹雪型11号舰，特II型1号舰。相比特I型，绫波号增加了主炮高射功能，35年针对第四舰队事件进行了改装，战争初期隶属南方部队。1942年8月被派到瓜岛，并参加了11月的第三次所罗门海战，战斗中绫波号表现突出，至少击伤四艘美军战舰，其中包括南达科他号战列舰，绫波号自身也在此次海战中沉没。"]],
 
                             skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei"], ["forbidai", "des:测试用"]],
                         },
@@ -13218,6 +13219,161 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (card) player.gain(card, "gain2", "log");
                                 },
                             },
+                            zhanxian: {
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: {
+                                    player: "phaseUseBegin",
+                                },
+                                frequent: true,
+                                filter(event, player) {
+                                    return player.countCards("h") > 0;
+                                },
+                                content() {
+                                    "step 0";
+                                    player.chooseCard("h", [1, player.countCards("h")], get.prompt("zhanxian"), "将任意张牌作为“斩”置于武将牌上").set("ai", function (card) {
+                                        var player = _status.event.player;
+                                        if (!player.hasValueTarget(card)) return 1;
+                                        return 0;
+                                    });
+                                    "step 1";
+                                    if (result.bool) {
+                                        player.logSkill("zhanxian");
+                                        player.addToExpansion(result.cards, player, "give").gaintag.add("zhanxian");
+                                    }
+                                },
+                                onremove(player, skill) {
+                                    var cards = player.getExpansions(skill);
+                                    if (cards.length) player.loseToDiscardpile(cards);
+                                },
+                                intro: {
+                                    content: "expansion",
+                                    markcount: "expansion",
+                                },
+                                group: ["zhanxian_1", "zhanxian_2"],
+                                subSkill: {
+                                    1: {
+                                        trigger: {
+                                            player: "phaseJieshuBegin",
+                                        },
+                                        forced: true,
+                                        locked: false,
+                                        filter(event, player) {
+                                            return (
+                                                player.getExpansions("zhanxian").length > 0
+                                            );
+                                        },
+                                        content() {
+                                            "step 0";
+                                            var cards = player.getExpansions("zhanxian");
+                                            if (cards.length) player.gain(cards, "gain2");
+                                        },
+                                        sub: true,
+                                        "_priority": 0,
+                                    },
+                                    2: {
+                                        trigger: {
+                                            player: "useCard",
+                                        },
+                                        forced: true,
+                                        filter: function (event, player) {
+                                            return (
+                                                game.hasPlayer(function (current) {
+                                                    return /* current != player && */ current.countCards("h") >= player.countCards("h");
+                                                })
+                                            );
+                                        },
+                                        content: function () {
+                                            var hs = player.countCards("h");
+                                            trigger.directHit.addArray(
+                                                game.filterPlayer(function (current) {
+                                                    return /* current != player && */ current.countCards("h") >= hs;
+                                                })
+                                            );
+                                        },
+                                        ai: {
+                                            threaten: 1.4,
+                                            "directHit_ai": true,
+                                            skillTagFilter: function (player, tag, arg) {
+                                                return (
+                                                    player.countCards("h", function (card) {
+                                                        return !ui.selected.cards.includes(card);
+                                                    }) <= arg.target.countCards("h")
+                                                );
+                                            },
+                                        },
+                                    },
+                                },
+                                "_priority": 0,
+                            },
+                            guishen: {
+                                onremove(player, skill) {
+                                    var targets = game.filterPlayer(current => current.hasSkill("hangkongyazhi_fengyin"));
+                                    for (i in targets) {
+                                        targets[i].removeSkill("hangkongyazhi_fengyin");
+                                    }
+                                },
+                                force: true,
+                                trigger: {
+                                    player: "phaseBegin",
+                                },
+                                direct: true,
+                                filter: function (event, player) {
+                                    return _status.currentPhase == player;
+                                },
+                                content: function () {
+                                    "step 0";
+                                    event.num = 0;
+                                    event.targets = game.filterPlayer(current => current != player).sortBySeat();
+                                    "step 1";
+                                    lib.target = event.targets.shift();
+                                    if (lib.target.hp > lib.target.maxHp / 2) {
+                                        lib.target.addTempSkill("hangkongyazhi_fengyin", { global: "phaseEnd" });
+                                    }
+                                    'step 2';
+                                    if (event.num < targets.length) { event.goto(1); }
+                                    game.log("技能结束");
+                                },
+                                group: ["guishen_change"],
+                                subSkill: {
+                                    change: {
+                                        force: true,
+                                        direct: true,
+                                        trigger: {
+                                            global: ["damageEnd", "loseHpEnd", "recoverEnd", "loseMaxHpEnd", "gainMaxHpEnd"],
+                                        },
+                                        filter: function (event, player) {
+                                            return _status.currentPhase == player && event.player != player;
+                                        },
+                                        content: function () {
+                                            if (trigger.player.hp > trigger.player.maxHp / 2 && !trigger.player.hasSkill("hangkongyazhi_fengyin")) { trigger.player.addTempSkill("hangkongyazhi_fengyin", { global: "phaseEnd" }); }
+                                            if (trigger.player.hp <= trigger.player.maxHp / 2 && trigger.player.hasSkill("hangkongyazhi_fengyin")) { trigger.player.removeSkill("hangkongyazhi_fengyin"); }
+                                        },
+                                    },
+                                },
+                            },
+                            guishen_fengyin: {
+                                init: function (player, skill) {
+                                    player.addSkillBlocker(skill);
+                                },
+                                onremove: function (player, skill) {
+                                    player.removeSkillBlocker(skill);
+                                },
+                                charlotte: true,
+                                skillBlocker: function (skill, player) {
+                                    return !lib.skill[skill].charlotte;
+                                },
+                                mark: true,
+                                intro: {
+                                    content: function (storage, player, skill) {
+                                        var list = player.getSkills(null, false, false).filter(function (i) {
+                                            return lib.skill.guishen_fengyin.skillBlocker(i, player);
+                                        });
+                                        if (list.length) return "失效技能：" + get.translation(list);
+                                        return "无失效技能";
+                                    },
+                                },
+                                "_priority": 0,
+                            }
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -13306,6 +13462,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             aisijimoren: "爱斯基摩人",
                             sp_zhongtudao: "SP中途岛",
                             guying: "古鹰",
+
+                            lingbo: "绫波",
 
                             pachina: "要塞姬",
                             loki: "洛基",
@@ -13561,6 +13719,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jianmiemoshi: "歼灭模式", "jianmiemoshi_info": "你的回合内，其他角色无法对非“歼灭”牌进行响应。回合结束时，你的手牌标记为“歼灭”牌。",
                             zhaopin: "招聘", "zhaopin_info": "限定技，主公技，你进入濒死状态时，可以弃置自己区域所有牌选择令其他角色依次选择是否响应，若有角色响应，则你与其互换身份牌，然后其可以获得一点体力上限并恢复一点体力，你失去一点体力上限，摸4张手牌，并将体力恢复至1点。",
                             huodezhuangbei: "获得装备", "huodezhuangbei_info": "从牌堆中获得一张装备。测试用。",
+                            zhanxian: "斩仙", "zhanxian_info": "出牌阶段开始时，你可以将任意张手牌作为“斩”扣置在武将牌上至本回合结束。锁定技，手牌数不多于你“斩”张数的角色不能响应你使用的牌。",
+                            guishen: "鬼神", "guishen_info": "锁定技，你的回合内，体力值大于体力上限一半的其他角色所有技能失效。",
+                            guishen_fengyin: "鬼神_封印",
 
 
                             jianrbiaozhun: "舰r标准",
