@@ -13719,7 +13719,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jianmiemoshi: "歼灭模式", "jianmiemoshi_info": "你的回合内，其他角色无法对非“歼灭”牌进行响应。回合结束时，你的手牌标记为“歼灭”牌。",
                             zhaopin: "招聘", "zhaopin_info": "限定技，主公技，你进入濒死状态时，可以弃置自己区域所有牌选择令其他角色依次选择是否响应，若有角色响应，则你与其互换身份牌，然后其可以获得一点体力上限并恢复一点体力，你失去一点体力上限，摸4张手牌，并将体力恢复至1点。",
                             huodezhuangbei: "获得装备", "huodezhuangbei_info": "从牌堆中获得一张装备。测试用。",
-                            zhanxian: "斩仙", "zhanxian_info": "出牌阶段开始时，你可以将任意张手牌作为“斩”扣置在武将牌上至本回合结束。锁定技，手牌数不多于你“斩”张数的角色不能响应你使用的牌。",
+                            zhanxian: "斩仙", "zhanxian_info": "出牌阶段开始时，你可以将任意张手牌作为“斩”扣置在武将牌上至本回合结束。锁定技，手牌数不少于你“斩”张数的角色不能响应你使用的牌。",
                             guishen: "鬼神", "guishen_info": "锁定技，你的回合内，体力值大于体力上限一半的其他角色所有技能失效。",
                             guishen_fengyin: "鬼神_封印",
 
