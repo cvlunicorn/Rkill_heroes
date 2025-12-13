@@ -13278,7 +13278,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         filter: function (event, player) {
                                             return (
                                                 game.hasPlayer(function (current) {
-                                                    return /* current != player && */player.getExpansions("zhanxian") && current.countCards("h") >= player.getExpansions('zhanxian').length;
+                                                    return /* current != player && */player.getExpansions("zhanxian") && current.countCards("h") <= player.getExpansions('zhanxian').length;
                                                 })
                                             );
                                         },
@@ -13286,7 +13286,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             var hs = player.getExpansions('zhanxian').length;
                                             trigger.directHit.addArray(
                                                 game.filterPlayer(function (current) {
-                                                    return /* current != player && */ current.countCards("h") >= hs;
+                                                    return /* current != player && */ current.countCards("h") <= hs;
                                                 })
                                             );
                                         },
@@ -13295,7 +13295,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             "directHit_ai": true,
                                             skillTagFilter: function (player, tag, arg) {
                                                 return (
-                                                    player.getExpansions("zhanxian") && player.getExpansions('zhanxian').length <= arg.target.countCards("h")
+                                                    player.getExpansions("zhanxian") && player.getExpansions('zhanxian').length >= arg.target.countCards("h")
                                                 );
                                             },
                                         },
