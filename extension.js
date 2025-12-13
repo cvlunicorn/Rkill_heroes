@@ -13222,7 +13222,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhanxian: {
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
-                                    player: "phaseUseBegin",
+                                    player: "phaseUseBefore",
                                 },
                                 frequent: true,
                                 filter(event, player) {
@@ -13259,7 +13259,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         locked: false,
                                         filter(event, player) {
                                             return (
-                                                player.getExpansions("zhanxian").length > 0
+                                                player.getExpansions("zhanxian") && player.getExpansions("zhanxian").length > 0
                                             );
                                         },
                                         content() {
@@ -13278,12 +13278,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         filter: function (event, player) {
                                             return (
                                                 game.hasPlayer(function (current) {
-                                                    return /* current != player && */ current.countCards("h") >= player.countCards("h");
+                                                    return /* current != player && */player.getExpansions("zhanxian") && current.countCards("h") >= player.getExpansions('zhanxian').length;
                                                 })
                                             );
                                         },
                                         content: function () {
-                                            var hs = player.countCards("h");
+                                            var hs = player.getExpansions('zhanxian').length;
                                             trigger.directHit.addArray(
                                                 game.filterPlayer(function (current) {
                                                     return /* current != player && */ current.countCards("h") >= hs;
@@ -13295,9 +13295,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             "directHit_ai": true,
                                             skillTagFilter: function (player, tag, arg) {
                                                 return (
-                                                    player.countCards("h", function (card) {
-                                                        return !ui.selected.cards.includes(card);
-                                                    }) <= arg.target.countCards("h")
+                                                    player.getExpansions("zhanxian") && player.getExpansions('zhanxian').length <= arg.target.countCards("h")
                                                 );
                                             },
                                         },
@@ -13307,14 +13305,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             guishen: {
                                 onremove(player, skill) {
-                                    var targets = game.filterPlayer(current => current.hasSkill("hangkongyazhi_fengyin"));
+                                    var targets = game.filterPlayer(current => current.hasSkill("guishen_fengyin"));
                                     for (i in targets) {
-                                        targets[i].removeSkill("hangkongyazhi_fengyin");
+                                        targets[i].removeSkill("guishen_fengyin");
                                     }
                                 },
                                 force: true,
                                 trigger: {
-                                    player: "phaseBegin",
+                                    player: "phaseUseBegin",
                                 },
                                 direct: true,
                                 filter: function (event, player) {
@@ -13327,7 +13325,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     "step 1";
                                     lib.target = event.targets.shift();
                                     if (lib.target.hp > lib.target.maxHp / 2) {
-                                        lib.target.addTempSkill("hangkongyazhi_fengyin", { global: "phaseEnd" });
+                                        lib.target.addTempSkill("guishen_fengyin", { global: "phaseUseEnd" });
                                     }
                                     'step 2';
                                     if (event.num < targets.length) { event.goto(1); }
@@ -13345,8 +13343,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return _status.currentPhase == player && event.player != player;
                                         },
                                         content: function () {
-                                            if (trigger.player.hp > trigger.player.maxHp / 2 && !trigger.player.hasSkill("hangkongyazhi_fengyin")) { trigger.player.addTempSkill("hangkongyazhi_fengyin", { global: "phaseEnd" }); }
-                                            if (trigger.player.hp <= trigger.player.maxHp / 2 && trigger.player.hasSkill("hangkongyazhi_fengyin")) { trigger.player.removeSkill("hangkongyazhi_fengyin"); }
+                                            if (trigger.player.hp > trigger.player.maxHp / 2 && !trigger.player.hasSkill("guishen_fengyin")) { trigger.player.addTempSkill("guishen_fengyin", { global: "phaseUseEnd" }); }
+                                            if (trigger.player.hp <= trigger.player.maxHp / 2 && trigger.player.hasSkill("guishen_fengyin")) { trigger.player.removeSkill("guishen_fengyin"); }
                                         },
                                     },
                                 },
@@ -13719,8 +13717,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jianmiemoshi: "歼灭模式", "jianmiemoshi_info": "你的回合内，其他角色无法对非“歼灭”牌进行响应。回合结束时，你的手牌标记为“歼灭”牌。",
                             zhaopin: "招聘", "zhaopin_info": "限定技，主公技，你进入濒死状态时，可以弃置自己区域所有牌选择令其他角色依次选择是否响应，若有角色响应，则你与其互换身份牌，然后其可以获得一点体力上限并恢复一点体力，你失去一点体力上限，摸4张手牌，并将体力恢复至1点。",
                             huodezhuangbei: "获得装备", "huodezhuangbei_info": "从牌堆中获得一张装备。测试用。",
-                            zhanxian: "斩仙", "zhanxian_info": "出牌阶段开始时，你可以将任意张手牌作为“斩”扣置在武将牌上至本回合结束。锁定技，手牌数不少于你“斩”张数的角色不能响应你使用的牌。",
-                            guishen: "鬼神", "guishen_info": "锁定技，你的回合内，体力值大于体力上限一半的其他角色所有技能失效。",
+                            zhanxian: "斩仙", "zhanxian_info": "出牌阶段开始前，你可以将任意张手牌作为“斩”扣置在武将牌上至本回合结束。锁定技，手牌数不多于你“斩”张数的角色不能响应你使用的牌。",
+                            guishen: "鬼神", "guishen_info": "锁定技，你的出牌阶段内，体力值大于体力上限一半的其他角色所有技能失效。",
                             guishen_fengyin: "鬼神_封印",
 
 
