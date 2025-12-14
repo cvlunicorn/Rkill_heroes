@@ -905,7 +905,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 shixinrumoR_tan: [],
                                 shixinrumoR_chen: [],
                                 shixinrumoR_chi: ["southdakota", "pachina", "loki"],
-                                shixinrumoR_man: [],
+                                shixinrumoR_man: ["sukhbaatar"],
                                 shixinrumoR_yi: [],
                             },
                         },
@@ -1004,6 +1004,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             loki: ["female", "KMS", 4, ["hangmucv", "xiance"], ["des:深海版的装甲航空母舰彼得·施特拉塞尔。"]],
                             southdakota: ["female", "USN", 4, ["zhanliebb", "zhuangjiafh", "gumei", "jianmiemoshi", "zhaopin"], ["des:原型为美国海军南达科他级战列舰南达科他（BB-57）。"]],
                             lingbo: ["female", "IJN", 3, ["quzhudd", "dajiaoduguibi", "zhanxian", "guishen"], ["des:吹雪型11号舰，特II型1号舰。相比特I型，绫波号增加了主炮高射功能，35年针对第四舰队事件进行了改装，战争初期隶属南方部队。1942年8月被派到瓜岛，并参加了11月的第三次所罗门海战，战斗中绫波号表现突出，至少击伤四艘美军战舰，其中包括南达科他号战列舰，绫波号自身也在此次海战中沉没。"]],
+                            sukhbaatar: ["female", "OTHER", 3, ["junfu", "sukhbaatar_rumeng", "sudaren", "zuiqiang"], ["des:CLASSIFIED*。"]],
 
                             skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei"], ["forbidai", "des:测试用"]],
                         },
@@ -13371,6 +13372,179 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                                 "_priority": 0,
+                            },
+                            sukhbaatar_rumeng: {
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: {
+                                    player: "phaseZhunbeiBegin",
+                                },
+                                force: true,
+                                direct: true,
+                                filter: function (event, player) {
+                                    return (player.countCards("h") &&
+                                        game.hasPlayer(function (current) {
+                                            return player.canCompare(current);
+                                        })
+                                    );
+                                },
+                                content: function () {
+                                    "step 0";
+                                    player.chooseTarget(get.prompt2("sukhbaatar_rumeng"), function (card, player, target) {
+                                        return player.canCompare(target);
+                                    }).set("ai", target => {
+                                        return -get.attitude(player, target);
+                                    });
+                                    "step 1";
+                                    if (result.bool) {
+                                        //game.log(result.targets[0]);
+                                        player.chooseToCompare(result.targets[0]);
+                                    }
+                                },
+                                group: ["sukhbaatar_rumeng_1"],
+                                subSkill: {
+                                    1: {
+                                        force: true,
+                                        trigger: {
+                                            global: "chooseToCompareBegin",
+                                        },
+                                        filter: function (event, player) {
+                                            if (!game.hasPlayer(function (current) {
+                                                return current.countCards("s", function (card) { return card.hasGaintag('junfu') });
+                                            })) { return false; }
+                                            if (player == event.player) return true;
+                                            if (event.targets) return event.targets.includes(player);
+                                            return player == event.target;
+                                        },
+                                        check: function (trigger, player) {
+                                            return true;
+                                        },
+                                        content: function () {
+                                            "step 0";
+                                            player.chooseTarget("获得一名角色的一张【军辅】牌", function (card, player, target) {
+                                                return target.countCards("s", function (card) { return card.hasGaintag('junfu') });
+                                            }).set("ai", target => {
+                                                return -get.attitude(player, target);
+                                            });
+                                            "step 1";
+                                            if (result.bool) {
+                                                game.log(result.targets[0]);
+                                                event.target = result.targets[0];
+                                                let cards = event.target.getCards("s", function (card) { return card.hasGaintag('junfu') });
+                                                player.chooseCardButton("获得一张【军辅】牌", true, cards).set('ai', function (button) {
+                                                    return get.number(button.link);
+                                                }).set('selectButton', 1);
+                                            } else { event.finish(); }
+                                            "step 2";
+                                            if (result.bool) {
+                                                game.log(result.links[0]);
+                                                player.gain(result.links[0], "gain2");
+                                            }
+                                        },
+                                    },
+                                },
+                            },
+                            sudaren: {
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                mark: true,
+                                locked: false,
+                                zhuanhuanji: true,
+                                marktext: "☯",
+                                intro: {
+                                    content(storage, player, skill) {
+                                        if (player.storage.sudaren == true) return "你使用基本牌或普通锦囊牌时，可以弃置一张“军辅”牌让那张牌额外结算1次。";
+                                        return "其他角色对你使用牌时，你可以摸一张牌，并将一张手牌置于在武将牌上，视作“军辅”牌";
+                                    },
+                                },
+                                group: ["sudaren_1", "sudaren_2"],
+                                subSkill: {
+                                    "1": {
+                                        prompt: "其他角色对你使用牌时，你可以摸一张牌，并将一张手牌置于在武将牌上，视作“军辅”牌",
+                                        audio: "ext:舰R牌将/audio/skill:true",
+                                        trigger: {
+                                            target: "useCardToBefore",
+                                        },
+                                        filter(event, player) {
+                                            if (player.storage.sudaren) return false;
+                                            return _status.currentPhase != player;
+                                        },
+                                        check: function (event, player) {
+                                            return 1;
+                                        },
+                                        content() {
+                                            'step 0'
+                                            player.changeZhuanhuanji("sudaren");
+                                            player.draw(1);
+                                            player.chooseCard('h', 1, '将一张手牌置于你的武将牌上，称为【军辅】').set('ai', function (card) {
+                                                var player = get.player();
+                                                if (ui.selected.cards.type == "equip") return -get.value(card);
+                                                return 9 - get.value(card);
+                                            });
+                                            'step 1'
+                                            if (result.bool) {
+                                                // player.addToExpansion(result.cards,player,'giveAuto').gaintag.add('junfu');player.update();
+                                                player.loseToSpecial(result.cards, 'junfu', player).visible = true;
+                                            }
+                                        },
+                                        sub: true,
+                                        "_priority": 0,
+                                    },
+                                    "2": {
+                                        trigger: {
+                                            player: "useCard",
+                                        },
+                                        filter(event, player) {
+                                            if (!player.storage.sudaren) return false;
+                                            return player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length > 0 && (get.type(event.card) == 'trick' || get.type(event.card) == "basic" && get.name(event.card) != "shan");
+                                        },
+                                        check: function (event, player) {
+                                            return 1;
+                                        },
+                                        content() {
+                                            "step 0";
+                                            var card1 = trigger.card;
+                                            player.chooseCardButton(get.prompt2('sudaren', player), player.getCards('s', function (card) { return card.hasGaintag('junfu') }), 1).set('ai', function (card) {
+                                                return get.value(_status.event.card1) - get.value(card);
+                                            }).set('card1', card1);
+                                            "step 1";
+                                            if (result.bool) {
+                                                player.changeZhuanhuanji("sudaren");
+                                                player.logSkill("sudaren");
+                                                player.discard(result.links);
+                                                trigger.effectCount++;
+                                            }
+                                        },
+                                        sub: true,
+                                        "_priority": 0,
+                                    },
+                                },
+                                ai: {
+                                    combo: "sudaren",
+                                },
+                                "_priority": 0,
+                            },
+                            zuiqiang: {
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                force: true,
+                                direct: true,
+                                trigger: {
+                                    global: "damageBegin4",
+                                },
+                                filter: function (event, player) {
+                                    if (!event.source || event.source != player || event.player == player) return false;
+                                    return event.player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length <= 0 && event.num >= event.player.hp;
+                                },
+                                content: function () {
+                                    "step 0";
+                                    trigger.cancel();
+                                    player.chooseCard('h', 1, '将一张手牌置于其的武将牌上，称为【军辅】', true).set('ai', function (card) {
+                                        return 9 - get.value(card);
+                                    });
+                                    "step 1";
+                                    if (result.bool) {
+                                        // player.addToExpansion(result.cards,player,'giveAuto').gaintag.add('junfu');player.update();
+                                        player.loseToSpecial(result.cards, 'junfu', trigger.player).visible = true;
+                                    }
+                                },
                             }
                             //在这里添加新技能。
 
@@ -13466,6 +13640,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             pachina: "要塞姬",
                             loki: "洛基",
                             southdakota: "南达科他",
+                            sukhbaatar: "苏赫巴托尔",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -13720,7 +13895,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhanxian: "斩仙", "zhanxian_info": "出牌阶段开始前，你可以将任意张手牌作为“斩”扣置在武将牌上至本回合结束。锁定技，手牌数不多于你“斩”张数的角色不能响应你使用的牌。",
                             guishen: "鬼神", "guishen_info": "锁定技，你的出牌阶段内，体力值大于体力上限一半的其他角色所有技能失效。",
                             guishen_fengyin: "鬼神_封印",
-
+                            sukhbaatar_rumeng: "入梦", "sukhbaatar_rumeng_info": "锁定技,准备阶段，你选择一名角色与其拼点。你发起拼点或成为拼点目标时可以获得场上一张“军辅”牌。",
+                            sukhbaatar_rumeng_1: "入梦", "sukhbaatar_rumeng_1_info": "锁定技，你发起拼点或成为拼点目标时可以获得场上一张“军辅”牌。",
+                            sudaren: "苏大人", "sudaren_info": "转换技,你拼点赢时，转换为阳；拼点没赢，转换为阴。阳：你使用牌时，可以弃置一张“军辅”牌让那张牌额外结算1次。阴：其他角色对你使用牌时，可以摸一张牌，并将一张手牌置于在武将牌上，视作“军辅”牌",
+                            zuiqiang: "最强", "zuiqiang_info": "锁定技,一名武将牌上没有“军辅”牌的其他角色受到你造成的伤害时，若此伤害会令其进入濒死状态，防止之并将你的一张手牌作为“军辅”牌置于其武将牌上。",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
