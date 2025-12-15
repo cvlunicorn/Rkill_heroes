@@ -13452,37 +13452,37 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 intro: {
                                     content(storage, player, skill) {
                                         if (player.storage.sudaren == true) return "你使用基本牌或普通锦囊牌时，可以弃置一张“军辅”牌让那张牌额外结算1次。";
-                                        return "其他角色对你使用牌时，你可以摸一张牌，并将一张手牌置于在武将牌上，视作“军辅”牌";
+                                        return "一名角色对你使用牌时，可以摸一张牌，并将一张手牌置于在武将牌上，视作“军辅”牌";
                                     },
                                 },
-                                group: ["sudaren_1", "sudaren_2"],
+                                group: ["sudaren_1", "sudaren_2", "sudaren_3"],
                                 subSkill: {
                                     "1": {
-                                        prompt: "其他角色对你使用牌时，你可以摸一张牌，并将一张手牌置于在武将牌上，视作“军辅”牌",
+                                        prompt: "一名角色对你使用牌时，可以摸一张牌，并将一张手牌置于在武将牌上，视作“军辅”牌",
                                         audio: "ext:舰R牌将/audio/skill:true",
                                         trigger: {
                                             target: "useCardToBefore",
                                         },
+                                        direct: true,
                                         filter(event, player) {
                                             if (player.storage.sudaren) return false;
-                                            return _status.currentPhase != player;
+                                            return true;
                                         },
                                         check: function (event, player) {
                                             return 1;
                                         },
                                         content() {
                                             'step 0'
-                                            player.changeZhuanhuanji("sudaren");
-                                            player.draw(1);
-                                            player.chooseCard('h', 1, '将一张手牌置于你的武将牌上，称为【军辅】').set('ai', function (card) {
+                                            //player.changeZhuanhuanji("sudaren");
+                                            trigger.player.draw(1);
+                                            trigger.player.chooseCard('h', 1, '将一张手牌置于你的武将牌上，称为【军辅】').set('ai', function (card) {
                                                 var player = get.player();
                                                 if (ui.selected.cards.type == "equip") return -get.value(card);
                                                 return 9 - get.value(card);
                                             });
                                             'step 1'
                                             if (result.bool) {
-                                                // player.addToExpansion(result.cards,player,'giveAuto').gaintag.add('junfu');player.update();
-                                                player.loseToSpecial(result.cards, 'junfu', player).visible = true;
+                                                trigger.player.loseToSpecial(result.cards, 'junfu', trigger.player).visible = true;
                                             }
                                         },
                                         sub: true,
@@ -13507,7 +13507,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             }).set('card1', card1);
                                             "step 1";
                                             if (result.bool) {
-                                                player.changeZhuanhuanji("sudaren");
+                                                //player.changeZhuanhuanji("sudaren");
                                                 player.logSkill("sudaren");
                                                 player.discard(result.links);
                                                 trigger.effectCount++;
@@ -13515,6 +13515,35 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         sub: true,
                                         "_priority": 0,
+                                    },
+                                    3: {
+                                        trigger: {
+                                            player: ["chooseToCompareAfter", "compareMultipleAfter"],
+                                            target: ["chooseToCompareAfter", "compareMultipleAfter"],
+                                        },
+                                        filter: function (event, player) {
+                                            if (event.preserve) return false;
+                                            return true;
+                                        },
+                                        direct: true,
+                                        content: function () {
+                                            var win = false;
+                                            if (player == trigger.player) {
+                                                if (trigger.num1 > trigger.num2) {
+                                                    win = true;
+                                                } else {
+                                                    win = false;
+                                                }
+                                            } else {
+                                                if (trigger.num1 < trigger.num2) {
+                                                    win = true;
+                                                } else {
+                                                    win = false;
+                                                }
+                                            }
+                                            game.log(win);
+                                            if ((player.storage.sudaren != true && win) || (player.storage.sudaren == true && !win)) player.changeZhuanhuanji("sudaren");
+                                        },
                                     },
                                 },
                                 ai: {
@@ -13536,6 +13565,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 content: function () {
                                     "step 0";
                                     trigger.cancel();
+                                    player.draw(1);
                                     player.chooseCard('h', 1, '将一张手牌置于其的武将牌上，称为【军辅】', true).set('ai', function (card) {
                                         return 9 - get.value(card);
                                     });
