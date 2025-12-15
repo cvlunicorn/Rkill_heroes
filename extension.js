@@ -1004,9 +1004,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             loki: ["female", "KMS", 4, ["hangmucv", "xiance"], ["des:深海版的装甲航空母舰彼得·施特拉塞尔。"]],
                             southdakota: ["female", "USN", 4, ["zhanliebb", "zhuangjiafh", "gumei", "jianmiemoshi", "zhaopin"], ["des:原型为美国海军南达科他级战列舰南达科他（BB-57）。"]],
                             lingbo: ["female", "IJN", 3, ["quzhudd", "dajiaoduguibi", "zhanxian", "guishen"], ["des:吹雪型11号舰，特II型1号舰。相比特I型，绫波号增加了主炮高射功能，35年针对第四舰队事件进行了改装，战争初期隶属南方部队。1942年8月被派到瓜岛，并参加了11月的第三次所罗门海战，战斗中绫波号表现突出，至少击伤四艘美军战舰，其中包括南达科他号战列舰，绫波号自身也在此次海战中沉没。"]],
-                            sukhbaatar: ["female", "OTHER", 3, ["junfu", "sukhbaatar_rumeng", "sudaren", "zuiqiang"], ["des:CLASSIFIED*。"]],
+                            sukhbaatar: ["female", "OTHER", 4, ["junfu", "sukhbaatar_rumeng", "sudaren", "zuiqiang"], ["des:CLASSIFIED*。"]],
 
-                            skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "junfu", "gnjinfan"], ["forbidai", "des:测试用"]],
+                            skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "junfu"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
                             _yuanhang: {
