@@ -13479,7 +13479,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             'step 0'
                                             //player.changeZhuanhuanji("sudaren");
                                             trigger.player.draw(1);
-                                            trigger.player.chooseCard('h', 1, '将一张手牌置于你的武将牌上，称为【军辅】').set('ai', function (card) {
+                                            trigger.player.chooseCard('h', 1, '将一张手牌置于你的武将牌上，称为【军辅】', true).set('ai', function (card) {
                                                 var player = get.player();
                                                 if (ui.selected.cards.type == "equip") return -get.value(card);
                                                 return 9 - get.value(card);
