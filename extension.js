@@ -2762,16 +2762,44 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                 },
                                 ai: { combo: "junfu", },
-                                group: ["junfu_choose"],
+                                group: ["junfu_choose",],
                                 onremove: function (player, skill) {
                                     var cards = player.getExpansions(skill);
                                     if (cards.length) player.loseToDiscardpile(cards);
                                 },
+                                mark: true,
                                 intro: {
-                                    content: "expansion",
-                                    markcount: "expansion",
+                                    content: function (storage, player) {
+                                        if (!player.getCards('s', function (card) { return card.hasGaintag('junfu') })) return "共有零张牌";
+                                        return "共有" + get.cnNumber(player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length) + "张军辅牌";
+                                    },
+                                    mark: function (dialog, storage, player) {
+                                        if (!player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length) return "共有零张牌";
+                                        return "共有" + get.cnNumber(player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length) + "张军辅牌";
+                                    },
+                                    markcount: function (storage, player) {
+                                        if (player.getCards('s', function (card) { return card.hasGaintag('junfu') })) return player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length;
+                                        return 0;
+                                    },
                                 },
                                 subSkill: {
+                                    mark: {
+                                        mark: true,
+                                        intro: {
+                                            content: function (storage, player) {
+                                                if (!player.getCards('s', function (card) { return card.hasGaintag('junfu') })) return "共有零张牌";
+                                                return "共有" + get.cnNumber(player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length) + "张军辅牌";
+                                            },
+                                            mark: function (dialog, storage, player) {
+                                                if (!player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length) return "共有零张牌";
+                                                return "共有" + get.cnNumber(player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length) + "张军辅牌";
+                                            },
+                                            markcount: function (storage, player) {
+                                                if (player.getCards('s', function (card) { return card.hasGaintag('junfu') })) return player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length;
+                                                return 0;
+                                            },
+                                        },
+                                    },
                                     choose: {
                                         trigger: {
                                             player: "phaseUseEnd",
@@ -2804,18 +2832,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 player.loseToSpecial(result.cards, 'junfu', player).visible = true;
                                             }
                                         },
-                                        sub: true,
+                                        //sub: true,
+
                                         mod: {
                                             aiOrder: function (player, card, num) {
                                                 if (get.itemtype(card) == "card" && card.hasGaintag("junfu")) return num + 0.5;
                                             },
                                         },
-                                    }
-                                    ,
-                                },
-                                intro: {
-                                    content: function () {
-                                        return get.translation(skill + '_info');
                                     },
                                 },
                             },
@@ -10222,7 +10245,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 frequent: true,
                                 filter: function (event, player) {
-                                    return player.countCards("h") > event.player.countCards("h") && event.notLink();
+                                    return event.card.name == "sha" && player.countCards("h") > event.player.countCards("h") && event.notLink();
                                 },
                                 content: function () {
                                     trigger.num += 1;
@@ -10775,7 +10798,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             })
                                             .set("filterButton", function (button) {
                                                 var filtersuit = [...new Set(ui.selected.buttons.map(card => get.suit(card)))]
-                                                if (filtersuit.length >= event.suitNum && !filtersuit.includes(get.suit(button.link))) { return false; }
+                                                if (filtersuit.length == event.suitNum && !filtersuit.includes(get.suit(button.link))) { return false; }
                                                 return true;
                                             });
                                     }
@@ -13102,6 +13125,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             jianmiemoshi: {
+                                nobracket: true,
                                 direct: true,
                                 trigger: {
                                     player: "useCard",
@@ -13138,6 +13162,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             zhaopin: {
+                                nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 skillAnimation: true,
                                 animationColor: "thunder",
@@ -13216,6 +13241,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             huodezhuangbei: {
+                                nobracket: true,
                                 enable: "phaseUse",
                                 content: function () {
                                     var card = get.cardPile2(function (card) {
@@ -13225,6 +13251,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             zhanxian: {
+                                nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
                                     player: "phaseUseBefore",
@@ -13309,6 +13336,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             guishen: {
+                                nobracket: true,
                                 onremove(player, skill) {
                                     var targets = game.filterPlayer(current => current.hasSkill("guishen_fengyin"));
                                     for (i in targets) {
@@ -13378,6 +13406,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             sukhbaatar_rumeng: {
+                                nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
                                     player: "phaseZhunbeiBegin",
@@ -13393,7 +13422,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     "step 0";
-                                    player.chooseTarget(get.prompt2("sukhbaatar_rumeng"), function (card, player, target) {
+                                    player.chooseTarget(true, get.prompt2("sukhbaatar_rumeng"), function (card, player, target) {
                                         return player.canCompare(target);
                                     }).set("ai", target => {
                                         return -get.attitude(player, target);
@@ -13448,6 +13477,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             sudaren: {
+                                nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 mark: true,
                                 locked: false,
@@ -13479,6 +13509,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             'step 0'
                                             //player.changeZhuanhuanji("sudaren");
                                             trigger.player.draw(1);
+                                            if (!trigger.player.hasSkill("junfu_mark")) { trigger.player.addSkill("junfu_mark"); }
                                             trigger.player.chooseCard('h', 1, '将一张手牌置于你的武将牌上，称为【军辅】', true).set('ai', function (card) {
                                                 var player = get.player();
                                                 if (ui.selected.cards.type == "equip") return -get.value(card);
@@ -13556,6 +13587,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 "_priority": 0,
                             },
                             zuiqiang: {
+                                nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 force: true,
                                 direct: true,
