@@ -1006,7 +1006,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             lingbo: ["female", "IJN", 3, ["quzhudd", "dajiaoduguibi", "zhanxian", "guishen"], ["des:吹雪型11号舰，特II型1号舰。相比特I型，绫波号增加了主炮高射功能，35年针对第四舰队事件进行了改装，战争初期隶属南方部队。1942年8月被派到瓜岛，并参加了11月的第三次所罗门海战，战斗中绫波号表现突出，至少击伤四艘美军战舰，其中包括南达科他号战列舰，绫波号自身也在此次海战中沉没。"]],
                             sukhbaatar: ["female", "OTHER", 3, ["junfu", "sukhbaatar_rumeng", "sudaren", "zuiqiang"], ["des:CLASSIFIED*。"]],
 
-                            skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei"], ["forbidai", "des:测试用"]],
+                            skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "junfu", "gnjinfan"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
                             _yuanhang: {
@@ -2778,7 +2778,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         forced: true,
                                         popup: false,
-                                        firstDo: true,
+                                        //firstDo: true,
+                                        locked: false,
                                         filter: function (event, player) {
                                             var zongshu = 1 + player.countMark('jinengup'), cunpaishu = player.getExpansions('junfu').length + player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length;
                                             return zongshu > cunpaishu && player.countCards('h');
@@ -2802,10 +2803,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 // player.addToExpansion(result.cards,player,'giveAuto').gaintag.add('junfu');player.update();
                                                 player.loseToSpecial(result.cards, 'junfu', player).visible = true;
                                             }
-                                            'step 2'
-
                                         },
                                         sub: true,
+                                        mod: {
+                                            aiOrder: function (player, card, num) {
+                                                if (get.itemtype(card) == "card" && card.hasGaintag("junfu")) return num + 0.5;
+                                            },
+                                        },
                                     }
                                     ,
                                 },
