@@ -1006,7 +1006,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             lingbo: ["female", "IJN", 3, ["quzhudd", "dajiaoduguibi", "zhanxian", "guishen"], ["des:吹雪型11号舰，特II型1号舰。相比特I型，绫波号增加了主炮高射功能，35年针对第四舰队事件进行了改装，战争初期隶属南方部队。1942年8月被派到瓜岛，并参加了11月的第三次所罗门海战，战斗中绫波号表现突出，至少击伤四艘美军战舰，其中包括南达科他号战列舰，绫波号自身也在此次海战中沉没。"]],
                             sukhbaatar: ["female", "OTHER", 4, ["junfu", "sukhbaatar_rumeng", "sudaren", "zuiqiang"], ["des:CLASSIFIED*。"]],
                             odin: ["female", "OTHER", 4, ["junfu", "ganggenier"], ["des:CLASSIFIED*。"]],
-                            vestal: ["female", "OTHER", 4, ["junfu", "vestal_mowang"], ["des:CLASSIFIED*。"]],
+                            vestal: ["female", "USN", 4, ["junfu", "vestal_mowang"], ["des:CLASSIFIED*。"]],
+                            nvzaoshen: ["female", "USN", 3, ["junfu", "dajiaoduguibi", "xiwangdeshuguang"], ["des:女灶神号（舷号AR-4）是一艘在1913年至1946年期间服役于美国海军的修理船。在改装为修理船之前，女灶神是一条运煤船（从1909年开始）。女灶神号参与了全部两次世界大战，在日本空袭珍珠港期间，该舰在港口内遭到重创。打满整场第二次世界大战的女灶神共获得了两枚战斗之星。"]],
 
                             skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "junfu"], ["forbidai", "des:测试用"]],
                         },
@@ -13728,12 +13729,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     cards1 = Array.isArray(cards1) ? cards1 : [];
                                     cards2 = Array.isArray(cards2) ? cards2 : [];
                                     if (cards1 != [] && cards2 != []) {
-                                        var chooseButton=player.chooseButton(1,['弃置你的军辅牌，视为使用桃',cards1,'弃置'+get.translation(trigger.player)+'的军辅牌，视为使用桃',cards2]);
-					
+                                        var chooseButton = player.chooseButton(1, ['弃置你的军辅牌，视为使用桃', cards1, '弃置' + get.translation(trigger.player) + '的军辅牌，视为使用桃', cards2]);
+
                                     } else if (cards1 != []) {
-                                        var chooseButton=player.chooseButton(1,['弃置'+get.translation(player)+'的军辅牌，视为使用桃',cards1]);
+                                        var chooseButton = player.chooseButton(1, ['弃置' + get.translation(player) + '的军辅牌，视为使用桃', cards1]);
                                     } else {
-                                        var chooseButton=player.chooseButton(1,['弃置'+get.translation( trigger.player)+'的军辅牌，视为使用桃',cards2]);
+                                        var chooseButton = player.chooseButton(1, ['弃置' + get.translation(trigger.player) + '的军辅牌，视为使用桃', cards2]);
                                     }
                                     chooseButton.set('ai', button => {
                                         var len = _status.event.len;
@@ -13741,12 +13742,45 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         return -_status.event.player.getValue(card);
                                     });
                                     "step 1"
-                                    if(result.bool){
-                                        var card={name:'tao',iscard:true};
+                                    if (result.bool) {
+                                        var card = { name: 'tao', iscard: true };
                                         player.discard(result.links[0]);
-                                        player.useCard(card,trigger.player,true);
+                                        player.useCard(card, trigger.player, true);
                                     }
                                 },
+                            },
+                            xiwangdeshuguang: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: {
+                                    global: "phaseEnd",
+                                },
+                                filter: function (event, player) {
+                                    const damagedPlayers = game.filterPlayer(current => current.getHistory('damage').length > 0);
+                                    return player.countCards("h") && damagedPlayers && damagedPlayers.length > 0;
+                                },
+                                direct: true,
+                                content() {
+                                    "step 0"
+                                    player.chooseTarget(get.prompt('xiwangdeshuguang'), "选择一名本回合受过伤害的角色", function (card, player, target) {
+                                        return target.getHistory('damage').length > 0;
+                                    }).set(ai, function (target) {
+                                        var player = get.player();
+                                        return get.attitude(player, target);
+                                    });
+                                    "step 1"
+                                    if (!result.bool) { event.finish(); }
+                                    event.target = result.targets[0];
+                                    player.chooseToDiscard(get.prompt('xiwangdeshuguang'), "弃置一张手牌，令" + get.translation(event.target) + "恢复一点体力", 1).set(ai, function (card) {
+                                        return get.value(card);
+                                    });
+                                    "step 2"
+                                    if (!result.bool) { event.finish(); }
+                                    event.target.recover();
+                                },
+                                ai: {
+                                    threaten: 1.5,
+                                }
                             },
                             //在这里添加新技能。
 
@@ -13839,12 +13873,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                             lingbo: "绫波",
 
-                            pachina: "要塞姬",
-                            loki: "洛基",
-                            southdakota: "南达科他",
-                            sukhbaatar: "苏赫巴托尔",
-                            odin: "奥丁",
-                            vestal: "女灶神",
+                            pachina: "痴要塞姬",
+                            loki: "痴洛基",
+                            southdakota: "痴南达科他",
+                            sukhbaatar: "慢苏赫巴托尔",
+                            odin: "慢奥丁",
+                            vestal: "慢女灶神",
+                            nvzaoshen: "女灶神",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -13855,6 +13890,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             daodan: "防空导弹",
                             zhandouji: "战斗机",
                             yaosai: "要塞",
+
                             "fangqu_info": "游戏开始时/出牌阶段开始时，将至多1/2/3张手牌放到武将牌上.称为防空导弹。锦囊牌被使用时，你可以移去一枚防空导弹，令其无效。",
                             "fangqu_wuxie": "发射防空导弹",
                             hangmucv: "航母", "hangmucv_info": "(可强化)你的出牌阶段开始时，<br>你可以将任意张：零级强化，黑桃或梅花手牌；一级强化，黑桃或梅花或红桃手牌；二级强化，任意手牌。当作万箭齐发对等量个目标使用",
@@ -14107,7 +14143,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             ganggenier_1: "冈格尼尔", "ganggenier_1_info": "出牌阶段限一次，你可以弃置两名角色各一张“军辅”牌，直到回合结束，其他所有角色无法使用或打出与被以此法弃置的牌相同花色的牌。",
                             vestal_mowang: "魔王", "vestal_mowang_info": "当有角色陷入濒死时，你可以将自己或其武将牌上的“军辅”牌当做【桃】对其使用。当场上有角色脱离濒死状态时，你可以选择恢复一点体力或摸一张牌。",
                             vestal_mowang_1: "魔王",
-
+                            xiwangdeshuguang: "希望的曙光", "xiwangdeshuguang_info": "每个回合结束时，你可以弃置一张手牌，令一名本回合受到过伤害的角色回复一点体力。",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
