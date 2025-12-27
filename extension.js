@@ -905,7 +905,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 shixinrumoR_tan: [],
                                 shixinrumoR_chen: [],
                                 shixinrumoR_chi: ["southdakota", "pachina", "loki"],
-                                shixinrumoR_man: ["sukhbaatar"],
+                                shixinrumoR_man: ["sukhbaatar", "odin", "vestal"],
                                 shixinrumoR_yi: [],
                             },
                         },
@@ -1006,6 +1006,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             lingbo: ["female", "IJN", 3, ["quzhudd", "dajiaoduguibi", "zhanxian", "guishen"], ["des:吹雪型11号舰，特II型1号舰。相比特I型，绫波号增加了主炮高射功能，35年针对第四舰队事件进行了改装，战争初期隶属南方部队。1942年8月被派到瓜岛，并参加了11月的第三次所罗门海战，战斗中绫波号表现突出，至少击伤四艘美军战舰，其中包括南达科他号战列舰，绫波号自身也在此次海战中沉没。"]],
                             sukhbaatar: ["female", "OTHER", 4, ["junfu", "sukhbaatar_rumeng", "sudaren", "zuiqiang"], ["des:CLASSIFIED*。"]],
                             odin: ["female", "OTHER", 4, ["junfu", "ganggenier"], ["des:CLASSIFIED*。"]],
+                            vestal: ["female", "OTHER", 4, ["junfu", "vestal_mowang"], ["des:CLASSIFIED*。"]],
 
                             skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "junfu"], ["forbidai", "des:测试用"]],
                         },
@@ -13707,6 +13708,46 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
+                            vestal_mowang: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: {
+                                    global: "dying",
+                                },
+                                frequent: true,
+                                filter: function (event, player) {
+                                    return event.player.countCards('s', function (card) { return card.hasGaintag('junfu') }) > 0 || player.countCards('s', function (card) { return card.hasGaintag('junfu') }) > 0;
+                                },
+                                check: function (event, player) {
+                                    return get.attitude(player, event.player);
+                                },
+                                content() {
+                                    "step 0"
+                                    var cards1 = player.getCards('s', function (card) { return card.hasGaintag('junfu') });
+                                    var cards2 = trigger.player.getCards('s', function (card) { return card.hasGaintag('junfu') });
+                                    cards1 = Array.isArray(cards1) ? cards1 : [];
+                                    cards2 = Array.isArray(cards2) ? cards2 : [];
+                                    if (cards1 != [] && cards2 != []) {
+                                        var chooseButton=player.chooseButton(1,['弃置你的军辅牌，视为使用桃',cards1,'弃置'+get.translation(trigger.player)+'的军辅牌，视为使用桃',cards2]);
+					
+                                    } else if (cards1 != []) {
+                                        var chooseButton=player.chooseButton(1,['弃置'+get.translation(player)+'的军辅牌，视为使用桃',cards1]);
+                                    } else {
+                                        var chooseButton=player.chooseButton(1,['弃置'+get.translation( trigger.player)+'的军辅牌，视为使用桃',cards2]);
+                                    }
+                                    chooseButton.set('ai', button => {
+                                        var len = _status.event.len;
+                                        var card = button.link;
+                                        return -_status.event.player.getValue(card);
+                                    });
+                                    "step 1"
+                                    if(result.bool){
+                                        var card={name:'tao',iscard:true};
+                                        player.discard(result.links[0]);
+                                        player.useCard(card,trigger.player,true);
+                                    }
+                                },
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -13803,6 +13844,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             southdakota: "南达科他",
                             sukhbaatar: "苏赫巴托尔",
                             odin: "奥丁",
+                            vestal: "女灶神",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -14063,7 +14105,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zuiqiang: "最强", "zuiqiang_info": "锁定技,一名武将牌上没有“军辅”牌的其他角色受到你造成的伤害时，若此伤害会令其进入濒死状态，防止之并将你的一张手牌作为“军辅”牌置于其武将牌上。",
                             ganggenier: "冈格尼尔", "ganggenier_info": "准备阶段，依次从牌堆顶给所有没有“军辅”牌的角色武将牌上放置一张牌，视作“军辅”牌。出牌阶段限一次，你可以弃置两名角色各一张“军辅”牌，直到回合结束，其他所有角色无法使用或打出与被以此法弃置的牌相同花色的牌。",
                             ganggenier_1: "冈格尼尔", "ganggenier_1_info": "出牌阶段限一次，你可以弃置两名角色各一张“军辅”牌，直到回合结束，其他所有角色无法使用或打出与被以此法弃置的牌相同花色的牌。",
-
+                            vestal_mowang: "魔王", "vestal_mowang_info": "当有角色陷入濒死时，你可以将自己或其武将牌上的“军辅”牌当做【桃】对其使用。当场上有角色脱离濒死状态时，你可以选择恢复一点体力或摸一张牌。",
+                            vestal_mowang_1: "魔王",
 
 
                             jianrbiaozhun: "舰r标准",
