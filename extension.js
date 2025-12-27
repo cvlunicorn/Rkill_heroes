@@ -6338,12 +6338,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
 
                                 locked: true,
-                                ai: {
-                                    viewHandcard: true,
-                                    skillTagFilter(player, tag, arg) {
-                                        if (player == arg) return false;
+                                ai: {//全在ai里面
+                                    viewHandcard: function (player) {//关于能看别人手牌的
+                                        if (!player.hasEmptySlot(5)) return false; //宝具有没有，装备5是宝具
+                                        return true;//如果是的话生效
                                     },
-
+                                    skillTagFilter(player, tag, arg) {//这是给ai的
+                                        if (!player.hasEmptySlot(5)) return false;//也是检查宝具的
+                                        if (player == arg) return false; // 且加上过滤器，防止对自己使用
+                                    }
                                 },
                                 "_priority": 0,
                             },
