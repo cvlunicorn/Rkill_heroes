@@ -13759,27 +13759,29 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     global: "phaseEnd",
                                 },
                                 filter: function (event, player) {
-                                    const damagedPlayers = game.filterPlayer(current => current.getHistory('damage').length > 0);
+                                    var damagedPlayers = game.filterPlayer(current => current.getHistory('damage').length > 0 && current.isDamaged());
                                     return player.countCards("h") && damagedPlayers && damagedPlayers.length > 0;
                                 },
                                 direct: true,
                                 content() {
                                     "step 0"
                                     player.chooseTarget(get.prompt('xiwangdeshuguang'), "选择一名本回合受过伤害的角色", function (card, player, target) {
-                                        return target.getHistory('damage').length > 0;
+                                        return target.getHistory('damage').length > 0 && target.isDamaged();
                                     }).set(ai, function (target) {
                                         var player = get.player();
                                         return get.attitude(player, target);
                                     });
                                     "step 1"
-                                    if (!result.bool) { event.finish(); }
-                                    event.target = result.targets[0];
-                                    player.chooseToDiscard(get.prompt('xiwangdeshuguang'), "弃置一张手牌，令" + get.translation(event.target) + "恢复一点体力", 1).set(ai, function (card) {
-                                        return get.value(card);
-                                    });
+                                    if (result.bool) {
+                                        event.targets = result.targets[0];
+                                        player.chooseToDiscard(get.prompt('xiwangdeshuguang'), "弃置一张手牌，令" + get.translation(event.target) + "恢复一点体力", 1).set(ai, function (card) {
+                                            return 9 - get.value(card);
+                                        });
+                                    }
+                                    else { event.finish(); }
                                     "step 2"
                                     if (!result.bool) { event.finish(); }
-                                    event.target.recover();
+                                    event.targets.recover();
                                 },
                                 ai: {
                                     threaten: 1.5,
