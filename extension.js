@@ -1005,6 +1005,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             southdakota: ["female", "USN", 4, ["zhanliebb", "zhuangjiafh", "gumei", "jianmiemoshi", "zhaopin"], ["des:原型为美国海军南达科他级战列舰南达科他（BB-57）。"]],
                             lingbo: ["female", "IJN", 3, ["quzhudd", "dajiaoduguibi", "zhanxian", "guishen"], ["des:吹雪型11号舰，特II型1号舰。相比特I型，绫波号增加了主炮高射功能，35年针对第四舰队事件进行了改装，战争初期隶属南方部队。1942年8月被派到瓜岛，并参加了11月的第三次所罗门海战，战斗中绫波号表现突出，至少击伤四艘美军战舰，其中包括南达科他号战列舰，绫波号自身也在此次海战中沉没。"]],
                             sukhbaatar: ["female", "OTHER", 4, ["junfu", "sukhbaatar_rumeng", "sudaren", "zuiqiang"], ["des:CLASSIFIED*。"]],
+                            odin: ["female", "OTHER", 4, ["junfu", "ganggenier"], ["des:CLASSIFIED*。"]],
 
                             skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "junfu"], ["forbidai", "des:测试用"]],
                         },
@@ -13611,7 +13612,101 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player.loseToSpecial(result.cards, 'junfu', trigger.player).visible = true;
                                     }
                                 },
-                            }
+                            },
+                            ganggenier: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                direct: true,
+                                trigger: {
+                                    player: "phaseZhunbeiBegin",
+                                },
+                                filter: function (event, player) {
+                                    return game.countPlayer(function (current) {
+                                        return current.getCards('s', function (card) { return card.hasGaintag('junfu') }).length <= 0;
+                                    });
+                                },
+                                content: function () {
+                                    var targets = game.filterPlayer(function (current) {
+                                        return current.getCards('s', function (card) { return card.hasGaintag('junfu') }).length <= 0;
+                                    });
+                                    var cardi = get.cards(targets.length);
+                                    for (var i = 0; i < targets.length; i++) {
+                                        targets[i].addSkill("junfu_mark");
+                                        targets[i].loseToSpecial([cardi[i]], 'junfu').visible = true;
+                                    }
+
+                                },
+                                group: ["ganggenier_1"],
+                                subSkill: {
+                                    1: {
+                                        nobracket: true,
+                                        audio: "ext:舰R牌将/audio/skill:true",
+                                        enable: "phaseUse",
+                                        usable: 1,
+                                        filter: function (event, player) {
+                                            return game.countPlayer(current => current.countCards('s', function (card) { return card.hasGaintag('junfu') })) > 1;
+                                        },
+                                        multitarget: true,
+                                        selectTarget: 2,
+                                        filterTarget: function (card, player, target) {
+                                            return target.countCards('s', function (card) { return card.hasGaintag('junfu') }) > 0;
+                                        },
+                                        content: function () {
+                                            "step 0";
+                                            if (targets.length > 1) {
+                                                event.i = 0;
+                                                event.suits = [];
+                                            } else { event.finish(); }
+                                            "step 1";
+                                            var cards = targets[event.i].getCards("s", function (card) { return card.hasGaintag('junfu') });
+                                            player.chooseCardButton("弃置" + get.translation(targets[event.i]) + "一张【军辅】牌", true, cards).set('ai', function (button) {
+                                                return get.value(button.link);
+                                            }).set('selectButton', 1);
+                                            "step 2";
+                                            var suit = get.suit(result.links[0]);
+                                            if (!event.suits.includes(suit)) { event.suits.push(suit); }
+                                            player.discard(result.links[0]);
+                                            event.i++;
+                                            if (event.i < 2) { event.goto(1); }
+                                            "step 3";
+                                            var targets1 = game.filterPlayer(current => current != player);
+                                            for (target of targets1) {
+                                                target.addTempSkill("ganggenier_ban", { global: "phaseEnd" });
+                                                target.markAuto("ganggenier_ban", event.suits);
+                                            }
+                                        },
+                                        ai: {
+                                            order: 11,
+                                            result: {
+                                                target(player, target) {
+                                                    return -1;
+                                                },
+                                            },
+                                            threaten: 1.2,
+                                        },
+                                    },
+                                    ban: {
+                                        onremove: true,
+                                        charlotte: true,
+                                        mod: {
+                                            cardEnabled: function (card, player) {
+                                                if (player.getStorage('ganggenier_ban').includes(get.suit(card))) return false;
+                                            },
+                                            cardRespondable: function (card, player) {
+                                                if (player.getStorage('ganggenier_ban').includes(get.suit(card))) return false;
+                                            },
+                                            cardSavable: function (card, player) {
+                                                if (player.getStorage('ganggenier_ban').includes(get.suit(card))) return false;
+                                            },
+                                        },
+                                        mark: true,
+                                        marktext: '封印',
+                                        intro: {
+                                            content: '本回合内不能使用或打出$的牌',
+                                        },
+                                    },
+                                },
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -13707,6 +13802,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             loki: "洛基",
                             southdakota: "南达科他",
                             sukhbaatar: "苏赫巴托尔",
+                            odin: "奥丁",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -13965,6 +14061,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             sukhbaatar_rumeng_1: "入梦", "sukhbaatar_rumeng_1_info": "锁定技，你发起拼点或成为拼点目标时可以获得场上一张“军辅”牌。",
                             sudaren: "苏大人", "sudaren_info": "转换技,你拼点赢时，转换为阳；拼点没赢，转换为阴。阳：你使用牌时，可以弃置一张“军辅”牌让那张牌额外结算1次。阴：其他角色对你使用牌时，可以摸一张牌，并将一张手牌置于在武将牌上，视作“军辅”牌",
                             zuiqiang: "最强", "zuiqiang_info": "锁定技,一名武将牌上没有“军辅”牌的其他角色受到你造成的伤害时，若此伤害会令其进入濒死状态，防止之并将你的一张手牌作为“军辅”牌置于其武将牌上。",
+                            ganggenier: "冈格尼尔", "ganggenier_info": "准备阶段，依次从牌堆顶给所有没有“军辅”牌的角色武将牌上放置一张牌，视作“军辅”牌。出牌阶段限一次，你可以弃置两名角色各一张“军辅”牌，直到回合结束，其他所有角色无法使用或打出与被以此法弃置的牌相同花色的牌。",
+                            ganggenier_1: "冈格尼尔", "ganggenier_1_info": "出牌阶段限一次，你可以弃置两名角色各一张“军辅”牌，直到回合结束，其他所有角色无法使用或打出与被以此法弃置的牌相同花色的牌。",
+
+
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
