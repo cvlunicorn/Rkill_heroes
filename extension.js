@@ -3722,18 +3722,34 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                             bigE: {
                                 prompt: "你令使用的第一张杀不可响应",
-                                trigger: {
-                                    player: "useCard",
-                                },
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 forced: true,
                                 filter: function (event, player) {
-                                    return event.card.name == 'sha' && player.getHistory('useCard', function (event) {
+                                    return event.card.name == 'sha' && !event.getParent().directHit.includes(event.target) && player.getHistory('useCard', function (event) {
                                         return (event.card.name == 'sha' || event.card.name == 'sheji9') && event.cards && event.cards.length;
                                     }).indexOf(event) == 0;
                                 },
-                                content: function () {
-                                    trigger.directHit.addArray(game.players);
+                                trigger: { player: 'useCardToPlayered' },
+                                filter(event, player) {
+                                    return event.card.name == 'sha'
+                                },
+                                logTarget: 'target',
+                                async content(event, trigger, player) {
+                                    const id = trigger.target.playerid;
+                                    const map = trigger.getParent().customArgs;
+                                    if (!map[id]) map[id] = {};
+                                    if (typeof map[id].shanRequired == 'number') {
+                                        map[id].shanRequired++;
+                                    }
+                                    else {
+                                        map[id].shanRequired = 2;
+                                    }
+                                },
+                                ai: {
+                                    directHit_ai: true,
+                                    skillTagFilter(player, tag, arg) {
+                                        if (arg.card.name != 'sha' || arg.target.countCards('h', 'shan') > 1) return false;
+                                    },
                                 },
                                 group: ["bigE_effect"],
                                 subSkill: {
@@ -3743,6 +3759,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger: {
                                             source: "damageSource",
                                         },
+                                        frequent:true,
                                         filter: function (event, player) {
                                             if (event._notrigger.includes(event.player)) return false;
                                             return (event.card && (event.card.name == 'sha' || event.card.name == 'sheji9') && (event.getParent().name == 'sha' || event.getParent().name == 'sheji9') &&
@@ -4376,10 +4393,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         var evt = _status.event.getTrigger();
                                         return target != player && !evt.targets.includes(target) && lib.filter.targetEnabled(evt.card, evt.player, target);
                                     }).set('ai', function (target) {
-                                        var trigger = _status.event.getTrigger();
                                         var player = get.player();
-                                        return get.effect(target, trigger.card, trigger.player, player) + 0.1;
-                                    }).set('targets', trigger.targets).set('playerx', trigger.player);
+                                        return get.attitude(target, player);
+                                    }).set('targets', trigger.targets);
                                     'step 1'
                                     if (result.bool) {
                                         var target = result.targets[0];
@@ -4389,10 +4405,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             '无效，或袖手旁观', function (card) {
                                                 return get.type(card) != 'basic';
                                             }).set('ai', function (card) {
-
-                                                //game.log(get.attitude(target, player));                                
-                                                //game.log(get.effect(player, trigger.card, trigger.player, player));                       
-                                                //game.log(card.name+get.value(card));                     
                                                 return (get.effect(player, trigger.card, trigger.player, player)) - get.value(card);
                                             });
                                         game.delay();
@@ -13977,9 +13989,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qianting_jiezi: "截辎", "qianting_jiezi_info": "其他角色跳过阶段时，你摸一张牌",
                             "_yuanhang": "远航", "_yuanhang_info": "受伤时手牌上限+1,挑战模式不屈时手牌上限+1<br>当你失去手牌后，且手牌数<手牌上限值时，你摸一张牌。使用次数上限0/1/2次，处于自己的回合时+1，每回合回复一次使用次数。<br>当你进入濒死状态时，你摸一张牌，体力上限大于二时需减少一点体力上限，额外摸一张牌；死亡后，你可以按自己的身份，令一名角色摸-/2/1/1（主/忠/反/内）张牌。",
                             kaishimopai: "开始摸牌", "kaishimopai_info": "<br>，判定阶段你可以减少一次摸牌阶段的摸牌，然后在回合结束时摸一张牌。",
-                            "_jianzaochuan": "建造", "_jianzaochuan_info": "限一次，当你进行了至少一次强化后<br>1.出牌阶段<br>你可以弃置3张不同花色的牌，提升一点血量上限与强化上限。<br>2.当你濒死时，<br>你可以弃置4张不同花色的牌，回复一点体力。<br>（未开启强化，则无需强化即可使用建造。未开启建造，则强化上限仅为1级。）",
+                            "_jianzaochuan": "建造", "_jianzaochuan_info": "每局游戏限一次，当你进行了至少一次强化后<br>1.出牌阶段<br>你可以弃置3张不同花色的牌，提升一点血量上限与强化上限。",//<br>2.当你濒死时，<br>你可以弃置4张不同花色的牌，回复一点体力。<br>（未开启强化，则无需强化即可使用建造。未开启建造，则强化上限仅为1级。）",
                             "_qianghuazhuang": "强化装备",
-                            "_qianghuazhuang_info": "你可以消耗经验，或弃置二至四张牌，选择一至两个永久效果升级。<br>（摸牌、技能、攻击范围、防御距离、手牌上限）每回合限一次。<br>一级强化消耗两点经验，二级强化消耗三点经验",//装备牌代表两张牌
+                            "_qianghuazhuang_info": "每回合限一次，你可以弃置二至四张牌或消耗经验，选择一至两个永久效果升级。<br>（摸牌、技能、攻击范围、防御距离、手牌上限）<br>一级强化消耗两点经验，二级强化消耗三点经验",//装备牌代表两张牌
                             diewulimitai: "递杀", "diewulimitai_info": "给实际距离为1的队友递一张杀或装备牌，可以立即使用（杀只能用一次），一回合限2次。可强化",
                             "_wulidebuff": "属性伤害效果",
                             "_wulidebuff_info": "火杀：令目标回合结束后，受到一点火焰伤害，摸两张牌。</br>冰杀：护甲加1伤；减少对手1点防御距离。</br>雷杀：自动判断是否流失对手体力；减少对手1点手牌上限；。</br>此角色回合结束后移除所有的进水、减速、燃烧。",
@@ -14015,18 +14027,18 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             kaifa: "开发装备",
                             "kaifa_info": "出牌阶段，你可以展示一张未强化过的【诸葛连弩】或标准包/军争包/SP包中的防具牌，然后对其进行强化。当你处于濒死状态时，你可以重铸一张防具牌，然后将体力回复至1点。",
                             huijiahuihe: "额外回合",
-                            "huijiahuihe_info": "当你有护甲时，你可以移除所有护甲并进行一个额外的回合；额外回合的摸牌数等于护甲数。此回合没有输出时，摸一张牌。",
+                            "huijiahuihe_info": "当你有护甲时，你可以移除所有护甲并进行一个额外的回合；额外回合的摸牌数等于护甲数。此回合结束时，若你没有造成伤害，你摸一张牌。",
                             junfu: "军辅船",
                             "junfu_info": "（可强化）出牌阶段结束时,你可以把至多1/2/3张手牌存于武将牌上，如手牌般使用。<br>其他角色回合开始时，你可以把存储的牌交给ta，然后你摸一张牌。",
                             manchangzhanyi: "漫长战役", "manchangzhanyi_info": "每轮限一次，你受到锦囊牌的伤害时，你免疫此伤害。你攻击范围内的其他角色的准备阶段，你可以弃置其一张手牌。",
                             manchangzhanyi_mianyi: "漫长战役", "manchangzhanyi_mianyi_info": "",
-                            guzhuyizhi: "孤注一掷", "guzhuyizhi_info": "准备阶段，你可以摸两张牌并弃置所有手牌，然后摸等量的牌，如此做，你的其他技能失效直到你的下回合开始，你计算与其他角色的距离-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。",
+                            guzhuyizhi: "孤注一掷", "guzhuyizhi_info": "准备阶段，你可以弃置所有手牌，然后摸弃置的手牌数+2张牌，如此做，你的其他技能失效直到你的下回合开始，你计算与其他角色的距离-1，杀使用次数+1，你的手牌上限等于本回合造成的伤害。",
                             guzhuyizhi2: "孤注一掷", "guzhuyizhi2_info": "",
                             shuileizhandui_1: "水雷战队", "shuileizhandui_1_info": "",
                             shuileizhandui: "水雷战队", "shuileizhandui_info": "你可以交给一名角色任意张牌。若你是本回合第一次发动本技能，你可以从牌堆和弃牌堆获得一张雷杀。你没有手牌时，不能成为杀的目标。",
-                            dumuchenglin: "独木成林", "dumuchenglin_info": "你获得【规避】。当场上没有其他航母时，杀使用次数+1，你于你的回合对其他角色造成的第一次伤害时此伤害+1。",
+                            dumuchenglin: "独木成林", "dumuchenglin_info": "你获得【规避】。当场上没有其他航母时，杀使用次数+1。",//，你于你的回合对其他角色造成的第一次伤害时此伤害+1。",
                             dumuchenglin_2: "独木成林2", "dumuchenglin_2_info": "杀使用次数+1",
-                            bigE: "大E", bigE_info: "你使用的第一张杀不能被响应。受到你使用杀造成的伤害的角色手牌上限-1直到其回合结束",
+                            bigE: "大E", bigE_info: "你使用的第一张杀需要两张闪响应。受到你使用杀造成的伤害的角色进水（手牌上限-1直到其回合结束）。",
                             xiangrui: "祥瑞", "xiangrui_info": "每名玩家的回合限一次，当你受到伤害前，你可以进行判定，判定结果为黑桃，免疫此次伤害，然后获得[祥瑞]标记。",
                             yumian: "御免", "yumian_info": "锁定技，结束阶段，你移除所有[祥瑞]标记。你可以选择距你1以内的目标，让其失去一点体力并摸两张牌。若你失去了一个或以上的祥瑞标记，你可以选择的目标不受距离限制",
                             hangkongzhanshuxianqu: "航空战术先驱", "hangkongzhanshuxianqu_info": "你使用转化的锦囊牌结算后，你可以展示牌堆顶的x张牌，获取其中花色各不相同的牌(x为你指定的目标数，至多为4)",
