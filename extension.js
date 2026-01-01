@@ -4596,7 +4596,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player.addTempSkill("qijianshashou_1");
                                         game.log("拼点赢");
                                     } else {
-                                        trigger.cancel();
+                                        var evt = _status.event.getParent("phaseUse");
+                                        if (evt && evt.name == "phaseUse") {
+                                            evt.skipped = true;
+                                        }
                                         player.skip('phaseDiscard');
                                         game.log("拼点没赢");
                                     }
@@ -14130,8 +14133,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhongbangtuxi: "重磅突袭", zhongbangtuxi_info: "限定技，出牌阶段，你可以弃置任意张红色牌对等量角色各造成一点火焰伤害。",
                             huangjiahaijunderongyao: "皇家海军的荣耀", huangjiahaijunderongyao_info: "锁定技，你对其他角色造成伤害或受到其他角色的伤害时，你弃置对方的一张牌，若此牌点数小于等于受伤角色的手牌数，此伤害+1",
                             huangjiaxunyou: "皇家巡游", huangjiaxunyou_info: "锁定技，你计算与其他角色距离-1.",
-                            tianshi: "天使", tianshi_info: "主公技，你的判定牌生效前，E国势力的角色可以打出一张红牌代替之",
-                            tianshi2: "天使2", tianshi2_info: "拥有“天使”的角色判定牌生效前，E国势力的角色可以打出一张红牌代替之",
+                            tianshi: "天使", tianshi_info: "主公技，你的判定牌生效前，E国势力的角色可以打出一张手牌代替之",
+                            tianshi2: "天使2", tianshi2_info: "拥有“天使”的角色判定牌生效前，E国势力的角色可以打出一张手牌代替之",
                             jishiyu: "及时雨", jishiyu_info: "每回合限三次，若你的体力值全场最少，你的判定牌生效后，你可以获得之。",
                             jishiyu1: "及时雨", jishiyu1_info: "每回合各限一次，当你需要使用或打出杀时，你可以进行判定，判定结果为黑色则视为你使用或打出了杀。",
                             yongbuchenmodezhanjian: "永不沉没的战舰", yongbuchenmodezhanjian_info: "主公技，每回合限一次，你有护甲值时，你可以弃置一张牌令受到的伤害-1。",
