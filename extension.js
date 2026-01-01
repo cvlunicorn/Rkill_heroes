@@ -17,6 +17,7 @@ yield需要无名杀版本1.10.10或更高版本的支持
 //nobracket:true,该属性可以让技能显示完整名称（而不是只有前两个字）
 //var player = get.player();指的是当前正在做选择的角色，如果是玩家让其他角色选择，这个选择的ai里get.player()就是“其他角色“。此写法中获取到的player等价于_status.event.player但不包含对客机的广播（也就是_status.event.player在单机中可用，联机时可能出错）
 //useCard时机牌已经离开手牌区，牌上的tag已经清除。如果需要让特定标签的牌无法响应，参考国战刘琦问计：
+//JS中数组之间==比较的是数组地址，不比较内容。不能通过card==[]判断数组为空或不为空。
 /*return (
                     player.getHistory("lose", function (evt) {
                         if (evt.getParent() != event) return false;
@@ -13790,26 +13791,25 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return event.player.countCards('s', function (card) { return card.hasGaintag('junfu') }) > 0 || player.countCards('s', function (card) { return card.hasGaintag('junfu') }) > 0;
                                 },
                                 check: function (event, player) {
-                                    return get.attitude(player, event.player);
+                                    return get.attitude(player, event.player) > 0;
                                 },
                                 content() {
                                     "step 0"
-                                    var cards1 = player.getCards('s', function (card) { return card.hasGaintag('junfu') });
-                                    var cards2 = trigger.player.getCards('s', function (card) { return card.hasGaintag('junfu') });
+                                    var cards1 = player.getCards('s', function (card) { return card.hasGaintag('junfu'); });
+                                    var cards2 = trigger.player.getCards('s', function (card) { return card.hasGaintag('junfu'); });
                                     cards1 = Array.isArray(cards1) ? cards1 : [];
                                     cards2 = Array.isArray(cards2) ? cards2 : [];
-                                    if (cards1 != [] && cards2 != []) {
-                                        var chooseButton = player.chooseButton(1, ['弃置你的军辅牌，视为使用桃', cards1, '弃置' + get.translation(trigger.player) + '的军辅牌，视为使用桃', cards2]);
+                                    if (player != trigger.player && cards1.length && cards2.length) {
+                                        var chooseButton = player.chooseButton(1, ['弃置' + get.translation(player) + '的军辅牌，视为使用桃', cards1, '弃置' + get.translation(trigger.player) + '的军辅牌，视为使用桃', cards2]);
 
-                                    } else if (cards1 != []) {
+                                    } else if (cards1.length) {
                                         var chooseButton = player.chooseButton(1, ['弃置' + get.translation(player) + '的军辅牌，视为使用桃', cards1]);
                                     } else {
                                         var chooseButton = player.chooseButton(1, ['弃置' + get.translation(trigger.player) + '的军辅牌，视为使用桃', cards2]);
                                     }
                                     chooseButton.set('ai', button => {
-                                        var len = _status.event.len;
                                         var card = button.link;
-                                        return -_status.event.player.getValue(card);
+                                        return 7 - getValue(card);
                                     });
                                     "step 1"
                                     if (result.bool) {
