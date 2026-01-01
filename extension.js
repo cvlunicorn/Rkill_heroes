@@ -2674,9 +2674,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player: "phaseZhunbeiBegin",
                                 },
                                 lastDo: true,
-                                //round: 1,
-                                "prompt2": function (event, player) {
-                                },
+                                frequent: true,
                                 filter: function (event, player) {//意外发现function应用广泛，然而解决不了自动显示隐藏标记。航母开幕，然后根据舰种判断具体出什么杀game.log();
                                     return player.countCards('h') > 0;
                                 },
@@ -2698,8 +2696,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }
                                         return false;
                                     }, 'h')
-                                        .set('prompt', '雷杀')
-                                        .set('prompt2', '弃置一张符合要求的牌')
+                                        .set('prompt', '开幕雷击')
+                                        .set('prompt2', '弃置一张符合要求的牌视为使用一张雷杀')
                                         .set('ai', card => {
                                             return 5 - get.useful(card);
                                         }).set('logSkill', '潜艇');
