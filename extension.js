@@ -439,7 +439,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     filter: function (event, player) {//
                         if (player.hasSkill("guzhuyizhi2")) { return 0; }//孤注一掷发动后禁用强化。
                         var a = player.countMark('mopaiup'), b = player.countMark('jinengup'), c = player.countMark('wuqiup'), d = player.countMark('useshaup'), e = player.countMark('jidongup'), f = player.countMark('shoupaiup'), g = player.countMark('songpaiup'), h = player.countMark('Expup'), k = player.countMark('_jianzaochuan') + 1, lv = 0; if (k < 3) { lv = k * 6 };/*if(k>=3){lv=k+10};*///远航上限降低为2，总可用强化数量公式作相应修改
-                        if (player.countCards('h') > 0) { if ((a + b + c + d + e + f + g) >= (lv)) return false }; return player.countCards('h') > 1 || player.countMark('Expup') > 1;
+                        if (player.countCards('h') > 0) { if ((a + b + c + d + e + f + g) >= (lv)) return false };
+                        return player.countCards('h') > 1 || player.countMark('Expup') > 1;
                         //比较保守的设计，便于设计与更改。
                         ;
                     },
@@ -677,18 +678,18 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 return player.hasMark('_wulidebuff_ranshao')
                             },
                             content: function () {
-                                
-                                    if (event.triggername != 'dying') {
-                                        if (player.hujia == 0) {
-                                            player.draw(2);
 
-                                        } else {
-                                            player.draw(1);
-                                        }
-                                        player.damage(1, 'fire', "nosource");
-                                    };
-                                    player.removeMark('_wulidebuff_ranshao', player.countMark('_wulidebuff_ranshao'));
-                                    player.removeSkill('_wulidebuff_ranshao');
+                                if (event.triggername != 'dying') {
+                                    if (player.hujia == 0) {
+                                        player.draw(2);
+
+                                    } else {
+                                        player.draw(1);
+                                    }
+                                    player.damage(1, 'fire', "nosource");
+                                };
+                                player.removeMark('_wulidebuff_ranshao', player.countMark('_wulidebuff_ranshao'));
+                                player.removeSkill('_wulidebuff_ranshao');
                             },
                             intro: {
                                 marktext: "燃烧", content: function (player) {//+player.countMark('_wulidebuff_ranshao')+'次，'+tishi
@@ -3758,7 +3759,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger: {
                                             source: "damageSource",
                                         },
-                                        frequent:true,
+                                        frequent: true,
                                         filter: function (event, player) {
                                             if (event._notrigger.includes(event.player)) return false;
                                             return (event.card && (event.card.name == 'sha' || event.card.name == 'sheji9') && (event.getParent().name == 'sha' || event.getParent().name == 'sheji9') &&
@@ -4809,9 +4810,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     //game.log(event.targets);
                                     'step 3'
                                     lib.target = event.targets.shift();
-                                    var a = player.countMark('mopaiup'), b = player.countMark('jinengup'), c = player.countMark('wuqiup'), d = player.countMark('useshaup'), e = player.countMark('jidongup'), f = player.countMark('shoupaiup'), g = player.countMark('songpaiup'), h = player.countMark('Expup'), k = player.countMark('_jianzaochuan') + 1, lv = 0; if (k < 3) { lv = k * 6 };//远航上限为2
-                                    if ((a + b + c + d + e + f + g) >= (lv)) event._result = { index: 0 };
-                                    else lib.target.chooseControlList(
+                                    lib.target.chooseControlList(
                                         ['令' + get.translation(player) + '获得你的两张牌',
                                         '令' + get.translation(player) + '给出一张牌作为Z'],
                                         true).set('ai', function (event, player) {
@@ -4893,6 +4892,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 enable: "phaseUse",
                                 prompt: "你可以移去一张Z，强化一项或摸两张牌",
                                 filter: function (event, player) {
+                                    var a = player.countMark('mopaiup'), b = player.countMark('jinengup'), c = player.countMark('wuqiup'), d = player.countMark('useshaup'), e = player.countMark('jidongup'), f = player.countMark('shoupaiup'), g = player.countMark('songpaiup'), h = player.countMark('Expup'), k = player.countMark('_jianzaochuan') + 1, lv = 0; if (k < 3) { lv = k * 6 };/*if(k>=3){lv=k+10};*///远航上限降低为2，总可用强化数量公式作相应修改
+                                    if (player.countCards('h') > 0) { if ((a + b + c + d + e + f + g) >= (lv)) return false };
                                     return player.getExpansions('Z').length;
 
                                 },
@@ -4993,7 +4994,16 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.storage._qianghuazhuang = [a, b, c, d, e, f, g, h];
                                 },
                                 ai: {
+                                    save: true,
+                                    expose: 0,
                                     threaten: 1,
+                                    order: 2,
+                                    result: {
+                                        player: function (player) {
+                                            if (player.getExpansions('Z').length > 0) return 6;
+                                            return 0;
+                                        },
+                                    },
                                 },
                             },
                             wuziliangjiangdao: {//军争可用的五子良将纛
