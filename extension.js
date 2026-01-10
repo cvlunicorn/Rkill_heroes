@@ -14432,7 +14432,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhizhanzhige: "止战之戈", "zhizhanzhige_info": "结束阶段，你可以依次视为使用至多三张本回合出牌阶段使用的基本牌或普通锦囊牌，然后翻面。",
                             zhongleizhuangjiantuxi: "重雷装舰突袭", "zhongleizhuangjiantuxi_info": "限定技，准备阶段若你体力值为一，你可以视为对一名角色使用三张无次数限制的雷杀，若此技能结算流程中目标未进入过濒死状态，你弃置所有手牌与装备牌",
                             jianjianleiji: "渐减雷击", "jianjianleiji_info": "每回合限一次，你可以将一张装备牌当作无距离次数限制的雷杀使用",
-                            fenzhandaodi: "奋战到底", "fenzhandaodi_info": "你的手牌上限基数为你的体力上限。你可以将红色牌当作雷杀使用。你使用杀指定的目标不能使用花色与此杀不相同的牌响应。",
+                            fenzhandaodi: "奋战到底", "fenzhandaodi_info": "你的手牌上限基数为你的体力上限。你可以将红色牌当作雷杀使用。你使用杀指定的目标不能使用花色与此杀相同的牌响应。",
                             huofu: "祸福", "huofu_info": "锁定技，若你于回合内弃置了红色基本牌，则防止你受到由红色牌造成的伤害直至你下回合开始。",
                             xunqian: "巡潜", "xunqian_info": "你使用锦囊牌时，你可以摸一张牌，然后你选择：1.弃置一张牌；2.将任意张牌交给一名其他角色。",
                             jinyangmaozhishi: "金羊毛之誓", "jinyangmaozhishi_info": "限定技，当你成为其他角色使用牌的目标时，若你已受伤，你可以令此牌对你无效。",
