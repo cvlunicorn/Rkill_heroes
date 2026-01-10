@@ -5115,19 +5115,19 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 mod: {
                                     attackFrom: function (from, to, distance) {
-                                        if (lib.config.extension_舰R牌将__qianghuazhuang === true) return false;
+                                        if (lib.config.extension_舰R牌将__qianghuazhuang === true) return distance;
                                         var a = 0; if (from.countMark('wuqiup')) { var a = a + from.countMark('wuqiup') }; return distance - a;
                                     },
                                     attackTo: function (from, to, distance) {
-                                        if (lib.config.extension_舰R牌将__qianghuazhuang === true) return false;
+                                        if (lib.config.extension_舰R牌将__qianghuazhuang === true) return distance;
                                         var a = 0; if (to.countMark('jidongup')) { var a = a + to.countMark('jidongup') }; return distance + a;
                                     },
                                     cardUsable: function (card, player, num) {
-                                        if (lib.config.extension_舰R牌将__qianghuazhuang === true) return false;
+                                        if (lib.config.extension_舰R牌将__qianghuazhuang === true) return num;
                                         var a = 0; if (card.name == 'sha') return num + player.countMark('useshaup');
                                     },
                                     maxHandcard: function (player, num) {
-                                        if (lib.config.extension_舰R牌将__qianghuazhuang === true) return false;
+                                        if (lib.config.extension_舰R牌将__qianghuazhuang === true) return num;
                                         var a = 0; if (player.countMark('shoupaiup')) { var a = a + player.countMark('shoupaiup') }; return num + a;
                                     },
                                 },
