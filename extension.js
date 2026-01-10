@@ -11287,7 +11287,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             }
                                         }
                                     }
-                                    if (list.length) {
                                         list.push('cancel2');
                                         player
                                             .chooseControl(list)
@@ -11304,11 +11303,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                     })[0];
                                                 })()
                                             );
-                                    }
                                     "step 1"
-                                    if (result.control == "cancel2") {
+                                    if (!result.control || result.control == "cancel2") {
                                         event.finish();
                                     } else {
+                                        game.log(get.translation(result.control));
                                         event.cards2 = target.getCards("h", { suit: result.control });
                                         event.cards1 = player.getCards("h", { suit: result.control });
                                         game.log(get.translation(target) + "该花色的牌" + get.translation(event.cards2));
