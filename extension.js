@@ -1049,7 +1049,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             vestal: ["female", "USN", 4, ["junfu", "vestal_mowang"], ["des:CLASSIFIED*。"]],
                             nvzaoshen: ["female", "USN", 3, ["junfu", "dajiaoduguibi", "xiwangdeshuguang"], ["des:女灶神号（舷号AR-4）是一艘在1913年至1946年期间服役于美国海军的修理船。在改装为修理船之前，女灶神是一条运煤船（从1909年开始）。女灶神号参与了全部两次世界大战，在日本空袭珍珠港期间，该舰在港口内遭到重创。打满整场第二次世界大战的女灶神共获得了两枚战斗之星。"]],
 
-                            skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "junfu", "_yuanhang"], ["forbidai", "des:测试用"]],
+                            skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "junfu", "zhiqiu2"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
                             _yuanhang: {
@@ -4717,6 +4717,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     "step 1"
                                     if (result.bool) {
                                         player.logSkill('wufenzhong2', result.targets);
+                                        player.discard(result.cards[0]);
                                         player.storage.AttTarget = result.targets[0]
                                         var list = ["thunder", "fire"];
                                         //game.log(JSON.stringify(list));
@@ -11350,7 +11351,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         event.finish();
                                         return 0;
                                     }
-                                    var unablelist=["shan","huibi9","ganraodan9","wuxie","zhikongquan9"];
+                                    var unablelist = ["shan", "huibi9", "ganraodan9", "wuxie", "zhikongquan9"];
                                     if (unablelist.includes(get.name(event.card))) {
                                         event.finish();
                                         return 0;
@@ -14108,19 +14109,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhiqiu2: {//掷球2，只是改杀的
                                 locked: true,
                                 mod: {
-                                    cardname(card, player) {
-                                        if (card.name == 'sha') return "tao";
+                                    cardnature(card, player) {
+                                        if ((card.name == 'sha' || card.name == 'sheji9') && card.nature == "thunder") return false;
                                     },
                                 },
-                                /*mod: {
-                                    cardname(card) {
-                                        if (get.name(card) == "sha" && get.nature(card) == "thunder") return 'sha';
-                                    },
-                                    cardnature(card) {
-                                        if (get.name(card) == "sha" && get.nature(card) == "thunder") return false;//如果遇到火杀则变成雷杀
-                                    },
- 
-                                },*/
                             },
                             //在这里添加新技能。
 
