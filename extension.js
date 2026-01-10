@@ -38,7 +38,7 @@ try {
 //const { connect } = require("ws");///vscode生成出来的，vscodeAI检测到enable认为没导入自动添加了导入但其实enable只是一个标签。目前使用try-catch包裹起来。
 import { lib, game, ui, get, ai, _status } from '../../noname.js'
 import { checkBegin } from '../../noname/library/assembly/buildin.js';
-import { freezeButExtensible } from '../../noname/util/index.js';
+import { delay, freezeButExtensible } from '../../noname/util/index.js';
 game.import("extension", function (lib, game, ui, get, ai, _status) {
 
     return {
@@ -11287,22 +11287,22 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             }
                                         }
                                     }
-                                        list.push('cancel2');
-                                        player
-                                            .chooseControl(list)
-                                            .set("dialog", dialog)
-                                            .set("ai", () => {
-                                                return _status.event.control;
-                                            })
-                                            .set(
-                                                "control",
-                                                (() => {
-                                                    var getv = cards => cards.map(i => get.value(i)).reduce((p, c) => p + c, 0);
-                                                    return list.sort((a, b) => {
-                                                        return (getv(target.getCards("h", { suit: b })) - getv(player.getCards("h", { suit: b }))) - (getv(target.getCards("h", { suit: a })) - getv(player.getCards("h", { suit: a })));
-                                                    })[0];
-                                                })()
-                                            );
+                                    list.push('cancel2');
+                                    player
+                                        .chooseControl(list)
+                                        .set("dialog", dialog)
+                                        .set("ai", () => {
+                                            return _status.event.control;
+                                        })
+                                        .set(
+                                            "control",
+                                            (() => {
+                                                var getv = cards => cards.map(i => get.value(i)).reduce((p, c) => p + c, 0);
+                                                return list.sort((a, b) => {
+                                                    return (getv(target.getCards("h", { suit: b })) - getv(player.getCards("h", { suit: b }))) - (getv(target.getCards("h", { suit: a })) - getv(player.getCards("h", { suit: a })));
+                                                })[0];
+                                            })()
+                                        );
                                     "step 1"
                                     if (!result.control || result.control == "cancel2") {
                                         event.finish();
@@ -11345,6 +11345,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (get.type(event.card) == "trick") {
                                         game.log("爱知视为未发动过");
                                         player.getStat('skill').aizhi -= 1;
+                                    }
+                                    if (get.type(event.card) === "delay" || get.type(event.card) === "equip") {
+                                        event.finish();
+                                        return 0;
+                                    }
+                                    var unablelist=["shan","huibi9","ganraodan9","wuxie","zhikongquan9"];
+                                    if (unablelist.includes(get.name(event.card))) {
+                                        event.finish();
+                                        return 0;
                                     }
                                     player.chooseToDiscard("你可以弃置一张手牌视为使用" + get.translation(event.card), 1, false);
                                     'step 2';
