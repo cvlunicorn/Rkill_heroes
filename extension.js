@@ -3269,13 +3269,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                             },
                             dajiaoduguibi: {
-                                //inherit: "bagua_skill",//继承：八卦
-                                audio: "bagua_skill",
                                 trigger: {
-                                    player: ["damageBegin4"],
+                                    player: ["damageBefore"],
                                 },
+                                firstDo:true,
                                 filter(event, player, name) {
                                     if (!player.isEmpty(2)) return false;
+                                    if (!event.card || !event.card.name) return false;
                                     return event.num > 0;
                                 },
                                 check: function (event, player) {
@@ -3323,7 +3323,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 target: target,
                                                 card: card
                                             })) return;
-                                            if (get.tag(card, 'respondShan')) return 0.5;
+                                            if (get.tag(card, 'damage')) return 0.5;
                                         },
                                     },
                                 },
@@ -14246,7 +14246,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "danzong_info": "每使用六张杀，你便可以在造成无属性伤害附加属性：<br>潜艇、驱逐：获得雷属性的效果，<br>战列、航母：获得雷属性与改进型冰杀的效果。<br>其他舰种时：获得火属性,点燃目标。<br>效果持续到伤害结算完成时（打不穿藤甲的高爆弹与暴击藤甲的决斗）",
                             /* "paohuozb_skill": "炮火准备1", "paohuozb_skill_info": "装备技能", */
                             dajiaoduguibi: "规避",
-                            "dajiaoduguibi_info": "（可强化）你受到伤害时可以进行一次判定，判定结果为：零级强化，方块/一级强化，桃、闪、方块/二级强化，红桃或方块，防止此伤害。",
+                            "dajiaoduguibi_info": "（可强化）若你没有装备防具，你受到牌造成的伤害前可以进行一次判定，判定结果为：零级强化，方块/一级强化，桃、闪、方块/二级强化，红桃或方块，防止此伤害。",
                             "rendeonly2": "仁德界改",
                             "rendeonly2_info": "给实际距离为2的队友最多两张牌，一回合限2次，给出第二张牌时，你视为使用一张基本牌。可强化",
                             zhiyangai: "直言",
