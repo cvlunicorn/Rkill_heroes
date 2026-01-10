@@ -942,7 +942,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lishizhanyi_haixiafujizhan: ["u47", "u81", "u505", "jinqu", "kente", "u96", "lundun"],
                                 weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan", "sp_aisaikesi", "sp_ninghai", "sp_zhongtudao", "xukufu", "lingbo"],
                                 cangqinghuanying: ["mist_dujiaoshou", "mist_xiawu", "mist_shanhuhai"],
-                                shixinrumoR_tan: [],
+                                shixinrumoR_tan: ["bismarck"],
                                 shixinrumoR_chen: [],
                                 shixinrumoR_chi: ["southdakota", "pachina", "loki"],
                                 shixinrumoR_man: ["sukhbaatar", "odin", "vestal"],
@@ -1048,6 +1048,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             odin: ["female", "OTHER", 4, ["junfu", "ganggenier"], ["des:CLASSIFIED*。"]],
                             vestal: ["female", "USN", 4, ["junfu", "vestal_mowang"], ["des:CLASSIFIED*。"]],
                             nvzaoshen: ["female", "USN", 3, ["junfu", "dajiaoduguibi", "xiwangdeshuguang"], ["des:女灶神号（舷号AR-4）是一艘在1913年至1946年期间服役于美国海军的修理船。在改装为修理船之前，女灶神是一条运煤船（从1909年开始）。女灶神号参与了全部两次世界大战，在日本空袭珍珠港期间，该舰在港口内遭到重创。打满整场第二次世界大战的女灶神共获得了两枚战斗之星。"]],
+                            bismarck: ["female", "KMS", 4, ["zhuangjiafh", "chajin", "fanji"], ["des:表里不一的“野猫”虽然一直说着带攻击性的话，但意外是个很单纯的人。长期相处，应该就能听懂她真正的意思。"]],
 
                             skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "junfu", "zhiqiu2"], ["forbidai", "des:测试用"]],
                         },
@@ -3272,7 +3273,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     player: ["damageBefore"],
                                 },
-                                firstDo:true,
+                                firstDo: true,
                                 filter(event, player, name) {
                                     if (!player.isEmpty(2)) return false;
                                     if (!event.card || !event.card.name) return false;
@@ -14093,6 +14094,130 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     threaten: 1.5,
                                 }
                             },
+                            chajin: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: {
+                                    global: "drawEnd",
+                                },
+                                filter: function (event, player) {
+                                    if (player.hasSkill("chajin_tempBan")) return false;
+                                    if (event.getParent().name != "phaseDraw" && event.getParent().name != "_yuanhang_mopai" && event.getParent().name != "_yuanhang_bingsimopai") return event.player != player;
+                                    return false;
+                                },
+                                content() {
+                                    "step 0";
+                                    var suits = lib.suit.slice();
+                                    suits.push('cancel2');
+                                    player.chooseControl(suits)
+                                        .set("ai", function () {
+                                            var suits = lib.suit.slice();
+                                            return suits.randomGet();
+                                        })
+                                        .set("prompt", get.prompt2("chajin", trigger.player));
+                                    "step 1";
+                                    if (!result.control || result.control == "cancel2") { event.finish(); return; }
+                                    event.suit = result.control;
+                                    game.log(get.translation(player) + "声明了" + get.translation(result.control));
+                                    player.chat("声明了" + get.translation(result.control));
+                                    trigger.player.chooseCard('h', [0, Infinity], '交给' + get.translation(player) + '任意张手牌').set("ai", function (card) {
+                                        var evt = _status.event.getParent();
+                                        var player = get.player();
+                                        var att = get.attitude(evt.player, player);
+                                        game.log("做出选择的玩家" + get.translation(player));
+                                        game.log("查禁技能拥有者" + get.translation(evt.player));
+                                        game.log(att);
+                                        if (att > 2 && evt.player.isDamaged() && get.tag(card, "recover")) return 10;
+                                        if (att > 0) return 0;
+                                        if (att <= 0 && player.countCards("h", function (card) { return get.suit(card) == event.suit; }) <= 0) { return 0 };
+                                        if (att <= 0 && get.suit(card) == event.suit) { return 8.5 - get.value(card); }
+                                        return 0;
+                                    });
+                                    "step 2";
+                                    if (result.cards) { trigger.player.give(result.cards, player); }
+                                    player.chooseControl(["doubts", "noDoubts"]).set("ai", function (event) {
+                                        var evt = _status.event.getParent();
+                                        var player = get.player();
+                                        var att = get.attitude(player, evt.player);
+                                        game.log(att);
+                                        if (att > 0) return "noDoubts";
+                                        if (player.hp < 2) return "noDoubts";
+                                        if (Math.random() < 0.4) return "noDoubts";
+                                        return "doubts";
+                                    });
+                                    "step 3";
+                                    if (result.control && result.control == "doubts") {
+                                        trigger.player.showHandcards();
+                                    } else { event.finish(); return; }
+                                    "step 4";
+                                    if (trigger.player.countCards("h", function (card) { return get.suit(card) == event.suit; })) {
+                                        var cards = trigger.player.getCards("h", function (card) { return get.suit(card) == event.suit; });
+                                        player.gain(cards, trigger.player, "gain2");
+                                        trigger.player.damage(player, "nocard");
+                                    } else {
+                                        player.loseHp(1);
+                                        player.addTempSkill("chajin_tempBan", { global: "phaseEnd" });
+                                    }
+                                },
+                                ai: {
+                                    threaten: 3.1,
+                                }
+                            },
+                            chajin_tempBan: {
+                                mark: true,
+                                charlotte: true,
+                                intro: {
+                                    content(storage, player, skill) {
+                                        return "查禁失效";
+                                    },
+                                },
+                            },
+                            fanji: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: {
+                                    player: "damageEnd",
+                                },
+                                filter(event, player) {
+                                    return event.source != undefined;
+                                },
+                                check(event, player) {
+                                    return get.attitude(player, event.source) <= 0;
+                                },
+                                direct: true,
+                                content(event, trigger, player) {
+                                    var card = {
+                                        name: "sha",
+                                        isCard: true,
+                                    };
+                                    if (player.canUse(card, trigger.source, false)) {
+                                        player.chooseToUse(function (card, player, event) {
+                                            if (get.name(card) != "sha") return false;
+                                            return lib.filter.filterCard.apply(this, arguments);
+                                        }, "是否对" + get.translation(trigger.source) + "使用一张【杀】？")
+                                            .set("targetRequired", true)
+                                            .set("complexSelect", true)
+                                            .set("filterTarget", function (card, player, target) {
+                                                if (
+                                                    target != _status.event.sourcex &&
+                                                    !ui.selected.targets.includes(_status.event.sourcex)
+                                                )
+                                                    return false;
+                                                return lib.filter.filterTarget.apply(this, arguments);
+                                            }).set("sourcex", trigger.source);
+                                    }
+                                },
+                                ai: {
+                                    "maixie_defend": true,
+                                    effect: {
+                                        target(card, player, target) {
+                                            if (player.hasSkillTag("jueqing", false, target)) return [1, -1];
+                                            return 0.8;
+                                            // if(get.tag(card,'damage')&&get.damageEffect(target,player,player)>0) return [1,0,0,-1.5];
+                                        },
+                                    },
+                                },
+                            },
                             zhiqiu: {//掷球，只是看牌的
                                 locked: true,//锁定技
                                 ai: {//全在ai里面
@@ -14212,6 +14337,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             odin: "慢奥丁",
                             vestal: "慢女灶神",
                             nvzaoshen: "女灶神",
+                            bismarck: "贪俾斯麦",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -14476,6 +14602,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             vestal_mowang: "魔王", "vestal_mowang_info": "当有角色陷入濒死时，你可以将自己或其武将牌上的“军辅”牌当做【桃】对其使用。当场上有角色脱离濒死状态时，你可以选择恢复一点体力或摸一张牌。",
                             vestal_mowang_1: "魔王",
                             xiwangdeshuguang: "希望的曙光", "xiwangdeshuguang_info": "每个回合结束时，你可以弃置一张手牌，令一名本回合受到过伤害的角色回复一点体力。",
+                            chajin: "查禁", "chajin_info": "其他角色于摸牌阶段及“远航”技能效果外从牌堆摸牌时，你可以声明一个花色，之后其可以选择交给你任意张手牌。执行完上述流程后，你可以选择质疑其手牌中还有你声明的花色，然后展示其所有手牌，若其手牌有你声明的花色，你获得之，并对其造成1点伤害；否则，你流失1点体力，并且此技能直到回合结束阶段失效。",
+                            doubts: "质疑",
+                            noDoubts: "不质疑",
+                            fanji: "反击", "fanji_info": "你受到伤害后，你可以对伤害来源使用一张无视距离的【杀】",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
