@@ -942,7 +942,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lishizhanyi_haixiafujizhan: ["u47", "u81", "u505", "jinqu", "kente", "u96", "lundun"],
                                 weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan", "sp_aisaikesi", "sp_ninghai", "sp_zhongtudao", "xukufu", "lingbo"],
                                 cangqinghuanying: ["mist_dujiaoshou", "mist_xiawu", "mist_shanhuhai"],
-                                shixinrumoR_tan: ["bismarck"],
+                                shixinrumoR_tan: ["bismarck", "tirpitz"],
                                 shixinrumoR_chen: [],
                                 shixinrumoR_chi: ["southdakota", "pachina", "loki"],
                                 shixinrumoR_man: ["sukhbaatar", "odin", "vestal"],
@@ -1049,6 +1049,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             vestal: ["female", "USN", 4, ["junfu", "vestal_mowang"], ["des:CLASSIFIED*。"]],
                             nvzaoshen: ["female", "USN", 3, ["junfu", "dajiaoduguibi", "xiwangdeshuguang"], ["des:女灶神号（舷号AR-4）是一艘在1913年至1946年期间服役于美国海军的修理船。在改装为修理船之前，女灶神是一条运煤船（从1909年开始）。女灶神号参与了全部两次世界大战，在日本空袭珍珠港期间，该舰在港口内遭到重创。打满整场第二次世界大战的女灶神共获得了两枚战斗之星。"]],
                             bismarck: ["female", "KMS", 4, ["zhuangjiafh", "chajin", "fanji"], ["des:表里不一的“野猫”虽然一直说着带攻击性的话，但意外是个很单纯的人。长期相处，应该就能听懂她真正的意思。"]],
+                            tirpitz: ["female", "KMS", 4, ["zhuangjiafh", "jinshu", "chuanyue", "nvwangfugui"], ["des:无表情的“人偶”总是盯着手里的东西，对其他的事情缺乏兴趣。但却喜欢为他人解说姐姐说的话，这一点上，很有趣。"]],
 
                             skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "junfu", "zhiqiu2"], ["forbidai", "des:测试用"]],
                         },
@@ -14124,9 +14125,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         var evt = _status.event.getParent();
                                         var player = get.player();
                                         var att = get.attitude(evt.player, player);
-                                        game.log("做出选择的玩家" + get.translation(player));
-                                        game.log("查禁技能拥有者" + get.translation(evt.player));
-                                        game.log(att);
                                         if (att > 2 && evt.player.isDamaged() && get.tag(card, "recover")) return 10;
                                         if (att > 0) return 0;
                                         if (att <= 0 && player.countCards("h", function (card) { return get.suit(card) == event.suit; }) <= 0) { return 0 };
@@ -14139,7 +14137,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         var evt = _status.event.getParent();
                                         var player = get.player();
                                         var att = get.attitude(player, evt.player);
-                                        game.log(att);
                                         if (att > 0) return "noDoubts";
                                         if (player.hp < 2) return "noDoubts";
                                         if (Math.random() < 0.4) return "noDoubts";
@@ -14166,6 +14163,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             chajin_tempBan: {
                                 mark: true,
                                 charlotte: true,
+                                marktext: "禁",
                                 intro: {
                                     content(storage, player, skill) {
                                         return "查禁失效";
@@ -14218,25 +14216,180 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
-                            zhiqiu: {//掷球，只是看牌的
-                                locked: true,//锁定技
-                                ai: {//全在ai里面
-                                    viewHandcard: function (player) {//关于能看别人手牌的
-                                        if (!player.hasEmptySlot(5)) return false; //宝具有没有，装备5是宝具
-                                        return true;//如果是的话生效
-                                    },
-                                    skillTagFilter(player, tag, arg) {//这是给ai的
-                                        if (!player.hasEmptySlot(5)) return false;//也是检查宝具的
-                                        if (player == arg) return false; // 且加上过滤器，防止对自己使用
+                            jinshu: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: {
+                                    global: "roundStart",
+                                },
+                                init(player) {
+                                    if (!player.storage.jinshu) return player.storage.jinshu = 0;
+                                    if (!player.storage.jinshuSuit) return player.storage.jinshuSuit = "";
+                                },
+                                filter(event, player) {
+                                    return player.countCards("h");
+                                },
+                                frequent: true,
+                                content() {
+                                    "step 0"
+                                    player.chooseCard(get.prompt2("jinshu")).set("ai", function (card) {
+                                        var player = get.player();
+                                        if (player.storage.jinshu >= 1) { return Math.random() + 1; }
+                                        if (player.countCards("j") || player.countCards("h", function (card) {
+                                            return get.tag(card) == "damage" && get.type(card == "trick") || get.type(card) == "equip";
+                                        }) < 3) {
+                                            return Math.random() + 1;
+                                        }
+                                        return 0;
+                                    });
+                                    "step 1"
+                                    if (result.bool) {
+                                        player.showCards(result.cards[0]);
+                                        if (player.storage.jinshu == 0) {
+                                            player.addTempSkill("jinshu_skip", { global: "roundStart" });
+                                        }
+                                        player.addTempSkill("jinshu_draw", { global: "roundStart" });
+                                        player.storage.jinshuSuit = get.suit(result.cards[0]);
                                     }
+
+                                },
+                                subSkill: {
+                                    skip: {
+                                        mark: true,
+                                        marktext: "禁书",
+                                        charlotte: true,
+                                        direct: true,
+                                        onremove: true,
+                                        intro: {
+                                            content(storage, player, skill) {
+                                                return "跳过本轮的出牌和弃牌阶段";
+                                            },
+                                        },
+                                        trigger: {
+                                            player: ["phaseUseBefore", "phaseDiscardBefore"],
+                                        },
+                                        filter(event, player) {
+                                            if (player.storage.jinshuSuit) return true;
+                                            return false;
+                                        },
+                                        async content(event, trigger, player) {
+                                            trigger.cancel();
+                                        },
+                                    },
+                                    draw: {
+                                        mark: true,
+                                        marktext: "禁书",
+                                        charlotte: true,
+                                        onremove: true,
+                                        intro: {
+                                            content(storage, player, skill) {
+                                                return get.translation(player.storage.jinshuSuit);
+                                            },
+                                        },
+                                        trigger: {
+                                            global: ["loseAfter", "loseAsyncAfter", "cardsDiscardAfter"],
+                                        },
+                                        filter: function (event, player) {
+                                            if (player.getStorage("jinshuSuit")) {
+                                                return event.getd().some(function (i) {
+                                                    return player.getStorage("jinshuSuit") == get.suit(i, false);
+                                                });
+                                            }
+                                        },
+                                        direct: true,
+                                        content: function () {
+                                            player.draw(1);
+                                        },
+
+                                    },
                                 },
                             },
-                            zhiqiu2: {//掷球2，只是改杀的
-                                locked: true,
-                                mod: {
-                                    cardnature(card, player) {
-                                        if ((card.name == 'sha' || card.name == 'sheji9') && card.nature == "thunder") return false;
+                            chuanyue: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: {
+                                    global: "phaseZhunbeiBegin",
+                                },
+                                check: function (event, player) {
+                                    return get.attitude(player, event.player) > 0;
+                                },
+                                filter: function (event, player) {
+                                    return player != event.player && player.countCards("h");
+                                },
+                                content() {
+                                    "step 0"
+                                    player.chooseCard(get.prompt2("chuanyue")).set("ai", function (card) {
+                                        var player = get.player();
+                                        var evt = _status.event.player;
+                                        return get.value(card, evt);
+                                    });
+                                    "step 1"
+                                    if (result.bool) {
+                                        player.give(result.cards[0], trigger.player);
+                                        if (trigger.player.hasSkill("chuanyue_shadow")) {
+                                            trigger.player.addTempSkill("chuanyue_shadow", { global: "phaseEnd" });
+                                        }
+                                        if (!trigger.player.storage.chuanyue_shadow) { trigger.player.storage.chuanyue_shadow = []; }
+                                        trigger.player.storage.chuanyue_shadow.push(get.suit(result.cards[0]));
+                                    } else {
+                                        event.finish(); return;
+                                    }
+
+                                },
+                                subSkill: {
+                                    shadow: {
+                                        marktext: "阅",
+                                        onremove: true,
+                                        init: function (player, skill) {
+                                            if (!player.storage[skill]) player.storage[skill] = [];
+                                        },
+                                        intro: {
+                                            content: function (player) {
+                                                var str = "";
+                                                var shadow = player.getStorage("chuanyue_shadow")
+                                                for (var i = 0; i < shadow.length; i++) {
+                                                    if (i > 0) str += get.translation(shadow[i]);
+                                                }
+                                                return str;
+                                            },
+                                        },
+                                        mod: {
+                                            cardDiscardable: function (card, player) {
+                                                var list = player.storage.chuanyue_shadow;
+                                                for (var i = 0; i < list.length; i++) {
+                                                    if (list[i] == card.suit) return false;
+                                                }
+                                            },
+                                        },
                                     },
+                                },
+
+                            },
+                            nvwangfugui: {
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                nobracket: true,
+                                trigger: {
+                                    global: "die",
+                                },
+                                unique: true,
+                                juexingji: true,
+                                forced: true,
+                                skillAnimation: true,
+                                animationColor: "gray",
+                                filter: function (event, player) {
+                                    if (player.storage.nvwangfugui) return false;
+                                    return player.hasSkill("nvwangfugui") && (event.player.name == "bisimai" || event.player.name == "bismarck");
+                                },
+                                content: function () {
+                                    'step 0'
+                                    player.awakenSkill('nvwangfugui');
+                                    if (player.hasSkill("jinshu")) { player.storage.jinshu = 1; }
+                                    'step 1'
+                                    event.hp = player.hp;
+                                    player.loseHp(player.hp - 1);
+                                    'step 2'
+                                    player.changeHujia(event.hp - 1);
+                                    player.removeSkill('nvwangfugui');
                                 },
                             },
                             //在这里添加新技能。
@@ -14338,6 +14491,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             vestal: "慢女灶神",
                             nvzaoshen: "女灶神",
                             bismarck: "贪俾斯麦",
+                            tirpitz: "贪提尔比兹",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -14605,7 +14759,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             chajin: "查禁", "chajin_info": "其他角色于摸牌阶段及“远航”技能效果外从牌堆摸牌时，你可以声明一个花色，之后其可以选择交给你任意张手牌。执行完上述流程后，你可以选择质疑其手牌中还有你声明的花色，然后展示其所有手牌，若其手牌有你声明的花色，你获得之，并对其造成1点伤害；否则，你流失1点体力，并且此技能直到回合结束阶段失效。",
                             doubts: "质疑",
                             noDoubts: "不质疑",
+                            chajin_tempBan: "查禁失效",
                             fanji: "反击", "fanji_info": "你受到伤害后，你可以对伤害来源使用一张无视距离的【杀】",
+                            jinshu: "禁书", "jinshu_info": "每轮开始时，你可以展示一张手牌，并且跳过你本轮的出牌阶段和弃牌阶段。若如此做，每当一张与展示牌花色相同的牌进入弃牌堆时，你摸一张牌。",
+                            chuanyue: "传阅", "chuanyue_info": "其他角色准备阶段开始时，你可以展示并交给其一张牌，其本回合无法弃置与展示牌相同花色的牌。",
+                            nvwangfugui: "女王复归", "": "觉醒技，场上的“俾斯麦”死亡时，你将体力值调整至1点，获得X点护甲并修改“禁书”（X为因“女王复归”而减少的体力值数量）（修改禁书：每轮开始时，你可以展示一张手牌，若如此做，每当一张与弃置牌花色相同的牌进入弃牌堆时，你摸一张牌。）",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
