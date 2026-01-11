@@ -14166,14 +14166,16 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     });
                                     "step 2";
                                     if (result.cards) { trigger.player.give(result.cards, player); }
-                                    player.chooseControl(["doubts", "noDoubts"]).set("ai", function (event) {
+                                    player.chooseControl(["doubts", "noDoubts"]).set("ai", function () {
                                         var player = get.player();
-                                        var att = get.attitude(player, target);
+                                        var evt=_status.event.getTrigger();
+                                        var att = get.attitude(player, evt.player);
+                                        game.log(get.translation(player)+get.translation(evt.player)+att);
                                         if (att >=0) {return "noDoubts";}
                                         if (player.hp < 2) {return "noDoubts";}
                                         if (Math.random() < 0.4) {return "noDoubts";}
                                         return "doubts";
-                                    }).set("target",trigger.player);
+                                    });
                                     "step 3";
                                     game.log(result.control);
                                     if (result.control && result.control == "doubts") {
