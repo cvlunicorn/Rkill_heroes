@@ -14070,25 +14070,28 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     var damagedPlayers = game.filterPlayer(current => current.getHistory('damage').length > 0 && current.isDamaged());
                                     return player.countCards("h") && damagedPlayers && damagedPlayers.length > 0;
                                 },
-                                direct: true,
+                                frequent: true,
                                 content() {
                                     "step 0"
                                     player.chooseTarget(get.prompt('xiwangdeshuguang'), "选择一名本回合受过伤害的角色", function (card, player, target) {
                                         return target.getHistory('damage').length > 0 && target.isDamaged();
-                                    }).set(ai, function (target) {
+                                    }).set("ai", function (target) {
                                         var player = get.player();
-                                        return get.attitude(player, target);
+                                        var att = get.attitude(player, target);
+                                        game.log("希望的曙光AI" +get.translation(target)+att);
+                                        return att;
                                     });
                                     "step 1"
                                     if (result.bool) {
+                                        game.log(result.targets[0]);
                                         event.targets = result.targets[0];
                                         player.chooseToDiscard(get.prompt('xiwangdeshuguang'), "弃置一张手牌，令" + get.translation(event.target) + "恢复一点体力", 1).set(ai, function (card) {
                                             return 9 - get.value(card);
                                         });
                                     }
-                                    else { event.finish(); }
+                                    else { event.finish(); return; }
                                     "step 2"
-                                    if (!result.bool) { event.finish(); }
+                                    if (!result.bool) { event.finish(); return; }
                                     event.targets.recover();
                                 },
                                 ai: {
@@ -14133,13 +14136,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     });
                                     "step 2";
                                     if (result.cards) { trigger.player.give(result.cards, player); }
-                                    player.chooseControl(["doubts", "noDoubts"]).set("ai", function (event) {
-                                        var evt = _status.event.getParent();
+                                    player.chooseControl(["doubts", "noDoubts"]).set("ai", function () {
                                         var player = get.player();
+                                        var evt = _status.event.getTrigger();
                                         var att = get.attitude(player, evt.player);
-                                        if (att > 0) return "noDoubts";
-                                        if (player.hp < 2) return "noDoubts";
-                                        if (Math.random() < 0.4) return "noDoubts";
+                                        if (att >= 0) { return "noDoubts"; }
+                                        if (player.hp < 2) { return "noDoubts"; }
+                                        if (Math.random() < 0.4) { return "noDoubts"; }
                                         return "doubts";
                                     });
                                     "step 3";
