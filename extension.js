@@ -1051,7 +1051,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             bismarck: ["female", "KMS", 4, ["zhuangjiafh", "chajin", "fanji"], ["des:表里不一的“野猫”虽然一直说着带攻击性的话，但意外是个很单纯的人。长期相处，应该就能听懂她真正的意思。"]],
                             tirpitz: ["female", "KMS", 4, ["zhuangjiafh", "jinshu", "chuanyue", "nvwangfugui"], ["des:无表情的“人偶”总是盯着手里的东西，对其他的事情缺乏兴趣。但却喜欢为他人解说姐姐说的话，这一点上，很有趣。"]],
 
-                            skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "junfu", "zhiqiu2"], ["forbidai", "des:测试用"]],
+                            skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei","zhiqiu", "zhiqiu2", "shuiji1"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
                             _yuanhang: {
@@ -4430,8 +4430,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 prompt: "将一张黑色牌当雷杀使用",
                                 check(card) { return 4 - get.value(card) },
-
-
+                                hiddenCard: function (player, name) {
+                                    if (name == 'sha') return player.countCards('hs', { color: 'black' }) > 0;
+                                },
                                 ai: {
                                     yingbian: function (card, player, targets, viewer) {
                                         if (get.attitude(viewer, player) <= 0) return 0;
@@ -9336,6 +9337,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 nobracket: true,
                                 enable: "chooseToUse",
+                                hiddenCard: function (player, name) {
+                                    if (name == "wuxie") return player.countMark('shenfeng') >= 1;
+                                    return false;
+                                },
                                 viewAs: {
                                     name: "wuxie",
                                     isCard: true,
@@ -14078,7 +14083,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }).set("ai", function (target) {
                                         var player = get.player();
                                         var att = get.attitude(player, target);
-                                        game.log("希望的曙光AI" +get.translation(target)+att);
+                                        game.log("希望的曙光AI" + get.translation(target) + att);
                                         return att;
                                     });
                                     "step 1"
@@ -14395,6 +14400,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.removeSkill('nvwangfugui');
                                 },
                             },
+                            
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -14572,7 +14578,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             rand: "随机数", "rand_info": "遇事不决？扔一个骰子吧。该技能可以生成1~6的随机数",
                             duikongfangyu: "对空防御", "duikongfangyu_info": "锁定技，你发动防空时技能等级视为满级。你发动[防空]仅需弃置一张牌。",
                             zhudaojiandui: "柱岛舰队", "zhudaojiandui_info": "锁定技，每当你使用或打出一张非虚拟非转化的基本牌，你获得一个[柱]标记。你可以移去三个柱标记视为使用一张不计入次数限制的杀。",
-                            sawohaizhan: "萨沃海战", "sawohaizhan_info": "出牌阶段各限一次。你可以将一张红牌当做当作洞烛先机使用,你可以将一张黑牌当作雷杀使用。",
+                            sawohaizhan: "萨沃海战", "sawohaizhan_info": "每回合各限一次。你可以将一张红牌当做当作洞烛先机使用,你可以将一张黑牌当作雷杀使用。",
                             sawohaizhan_1: "雷杀", "sawohaizhan_1_info": "你可以将一张黑牌当作雷杀使用。",
                             sawohaizhan_2: "洞烛先机", "sawohaizhan_2_info": "你可以将一张红牌当作洞烛先机使用（洞烛先机：观星2，然后摸两张牌）。",
                             qingyeqingyeqing: "青叶青叶青", "qingyeqingyeqing_info": "当你成为牌的唯一目标时，你可以指定一名其他角色，其可以选择弃置一张非基本牌令此牌对你无效。",
