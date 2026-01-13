@@ -14072,7 +14072,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                     chooseButton.set('ai', button => {
                                         var card = button.link;
-                                        return 7 - getValue(card);
+                                        return 7 - get.value(card);
                                     });
                                     "step 1"
                                     if (result.bool) {
