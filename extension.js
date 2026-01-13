@@ -1051,7 +1051,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             bismarck: ["female", "KMS", 4, ["zhuangjiafh", "chajin", "fanji"], ["des:表里不一的“野猫”虽然一直说着带攻击性的话，但意外是个很单纯的人。长期相处，应该就能听懂她真正的意思。"]],
                             tirpitz: ["female", "KMS", 4, ["zhuangjiafh", "jinshu", "chuanyue", "nvwangfugui"], ["des:无表情的“人偶”总是盯着手里的东西，对其他的事情缺乏兴趣。但却喜欢为他人解说姐姐说的话，这一点上，很有趣。"]],
 
-                            skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei","zhiqiu", "zhiqiu2", "shuiji1"], ["forbidai", "des:测试用"]],
+                            skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "zhiqiu", "zhiqiu2", "shuiji1"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
                             _yuanhang: {
@@ -9343,14 +9343,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 viewAs: {
                                     name: "wuxie",
-                                    isCard: true,
+                                    isCard: false,
                                 },
                                 viewAsFilter: function (player) {
                                     return (!player.hasSkill('buju_wuxie_disable')) && player.countMark('shenfeng') >= 1;
                                 },
-                                filterCard: () => false,
-                                prompt: "视为使用【无懈可击】",
-                                selectCard: 0,
+                                filterCard: () => true,
+                                prompt: "将一张牌当作【无懈可击】",
+                                selectCard: 1,
                                 check: () => 1,
                                 precontent: function () {
                                     player.logSkill("buju_wuxie");
@@ -9389,10 +9389,27 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (name == "jiu") return player.countMark('shenfeng') >= 1;
                                     return false;
                                 },
-                                filter: function (event, player) {
+                                /* filter: function (event, player) {
                                     return (!player.hasSkill('buju_jiu_disable')) && player.countMark('shenfeng') >= 1 && event.filterCard({ name: "jiu", isCard: true }, player, event);
+                                }, */
+                                 viewAs: {
+                                    name: "jiu",
+                                    isCard: false,
                                 },
-                                content: function () {
+                                viewAsFilter: function (player) {
+                                    return (!player.hasSkill('buju_jiu_disable')) && player.countMark('shenfeng') >= 1;
+                                },
+                                filterCard: () => true,
+                                prompt: "将一张牌当作【酒】",
+                                selectCard: 1,
+                                check: () => 1,
+                                precontent: function () {
+                                    player.logSkill("buju_jiu");
+                                    player.removeMark('shenfeng', 1);
+                                    player.addTempSkill('buju_jiu_disable', 'roundStart');
+                                    delete event.result.skill;
+                                },
+                                /* content: function () {
                                     if (_status.event.getParent(2).type == "dying") {
                                         event.dying = player;
                                         event.type = "dying";
@@ -9400,7 +9417,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.removeMark('shenfeng', 1);
                                     player.addTempSkill('buju_jiu_disable', 'roundStart');
                                     player.useCard({ name: "jiu", isCard: true }, player);
-                                },
+                                }, */
                                 ai: {
                                     order: 5,
                                     result: {
@@ -14400,7 +14417,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.removeSkill('nvwangfugui');
                                 },
                             },
-                            
+
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
