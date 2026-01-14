@@ -14169,7 +14169,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger.player.damage(player, "nocard");
                                     } else {
                                         player.loseHp(1);
-                                        player.addTempSkill("chajin_tempBan", { global: "phaseEnd" });
+                                        player.addTempSkill("chajin_tempBan", { global: "roundStart" });
                                     }
                                 },
                                 ai: {
@@ -14302,15 +14302,21 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 return get.translation(player.storage.jinshuSuit);
                                             },
                                         },
+                                        init: (player) => {
+                                            game.addGlobalSkill('lingce_global');
+                                        },
                                         trigger: {
-                                            global: ["loseAfter", "loseAsyncAfter", "cardsDiscardAfter"],
+                                            global: ["useCardAfter", "respond"],
                                         },
                                         filter: function (event, player) {
-                                            if (player.getStorage("jinshuSuit")) {
-                                                return event.getd().some(function (i) {
-                                                    return player.getStorage("jinshuSuit") == get.suit(i, false);
-                                                });
+                                            if (player.getStorage("jinshuSuit") == "") { return false; }
+                                            if (get.itemtype(event.cards) != 'cards') { return false; }
+                                            for (var i = 0; i < event.cards.length; i++) {
+                                                if (event.cards[i].isInPile()) {
+                                                    return player.getStorage("jinshuSuit") == get.suit(event.cards[i], false);;
+                                                }
                                             }
+                                            return false;
                                         },
                                         direct: true,
                                         content: function () {
@@ -14318,6 +14324,26 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
 
                                     },
+                                    global: {
+                                        ai: {
+                                            effect: {
+                                                player: (card, player, target) => {
+                                                    let num = 0, nohave = true;
+                                                    game.countPlayer(i => {
+                                                        if (i.hasSkill('jinshu')) {
+                                                            nohave = false;
+                                                            if (i.isIn() && lib.skill.jinshu_draw.filter({ card: card }, i)) num += get.sgnAttitude(player, i);
+                                                        }
+                                                    }, true);
+                                                    if (nohave) game.removeGlobalSkill('jinshu_global');
+                                                    else return [1, 0.8 * num];
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                ai:{
+                                    threaten: 3.1,
                                 },
                             },
                             chuanyue: {
@@ -14409,7 +14435,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.removeSkill('nvwangfugui');
                                 },
                             },
-
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -14774,7 +14799,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             vestal_mowang: "魔王", "vestal_mowang_info": "当有角色陷入濒死时，你可以将自己或其武将牌上的“军辅”牌当做【桃】对其使用。当场上有角色脱离濒死状态时，你可以选择恢复一点体力或摸一张牌。",
                             vestal_mowang_1: "魔王",
                             xiwangdeshuguang: "希望的曙光", "xiwangdeshuguang_info": "每个回合结束时，你可以弃置一张手牌，令一名本回合受到过伤害的角色回复一点体力。",
-                            chajin: "查禁", "chajin_info": "其他角色于摸牌阶段及“远航”技能效果外从牌堆摸牌时，你可以声明一个花色，之后其可以选择交给你任意张手牌。执行完上述流程后，你可以选择质疑其手牌中还有你声明的花色，然后展示其所有手牌，若其手牌有你声明的花色，你获得之，并对其造成1点伤害；否则，你流失1点体力，并且此技能直到回合结束阶段失效。",
+                            chajin: "查禁", "chajin_info": "其他角色于摸牌阶段及“远航”技能效果外从牌堆摸牌时，你可以声明一个花色，之后其可以选择交给你任意张手牌。执行完上述流程后，你可以选择质疑其手牌中还有你声明的花色，然后展示其所有手牌，若其手牌有你声明的花色，你获得之，并对其造成1点伤害；否则，你流失1点体力，并且此技能本轮失效。",
                             doubts: "质疑",
                             noDoubts: "不质疑",
                             chajin_tempBan: "查禁失效",
