@@ -5678,6 +5678,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             game.log("没有可用的牌了！");
                                             player.storage.jujianmengxiang_error = true;
                                             event.finish();
+                                            return ;
                                         }
                                         return ui.create.dialog('巨舰梦想', [list, "vcard"]);
 
@@ -6511,7 +6512,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 async content(event, trigger, player) {//这里由“浮海”（卫温诸葛直）修改而来，可能因为目标选择不同存在部分bug，需要注意。能跑就行暂不动他。2024.3.9
 
                                     const targets = event.targets.sortBySeat();
-                                    //game.log(targets);
                                     targets.push(player);
                                     game.log(targets);
                                     const next = player.chooseCardOL(targets, '请展示一张手牌', true).set('ai', card => {
@@ -6520,21 +6520,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         const hs = target.getCards('h');
                                         return { bool: true, cards: [hs.randomGet()] };
                                     });
-                                    //game.log(next);
                                     next._args.remove('glow_result');
                                     const { result } = await next;
-                                    game.log(JSON.stringify(result));
                                     const cardsA = [];
                                     const videoId = lib.status.videoId++;
-                                    if (typeof result == 'object') {
-                                        game.log("出现错误：选牌结果只有一张牌");
-                                        event.finish();
-                                    }
+                                    
                                     for (let i = 0; i < targets.length; i++) {
                                         cardsA.push(result[i].cards[0]);
-                                        game.log(targets[i], '展示了', result[i].cards[0]);
+                                        game.log(get.translation(targets[i]), '展示了', result[i].cards[0]);
                                     }
-                                    //game.log(JSON.stringify(result));
                                     game.broadcastAll((targets, cardsA, id, player) => {
                                         var dialog = ui.create.dialog(get.translation(player) + '发动了【新起点】', cardsA);
                                         dialog.videoId = id;
@@ -6550,19 +6544,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }, targets, cardsA, videoId, player);
                                     await game.asyncDelay(4);
                                     game.broadcastAll('closeDialog', videoId);
-
-
                                     const suit = get.suit(cardsA[0], false);
-                                    //game.log("flag0" + suit);
                                     let flag = false;
                                     for (let i = 0; i < targets.length; i++) {
                                         for (let j = 0; j < i; j++) {
                                             if (get.suit(cardsA[j], false) != get.suit(cardsA[i], false)) {
-                                                //game.log("flag=true" + get.suit(cards[i], false));
                                                 flag = true;
                                             }
                                             else {
-                                                //game.log("flag=false" + get.suit(cards[i], false));
                                                 flag = false;
                                                 i = targets.length;//触发上级停止条件，跳出循环
 
@@ -6572,18 +6561,16 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }
 
                                     }
-                                    //game.log("花色不同？" + flag);
-                                    //game.log(targets);
                                     for (let j = 0; j < targets.length; j++) {
                                         if (flag) {
 
-                                            game.log(targets[j].name + "摸牌");
+                                            game.log(get.translation(targets[j]) + "摸牌");
                                             targets[j].draw();
                                         }
 
                                         if (!flag) {
 
-                                            game.log(targets[j].name + "获得技能");
+                                            game.log(get.translation(targets[j]) + "获得技能");
                                             targets[j].addTempSkill("mashu", { player: "phaseJieshuBegin" });
                                         }
                                     }
@@ -7115,6 +7102,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     } else {
                                         game.log("不给牌结束");
                                         event.finish();
+                                        return ;
                                     }
 
                                 },
@@ -7475,6 +7463,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 if (result.targets[0].getExpansions('Z').length == 0) {
                                                     //game.log("event.finish");
                                                     event.finish();
+                                                    return;
                                                 }
                                                 //game.log(result.targets[1]);
                                                 /*----下列部分用于检查并给予result.target[1]技能Z----*/
@@ -7487,13 +7476,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 var result1 = yield player.chooseCardButton('Z驱领舰：选择一张“Z”移动', true, cards).set('ai', function (button) {
                                                     return 1;
                                                 });
-                                            } else { event.finish(); }
+                                            } else { event.finish(); return;}
                                             "step 2"
                                             if (result.bool) {
                                                 var cards = result1.links;
                                                 result.targets[0].loseToDiscardpile(cards);
                                                 result.targets[1].addToExpansion(cards, 'gain2').gaintag.add('Z');
-                                            } else { event.finish(); }
+                                            } else { event.finish(); return;}
                                             "step 3"
                                             player.logSkill("z1_Zqulingjian_move");
                                             event.finish();
@@ -7938,7 +7927,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return 1;
                                         });
                                     }
-                                    else event.finish();
+                                    else {event.finish();return;}
                                     'step 1'
                                     event.cards = result.links;
                                     player.loseToDiscardpile(event.cards);
@@ -8093,7 +8082,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                     return 1;
                                                 });
                                             }
-                                            else event.finish();
+                                            else {event.finish();return;}
                                             'step 1'
                                             event.cards = result.links;
                                             player.loseToDiscardpile(event.cards);
@@ -8291,7 +8280,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                     return 1;
                                                 });
                                             }
-                                            else event.finish();
+                                            else {event.finish();return;}
                                             'step 1'
                                             event.cards = result.links;
                                             player.loseToDiscardpile(event.cards);
@@ -14357,7 +14346,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         if (!trigger.player.storage.chuanyue_shadow) { trigger.player.storage.chuanyue_shadow = []; }
                                         trigger.player.storage.chuanyue_shadow.push(get.suit(result.cards[0]));
                                     } else {
-                                        event.finish(); return;
+                                        event.finish(); 
+                                        return;
                                     }
 
                                 },
