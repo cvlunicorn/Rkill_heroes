@@ -5678,7 +5678,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             game.log("没有可用的牌了！");
                                             player.storage.jujianmengxiang_error = true;
                                             event.finish();
-                                            return ;
+                                            return;
                                         }
                                         return ui.create.dialog('巨舰梦想', [list, "vcard"]);
 
@@ -6524,7 +6524,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     const { result } = await next;
                                     const cardsA = [];
                                     const videoId = lib.status.videoId++;
-                                    
+
                                     for (let i = 0; i < targets.length; i++) {
                                         cardsA.push(result[i].cards[0]);
                                         game.log(get.translation(targets[i]), '展示了', result[i].cards[0]);
@@ -7102,7 +7102,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     } else {
                                         game.log("不给牌结束");
                                         event.finish();
-                                        return ;
+                                        return;
                                     }
 
                                 },
@@ -7476,13 +7476,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 var result1 = yield player.chooseCardButton('Z驱领舰：选择一张“Z”移动', true, cards).set('ai', function (button) {
                                                     return 1;
                                                 });
-                                            } else { event.finish(); return;}
+                                            } else { event.finish(); return; }
                                             "step 2"
                                             if (result.bool) {
                                                 var cards = result1.links;
                                                 result.targets[0].loseToDiscardpile(cards);
                                                 result.targets[1].addToExpansion(cards, 'gain2').gaintag.add('Z');
-                                            } else { event.finish(); return;}
+                                            } else { event.finish(); return; }
                                             "step 3"
                                             player.logSkill("z1_Zqulingjian_move");
                                             event.finish();
@@ -7927,7 +7927,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return 1;
                                         });
                                     }
-                                    else {event.finish();return;}
+                                    else { event.finish(); return; }
                                     'step 1'
                                     event.cards = result.links;
                                     player.loseToDiscardpile(event.cards);
@@ -8082,7 +8082,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                     return 1;
                                                 });
                                             }
-                                            else {event.finish();return;}
+                                            else { event.finish(); return; }
                                             'step 1'
                                             event.cards = result.links;
                                             player.loseToDiscardpile(event.cards);
@@ -8280,7 +8280,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                     return 1;
                                                 });
                                             }
-                                            else {event.finish();return;}
+                                            else { event.finish(); return; }
                                             'step 1'
                                             event.cards = result.links;
                                             player.loseToDiscardpile(event.cards);
@@ -9381,7 +9381,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 /* filter: function (event, player) {
                                     return (!player.hasSkill('buju_jiu_disable')) && player.countMark('shenfeng') >= 1 && event.filterCard({ name: "jiu", isCard: true }, player, event);
                                 }, */
-                                 viewAs: {
+                                viewAs: {
                                     name: "jiu",
                                     isCard: false,
                                 },
@@ -14117,8 +14117,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 filter: function (event, player) {
                                     if (player.hasSkill("chajin_tempBan")) return false;
-                                    if (event.getParent().name != "phaseDraw" && event.getParent().name != "_yuanhang_mopai" && event.getParent().name != "_yuanhang_bingsimopai") return event.player != player;
-                                    return false;
+                                    var skipEventList = ["phaseDraw", "_yuanhang_mopai", "_yuanhang_bingsimopai", "bahu"];
+                                    if (skipEventList.includes(event.getParent().name)) return false;
+                                    return event.player != player;
                                 },
                                 content() {
                                     "step 0";
@@ -14142,7 +14143,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         if (att > 2 && evt.player.isDamaged() && get.tag(card, "recover")) return 10;
                                         if (att > 0) return 0;
                                         if (att <= 0 && player.countCards("h", function (card) { return get.suit(card) == event.suit; }) <= 0) { return 0 };
-                                        if (att <= 0 && get.suit(card) == event.suit) { return 8.5 - get.value(card); }
+                                        if (att <= 0 && get.suit(card) == event.suit && ui.selected.cards.length < 2) { return 8.5 - get.value(card); }
+                                        if (att <= 0 && get.suit(card) == event.suit && ui.selected.cards.length >= 2) { return 7 - get.value(card); }
                                         return 0;
                                     });
                                     "step 2";
@@ -14346,7 +14348,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         if (!trigger.player.storage.chuanyue_shadow) { trigger.player.storage.chuanyue_shadow = []; }
                                         trigger.player.storage.chuanyue_shadow.push(get.suit(result.cards[0]));
                                     } else {
-                                        event.finish(); 
+                                        event.finish();
                                         return;
                                     }
 
