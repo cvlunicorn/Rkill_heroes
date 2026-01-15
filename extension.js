@@ -10820,7 +10820,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return event.num > 0 && event.player != player;
                                 },
                                 check: function (event, player) {
-                                    return get.attitude(player, event.player) > 2;
+                                    return get.attitude(player, event.player) > 2&&!event.player.hasSkillTag("maixue");
                                 },
                                 prompt2: function (event, player) {
                                     return "你可以代替" + get.translation(event.player) + "承受此伤害，然后摸x张牌，将x张手牌交给一名其他角色或弃置(x为你已损失的体力值)。若目标为航母，此伤害值-1。";
