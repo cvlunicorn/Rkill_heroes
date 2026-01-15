@@ -13147,18 +13147,31 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     "step 0"
-                                    player.chooseTarget(get.prompt2("xinao"), function (card, player, target) {
-                                        return player != target;
-                                    }).set("ai", function (target) {
-                                        let player = _status.event.player;
-                                        if (player.hp <= 2) return get.attitude(player, target) + 2;
-                                        return get.attitude(player, target) - 1;
+                                    player.chooseCardTarget({
+                                        prompt: get.prompt("xinao"),
+                                        position: "h",
+                                        selectCard: [1, Infinity],
+                                        filterTarget: function (card, player, target) {
+                                            return player != target;
+                                        },
+                                        filterCard: function (card, player) {
+                                            return true;
+                                        },
+                                        ai1: function (card) {
+                                            return 9 - get.value(card);
+                                        },
+                                        ai2: function (target) {
+                                            let player = _status.event.player;
+                                            if (player.hp <= 2) return get.attitude(player, target) + 2;
+                                            return get.attitude(player, target) - 1;
+                                        },
                                     });
                                     "step 1"
                                     if (result.bool) {
                                         var target = result.targets[0];
-                                        var num = player.countCards("h");
-                                        player.give(player.getCards("h"), target);
+                                        var cards = result.cards;
+                                        var num = cards.length;
+                                        player.give(cards, target);
                                         player.storage.xinao = [target];
                                         player.turnOver();
                                         player.recover(Math.floor(num / 2));
@@ -14342,7 +14355,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }
                                     }
                                 },
-                                ai:{
+                                ai: {
                                     threaten: 3.1,
                                 },
                             },
@@ -14776,7 +14789,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhanxianyuanhu: "战线援护", "zhanxianyuanhu_info": "游戏开始时，你选择一名角色，其受到伤害时防止之，改为你受到此伤害值-1的伤害。",
                             //第二次配音到这里
 
-                            xinao: "嬉闹", "xinao_info": "每轮限一次，你受到伤害后,若你正面朝上且没有嬉闹对象，你可以将所有手牌交给一名其他角色并记录，然后你翻面。若如此做，你回复X点体力然后获得“装甲”直到下回合开始。(x为你交出的手牌数/2向下取整)。你的出牌阶段开始时，你令嬉闹对象交给你所有手牌并清空记录。",
+                            xinao: "嬉闹", "xinao_info": "每轮限一次，你受到伤害后,若你正面朝上且没有嬉闹对象，你可以将任意张手牌交给一名其他角色并记录，然后你翻面。若如此做，你回复X点体力然后获得“装甲”直到下回合开始。(x为你交出的手牌数/2向下取整)。你的出牌阶段开始时，你令嬉闹对象交给你所有手牌并清空记录。",
                             xinao_back: "嬉闹",
                             xiance: "献策", "xiance_info": "你拥有决策：出牌阶段限一次，你可以将两张手牌当作一张基本牌或非延时锦囊牌使用，本局每种牌名的牌限一次。每轮限一次，其他角色的出牌阶段开始时，你可以交给其两张牌并令其本阶段获得“决策”。本阶段结束时，若其没有杀死过角色，则你对其造成一点伤害。",
                             xiance2: "决策", "xiance2_info": "出牌阶段限一次，你可以将两张手牌当作一张基本牌或非延时锦囊牌使用，本局每种牌名的牌限一次。",
