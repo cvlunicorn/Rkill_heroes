@@ -942,7 +942,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 lishizhanyi_haixiafujizhan: ["u47", "u81", "u505", "jinqu", "kente", "u96", "lundun"],
                                 weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan", "sp_aisaikesi", "sp_ninghai", "sp_zhongtudao", "xukufu", "lingbo"],
                                 cangqinghuanying: ["mist_dujiaoshou", "mist_xiawu", "mist_shanhuhai"],
-                                shixinrumoR_tan: ["bismarck", "tirpitz"],
+                                shixinrumoR_tan: ["bismarck", "tirpitz", "akagikaga"],
                                 shixinrumoR_chen: [],
                                 shixinrumoR_chi: ["southdakota", "pachina", "loki"],
                                 shixinrumoR_man: ["sukhbaatar", "odin", "vestal"],
@@ -1050,6 +1050,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             nvzaoshen: ["female", "USN", 3, ["junfu", "dajiaoduguibi", "xiwangdeshuguang"], ["des:女灶神号（舷号AR-4）是一艘在1913年至1946年期间服役于美国海军的修理船。在改装为修理船之前，女灶神是一条运煤船（从1909年开始）。女灶神号参与了全部两次世界大战，在日本空袭珍珠港期间，该舰在港口内遭到重创。打满整场第二次世界大战的女灶神共获得了两枚战斗之星。"]],
                             bismarck: ["female", "KMS", 4, ["zhuangjiafh", "chajin", "fanji"], ["des:表里不一的“野猫”虽然一直说着带攻击性的话，但意外是个很单纯的人。长期相处，应该就能听懂她真正的意思。"]],
                             tirpitz: ["female", "KMS", 4, ["zhuangjiafh", "jinshu", "chuanyue", "nvwangfugui"], ["des:无表情的“人偶”总是盯着手里的东西，对其他的事情缺乏兴趣。但却喜欢为他人解说姐姐说的话，这一点上，很有趣。"]],
+                            akagikaga: ["female", "IJN", 4, ["hangmucv", "shuangzi", "akagikaga_zongyu"], ["des:对某些人类非常执着。每次回来，都是遍体鳞伤。而且，一直躺着会对素体产生影响。"]],
 
                             skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "zhiqiu", "zhiqiu2", "shuiji1"], ["forbidai", "des:测试用"]],
                         },
@@ -10820,7 +10821,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return event.num > 0 && event.player != player;
                                 },
                                 check: function (event, player) {
-                                    return get.attitude(player, event.player) > 2&&!event.player.hasSkillTag("maixue");
+                                    return get.attitude(player, event.player) > 2 && !event.player.hasSkillTag("maixue");
                                 },
                                 prompt2: function (event, player) {
                                     return "你可以代替" + get.translation(event.player) + "承受此伤害，然后摸x张牌，将x张手牌交给一名其他角色或弃置(x为你已损失的体力值)。若目标为航母，此伤害值-1。";
@@ -14448,6 +14449,122 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.removeSkill('nvwangfugui');
                                 },
                             },
+                            shuangzi: {
+                                nobracket: true,
+                                init: function (player) {
+                                    if (typeof player.storage.shuangzi === 'undefined') player.storage.shuangzi = false;
+                                },
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                zhuanhuanji: true,
+                                mark: true,
+                                marktext: "☯",
+                                frequent: true,
+                                intro: {
+                                    content: function (storage, player, skill) {
+                                        if (storage) return '你使用或打出锦囊牌时摸一张牌';
+                                        return '你使用或打出基本牌时摸一张牌';
+                                    },
+                                },
+                                trigger: {
+                                    player: ["useCardAfter", "respond"],
+                                },
+                                filter: function (event, player) {
+                                    if (typeof player.storage.shuangzi === 'undefined') player.storage.shuangzi = false;
+                                    if (player.storage.shuangzi) {
+                                        game.log("阳");
+                                        return (get.type(event.card) == 'trick' || get.type(event.card) == 'delay');
+                                    } else {
+                                        game.log("阴");
+                                        return (get.type(event.card) == 'basic');
+
+                                    }
+
+                                },
+                                check(event, player) {
+                                    return true;
+                                },
+                                content: function () {
+                                    if (typeof player.storage.shuangzi === 'undefined') { player.storage.shuangzi = false; }
+                                    player.storage.shuangzi = (!player.storage.shuangzi);
+                                    player.draw(1);
+                                },
+                            },
+                            akagikaga_zongyu: {
+                                global: "akagikaga_zongyu_turnOver",
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                forced: true,
+                                enable: ["chooseToRespond", "chooseToUse"],
+                                filterCard: function (card) {
+                                    return get.name(card) == "tao";
+                                },
+                                position: "he",
+                                viewAs: { name: "taoyuan" },
+                                viewAsFilter: function (player) {
+                                    if (!player.countCards("he", { name: "tao" })) return false;
+                                },
+                                prompt: "将一张桃当桃园使用或打出",
+                                check: function (card) {
+                                    return true;
+                                },
+                                mod: {
+                                    cardUsable(card, player, num) {
+                                        if (card.name == 'jiu' || card.name == 'Zziqi9') return Infinity;
+                                        if (card.name == 'tao' || card.name == 'kuaixiu9') return false;
+                                    },
+                                    cardEnabled(card, player) {
+                                        if (card.name == 'tao' || card.name == 'kuaixiu9') return false;
+                                    },
+                                    cardSavable(card, player) {
+                                        if (card.name == 'tao' || card.name == 'kuaixiu9') return false;
+                                    },
+                                },
+                                ai: {
+                                    skillTagFilter(player, tag, arg) {
+                                        if (arg && arg.name == 'jiu') return true;
+                                        return false;
+                                    }
+                                },
+                            },
+                            zongyu_turnOver: {
+                                trigger: { target: 'useCardToTargeted', },
+                                popup: false,
+                                onremove: true,
+                                init: function (player) {
+                                    if (typeof player.storage.akagikaga_zongyu_turnOver === 'undefined') player.storage.akagikaga_zongyu_turnOver = 0;
+                                },
+                                filter: function (event, player) {
+                                    return event.card.name == "tao" || event.card.name == "jiu" || event.card.name == "taoyuan";
+                                },
+                                direct: true,
+                                charlotte: true,
+                                content() {
+                                    "step 0"
+                                    player.storage.akagikaga_zongyu_turnOver += 1;
+                                    "step 1"
+                                    if (player.storage.akagikaga_zongyu_turnOver >= player.hp) {
+                                        player.turnOver();
+                                        player.storage.akagikaga_zongyu_turnOver = 0;
+                                    }
+                                },
+                                group: ["akagikaga_zongyu_turnOver1"],
+                            },
+                            akagikaga_zongyu_turnOver1: {
+                                trigger: { global: "roundStart", },
+                                popup: false,
+                                onremove: true,
+                                init: function (player) {
+                                    if (typeof player.storage.akagikaga_zongyu_turnOver === 'undefined') player.storage.akagikaga_zongyu_turnOver = 0;
+                                },
+                                filter: function (event, player) {
+                                    return true;
+                                },
+                                direct: true,
+                                charlotte: true,
+                                content() {
+                                    player.storage.akagikaga_zongyu_turnOver = 0;
+                                },
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -14548,6 +14665,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             nvzaoshen: "女灶神",
                             bismarck: "贪俾斯麦",
                             tirpitz: "贪提尔比兹",
+                            akagikaga: "贪赤城加贺",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -14820,6 +14938,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jinshu: "禁书", "jinshu_info": "每轮开始时，你可以展示一张手牌，并且跳过你本轮的出牌阶段和弃牌阶段。若如此做，每当一张与展示牌花色相同的牌进入弃牌堆时，你摸一张牌。",
                             chuanyue: "传阅", "chuanyue_info": "其他角色准备阶段开始时，你可以展示并交给其一张牌，其本回合无法弃置与展示牌相同花色的牌。",
                             nvwangfugui: "女王复归", "": "觉醒技，场上的“俾斯麦”死亡时，你将体力值调整至1点，获得X点护甲并修改“禁书”（X为因“女王复归”而减少的体力值数量）（修改禁书：每轮开始时，你可以展示一张手牌，若如此做，每当一张与弃置牌花色相同的牌进入弃牌堆时，你摸一张牌。）",
+                            shuangzi: "双子", shuangzi_info: "转换技，阳：你使用或打出基本牌时摸一张牌；阴：你使用或打出锦囊牌时摸一张牌",
+                            akagikaga_zongyu: "纵欲", akagikaga_zongyu_info: "锁定技，你使用【酒】无次数限制，你不能使用【桃】，你可以将【桃】当作【桃园结义】使用。若场上一名角色一轮中成为【酒】【桃】【桃园结义】目标的次数不小于其的体力值时，清空计数，并将其武将牌翻面。",
+                            akagikaga_zongyu_turnOver: "纵欲_翻面",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
