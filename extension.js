@@ -946,7 +946,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 shixinrumoR_chen: [],
                                 shixinrumoR_chi: ["southdakota", "pachina", "loki"],
                                 shixinrumoR_man: ["sukhbaatar", "odin", "vestal"],
-                                shixinrumoR_yi: ["savoy"],
+                                shixinrumoR_yi: ["savoy", "cassone"],
                             },
                         },
                         character: {
@@ -1052,6 +1052,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             tirpitz: ["female", "KMS", 4, ["zhuangjiafh", "jinshu", "chuanyue", "nvwangfugui"], ["des:无表情的“人偶”总是盯着手里的东西，对其他的事情缺乏兴趣。但却喜欢为他人解说姐姐说的话，这一点上，很有趣。"]],
                             akagikaga: ["female", "IJN", 4, ["hangmucv", "shuangzi", "akagikaga_zongyu"], ["des:对某些人类非常执着。每次回来，都是遍体鳞伤。而且，一直躺着会对素体产生影响。"]],
                             savoy: ["female", "RM", "3/6", ["savoy_xiuzhu", "savoy_wangong"], ["des:自称“吸血鬼”,坚称自己是人类幻想文学中的一员。在月圆之夜喜欢看着月亮发呆。一直随身带着石榴汁……？"]],
+                            cassone: ["female", "RM", 4, ["zhuangjiafh", "cassone_yibing", "cassone_weizhuangqixi"], ["des:深海版战列巡洋舰卡萨诺方案。"]],
+
 
                             skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "zhiqiu", "zhiqiu2", "shuiji1"], ["forbidai", "des:测试用"]],
                         },
@@ -14582,8 +14584,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     "step 0"
                                     player.chooseToCompare(target);
                                     "step 1"
-                                    game.log(result.player);
-                                    game.log(result.target);
                                     if (result.bool) {
                                         var color = get.color(result.target, false);
                                         target.addTempSkill("savoy_xiuzhu_block", { global: "phaseEnd", });
@@ -14600,7 +14600,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 ai: {
                                     order: 9,
-                                    threaten: 1.4,
+                                    threaten: 1.1,
                                 },
                                 subSkill: {
                                     block: {
@@ -14655,6 +14655,160 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: { player: ['dying'] },
                                 content() {
                                     player.useSkill("savoy_xiuzhu");
+                                },
+                            },
+                            cassone_yibing: {
+                                nobracket: true,
+                                mark: true,
+                                locked: false,
+                                zhuanhuanji: true,
+                                marktext: '☯',
+                                init: function (player) {
+                                    if (typeof player.storage.cassone_yibing === "undefined") player.storage.cassone_yibing = 0;
+                                },
+                                intro: {
+                                    content: function (storage) {
+                                        if (storage) return '将其他角色场上一张牌移动到自己相应位置。';
+                                        return '阳：将自己区域的一张牌移到其他角色相应位置。';
+                                    },
+                                },
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: { player: 'compare', target: 'compare' },
+                                filter: function (event, player) {
+                                    if (player.storage.cassone_yibing) {
+                                        return game.countPlayer(function (current) { return current != player && current.countCards("ej") > 0; }) > 0;
+                                    } else {
+                                        return player.countCards("hej");
+                                    }
+                                },
+                                content: function () {
+                                    if (player.storage.cassone_yibing) {
+                                        player.moveCard(`将其他角色场上里的牌移动至你的对应区域`, game.filterPlayer(i => i != player), player, card => {
+                                            return get.position(card) == 'ej';
+                                        });
+                                    } else {
+                                        player.moveCard(`将你区域内的牌移动至其他角色的对应区域`, game.filterPlayer(i => i == player), player, card => {
+                                            return get.position(card) == 'hej';
+                                        });
+                                    }
+                                    player.changeZhuanhuanji('cassone_yibing');
+
+                                },
+                                group: ["cassone_yibing_number"],
+                                subSkill: {
+                                    number: {
+                                        direct: true,
+                                        silent: true,
+                                        trigger: { player: 'compare', target: 'compare' },
+                                        filter: function (event, player) {
+                                            return player.getStorage('cassone_yibing') == 1;
+                                        },
+                                        content: function () {
+                                            game.log(player, '拼点牌点数视为14-x');
+                                            trigger.num1 = 14 - trigger.num1;
+                                            trigger.num2 = 14 - trigger.num2;
+                                        },
+                                    },
+                                },
+                            },
+                            cassone_weizhuangqixi: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                enable: "phaseUse",
+                                usable: 1,
+                                selectTarget: 1,
+                                filter: function (event, player) {
+                                    return player.countCards("h") > 0;
+                                },
+                                filterTarget: function (card, player, target) {
+                                    return player.canCompare(target);
+                                },
+                                content: function () {
+                                    "step 0"
+                                    player.chooseToCompare(target);
+                                    "step 1"
+                                    if (result.bool) {
+                                        player.addTempSkill("cassone_weizhuangqixi_win");
+                                        player.addTempSkill("cassone_weizhuangqixi_remove");
+                                        player.markAuto("cassone_weizhuangqixi_win", target);
+                                    } else {
+                                        player.loseHp(1);
+                                        player.addTempSkill("cassone_weizhuangqixi_lose");
+                                        player.addTempSkill("cassone_weizhuangqixi_remove");
+                                        player.markAuto("cassone_weizhuangqixi_lose", target);
+                                    }
+                                },
+                                ai: {
+                                    order: 10,
+                                    threaten: 1.4,
+                                },
+                                subSkill: {
+                                    win: {
+                                        charlotte: true,
+                                        init: function (player, skill) {
+                                            if (!player.storage[skill]) player.storage[skill] = [];
+                                        },
+                                        mark: true,
+                                        onremove: true,
+                                        usable: 1,
+                                        intro: {
+                                            content: "到$的距离视为1",
+                                        },
+                                        direct: true,
+                                        mod: {
+                                            globalFrom: function (from, to) {
+                                                if (from.getStorage('cassone_weizhuangqixi_win').includes(to)) {
+                                                    return -Infinity;
+                                                }
+                                            },
+                                        },
+                                        filter: function (event, player) {
+                                            return !event.getParent().directHit.includes(event.target) && player.getHistory('useCard', function (event) {
+                                                return event.cards && event.cards.length;
+                                            }).indexOf(event) == 0;
+                                        },
+                                        trigger: { player: 'useCardToPlayered' },
+                                        filter(event, player) {
+                                            return player.getStorage('cassone_weizhuangqixi_win').includes(event.target);
+                                        },
+                                        logTarget: 'target',
+                                        content(event, trigger, player) {
+                                            trigger.directHit.add(event.target);
+                                        },
+                                        ai: {
+                                            directHit_ai: true,
+                                        },
+                                    },
+                                    lose: {
+                                        charlotte: true,
+                                        init: function (player, skill) {
+                                            if (!player.storage[skill]) player.storage[skill] = [];
+                                        },
+                                        mark: true,
+                                        onremove: true,
+                                        direct: true,
+                                        trigger: { player: 'damageEnd' },
+                                        filter: function (event, player) {
+                                            return event.source && player.getStorage('cassone_weizhuangqixi_lose').includes(event.source);
+                                        },
+                                        content: function () {
+                                            if (player.hp < player.maxHp) player.recover(1);
+                                        },
+                                        ai: {
+                                            maixie: true,
+                                        },
+                                    },
+                                    remove: {
+                                        charlotte: true,
+                                        trigger: { global: "phaseEnd" },
+                                        filter: function (event, player) {
+                                            return (player.getStorage('cassone_weizhuangqixi_win').includes(event.player) && player.hasSkill("cassone_weizhuangqixi_win")) || (player.getStorage('cassone_weizhuangqixi_lose').includes(event.player) && player.hasSkill("cassone_weizhuangqixi_lose"));
+                                        },
+                                        content: function () {
+                                            if (player.hasSkill("cassone_weizhuangqixi_win")) player.removeSkill("cassone_weizhuangqixi_win");
+                                            if (player.hasSkill("cassone_weizhuangqixi_lose")) player.removeSkill("cassone_weizhuangqixi_lose");
+                                        },
+                                    },
                                 },
                             },
                             //在这里添加新技能。
@@ -14759,6 +14913,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             tirpitz: "贪提尔比兹",
                             akagikaga: "贪赤城加贺",
                             savoy: "疑萨沃尼亚",
+                            cassone: "疑卡萨诺方案",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -15037,6 +15192,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             savoy_xiuzhu: "修筑", savoy_xiuzhu_info: "出牌阶段限一次，你可以与一名角色拼点：没有赢的角色，直到回合结束，无法使用或打出与拼点牌相同颜色的牌，若你和其拼点牌点数之和大于13，则你和其各恢复1点体力。",
                             savoy_wangong: "完工", savoy_wangong_info: "觉醒技 结束阶段，若你不为已受伤状态时，你获得技能“装甲”和“要塞群”",
                             savoy_yaosaiqun: "要塞群", savoy_yaosaiqun_info: "你每次进入濒死状态限一次，你可以发动一次“修筑”。",
+                            cassone_yibing: "疑兵", yibing_info: "当你和其他角色进行拼点时，你可以：阳：将自己区域的一张牌移到其他角色相应位置。阴：将其他角色场上一张牌移动到自己相应位置。疑兵处于阴状态时，你参与的拼点，所有人点数视为14-X（X为牌原本的点数）。",
+                            cassone_weizhuangqixi: "伪装奇袭", weizhuangqixi_info: "出牌阶段限一次，你可以与一名角色：若你赢，你与其之间距离视作1，且每回合你对其使用的第一张牌不可响应，直到其回合结束；若其赢，你失去一点体力，那之后，直到其回合结束，你受到其造成的伤害后，恢复1点体力",
+                            cassone_weizhuangqixi_win: "伪装奇袭_赢",
+                            cassone_weizhuangqixi_lose: "伪装奇袭_没赢",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
