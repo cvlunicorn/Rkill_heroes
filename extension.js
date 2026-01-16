@@ -946,7 +946,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 shixinrumoR_chen: [],
                                 shixinrumoR_chi: ["southdakota", "pachina", "loki"],
                                 shixinrumoR_man: ["sukhbaatar", "odin", "vestal"],
-                                shixinrumoR_yi: [],
+                                shixinrumoR_yi: ["savoy"],
                             },
                         },
                         character: {
@@ -1051,6 +1051,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             bismarck: ["female", "KMS", 4, ["zhuangjiafh", "chajin", "fanji"], ["des:表里不一的“野猫”虽然一直说着带攻击性的话，但意外是个很单纯的人。长期相处，应该就能听懂她真正的意思。"]],
                             tirpitz: ["female", "KMS", 4, ["zhuangjiafh", "jinshu", "chuanyue", "nvwangfugui"], ["des:无表情的“人偶”总是盯着手里的东西，对其他的事情缺乏兴趣。但却喜欢为他人解说姐姐说的话，这一点上，很有趣。"]],
                             akagikaga: ["female", "IJN", 4, ["hangmucv", "shuangzi", "akagikaga_zongyu"], ["des:对某些人类非常执着。每次回来，都是遍体鳞伤。而且，一直躺着会对素体产生影响。"]],
+                            savoy: ["female", "RM", "3/6", ["savoy_xiuzhu", "savoy_wangong"], ["des:自称“吸血鬼”,坚称自己是人类幻想文学中的一员。在月圆之夜喜欢看着月亮发呆。一直随身带着石榴汁……？"]],
 
                             skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "zhiqiu", "zhiqiu2", "shuiji1"], ["forbidai", "des:测试用"]],
                         },
@@ -14565,6 +14566,97 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.storage.akagikaga_zongyu_turnOver = 0;
                                 },
                             },
+                            savoy_xiuzhu: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                enable: "phaseUse",
+                                usable: 1,
+                                selectTarget: 1,
+                                filter: function (event, player) {
+                                    return player.countCards("h") > 0;
+                                },
+                                filterTarget: function (card, player, target) {
+                                    return player.canCompare(target);
+                                },
+                                content: function () {
+                                    "step 0"
+                                    player.chooseToCompare(target);
+                                    "step 1"
+                                    game.log(result.player);
+                                    game.log(result.target);
+                                    if (result.bool) {
+                                        var color = get.color(result.target, false);
+                                        target.addTempSkill("savoy_xiuzhu_block", { global: "phaseEnd", });
+                                        target.markAuto("savoy_xiuzhu_block", color);
+                                    } else {
+                                        var color = get.color(result.player, false);
+                                        player.addTempSkill("savoy_xiuzhu_block", { global: "phaseEnd", });
+                                        player.markAuto("savoy_xiuzhu_block", color);
+                                    }
+                                    if (get.number(result.player) + get.number(result.target) > 13) {
+                                        player.recover();
+                                        target.recover();
+                                    }
+                                },
+                                ai: {
+                                    order: 9,
+                                    threaten: 1.4,
+                                },
+                                subSkill: {
+                                    block: {
+                                        mark: true,
+                                        onremove: true,
+                                        init: function (player) {
+                                            if (typeof player.storage.savoy_xiuzhu_block == "undefined") player.storage.savoy_xiuzhu_block = "";
+                                        },
+                                        charlotte: true,
+                                        mod: {
+                                            cardUsable(card, player, num) {
+                                                if (card.color == player.storage.savoy_xiuzhu_block) return false;
+                                            },
+                                            cardEnabled(card, player) {
+                                                if (card.color == player.storage.savoy_xiuzhu_block) return false;
+                                            },
+                                            cardSavable(card, player) {
+                                                if (card.color == player.storage.savoy_xiuzhu_block) return false;
+                                            },
+                                            cardRespondable(card, player) {
+                                                if (card.color == player.storage.savoy_xiuzhu_block) return false;
+                                            },
+                                        },
+                                        sub: true,
+
+                                    },
+                                },
+                            },
+                            savoy_wangong: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                skillAnimation: 'epic',
+                                animationColor: 'wood',
+                                juexingji: true,
+                                trigger: { player: 'phaseJieshuBegin' },
+                                forced: true,
+                                unique: true,
+                                audio: 2,
+                                filter(event, player) {
+                                    return player.hp == player.maxHp;
+                                },
+                                content() {
+                                    player.awakenSkill('savoy_wangong');
+                                    player.addSkills('zhuangjiafh');
+                                    player.addSkills('savoy_yaosaiqun');
+                                },
+                                derivation: ['savoy_yaosaiqun'],
+                            },
+                            savoy_yaosaiqun: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: { player: ['dying'] },
+                                content() {
+                                    player.useSkill("savoy_xiuzhu");
+                                },
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -14666,6 +14758,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             bismarck: "贪俾斯麦",
                             tirpitz: "贪提尔比兹",
                             akagikaga: "贪赤城加贺",
+                            savoy: "疑萨沃尼亚",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -14941,6 +15034,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             shuangzi: "双子", shuangzi_info: "转换技，阳：你使用或打出基本牌时摸一张牌；阴：你使用或打出锦囊牌时摸一张牌",
                             akagikaga_zongyu: "纵欲", akagikaga_zongyu_info: "锁定技，你使用【酒】无次数限制，你不能使用【桃】，你可以将【桃】当作【桃园结义】使用。若场上一名角色一轮中成为【酒】【桃】【桃园结义】目标的次数不小于其的体力值时，清空计数，并将其武将牌翻面。",
                             akagikaga_zongyu_turnOver: "纵欲_翻面",
+                            savoy_xiuzhu: "修筑", savoy_xiuzhu_info: "出牌阶段限一次，你可以与一名角色拼点：没有赢的角色，直到回合结束，无法使用或打出与拼点牌相同颜色的牌，若你和其拼点牌点数之和大于13，则你和其各恢复1点体力。",
+                            savoy_wangong: "完工", savoy_wangong_info: "觉醒技 结束阶段，若你不为已受伤状态时，你获得技能“装甲”和“要塞群”",
+                            savoy_yaosaiqun: "要塞群", savoy_yaosaiqun_info: "你每次进入濒死状态限一次，你可以发动一次“修筑”。",
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
