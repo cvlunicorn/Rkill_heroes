@@ -13772,7 +13772,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     });
                                     "step 1";
                                     if (result.bool) {
-                                        //game.log(result.targets[0]);
                                         player.chooseToCompare(result.targets[0]);
                                     }
                                 },
@@ -13803,7 +13802,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             });
                                             "step 1";
                                             if (result.bool) {
-                                                game.log(result.targets[0]);
                                                 event.target = result.targets[0];
                                                 let cards = event.target.getCards("s", function (card) { return card.hasGaintag('junfu') });
                                                 player.chooseCardButton("获得一张【军辅】牌", true, cards).set('ai', function (button) {
@@ -13812,7 +13810,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             } else { event.finish(); }
                                             "step 2";
                                             if (result.bool) {
-                                                game.log(result.links[0]);
                                                 player.gain(result.links[0], "gain2");
                                             }
                                         },
@@ -13919,7 +13916,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                     win = false;
                                                 }
                                             }
-                                            game.log(win);
                                             if ((player.storage.sudaren != true && win) || (player.storage.sudaren == true && !win)) player.changeZhuanhuanji("sudaren");
                                         },
                                     },
@@ -14111,7 +14107,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     });
                                     "step 1"
                                     if (result.bool) {
-                                        game.log(result.targets[0]);
                                         event.targets = result.targets[0];
                                         player.chooseToDiscard(get.prompt('xiwangdeshuguang'), "弃置一张手牌，令" + get.translation(event.target) + "恢复一点体力", 1).set(ai, function (card) {
                                             return 9 - get.value(card);
@@ -14176,7 +14171,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         return "doubts";
                                     });
                                     "step 3";
-                                    game.log(result.control);
                                     if (result.control && result.control == "doubts") {
                                         trigger.player.showHandcards();
                                     } else { event.finish(); return; }
@@ -14685,34 +14679,38 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 content: function () {
                                     "step 0";
                                     if (player.storage.cassone_yibing == 0) {
-                                        event._result = { bool: true, targets: player };
-                                }else{
-                                    player
-                                        .chooseTarget("选择一名其他角色，将其场上一张牌移动到自己相应位置。", function (card, player, target) {
-                                            return target.countCards("ej", function (card) {
-                                                var js = target.getCards("j");
-                                                for (var i = 0; i < js.length; i++) {
-                                                    if (player.canAddJudge(js[i])) return true;
-                                                }
-                                                if (player.isMin()) return false;
-                                                var es = target.getCards("e");
-                                                for (var i = 0; i < es.length; i++) {
-                                                    if (player.canEquip(es[i])) return true;
-                                                }
-                                                return false;
+                                        event._result = { bool: true, targets: [player],};
+                                    } else {
+                                        player
+                                            .chooseTarget("选择一名其他角色，将其场上一张牌移动到自己相应位置。", function (card, player, target) {
+                                                return target.countCards("ej", function (card) {
+                                                    var js = target.getCards("j");
+                                                    for (var i = 0; i < js.length; i++) {
+                                                        if (player.canAddJudge(js[i])) return true;
+                                                    }
+                                                    if (player.isMin()) return false;
+                                                    var es = target.getCards("e");
+                                                    for (var i = 0; i < es.length; i++) {
+                                                        if (player.canEquip(es[i])) return true;
+                                                    }
+                                                    return false;
+                                                });
+                                            })
+                                            .set("ai", function (target) {
+                                                var player = _status.event.player;
+                                                if (player.countCards("j")) return player == target ? 10 : 0.1;
+                                                return 6 - get.attitude(player, target);
                                             });
-                                        })
-                                        .set("ai", function (target) {
-                                            var player = _status.event.player;
-                                            if (player.countCards("j")) return player == target ? 10 : 0.1;
-                                            return 6 - get.attitude(player, target);
-                                        });
                                     }
+                                    "step 1";
+                                     if (result.bool) {
+                                        event.target0 = result.targets[0];
+                                    } else { event.finish(); return; }
                                     if (player.storage.cassone_yibing && result.bool) {
-                                        event._result = { bool: true, targets: player };
+                                        event._result = { bool: true, targets: [player], };
                                     } else if (result.bool) {
                                         player
-                                            .chooseTarget("请选择" + get.translation(event.card) + "的移动目标", true, function (card, player, target) {
+                                            .chooseTarget("请选择移动目标", true, function (card, player, target) {
                                                 if (target == player) return false;
                                                 var hs = player.getCards("h");
                                                 if (hs.length) return true;
@@ -14734,9 +14732,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 var sgnatt = get.sgn(att);
                                                 var es = player.getCards("e");
                                                 var i;
-                                                var att2 = get.sgn(get.attitude(player, from));
                                                 for (i = 0; i < es.length; i++) {
-                                                    if (sgnatt != 0 && att2 != 0 && sgnatt != att2 && get.sgn(get.value(es[i], from)) == -att2 && get.sgn(get.effect(target, es[i], player, target)) == sgnatt && target.canEquip(es[i])) {
+                                                    if (sgnatt != 0 && get.sgn(get.effect(target, es[i], player, target)) == sgnatt && target.canEquip(es[i])) {
                                                         return Math.abs(att);
                                                     }
                                                 }
@@ -14750,23 +14747,21 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                     if (player.countCards("h") > 0) return att;
                                                     return 0;
                                                 }
-                                                return -att * att2;
+                                                return -att;
                                             });
                                     } else event.finish();
-                                    "step 1";
+                                    "step 2";
                                     if (result.bool) {
-                                        var target1 = result.targets[0];
+                                        event.target1 = result.targets[0];
                                     } else { event.finish(); return; }
                                     if (player.storage.cassone_yibing) {
-                                        var es = target.getCards("ej", function (card) {
-                                            return game.hasPlayer(function (current) {
-                                                return current == target && current.canEquip(card);
-                                            });
+                                        var es = event.target0.getCards("ej", function (card) {
+                                            return (player.canEquip(card) || player.canAddJudge(card));
                                         });
                                     } else {
-                                        var es = target.getCards("hej", function (card) {
+                                        var es = player.getCards("hej", function (card) {
                                             return game.hasPlayer(function (current) {
-                                                return current != target && current.canEquip(card);
+                                                return current != player && (current.canEquip(card) || current.canAddJudge(card));
                                             });
                                         });
                                     }
@@ -14778,8 +14773,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 true,
                                                 function (button) {
                                                     var player = _status.event.player;
-                                                    var target0 = _status.event.target0;
-                                                    var target1 = _status.event.target1;
+                                                    var targets0 = _status.event.target0;
+                                                    var targets1 = _status.event.target1;
                                                     if (get.attitude(player, targets0) > 0 && get.attitude(player, targets1) < 0) {
                                                         if (get.position(button.link) == "j") return 12;
                                                         if (get.value(button.link, targets0) < 0 && get.effect(targets1, button.link, player, targets1) > 0) return 10;
@@ -14790,12 +14785,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                         return get.value(button.link) * get.effect(targets1, button.link, player, targets1);
                                                     }
                                                 },
-                                                targets[0]
-                                            )
-                                            .set("target0", target0)
-                                            .set("target1", target1)
+                                                event.target0
+                                            ).set('target0',event.target0).set('target1',event.target1)
                                             .set("filterButton", function (button) {
-                                                var targets1 = _status.event.targets1;
+                                                var targets1 = _status.event.target1;
                                                 if (get.position(button.link) == "h") {
                                                     return true;
                                                 } else if (get.position(button.link) == "j") {
@@ -14805,22 +14798,21 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 }
                                             });
                                     }
-
-                                    "step 2";
+                                    "step 3";
                                     if (result.bool) {
                                         event.card = result.links[0];
                                     } else { event.finish(); return; }
-                                    target.line(target2);
-                                    if (get.position(link) == "h") event.targets[1].gain(link, event.targets[0], "giveAuto");
+                                    event.target0.line(event.target1);
+                                    if (get.position(event.card) == "h") event.target1.gain(event.card, event.target0, "giveAuto");
                                     else {
-                                        event.targets[0].$give(link, event.targets[1], false);
-                                        if (get.position(link) == "e") event.targets[1].equip(link);
-                                        else if (link.viewAs) event.targets[1].addJudge({ name: link.viewAs }, [link]);
-                                        else event.targets[1].addJudge(link);
+                                        event.target0.$give(event.card, event.target1, false);
+                                        if (get.position(event.card) == "e") event.target1.equip(event.card);
+                                        else if (event.card.viewAs) event.target1.addJudge({ name: event.card.viewAs }, [event.card]);
+                                        else event.target1.addJudge(event.card);
                                     }
-                                    game.log(event.targets[0], "的", get.position(link) == "h" ? "一张手牌" : link, "被移动给了", event.targets[1]);
+                                    game.log(event.target0, "的", get.position(event.card) == "h" ? "一张手牌" : event.card, "被移动给了", event.target1);
                                     game.delay();
-                                    player.changeZhuanhuanji('cassone_yibing');
+                                    player.changeZhuanhuanji('cassone_yibing'); 
                                 },
                                 group: ["cassone_yibing_number"],
                                 subSkill: {
@@ -14832,7 +14824,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return player.getStorage('cassone_yibing') == 1;
                                         },
                                         content: function () {
-                                            game.log(player, '拼点牌点数视为14-x');
+                                            game.log('拼点牌点数视为14-x');
                                             trigger.num1 = 14 - trigger.num1;
                                             trigger.num2 = 14 - trigger.num2;
                                         },
@@ -14847,6 +14839,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 selectTarget: 1,
                                 filter: function (event, player) {
                                     return player.countCards("h") > 0;
+                                },
+                                check: function (event, player) {
+                                    return player.countCards("h") > 1;
                                 },
                                 filterTarget: function (card, player, target) {
                                     return player.canCompare(target);
@@ -14869,6 +14864,24 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 ai: {
                                     order: 10,
                                     threaten: 1.4,
+                                    result: {
+                                        player: function (player) {
+                                            if (player.hp < 2) return -100;
+                                            if (player.countCards('h', function (card) {
+                                                return get.tag(card, "damage");
+                                            }) > 0 && player.getHistory("useCard").length < 1) return 1;
+                                            var num = player.countCards('h');
+                                            if (num == 1) return -2;
+                                            if (num == 2) return -1;
+                                            return -0.7;
+                                        },
+                                        target: function (player, target) {
+                                            var num = target.countCards('h');
+                                            if (num == 1) return -1;
+                                            if (num == 2) return -0.7;
+                                            return -0.5
+                                        },
+                                    },
                                 },
                                 subSkill: {
                                     win: {
