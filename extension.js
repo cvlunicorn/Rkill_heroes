@@ -1055,7 +1055,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             cassone: ["female", "RM", 4, ["zhuangjiafh", "cassone_yibing", "cassone_weizhuangqixi"], ["des:深海版战列巡洋舰卡萨诺方案。"]],
 
 
-                            skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "zhiqiu", "zhiqiu2", "shuiji1","paoxiao"], ["forbidai", "des:测试用"]],
+                            skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "zhiqiu", "zhiqiu2", "shuiji1", "paoxiao"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
                             _yuanhang: {
@@ -14060,9 +14060,44 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     "step 1"
                                     if (result.bool) {
                                         var card = { name: 'tao', iscard: true };
-                                        player.discard(result.links[0]);
+                                        player.loseToDiscardpile(result.links[0]);
+
                                         player.useCard(card, trigger.player, true);
                                     }
+
+                                },
+                                group: ["vestal_mowang1"],
+                            },
+                            vestal_mowang1: {
+                                nobracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                trigger: {
+                                    global: "dyingAfter",
+                                },
+                                frequent: true,
+                                filter: function (event, player) {
+                                    return event.player.isAlive();
+                                },
+                                check: function (event, player) {
+                                    return true;
+                                },
+                                content() {
+                                    var choice;
+                                    if (player.isDamaged() && get.recoverEffect(player) > 0 && (player.countCards('hs', function (card) {
+                                        return card.name == 'sha' && player.hasValueTarget(card);
+                                    }) >= player.getCardUsable('sha'))) {
+                                        choice = 'recover_hp';
+                                    }
+                                    else {
+                                        choice = 'draw_card';
+                                    }
+                                    var next = player.chooseDrawRecover('###' + get.prompt(event.name) + '###摸一张牌或回复1点体力').set('logSkill', event.name);
+                                    next.set('choice', choice);
+                                    next.set('ai', function () {
+                                        return _status.event.getParent().choice;
+                                    });
+                                    next.setHiddenSkill('vestal_mowang1');
+
                                 },
                             },
                             xiwangdeshuguang: {
@@ -15301,7 +15336,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             ganggenier: "冈格尼尔", "ganggenier_info": "准备阶段，依次从牌堆顶给所有没有“军辅”牌的角色武将牌上放置一张牌，视作“军辅”牌。出牌阶段限一次，你可以弃置两名角色各一张“军辅”牌，直到回合结束，其他所有角色无法使用或打出与被以此法弃置的牌相同花色的牌。",
                             ganggenier_1: "冈格尼尔", "ganggenier_1_info": "出牌阶段限一次，你可以弃置两名角色各一张“军辅”牌，直到回合结束，其他所有角色无法使用或打出与被以此法弃置的牌相同花色的牌。",
                             vestal_mowang: "魔王", "vestal_mowang_info": "当有角色陷入濒死时，你可以将自己或其武将牌上的“军辅”牌当做【桃】对其使用。当场上有角色脱离濒死状态时，你可以选择恢复一点体力或摸一张牌。",
-                            vestal_mowang_1: "魔王",
+                            vestal_mowang1: "魔王",
                             xiwangdeshuguang: "希望的曙光", "xiwangdeshuguang_info": "每个回合结束时，你可以弃置一张手牌，令一名本回合受到过伤害的角色回复一点体力。",
                             chajin: "查禁", "chajin_info": "其他角色于摸牌阶段及“远航”技能效果外从牌堆摸牌时，你可以声明一个花色，之后其可以选择交给你任意张手牌。执行完上述流程后，你可以选择质疑其手牌中还有你声明的花色，然后展示其所有手牌，若其手牌有你声明的花色，你获得之，并对其造成1点伤害；否则，你流失1点体力，并且此技能本轮失效。",
                             doubts: "质疑",
