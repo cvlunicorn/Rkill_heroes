@@ -1055,7 +1055,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             cassone: ["female", "RM", 4, ["zhuangjiafh", "cassone_yibing", "cassone_weizhuangqixi"], ["des:深海版战列巡洋舰卡萨诺方案。"]],
 
 
-                            skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "zhiqiu", "zhiqiu2", "shuiji1"], ["forbidai", "des:测试用"]],
+                            skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "zhiqiu", "zhiqiu2", "shuiji1","paoxiao"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
                             _yuanhang: {
@@ -8781,7 +8781,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 zhuSkill: true,
                                 usable: 1,
                                 trigger: {
-                                    player: "damageBegin",
+                                    player: "damageBegin3",
                                 },
                                 forced: true,
                                 filter(event, player) {
@@ -12365,32 +12365,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 enable: ["chooseToRespond", "chooseToUse"],
+                                usable: function (event, player) {
+                                    if (game.zhu) return game.zhu.getDamagedHp();
+                                    return 0;
+                                },
                                 mod: {
                                     cardUsable: function (card) {
-                                        /* var check1 = game.countPlayer(function (current) {
-                                            let zhu = false;
-                                            switch (get.mode()) {
-                                                case "identity": {
-                                                    zhu = current.isZhu;
-                                                    break;
-                                                }
-                                                case "guozhan": {
-                                                    zhu = get.is.jun(current);
-                                                    break;
-                                                }
-                                                case "versus": {
-                                                    zhu = current.identity == "zhu";
-                                                    break;
-                                                }
-                                                case "doudizhu": {
-                                                    zhu = current == game.zhu;
-                                                    break;
-                                                }
-                                            }
-                                            return zhu && current.getDamagedHp() >= 2;
-                                        });
-                                        if 1(card.storage && card.storage.yixinyiyi && check1) return Infinity; */
-                                        return Infinity;
+                                        if (card.storage && card.storage.yixinyiyi) return Infinity;
                                     },
                                     /* targetInRange(card, player, target, now) {
                                         var check2 = game.countPlayer(function (current) {
@@ -12603,7 +12584,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                     },
                                 },
-                                group: ["yixinyiyi_damage"],
+                                //group: ["yixinyiyi_damage"],
                                 subSkill: {
                                     damage: {
                                         trigger: { player: "useCard" },
@@ -14679,7 +14660,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 content: function () {
                                     "step 0";
                                     if (player.storage.cassone_yibing == 0) {
-                                        event._result = { bool: true, targets: [player],};
+                                        event._result = { bool: true, targets: [player], };
                                     } else {
                                         player
                                             .chooseTarget("选择一名其他角色，将其场上一张牌移动到自己相应位置。", function (card, player, target) {
@@ -14703,7 +14684,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             });
                                     }
                                     "step 1";
-                                     if (result.bool) {
+                                    if (result.bool) {
                                         event.target0 = result.targets[0];
                                     } else { event.finish(); return; }
                                     if (player.storage.cassone_yibing && result.bool) {
@@ -14786,7 +14767,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                     }
                                                 },
                                                 event.target0
-                                            ).set('target0',event.target0).set('target1',event.target1)
+                                            ).set('target0', event.target0).set('target1', event.target1)
                                             .set("filterButton", function (button) {
                                                 var targets1 = _status.event.target1;
                                                 if (get.position(button.link) == "h") {
@@ -14812,7 +14793,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                     game.log(event.target0, "的", get.position(event.card) == "h" ? "一张手牌" : event.card, "被移动给了", event.target1);
                                     game.delay();
-                                    player.changeZhuanhuanji('cassone_yibing'); 
+                                    player.changeZhuanhuanji('cassone_yibing');
                                 },
                                 group: ["cassone_yibing_number"],
                                 subSkill: {
@@ -15284,7 +15265,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jinyangmaozhishi: "金羊毛之誓", "jinyangmaozhishi_info": "限定技，当你成为其他角色使用牌的目标时，若你已受伤，你可以令此牌对你无效。",
                             zhengzhansihai: "征战四海", "zhengzhansihai_info": "每回合限一次，当你造成或受到伤害后，你可以摸x张牌，x为你已损失的体力值。",
                             shuqinzhiyin: "竖琴之音", "shuqinzhiyin_info": "每轮限一次，其他角色技能结算后，你可以弃置两张牌，重置一名其他角色武将牌上的技能，然后其回复一点体力",
-                            yixinyiyi: "一心一意", "yixinyiyi_info": "你可以将一张手牌当作雷杀使用。此杀根据主公已损失体力值:不小于一点，无距离限制，不小于两点，无次数限制，不小于三点，伤害+1。",
+                            yixinyiyi: "一心一意", "yixinyiyi_info": "出牌阶段限X次，你可以将一张手牌当作雷杀使用，此法使用的牌无次数限制。X为主公已损失体力值。",
                             buxiuzhanshi: "不朽战士", "buxiuzhanshi_info": "出牌阶段限一次，你可以弃置任意张牌，视为对等量名角色使用决斗。下个回合摸牌阶段，你的摸牌数量+x（x为你本回合以此法对造成的伤害数）",
                             hailangchuji: "海狼出击", "hailangchuji_info": "有潜艇使用雷杀指定其他角色为目标后，你可以摸一张牌。",
                             yangwangxingkong: "仰望星空", "yangwangxingkong_info": "限定技，你可将一张手牌交给一名角色，然后该名角色选择一项：1，弃置所有手牌，2，将血量调整至濒死状态。若如此做，你在摸牌阶段的摸牌数-1。",
