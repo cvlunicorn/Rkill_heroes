@@ -3274,7 +3274,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
-                            dajiaoduguibi: {
+                            /* dajiaoduguibi: {//2025.11-2026.1版本的回避，过强。
                                 trigger: {
                                     player: ["damageBefore"],
                                 },
@@ -3302,14 +3302,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         return result.bool;
                                     };
                                     //以下部分是回避判定失败后摸牌。2023.8.6移除
-                                    /*if(result.judge<=0){event.cards.push(result.card);if(Math.max(player.getHandcardLimit(),3)>=player.countCards('h')){player.gain(event.cards);
+                                    //if(result.judge<=0){event.cards.push(result.card);if(Math.max(player.getHandcardLimit(),3)>=player.countCards('h')){player.gain(event.cards);
                               //var next=player.chooseToDiscard(get.prompt('回避弃牌事件'),1,'手牌数超过上限，请弃置一张手牌',true);
                                 //    next.ai=function(card){
                                           //  return 30-get.useful(card);}
                                         
-                                          };
+                                          //};
                                //if(player.hasSkill('quzhudd')){if(!player.countMark('dajiaoduguibi')){player.addMark('dajiaoduguibi');event.goto(0);}else {player.removeMark('dajiaoduguibi',player.countMark('dajiaoduguibi'));};};
-                                    };*/
+                                    //};
                                     "step 1"
                                     if (result.judge > 0) {
                                         trigger.cancel();
@@ -3339,8 +3339,90 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
-
-
+ */
+                            dajiaoduguibi: {
+                                trigger: { player: ["chooseToRespondBegin", "chooseToUseBegin"] },
+				filter: function (event, player) {
+					if (event.responded) return false;
+					if (event.dajiaoduguibi) return false;
+					if (!event.filterCard || !event.filterCard({ name: "shan" }, player, event)) return false;
+					if (
+						event.name == "chooseToRespond" &&
+						!lib.filter.cardRespondable({ name: "shan" }, player, event)
+					)
+						return false;
+					if (player.hasSkillTag("unequip2")) return false;
+					var evt = event.getParent();
+					if (
+						evt.player &&
+						evt.player.hasSkillTag("unequip", false, {
+							name: evt.card ? evt.card.name : null,
+							target: player,
+							card: evt.card,
+						})
+					)
+						return false;
+                        if (!player.hasEmptySlot(2)) return false;
+					return true;
+				},
+                check: function (event, player) {
+					if (!event) return true;
+					if (event.ai) {
+						var ai = event.ai;
+						var tmp = _status.event;
+						_status.event = event;
+						var result = ai({ name: "shan" }, _status.event.player, event);
+						_status.event = tmp;
+						return result > 0;
+					}
+					let evt = event.getParent();
+					if (player.hasSkillTag("noShan", null, evt)) return false;
+					if (!evt || !evt.card || !evt.player || player.hasSkillTag("useShan", null, evt))
+						return true;
+					if (
+						evt.card &&
+						evt.player &&
+						player.isLinked() &&
+						game.hasNature(evt.card) &&
+						get.attitude(player, evt.player._trueMe || evt.player) > 0
+					)
+						return false;
+					return true;
+				},
+                                
+                                content: function () {
+                                    "step 0"
+                                    player.judge('dajiaoduguibi', function (card) {
+                                        if (player.countMark('jinengup') <= 0) {
+                                            return (get.suit(card) == 'diamond') ? 1.6 : -0.5;
+                                        } else if (player.countMark('jinengup') == 1) {
+                                            return (get.suit(card) == 'heart' || get.suit(card) == 'diamond') ? 1.6 : -0.5;
+                                        } else if (player.countMark('jinengup') >= 2) {
+                                            return (get.suit(card) != 'spade') ? 1.6 : -0.5;
+                                        }
+                                    }).judge2 = function (result) {
+                                        return result.bool;
+                                    };
+                                    "step 1"
+                                    if (result.judge > 0) {
+                                        trigger.untrigger();
+                                        trigger.set('responded', true);
+                                        trigger.result = { bool: true, card: { name: 'shan' } }
+                                    }
+                                },
+                                ai: {
+                                    respondShan: true,
+                                    effect: {
+                                        target: function (card, player, target) {
+                                            if (player == target && get.subtype(card) == 'equip2') {
+                                                if (get.equipValue(card) <= 7.5) return 0;
+                                            }
+                                            if (!target.hasEmptySlot(2)) return;
+                                            return lib.skill.bagua_skill.ai.effect.target.apply(this, arguments);
+                                        }
+                                    }
+                                },
+                            },
                             huokongld: {
                                 firstDo: true,
                                 frequent: true,
@@ -15108,7 +15190,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "danzong_info": "每使用六张杀，你便可以在造成无属性伤害附加属性：<br>潜艇、驱逐：获得雷属性的效果，<br>战列、航母：获得雷属性与改进型冰杀的效果。<br>其他舰种时：获得火属性,点燃目标。<br>效果持续到伤害结算完成时（打不穿藤甲的高爆弹与暴击藤甲的决斗）",
                             /* "paohuozb_skill": "炮火准备1", "paohuozb_skill_info": "装备技能", */
                             dajiaoduguibi: "规避",
-                            "dajiaoduguibi_info": "（可强化）若你没有装备防具，你受到牌造成的伤害前可以进行一次判定，判定结果为：零级强化，方块/一级强化，桃、闪、方块/二级强化，红桃或方块，防止此伤害。",
+                            "dajiaoduguibi_info": "（可强化）若你没有装备防具，你需要使用或打出闪时可以进行一次判定，判定结果为：零级强化，方块/一级强化，红桃或方块/二级强化，不为黑桃，防止此伤害。",
                             "rendeonly2": "仁德界改",
                             "rendeonly2_info": "给实际距离为2的队友最多两张牌，一回合限2次，给出第二张牌时，你视为使用一张基本牌。可强化",
                             zhiyangai: "直言",
