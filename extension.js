@@ -1040,18 +1040,18 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             sp_zhongtudao: ["female", "USN", '3/4', ["hangmucv", "zhuangjiajiaban", "xiandaihuagaizao"], ["des:中途岛级航母是美国海军在二战中设计的最后一型航母，也是海军第一艘真正意义上摆脱了条约限制的航母（前代埃塞克斯级由于设计时间过短而继承了很多约克城级的特征），在核心思路上大量参考了英国的装甲航母设计，而在舰体设计上则借用了蒙大拿级的设计。中途岛号在1945年3月下水时的排水量为45000吨，是此后10年内全球最大的现役航母；在长达52年的服役史中，她是海军首艘接触斜角甲板概念的航母，先后参与了越南战争（击落了战争中第一架和最后一架敌机）和海湾战争，接受了两次大规模现代化改造，最终于1997年退役，作为博物馆保存至今。"]],
                             guying: ["female", "IJN", 4, ["huokongld", "zhongxunca", "zhanxianyuanhu"], ["des:该型是日本在八八舰队时期设计的侦查巡洋舰，由于之后海军条约的签署，根据规定古鹰型被划为重巡洋舰。在37年，两艘古鹰型进行了大改装，单装主炮换为新式连装炮，其余武备和设施也进行了更新，外形上和青叶型很相似。古鹰号在战争初期很活跃，参与了威克岛到中途岛的一系列作战。42年古鹰号编入三川的第八舰队，在萨沃岛海战中重创了美军。不过在同年10月的海战中，古鹰号好运不再，被美军击沉。"]],
 
-                            pachina: ["female", "RM", 6, ["yaosai", "xinao"], ["des:位于意大利西西里的帕基罗角（Pachino）。实际上意大利的海军并未在这里修建要塞，反而是英军的次要登陆场，英军在该地登陆后还建立了临时机场。"]],
+                            pachina: ["female", "RM", 4, ["yaosai", "xinao"], ["des:位于意大利西西里的帕基罗角（Pachino）。实际上意大利的海军并未在这里修建要塞，反而是英军的次要登陆场，英军在该地登陆后还建立了临时机场。"]],
                             loki: ["female", "KMS", 4, ["hangmucv", "xiance"], ["des:深海版的装甲航空母舰彼得·施特拉塞尔。"]],
-                            southdakota: ["female", "USN", 4, ["zhanliebb", "zhuangjiafh", "gumei", "jianmiemoshi", "zhaopin"], ["des:原型为美国海军南达科他级战列舰南达科他（BB-57）。"]],
+                            southdakota: ["female", "USN",4, ["zhanliebb", "zhuangjiafh", "gumei", "jianmiemoshi", "zhaopin"], ["des:原型为美国海军南达科他级战列舰南达科他（BB-57）。"]],
                             lingbo: ["female", "IJN", 3, ["quzhudd", "dajiaoduguibi", "zhanxian", "guishen"], ["des:吹雪型11号舰，特II型1号舰。相比特I型，绫波号增加了主炮高射功能，35年针对第四舰队事件进行了改装，战争初期隶属南方部队。1942年8月被派到瓜岛，并参加了11月的第三次所罗门海战，战斗中绫波号表现突出，至少击伤四艘美军战舰，其中包括南达科他号战列舰，绫波号自身也在此次海战中沉没。"]],
-                            sukhbaatar: ["female", "OTHER", 4, ["junfu", "sukhbaatar_rumeng", "sudaren", "zuiqiang"], ["des:CLASSIFIED*。"]],
-                            odin: ["female", "OTHER", 4, ["junfu", "ganggenier"], ["des:CLASSIFIED*。"]],
-                            vestal: ["female", "USN", 4, ["junfu", "vestal_mowang"], ["des:CLASSIFIED*。"]],
+                            sukhbaatar: ["female", "OTHER", 3, ["junfu", "sukhbaatar_rumeng", "sudaren", "zuiqiang"], ["des:CLASSIFIED*。"]],
+                            odin: ["female", "OTHER", 3, ["junfu", "ganggenier"], ["des:CLASSIFIED*。"]],
+                            vestal: ["female", "USN", 3, ["junfu", "vestal_mowang"], ["des:CLASSIFIED*。"]],
                             nvzaoshen: ["female", "USN", 3, ["junfu", "dajiaoduguibi", "xiwangdeshuguang"], ["des:女灶神号（舷号AR-4）是一艘在1913年至1946年期间服役于美国海军的修理船。在改装为修理船之前，女灶神是一条运煤船（从1909年开始）。女灶神号参与了全部两次世界大战，在日本空袭珍珠港期间，该舰在港口内遭到重创。打满整场第二次世界大战的女灶神共获得了两枚战斗之星。"]],
                             bismarck: ["female", "KMS", 4, ["zhuangjiafh", "chajin", "fanji"], ["des:表里不一的“野猫”虽然一直说着带攻击性的话，但意外是个很单纯的人。长期相处，应该就能听懂她真正的意思。"]],
                             tirpitz: ["female", "KMS", 4, ["zhuangjiafh", "jinshu", "chuanyue", "nvwangfugui"], ["des:无表情的“人偶”总是盯着手里的东西，对其他的事情缺乏兴趣。但却喜欢为他人解说姐姐说的话，这一点上，很有趣。"]],
                             akagikaga: ["female", "IJN", 4, ["hangmucv", "shuangzi", "akagikaga_zongyu"], ["des:对某些人类非常执着。每次回来，都是遍体鳞伤。而且，一直躺着会对素体产生影响。"]],
-                            savoy: ["female", "RM", "3/6", ["savoy_xiuzhu", "savoy_wangong"], ["des:自称“吸血鬼”,坚称自己是人类幻想文学中的一员。在月圆之夜喜欢看着月亮发呆。一直随身带着石榴汁……？"]],
+                            savoy: ["female", "RM", "2/4/1", ["yaosai", "savoy_xiuzhu", "savoy_wangong"], ["des:自称“吸血鬼”,坚称自己是人类幻想文学中的一员。在月圆之夜喜欢看着月亮发呆。一直随身带着石榴汁……？"]],
                             cassone: ["female", "RM", 4, ["zhuangjiafh", "cassone_yibing", "cassone_weizhuangqixi"], ["des:深海版战列巡洋舰卡萨诺方案。"]],
 
 
@@ -1261,65 +1261,67 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     ;
                                 },
                                 filterCard: {}, position: "h", selectCard: function (card) {
-                                    var player = get.player(), num = 0;//num+=(player.countMark('Expup'));if(ui.selected.cards.length&&get.type(ui.selected.cards[0],'equip')=='equip'){num+=(1)};if(ui.selected.cards.length>1&&get.type(ui.selected.cards[1],'equip')=='equip'){num+=(1)};//装备不再记为2强化点数
+                                    var player = get.player(), num = 0;
+                                    num+=(player.countMark('Expup'));
+                                    //if(ui.selected.cards.length&&get.type(ui.selected.cards[0],'equip')=='equip'){num+=(1)};if(ui.selected.cards.length>1&&get.type(ui.selected.cards[1],'equip')=='equip'){num+=(1)};//装备不再记为2强化点数
                                     return [Math.max(2 - num, 0), Math.max(4 - num, 2)];
                                 },
                                 discard: false,
                                 lose: false,
                                 check: function (card) {//ui，参考仁德，ai执行判断，卡牌价值大于1就执行（只管卡片）当然，能把玩家设置进来就可以if玩家没桃 return-1。
                                     var player = get.player();
-                                    if (ui.selected.cards.length && get.type(ui.selected.cards[0], 'equip') == 'equip') return 5 - get.value(card);
-                                    if (ui.selected.cards.length >= Math.max(1, player.countCards('h') / 2)) return 0;
-                                    if (game.phaseNumber < 3) return 7 - get.value(card);
-                                    return 3 - get.value(card);
+                                    //if (ui.selected.cards.length && get.type(ui.selected.cards[0], 'equip') == 'equip') return 5 - get.value(card);
+                                    //if (ui.selected.cards.length >= Math.max(1, player.countCards('h') / 2)) return 0;
+                                    //if (game.phaseNumber < 3) return 7 - get.value(card);
+                                    if(player.countCards("h")>player.maxHandcard)return 9-get.value(card);
+                                    return 7 - get.value(card);
                                 },
                                 content: function () {//choiceList.unshift
                                     'step 0'
                                     var a = player.countMark('mopaiup'), b = player.countMark('jinengup'), c = player.countMark('wuqiup'), d = player.countMark('useshaup'), e = player.countMark('jidongup'), f = player.countMark('shoupaiup'), g = player.countMark('songpaiup'), h = player.countMark('Expup'), k = player.countMark('_jianzaochuan') + 1, exp1 = 0;
                                     player.storage._qianghuazhuang = [a, b, c, d, e, f, g, h, k];
-                                    exp1 = cards.length;
+                                    event.exp1 = cards.length;
                                     var choiceList = [];
                                     var list = [];
                                     //game.log(cards);
                                     event.cao = cards;
                                     //game.log(event.cao);
-                                    //exp1 = player.countMark('Expup1');
-                                    jieshao = ['后勤保障：上限+' + (a + 1) + '→' + (a + 2) + '远航（用一摸一）标记上限，<br>手牌少于手牌上限1/2时，失去手牌会摸一张牌。防守反击的保障<br>每轮上限1/2/3，在自己的回合重置使用次数。', '技能升级：+' + (b) + '→' + (b + 1) + '，重巡-降低必中攻击限制(杀/黑牌/任意牌)、轻巡-增加无效群体锦囊牌范围(1/2/3)、航母-降低万箭齐发限制(黑桃与梅花/黑桃与梅花与红桃/任意牌);<br>战列舰-增加防护范围(杀造成的伤害/杀和锦囊牌造成的伤害/所有伤害)，导驱-增加射程(2/3/4)、潜艇-降低雷杀条件(红桃/红桃或黑桃/红桃或黑桃或方块);<br>驱逐-增加回避概率(0.25/0.33/0.50)、军辅-增加存牌上限(1/2/3)。', '射程升级：+' + c + '→' + (c + 1) + '武器（出杀）攻击距离，<br>增加出杀范围，虽然不增加锦囊牌距离，但胜在永久', '速射炮管：+' + d + '→' + (d + 1) + '出杀次数，<br>作为连弩的临时替代，进行多刀输出。', '改良推进器：+' + e + '→' + (e + 1) + '武器（被杀）防御距离<br>对手有更远的出杀范围才能对你出杀时，但不能防御锦囊牌。', '物流运输：+' + f + '→' + (f + 1) + '手牌上限，且蝶舞递装备给杀的距离提升，<br>双方状态差距越大，保牌效果越强。', '经验：+' + h + '→' + (player.countMark('Expup1')) + '，将卡牌转为经验，供下次升级。（直接点确定也行）<br>1级技能需要两张牌才能强化，2级技能需要三张牌才能强化。<br>但无名杀不能读取这个界面的文本，导致四点经验即可强化两个不同等级技能']//player.getEquip(1)，定义空数组，push填充它，事件变量可以自定义名字，什么都可以存。game.log('已强化:',a+b+c+d);
+                                    jieshao = ['后勤保障：上限+' + (a + 1) + '→' + (a + 2) + '远航（用一摸一）标记上限，<br>手牌少于手牌上限1/2时，失去手牌会摸一张牌。防守反击的保障<br>每轮上限1/2/3，在自己的回合重置使用次数。', '技能升级：+' + (b) + '→' + (b + 1) + '，重巡-降低必中攻击限制(杀/黑牌/任意牌)、轻巡-增加无效群体锦囊牌范围(1/2/3)、航母-降低万箭齐发限制(黑桃与梅花/黑桃与梅花与红桃/任意牌);<br>战列舰-增加防护范围(杀造成的伤害/杀和锦囊牌造成的伤害/所有伤害)，导驱-增加射程(2/3/4)降低导弹条件（武器/装备/任意牌）、潜艇-降低雷杀条件(红桃/红桃或黑桃/红桃或黑桃或方块);<br>驱逐-增加回避概率(0.25/0.50/0.75)、军辅-增加存牌上限(1/2/3)、要塞-增加血量上限（0/1/2）。', '射程升级：+' + c + '→' + (c + 1) + '武器（出杀）攻击距离，<br>增加出杀攻击范围，虽然不增加锦囊牌距离，但胜在永久', '速射炮管：+' + d + '→' + (d + 1) + '出杀次数，<br>作为连弩的临时替代，进行多刀输出。', '改良推进器：+' + e + '→' + (e + 1) + '武器（被杀）防御距离<br>对手有更远的出杀范围才能对你出杀时，但不能防御锦囊牌。', '物流运输：+' + f + '→' + (f + 1) + '手牌上限，且蝶舞递装备给杀的距离提升，<br>双方状态差距越大，保牌效果越强。', '经验：+' + h + '→' + event.exp1 + '，将卡牌转为经验，供下次升级。（直接点确定也行）<br>1级技能需要两张牌才能强化，2级技能需要三张牌才能强化。<br>但无名杀不能读取这个界面的文本，导致四点经验即可强化两个不同等级技能']//player.getEquip(1)，定义空数组，push填充它，事件变量可以自定义名字，什么都可以存。game.log('已强化:',a+b+c+d);
                                     var info = lib.skill._qianghuazhuang.getInfo(player);
                                     //game.log(info);
-                                    if (info[0] < k && (info[0] + 2 <= info[7] + exp1) && info[0] <= 2) {
+                                    if (info[0] < k && (info[0] + 2 <= info[6] + event.exp1) && info[0] <= 2) {
                                         list.push('mopaiup');
                                         choiceList.push(['mopaiup', jieshao[0]]);
                                     };
-                                    if (info[1] < k && (info[1] + 2 <= info[7] + exp1) && info[1] <= 2 && !player.hasSkill("shixiangquanneng")) {
+                                    if (info[1] < k && (info[1] + 2 <= info[6] + event.exp1) && info[1] <= 2 && !player.hasSkill("shixiangquanneng")) {
                                         list.push('jinengup');
                                         choiceList.push(['jinengup', jieshao[1]]);
                                     };
-                                    if (info[2] < k && (info[2] + 2 <= info[7] + exp1) && info[2] <= 2) {
+                                    if (info[2] < k && (info[2] + 2 <= info[6] + event.exp1) && info[2] <= 2) {
                                         list.push('wuqiup');
                                         choiceList.push(['wuqiup', jieshao[2]]);
                                     };//若此值：你强化的比目标多时，+1含锦囊牌防御距离。
-                                    if (info[3] < k && (info[3] + 2 <= info[7] + exp1) && info[3] <= 2) {
+                                    if (info[3] < k && (info[3] + 2 <= info[6] + event.exp1) && info[3] <= 2) {
                                         list.push('useshaup');
                                         choiceList.push(['useshaup', jieshao[3]]);
                                     };
-                                    if (info[4] < k && (info[4] + 2 <= info[7] + exp1) && info[4] <= 2) {
+                                    if (info[4] < k && (info[4] + 2 <= info[6] + event.exp1) && info[4] <= 2) {
                                         list.push('jidongup');
                                         choiceList.push(['jidongup', jieshao[4]]);
                                     };
-                                    if (info[5] < k && (info[5] + 2 <= info[7] + exp1) && info[5] <= 2) {
+                                    if (info[5] < k && (info[5] + 2 <= info[6] + event.exp1) && info[5] <= 2) {
                                         list.push('shoupaiup');
                                         choiceList.push(['shoupaiup', jieshao[5]]);
                                     };
                                     //      if(info[6]<k&&(info[0]+2<=info[7])&&info[6]<2){event.list.push('songpaiup');
                                     //  event.choiceList.push('+'+g+'→'+(g+1)+'给牌次数，<br>提升“先进雷达”技能的送牌范围。');};
-                                    if (info[7] <= k && info[7] < 6) {
+                                    if (info[6] <= k && info[6] < 6) {
                                         list.push('Expup');
                                         choiceList.push(['Expup', jieshao[6]]);
                                     };
                                     //game.log(choiceList);
                                     event.first = true;    //存了6个变量，可以导出为button，与textbutton样式，看需求
-                                    var xuanze = Math.max(Math.floor(event.cao.length / 2 + info[7]), 1);
+                                    var xuanze = Math.max(Math.floor((event.cao.length + info[6])/2), 1);
                                     //game.log("xuanze" + xuanze);
                                     player.chooseButton([
                                         '将手牌转化为强化点数强化以下能力；取消将返还卡牌，未使用完的点数将保留。<br>强化上限默认为1，发动建造技能后提高。<br>一级强化需要2点，二级强化需要3点强化点数。<br>鼠标滚轮或下拉查看所有选项。',
@@ -1330,7 +1332,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return true; //return xuanze >= player.countMark(ui.selected.buttons[0]) * 0.5 + 1;
                                         }
                                     }).set('ai', function (button) {
-                                        var haode = [jieshao[0], jieshao[1]]; var yingji = []; var tunpai = [jieshao[5]];//其实一个例子就行，不如直接if(){return 2;};
+                                        var haode = [jieshao[0], jieshao[1]]; 
+                                        var yingji = []; 
+                                        var tunpai = [jieshao[5]];//其实一个例子就行，不如直接if(){return 2;};
                                         if (game.hasPlayer(function (current) { return current.inRange(player) && get.attitude(player, current) < 0; }) < 1) { yingji.push(jieshao[2]) } else if (player.countCards('h', { name: 'sha' }) > 1) { yingji.push(jieshao[3]) };
                                         if (game.hasPlayer(function (current) { return player.inRange(current) && get.attitude(player, current) < 0; }) > 0) yingji.push(jieshao[4]);
                                         switch (ui.selected.buttons.length) {
@@ -1351,19 +1355,34 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }).set('selectButton', [0, xuanze]);
                                     'step 1'
                                     //game.log(result.links, result.bool)//只能返还这两个，所以更适合技能，更需要循环的方式进行计算。
-                                    if (!result.bool) { player.removeMark('Expup1', player.countMark('Expup1')); event.finish(); };//取消强化
+                                    if (!result.bool) { 
+                                        event.exp1=0;
+                                        event.finish(); 
+                                    };//取消强化
                                     if (result.bool) {  //player.addMark('Expup',event.cadechangdu);//先给经验再计算扣除经验升级，随着此项目的升级，花费也越多。通过一个有序的清单，遍历比对返回的内容，来定位要增加的标记/数组。
-                                        player.addMark('Expup', player.countMark('Expup1')); player.removeMark('Expup1', player.countMark('Expup1'));
-                                        for (var i = 0; i < result.links.length; i += (1)) { if (!result.links.includes('Expup')) { player.addMark(result.links[i], 1); player.removeMark('Expup', 1 + player.countMark(result.links[i])); game.log('数组识别:', result.links[i], '编号', i, '，总编号', result.links.length - 1); } }
+                                        player.addMark('Expup', event.exp1); 
+                                        event.exp1=0;
+                                        for (var i = 0; i < result.links.length; i += (1)) { 
+                                            if (!result.links.includes('Expup')) { 
+                                                player.addMark(result.links[i], 1);
+                                                 player.removeMark('Expup', 1 + player.countMark(result.links[i])); 
+                                                 //game.log('数组识别:', result.links[i], '编号', i, '，总编号', result.links.length - 1); 
+                                                 } 
+                                                }
                                         player.discard(event.cao);
-                                    };
-                                    //    if(event.choiceList.length<event.cao){player.addMark('Expup',1);};从0开始，当介绍数组有内容==选项数组的内容（第i个），就加的简称数组第i个(内容)标签。并通过game.log()调试,在出牌记录中查看执行效果。result.links.includes(event.list[i])&&
+                                    };//从0开始，当介绍数组有内容==选项数组的内容（第i个），就加的简称数组第i个(内容)标签。并通过game.log()调试,在出牌记录中查看执行效果。result.links.includes(event.list[i])&&
                                     'step 2'
-                                    var a = player.countMark('mopaiup'), b = player.countMark('jinengup'), c = player.countMark('wuqiup'), d = player.countMark('useshaup'), e = player.countMark('jidongup'), f = player.countMark('shoupaiup'), g = player.countMark('songpaiup'), h = player.countMark('Expup'), k = player.countMark('_jianzaochuan') + 1; game.log('结束', a, b, c, d, e, f, g, h, k);
+                                    var a = player.countMark('mopaiup'), b = player.countMark('jinengup'), c = player.countMark('wuqiup'), d = player.countMark('useshaup'), e = player.countMark('jidongup'), f = player.countMark('shoupaiup'), g = player.countMark('songpaiup'), h = player.countMark('Expup'), k = player.countMark('_jianzaochuan') + 1; 
+                                    //game.log('结束', a, b, c, d, e, f, g, h, k);
                                     player.storage._qianghuazhuang = [a, b, c, d, e, f, g, h];
                                 },
                                 ai: {
-                                    order: function (player) { var player = get.player(); if (player.countMark('_jianzaochuan') < 3) { return 7 }; return 1 }, threaten: 0,
+                                    order: function (player) { 
+                                        var player = get.player(); 
+                                        if (player.countMark('_jianzaochuan') < 3) { return 7 }; 
+                                        return 1;
+                                    }, 
+                                    threaten: 0,
                                     result: {
                                         player: function (player) {
                                             var player = get.player();
@@ -3342,54 +3361,54 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
  */
                             dajiaoduguibi: {
                                 trigger: { player: ["chooseToRespondBegin", "chooseToUseBegin"] },
-				filter: function (event, player) {
-					if (event.responded) return false;
-					if (event.dajiaoduguibi) return false;
-					if (!event.filterCard || !event.filterCard({ name: "shan" }, player, event)) return false;
-					if (
-						event.name == "chooseToRespond" &&
-						!lib.filter.cardRespondable({ name: "shan" }, player, event)
-					)
-						return false;
-					if (player.hasSkillTag("unequip2")) return false;
-					var evt = event.getParent();
-					if (
-						evt.player &&
-						evt.player.hasSkillTag("unequip", false, {
-							name: evt.card ? evt.card.name : null,
-							target: player,
-							card: evt.card,
-						})
-					)
-						return false;
-                        if (!player.hasEmptySlot(2)) return false;
-					return true;
-				},
-                check: function (event, player) {
-					if (!event) return true;
-					if (event.ai) {
-						var ai = event.ai;
-						var tmp = _status.event;
-						_status.event = event;
-						var result = ai({ name: "shan" }, _status.event.player, event);
-						_status.event = tmp;
-						return result > 0;
-					}
-					let evt = event.getParent();
-					if (player.hasSkillTag("noShan", null, evt)) return false;
-					if (!evt || !evt.card || !evt.player || player.hasSkillTag("useShan", null, evt))
-						return true;
-					if (
-						evt.card &&
-						evt.player &&
-						player.isLinked() &&
-						game.hasNature(evt.card) &&
-						get.attitude(player, evt.player._trueMe || evt.player) > 0
-					)
-						return false;
-					return true;
-				},
-                                
+                                filter: function (event, player) {
+                                    if (event.responded) return false;
+                                    if (event.dajiaoduguibi) return false;
+                                    if (!event.filterCard || !event.filterCard({ name: "shan" }, player, event)) return false;
+                                    if (
+                                        event.name == "chooseToRespond" &&
+                                        !lib.filter.cardRespondable({ name: "shan" }, player, event)
+                                    )
+                                        return false;
+                                    if (player.hasSkillTag("unequip2")) return false;
+                                    var evt = event.getParent();
+                                    if (
+                                        evt.player &&
+                                        evt.player.hasSkillTag("unequip", false, {
+                                            name: evt.card ? evt.card.name : null,
+                                            target: player,
+                                            card: evt.card,
+                                        })
+                                    )
+                                        return false;
+                                    if (!player.hasEmptySlot(2)) return false;
+                                    return true;
+                                },
+                                check: function (event, player) {
+                                    if (!event) return true;
+                                    if (event.ai) {
+                                        var ai = event.ai;
+                                        var tmp = _status.event;
+                                        _status.event = event;
+                                        var result = ai({ name: "shan" }, _status.event.player, event);
+                                        _status.event = tmp;
+                                        return result > 0;
+                                    }
+                                    let evt = event.getParent();
+                                    if (player.hasSkillTag("noShan", null, evt)) return false;
+                                    if (!evt || !evt.card || !evt.player || player.hasSkillTag("useShan", null, evt))
+                                        return true;
+                                    if (
+                                        evt.card &&
+                                        evt.player &&
+                                        player.isLinked() &&
+                                        game.hasNature(evt.card) &&
+                                        get.attitude(player, evt.player._trueMe || evt.player) > 0
+                                    )
+                                        return false;
+                                    return true;
+                                },
+
                                 content: function () {
                                     "step 0"
                                     player.judge('dajiaoduguibi', function (card) {
@@ -3703,7 +3722,28 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
-
+                            yaosai: {
+                                init: function (player) {//初始化数组，也可以运行事件再加if后面的内容
+                                    if (!player.storage.yaosai) player.storage.yaosai = 0;
+                                },
+                                enable: "phaseUse",
+                                filter: function (event, player) {
+                                    return player.storage.yaosai < player.countMark('jinengup');
+                                },
+                                content() {
+                                    player.gainMaxHp(1);
+                                    player.recover(1);
+                                    player.storage.yaosai += 1;
+                                },
+                                ai: {
+                                    order: 11,
+                                    result: {
+                                        player: function (player, target) {
+                                            return 2;
+                                        }
+                                    }
+                                },
+                            },
                             manchangzhanyi: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
@@ -3860,7 +3900,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player.addTempSkill("shuileizhandui_1", { player: 'phaseJieshuBegin' });
                                     }
                                     game.log("step end");
-                                }, ai: {
+                                },
+                                ai: {
                                     expose: 0.1,
                                     order: 5,
 
@@ -5236,46 +5277,37 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     'step 2'
                                     var a = player.countMark('mopaiup'), b = player.countMark('jinengup'), c = player.countMark('wuqiup'), d = player.countMark('useshaup'), e = player.countMark('jidongup'), f = player.countMark('shoupaiup'), g = player.countMark('songpaiup'), h = player.countMark('Expup'), k = player.countMark('_jianzaochuan') + 1, exp1 = 0;
                                     player.storage._qianghuazhuang = [a, b, c, d, e, f, g, h, k];
-                                    exp1 = 2;
                                     var choiceList = [];
                                     var list = [];
-                                    jieshao = ['后勤保障：上限+' + (a + 1) + '→' + (a + 2) + '远航（用一摸一）标记上限，<br>手牌少于手牌上限1/2时，失去手牌会摸一张牌。防守反击的保障<br>每轮上限1/2/3，在自己的回合重置使用次数。', '技能升级：+' + (b) + '→' + (b + 1) + '，重巡-降低必中攻击限制(杀/黑牌/任意牌)、轻巡-增加无效群体锦囊牌范围(1/2/3)、航母-降低万箭齐发限制(黑桃与梅花/黑桃与梅花与红桃/任意牌);<br>战列舰-增加防护范围(杀造成的伤害/杀和锦囊牌造成的伤害/所有伤害)，导驱-增加射程(2/3/4)、潜艇-降低雷杀条件(红桃/红桃或黑桃/红桃或黑桃或方块);<br>驱逐-增加回避概率(0.25/0.33/0.50)、军辅-增加存牌上限(1/2/3)。', '射程升级：+' + c + '→' + (c + 1) + '武器（出杀）攻击距离，<br>增加出杀范围，虽然不增加锦囊牌距离，但胜在永久', '速射炮管：+' + d + '→' + (d + 1) + '出杀次数，<br>作为连弩的临时替代，进行多刀输出。', '改良推进器：+' + e + '→' + (e + 1) + '武器（被杀）防御距离<br>对手有更远的出杀范围才能对你出杀时，但不能防御锦囊牌。', '物流运输：+' + f + '→' + (f + 1) + '手牌上限，且蝶舞递装备给杀的距离提升，<br>双方状态差距越大，保牌效果越强。', '经验：+' + h + '→' + (player.countMark('Expup1')) + '，将卡牌转为经验，供下次升级。（直接点确定也行）<br>1级技能需要两张牌才能强化，2级技能需要三张牌才能强化。<br>但无名杀不能读取这个界面的文本，导致四点经验即可强化两个不同等级技能']//player.getEquip(1)，定义空数组，push填充它，事件变量可以自定义名字，什么都可以存。game.log('已强化:',a+b+c+d);
+                                    jieshao = ['后勤保障：上限+' + (a + 1) + '→' + (a + 2) + '远航（用一摸一）标记上限，<br>手牌少于手牌上限1/2时，失去手牌会摸一张牌。防守反击的保障<br>每轮上限1/2/3，在自己的回合重置使用次数。', '技能升级：+' + (b) + '→' + (b + 1) + '，重巡-降低必中攻击限制(杀/黑牌/任意牌)、轻巡-增加无效群体锦囊牌范围(1/2/3)、航母-降低万箭齐发限制(黑桃与梅花/黑桃与梅花与红桃/任意牌);<br>战列舰-增加防护范围(杀造成的伤害/杀和锦囊牌造成的伤害/所有伤害)，导驱-增加射程(2/3/4)、潜艇-降低雷杀条件(红桃/红桃或黑桃/红桃或黑桃或方块);<br>驱逐-增加回避概率(0.25/0.33/0.50)、军辅-增加存牌上限(1/2/3)。', '射程升级：+' + c + '→' + (c + 1) + '武器（出杀）攻击距离，<br>增加出杀范围，虽然不增加锦囊牌距离，但胜在永久', '速射炮管：+' + d + '→' + (d + 1) + '出杀次数，<br>作为连弩的临时替代，进行多刀输出。', '改良推进器：+' + e + '→' + (e + 1) + '武器（被杀）防御距离<br>对手有更远的出杀范围才能对你出杀时，但不能防御锦囊牌。', '物流运输：+' + f + '→' + (f + 1) + '手牌上限，且蝶舞递装备给杀的距离提升，<br>双方状态差距越大，保牌效果越强。', '经验：+' + h + '→' + event.exp1 + '，将卡牌转为经验，供下次升级。（直接点确定也行）<br>1级技能需要两张牌才能强化，2级技能需要三张牌才能强化。<br>但无名杀不能读取这个界面的文本，导致四点经验即可强化两个不同等级技能']//player.getEquip(1)，定义空数组，push填充它，事件变量可以自定义名字，什么都可以存。game.log('已强化:',a+b+c+d);
                                     var info = lib.skill._qianghuazhuang.getInfo(player);
                                     //game.log(info);
-                                    if (info[0] < k && (info[0] + 2 <= info[7] + exp1) && info[0] <= 2) {
+                                    if (info[0] < k &&  info[0] <= 2) {
                                         list.push('mopaiup');
                                         choiceList.push(['mopaiup', jieshao[0]]);
                                     };
-                                    if (info[1] < k && (info[1] + 2 <= info[7] + exp1) && info[1] <= 2 && !player.hasSkill("shixiangquanneng")) {
+                                    if (info[1] < k && info[1] <= 2 && !player.hasSkill("shixiangquanneng")) {
                                         list.push('jinengup');
                                         choiceList.push(['jinengup', jieshao[1]]);
                                     };
-                                    if (info[2] < k && (info[2] + 2 <= info[7] + exp1) && info[2] <= 2) {
+                                    if (info[2] < k && info[2] <= 2) {
                                         list.push('wuqiup');
                                         choiceList.push(['wuqiup', jieshao[2]]);
                                     };//若此值：你强化的比目标多时，+1含锦囊牌防御距离。
-                                    if (info[3] < k && (info[3] + 2 <= info[7] + exp1) && info[3] <= 2) {
+                                    if (info[3] < k && info[3] <= 2) {
                                         list.push('useshaup');
                                         choiceList.push(['useshaup', jieshao[3]]);
                                     };
-                                    if (info[4] < k && (info[4] + 2 <= info[7] + exp1) && info[4] <= 2) {
+                                    if (info[4] < k && info[4] <= 2) {
                                         list.push('jidongup');
                                         choiceList.push(['jidongup', jieshao[4]]);
                                     };
-                                    if (info[5] < k && (info[5] + 2 <= info[7] + exp1) && info[5] <= 2) {
+                                    if (info[5] < k && info[5] <= 2) {
                                         list.push('shoupaiup');
                                         choiceList.push(['shoupaiup', jieshao[5]]);
                                     };
-                                    //      if(info[6]<k&&(info[0]+2<=info[7])&&info[6]<2){event.list.push('songpaiup');
-                                    //  event.choiceList.push('+'+g+'→'+(g+1)+'给牌次数，<br>提升“先进雷达”技能的送牌范围。');};
-                                    if (info[7] <= k && info[7] < 6) {
-                                        list.push('Expup');
-                                        choiceList.push(['Expup', jieshao[6]]);
-                                    };
-                                    //game.log(choiceList);
                                     event.first = true;    //存了6个变量，可以导出为button，与textbutton样式，看需求
-                                    var xuanze = Math.max(h + 1, 1);
-                                    //game.log("xuanze" + xuanze);
+                                    var xuanze = 1;
                                     player.chooseButton([
                                         '将手牌转化为强化点数强化以下能力；取消将返还卡牌，未使用完的点数将保留。<br>强化上限默认为1，发动建造技能后提高。<br>一级强化需要2点，二级强化需要3点强化点数。<br>鼠标滚轮或下拉查看所有选项。',
                                         [choiceList, 'textbutton'],
@@ -5307,10 +5339,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                     'step 3'
                                     //game.log(result.links, result.bool)//只能返还这两个，所以更适合技能，更需要循环的方式进行计算。
-                                    if (!result.bool) { player.draw(2);/*player.addToExpansion(player, 'give', event.cards).gaintag.add('Z');*/ player.removeMark('Expup1', player.countMark('Expup1')); event.finish(); };//返还牌再计算
+                                    if (!result.bool) { player.draw(2);/*player.addToExpansion(player, 'give', event.cards).gaintag.add('Z');*/ player.removeMarkevent.finish(); };//返还牌再计算
                                     if (result.bool) {  //player.addMark('Expup',event.cadechangdu);//先给经验再计算扣除经验升级，随着此项目的升级，花费也越多。通过一个有序的清单，遍历比对返回的内容，来定位要增加的标记/数组。
-                                        player.addMark('Expup', player.countMark('Expup1')); player.removeMark('Expup1', player.countMark('Expup1'));
-                                        for (var i = 0; i < result.links.length; i += (1)) { if (!result.links.includes('Expup')) { player.addMark(result.links[i], 1); player.removeMark('Expup', 1 + player.countMark(result.links[i])); game.log('数组识别:', result.links[i], '编号', i, '，总编号', result.links.length - 1); } }
+                                        for (var i = 0; i < result.links.length; i += (1)) { if (!result.links.includes('Expup')) { player.addMark(result.links[i], 1); // game.log('数组识别:', result.links[i], '编号', i, '，总编号', result.links.length - 1); 
+                                            }
+                                         }
                                     };
                                     //    if(event.choiceList.length<event.cao){player.addMark('Expup',1);};从0开始，当介绍数组有内容==选项数组的内容（第i个），就加的简称数组第i个(内容)标签。并通过game.log()调试,在出牌记录中查看执行效果。result.links.includes(event.list[i])&&
                                     'step 4'
@@ -14200,7 +14233,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }).set("ai", function (target) {
                                         var player = get.player();
                                         var att = get.attitude(player, target);
-                                        game.log("希望的曙光AI" + get.translation(target) + att);
                                         return att;
                                     });
                                     "step 1"
@@ -14753,7 +14785,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             cassone_yibing: {
                                 nobracket: true,
                                 mark: true,
-                                locked: false,
                                 zhuanhuanji: true,
                                 marktext: '☯',
                                 init: function (player) {
@@ -15165,7 +15196,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             fangqu: "防驱",
                             daodan: "防空导弹",
                             zhandouji: "战斗机",
-                            yaosai: "要塞",
+                            yaosai: "要塞", "yaosai_info": "(可强化)每局游戏限0/1/2次,出牌阶段，你可以增加一点体力上限，回复一点体力。",
 
                             "fangqu_info": "游戏开始时/出牌阶段开始时，将至多1/2/3张手牌放到武将牌上.称为防空导弹。锦囊牌被使用时，你可以移去一枚防空导弹，令其无效。",
                             "fangqu_wuxie": "发射防空导弹",
