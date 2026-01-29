@@ -1089,7 +1089,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger: { player: "loseAfter", global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"], },
                                         filter: function (event, player) {
                                             if (lib.config.extension_舰R牌将__yuanhang === false) return false;
-                                            var d = (player.getHandcardLimit() / 2), a = 0; if (player == _status.currentPhase) { a += (1) };
+                                            var d = (player.getHandcardLimit() / 2), a = 0;
+                                            if (player == _status.currentPhase) { a += (1) };
                                             if (player.countCards('h') > d) return false;
                                             var evt = event.getl(player);
                                             if (!player.countMark('_yuanhang_mopai')) return false;
@@ -3047,17 +3048,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                 },
                                 ai: { combo: "junfu", },
-                                group: ["junfu_choose",],
+                                group: ["junfu_choose", "junfu_mark"],
                                 onremove: function (player, skill) {
                                     var cards = player.getExpansions(skill);
                                     if (cards.length) player.loseToDiscardpile(cards);
                                 },
-                                mark: true,
-                                intro: {
-                                    content: function (storage, player) {
-                                        if (!player.getCards('s', function (card) { return card.hasGaintag('junfu') })) return "共有零张牌";
-                                        return "共有" + get.cnNumber(player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length) + "张军辅牌";
-                                    },
+                                //mark: true,
+                                /* intro: {
                                     mark: function (dialog, storage, player) {
                                         if (!player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length) return "共有零张牌";
                                         return "共有" + get.cnNumber(player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length) + "张军辅牌";
@@ -3066,15 +3063,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         if (player.getCards('s', function (card) { return card.hasGaintag('junfu') })) return player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length;
                                         return 0;
                                     },
-                                },
+                                }, */
                                 subSkill: {
                                     mark: {
                                         mark: true,
                                         intro: {
-                                            content: function (storage, player) {
+                                            /* content: function (storage, player) {
                                                 if (!player.getCards('s', function (card) { return card.hasGaintag('junfu') })) return "共有零张牌";
                                                 return "共有" + get.cnNumber(player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length) + "张军辅牌";
-                                            },
+                                            }, */
                                             mark: function (dialog, storage, player) {
                                                 if (!player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length) return "共有零张牌";
                                                 return "共有" + get.cnNumber(player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length) + "张军辅牌";
@@ -14099,7 +14096,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     });
                                     var cardi = get.cards(targets.length);
                                     for (var i = 0; i < targets.length; i++) {
-                                        targets[i].addSkill("junfu_mark");
+                                        if (!targets[i].hasSkill("junfu_mark")) {
+                                            targets[i].addSkill("junfu_mark");
+                                        }
                                         targets[i].loseToSpecial([cardi[i]], 'junfu').visible = true;
                                     }
 
@@ -14133,7 +14132,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             "step 2";
                                             var suit = get.suit(result.links[0]);
                                             if (!event.suits.includes(suit)) { event.suits.push(suit); }
-                                            player.discard(result.links[0]);
+                                            targets[event.i].discard(result.links[0]);
                                             event.i++;
                                             if (event.i < 2) { event.goto(1); }
                                             "step 3";
@@ -15226,19 +15225,19 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qingxuncl: "轻巡", "qingxuncl_info": "",
                             zhongxunca: "重巡", "zhongxunca_info": "",
                             zhanliebb: "战列", "zhanliebb_info": "",
-                            daoqu: "导驱", "daoqu_info": "你的攻击范围增加2+2X(x为技能强化次数),出牌阶段限一次，你可以弃置一张武器/装备牌，对一名角色使用一张不可响应的炮火覆盖。",
+                            daoqu: "导驱", "daoqu_info": "（可强化）你的攻击范围增加2+2X(x为技能强化次数),出牌阶段限一次，你可以弃置一张武器/装备牌，对一名角色使用一张不可响应的炮火覆盖。",
                             fangqu: "防驱",
                             daodan: "防空导弹",
                             zhandouji: "战斗机",
                             yaosai: "要塞", "yaosai_info": "(可强化)每局游戏限0/1/2次,出牌阶段，你可以增加一点体力上限，回复一点体力。",
 
-                            "fangqu_info": "游戏开始时/出牌阶段开始时，将至多1/2/3张手牌放到武将牌上.称为防空导弹。锦囊牌被使用时，你可以移去一枚防空导弹，令其无效。",
+                            "fangqu_info": "（可强化）游戏开始时/出牌阶段开始时，将至多1/2/3张手牌放到武将牌上.称为防空导弹。锦囊牌被使用时，你可以移去一枚防空导弹，令其无效。",
                             "fangqu_wuxie": "发射防空导弹",
                             hangmucv: "航母", "hangmucv_info": "(可强化)你的出牌阶段开始时，<br>你可以将任意张：零级强化，黑桃或梅花手牌；一级强化，黑桃或梅花或红桃手牌；二级强化，任意手牌。当作万箭齐发对等量个目标使用",
                             qianting_xiji: "袭击", "qianting_xiji_info": "每回合限两次，将♦/♥牌当做顺手牵羊，♣/♠牌当做兵粮寸断使用<br>你使用的锦囊牌可以对距离你2以内的角色使用。",
                             qianting: "潜艇", "qianting_info": "（可强化）准备阶段，你可以弃置一张红桃或黑桃/红桃或黑桃或方片/牌，视为对一个目标使用一张雷杀。",
                             qianting_jiezi: "截辎", "qianting_jiezi_info": "其他角色跳过阶段时，你摸一张牌",
-                            "_yuanhang": "远航", "_yuanhang_info": "受伤时手牌上限+1,挑战模式不屈时手牌上限+1<br>当你失去手牌后，且手牌数<手牌上限值时，你摸一张牌。使用次数上限0/1/2次，处于自己的回合时+1，每回合回复一次使用次数。<br>当你进入濒死状态时，你摸一张牌，体力上限大于二时需减少一点体力上限，额外摸一张牌；死亡后，你可以按自己的身份，令一名角色摸-/2/1/1（主/忠/反/内）张牌。",
+                            "_yuanhang": "远航", "_yuanhang_info": "若你已受伤，你的手牌上限+1。挑战模式不屈时手牌上限+1。<br>当你失去手牌后，且手牌数<手牌上限值时，你摸一张牌。使用次数上限0/1/2次，处于自己的回合时+1，每回合回复一次使用次数。<br>当你进入濒死状态时，你摸一张牌，体力上限大于二时需减少一点体力上限，额外摸一张牌；死亡后，你可以按自己的身份，令一名角色摸-/2/1/1（主/忠/反/内）张牌。",
                             kaishimopai: "开始摸牌", "kaishimopai_info": "<br>，判定阶段你可以减少一次摸牌阶段的摸牌，然后在回合结束时摸一张牌。",
                             "_jianzaochuan": "建造", "_jianzaochuan_info": "每局游戏限一次，当你进行了至少一次强化后<br>1.出牌阶段<br>你可以弃置3张不同花色的牌，提升一点血量上限与强化上限。",//<br>2.当你濒死时，<br>你可以弃置4张不同花色的牌，回复一点体力。<br>（未开启强化，则无需强化即可使用建造。未开启建造，则强化上限仅为1级。）",
                             "_qianghuazhuang": "强化装备",
