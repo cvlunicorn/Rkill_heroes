@@ -1040,16 +1040,16 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             sp_zhongtudao: ["female", "USN", '3/4', ["hangmucv", "zhuangjiajiaban", "xiandaihuagaizao"], ["des:中途岛级航母是美国海军在二战中设计的最后一型航母，也是海军第一艘真正意义上摆脱了条约限制的航母（前代埃塞克斯级由于设计时间过短而继承了很多约克城级的特征），在核心思路上大量参考了英国的装甲航母设计，而在舰体设计上则借用了蒙大拿级的设计。中途岛号在1945年3月下水时的排水量为45000吨，是此后10年内全球最大的现役航母；在长达52年的服役史中，她是海军首艘接触斜角甲板概念的航母，先后参与了越南战争（击落了战争中第一架和最后一架敌机）和海湾战争，接受了两次大规模现代化改造，最终于1997年退役，作为博物馆保存至今。"]],
                             guying: ["female", "IJN", 4, ["huokongld", "zhongxunca", "zhanxianyuanhu"], ["des:该型是日本在八八舰队时期设计的侦查巡洋舰，由于之后海军条约的签署，根据规定古鹰型被划为重巡洋舰。在37年，两艘古鹰型进行了大改装，单装主炮换为新式连装炮，其余武备和设施也进行了更新，外形上和青叶型很相似。古鹰号在战争初期很活跃，参与了威克岛到中途岛的一系列作战。42年古鹰号编入三川的第八舰队，在萨沃岛海战中重创了美军。不过在同年10月的海战中，古鹰号好运不再，被美军击沉。"]],
 
-                            pachina: ["female", "RM", 4, ["yaosai", "xinao"], ["des:位于意大利西西里的帕基罗角（Pachino）。实际上意大利的海军并未在这里修建要塞，反而是英军的次要登陆场，英军在该地登陆后还建立了临时机场。"]],
-                            loki: ["female", "KMS", 4, ["hangmucv", "xiance"], ["des:深海版的装甲航空母舰彼得·施特拉塞尔。"]],
-                            southdakota: ["female", "USN", 4, ["zhanliebb", "zhuangjiafh", "gumei", "jianmiemoshi", "zhaopin"], ["des:原型为美国海军南达科他级战列舰南达科他（BB-57）。"]],
+                            pachina: ["female", "RM", 4, ["yaosai", "pachina_xinao"], ["des:位于意大利西西里的帕基罗角（Pachino）。实际上意大利的海军并未在这里修建要塞，反而是英军的次要登陆场，英军在该地登陆后还建立了临时机场。"]],
+                            loki: ["female", "KMS", 4, ["hangmucv", "loki_xiance"], ["des:深海版的装甲航空母舰彼得·施特拉塞尔。"]],
+                            southdakota: ["female", "USN", 4, ["zhanliebb", "zhuangjiafh", "southdakota_gumei", "southdakota_jianmiemoshi", "southdakota_zhaopin"], ["des:原型为美国海军南达科他级战列舰南达科他（BB-57）。"]],
                             lingbo: ["female", "IJN", 3, ["quzhudd", "dajiaoduguibi", "zhanxian", "guishen"], ["des:吹雪型11号舰，特II型1号舰。相比特I型，绫波号增加了主炮高射功能，35年针对第四舰队事件进行了改装，战争初期隶属南方部队。1942年8月被派到瓜岛，并参加了11月的第三次所罗门海战，战斗中绫波号表现突出，至少击伤四艘美军战舰，其中包括南达科他号战列舰，绫波号自身也在此次海战中沉没。"]],
-                            sukhbaatar: ["female", "OTHER", 3, ["junfu", "sukhbaatar_rumeng", "sudaren", "zuiqiang"], ["des:CLASSIFIED*。"]],
-                            odin: ["female", "OTHER", 3, ["junfu", "ganggenier"], ["des:CLASSIFIED*。"]],
+                            sukhbaatar: ["female", "OTHER", 3, ["junfu", "sukhbaatar_rumeng", "sukhbaatar_sudaren", "sukhbaatar_zuiqiang"], ["des:CLASSIFIED*。"]],
+                            odin: ["female", "OTHER", 3, ["junfu", "odin_ganggenier"], ["des:CLASSIFIED*。"]],
                             vestal: ["female", "USN", 3, ["junfu", "vestal_mowang"], ["des:CLASSIFIED*。"]],
                             nvzaoshen: ["female", "USN", 3, ["junfu", "dajiaoduguibi", "xiwangdeshuguang"], ["des:女灶神号（舷号AR-4）是一艘在1913年至1946年期间服役于美国海军的修理船。在改装为修理船之前，女灶神是一条运煤船（从1909年开始）。女灶神号参与了全部两次世界大战，在日本空袭珍珠港期间，该舰在港口内遭到重创。打满整场第二次世界大战的女灶神共获得了两枚战斗之星。"]],
-                            bismarck: ["female", "KMS", 4, ["zhuangjiafh", "chajin", "fanji"], ["des:表里不一的“野猫”虽然一直说着带攻击性的话，但意外是个很单纯的人。长期相处，应该就能听懂她真正的意思。"]],
-                            tirpitz: ["female", "KMS", 4, ["zhuangjiafh", "jinshu", "chuanyue", "nvwangfugui"], ["des:无表情的“人偶”总是盯着手里的东西，对其他的事情缺乏兴趣。但却喜欢为他人解说姐姐说的话，这一点上，很有趣。"]],
+                            bismarck: ["female", "KMS", 4, ["zhuangjiafh", "bismarck_chajin", "bismarck_fanji"], ["des:表里不一的“野猫”虽然一直说着带攻击性的话，但意外是个很单纯的人。长期相处，应该就能听懂她真正的意思。"]],
+                            tirpitz: ["female", "KMS", 4, ["zhuangjiafh", "tirpitz_jinshu", "tirpitz_chuanyue", "tirpitz_nvwangfugui"], ["des:无表情的“人偶”总是盯着手里的东西，对其他的事情缺乏兴趣。但却喜欢为他人解说姐姐说的话，这一点上，很有趣。"]],
                             akagikaga: ["female", "IJN", 4, ["hangmucv", "shuangzi", "akagikaga_zongyu"], ["des:对某些人类非常执着。每次回来，都是遍体鳞伤。而且，一直躺着会对素体产生影响。"]],
                             savoy: ["female", "RM", "2/4/1", ["yaosai", "savoy_xiuzhu", "savoy_wangong"], ["des:自称“吸血鬼”,坚称自己是人类幻想文学中的一员。在月圆之夜喜欢看着月亮发呆。一直随身带着石榴汁……？"]],
                             cassone: ["female", "RM", 4, ["zhuangjiafh", "cassone_yibing", "cassone_weizhuangqixi"], ["des:深海版战列巡洋舰卡萨诺方案。"]],
@@ -1942,7 +1942,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     //game.log(result.links, result.bool);//只能返还这两个，所以更适合技能，更需要循环的方式进行计算。
                                     if (result.bool) {  //player.addMark('Expup',event.cadechangdu);//先给经验再计算         miki_binoculars smyyingshi  gwjingtian gushe tongxie jyzongshi reqiaoshui nlianji zhuandui reluoyi zhongji
                                         if (result.bool != 'cancel2') {
-                                            game.log(); var targets = game.filterPlayer();
+                                            //game.log(); 
+                                            var targets = game.filterPlayer();
                                             var f = result.index; for (var i = 0; i < targets.length; i++) {
                                                 if (result.links.includes('qixing')) { targets[i].addTempSkill('qixing', 'roundStart'); targets[i].addTempSkill('qixing2', 'roundStart') };
                                                 if (result.links.includes('reguanxing')) { targets[i].addTempSkill('reguanxing', 'roundStart'); targets[i].addTempSkill('nzry_cunmu', 'roundStart'); targets[i].addTempSkill('gwjingtian', 'phaseZhunbeiBegin'); if (i < targets.length / 2 - 1) { var s = targets.length - i; targets[s].useSkill('reguanxing'); }; };
@@ -3899,7 +3900,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }
                                         player.addTempSkill("shuileizhandui_1", { player: 'phaseJieshuBegin' });
                                     }
-                                    game.log("step end");
+                                    //game.log("step end");
                                 },
                                 ai: {
                                     expose: 0.1,
@@ -4273,10 +4274,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     //game.log(typeof player.storage.gaosusheji);
                                     if (typeof player.storage.gaosusheji === 'undefined') player.storage.gaosusheji = false;
                                     if (player.storage.gaosusheji) {
-                                        game.log("阳");
+                                        //game.log("阳");
                                         return (_status.currentPhase == player && (get.type(event.card) == 'trick') & event.getParent('phaseUse') == evtx);
                                     } else {
-                                        game.log("阴");
+                                        //game.log("阴");
                                         return (_status.currentPhase == player && (get.type(event.card) == 'basic') & event.getParent('phaseUse') == evtx);
 
                                     }
@@ -4369,25 +4370,25 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     //game.log("选择完成");
                                     'step 2'
                                     if (result.index == 0) {
-                                        game.log("弃牌");
+                                        game.log(get.translation(lib.target) + "弃牌");
                                         player.discardPlayerCard(lib.target, 2, 'hej', true)
 
                                     } else if (result.index == 1) {
-                                        game.log("不能使用手牌");
+                                        game.log(get.translation(lib.target) + "不能使用手牌");
                                         lib.target.addTempSkill('qixi_cv_block');
 
                                     } else {
-                                        game.log("翻面");
+                                        game.log(get.translation(lib.target) + "翻面");
                                         lib.target.turnOver();
 
                                     }
 
-                                    game.log("操作完成");
+                                    //game.log("操作完成");
 
                                     'step 3'
                                     if (event.num < targets.length) event.goto(1);
                                     else game.delayx();
-                                    game.log("技能结束");
+                                    //game.log("技能结束");
                                     'step 4'
                                     player.chooseTarget("请选择目标，视为使用【万箭齐发】", [1, Infinity], function (card, player, target) {
                                         return player != target;
@@ -5212,10 +5213,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player.addToExpansion(lib.target, 'give', result.cards).gaintag.add('Z');
                                     }
                                     'step 7'
-                                    game.log("操作完成");
+                                    //game.log("操作完成");
                                     if (event.num < targets.length) event.goto(3);
                                     else game.delayx();
-                                    game.log("技能结束");
+                                    //game.log("技能结束");
                                 },
                                 ai: {
                                     order: 10,
@@ -6634,7 +6635,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                     const targets = event.targets.sortBySeat();
                                     targets.push(player);
-                                    game.log(targets);
+                                    //game.log(targets);
                                     const next = player.chooseCardOL(targets, '请展示一张手牌', true).set('ai', card => {
                                         return -get.value(card);
                                     }).set('aiCard', target => {
@@ -7216,7 +7217,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger.player.draw(1);
                                         trigger.cancel();
                                         if (!trigger.player.hasSkill("u81_zonglie_shanghai")) {
-                                            game.log("添加技能");
+                                            //game.log("添加技能");
                                             trigger.player.addTempSkill("u81_zonglie_shanghai");
                                         }
                                         trigger.player.addMark('u81_zonglie_shanghai', 1, false);
@@ -10168,7 +10169,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         //game.log(target);
                                         return 1;
                                     }).length;
-                                    game.log(history);
+                                    //game.log(history);
                                     trigger.num += history;
                                 },
                                 ai: {
@@ -10522,7 +10523,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         usable: 1,
                                         content() {
                                             "step 0";
-                                            game.log("chuansuohongzha1");
+                                            //game.log("chuansuohongzha1");
                                             player
                                                 .chooseTarget(get.prompt("chuansuohongzha_send"), "将" + get.translation(trigger.cards) + "交给一名其他角色", function (card, player, target) {
                                                     return target != player && target.hp == target.maxHp;
@@ -11286,10 +11287,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     var zhandouji = player.getExpansions('zhandouji').length + player.getCards('s', function (card) { return card.hasGaintag('zhandouji') }).length;
                                     if (zhandouji >= 3) { return false; }
                                     if (player.storage.tebiekongxi) {
-                                        game.log("阳");
+                                        //game.log("阳");
                                         return _status.currentPhase == player;
                                     } else {
-                                        game.log("阴");
+                                        //game.log("阴");
                                         return _status.currentPhase != player;
 
                                     }
@@ -11442,11 +11443,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (!result.control || result.control == "cancel2") {
                                         event.finish();
                                     } else {
-                                        game.log(get.translation(result.control));
+                                        //game.log(get.translation(result.control));
                                         event.cards2 = target.getCards("h", { suit: result.control });
                                         event.cards1 = player.getCards("h", { suit: result.control });
-                                        game.log(get.translation(target) + "该花色的牌" + get.translation(event.cards2));
-                                        game.log(get.translation(player) + "该花色的牌" + get.translation(event.cards1));
+                                        //game.log(get.translation(target) + "该花色的牌" + get.translation(event.cards2));
+                                        //game.log(get.translation(player) + "该花色的牌" + get.translation(event.cards1));
                                         player.swapHandcards(target, event.cards1, event.cards2);
                                     }
                                 },
@@ -13232,14 +13233,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     threaten: 1.05,
                                 },
                             },
-                            xinao: {
+                            pachina_xinao: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
                                     player: "damageEnd",
                                 },
                                 init: function (player) {
-                                    if (!player.storage.xinao) player.storage.xinao = [];
+                                    if (!player.storage.pachina_xinao) player.storage.pachina_xinao = [];
                                 },
                                 check: function (event, player) {
                                     //if (player.countCards("h", { tag: "recover" }) < 0) { return player.hp <= 2; }
@@ -13251,11 +13252,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 content: function () {
                                     "step 0"
                                     player.chooseCardTarget({
-                                        prompt: get.prompt("xinao"),
+                                        prompt: get.prompt("pachina_xinao"),
                                         position: "h",
                                         selectCard: [1, Infinity],
                                         filterTarget: function (card, player, target) {
-                                            return player != target && !player.storage.xinao.some(arr=>arr.includes(target));
+                                            return player != target && !player.storage.pachina_xinao.some(arr => arr.includes(target));
                                         },
                                         filterCard: function (card, player) {
                                             return true;
@@ -13275,7 +13276,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         var cards = result.cards;
                                         var num = cards.length;
                                         player.give(cards, target);
-                                        player.storage.xinao.push([target, num]);
+                                        player.storage.pachina_xinao.push([target, num]);
+                                        for (var i = 0; i < player.storage.pachina_xinao.length; i++) {
+                                            // 取出数组中的每一项（[target, num]）
+                                            var item = player.storage.pachina_xinao[i];
+                                            var targetItem = item[0]; // 目标玩家对象
+                                            var numItem = item[1]; // 牌的数量
+
+                                            // 只打印玩家名称（简单字符串），不直接打印 target 对象
+                                            var targetName = targetItem ? targetItem.name : "未知目标";
+                                            game.log("pachina_xinao 第 " + (i + 1) + " 项：[目标：" + targetName + "，牌数：" + numItem + "]");
+                                        }
                                         player.turnOver();
                                         player.recover(Math.floor(num / 2));
                                         player.addTempSkill("zhuangjiafh", { player: "phaseBegin" });
@@ -13294,7 +13305,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                     },
                                 },
-                                group: ["xinao_back"],
+                                group: ["pachina_xinao_back"],
                                 subSkill: {
                                     back: {
                                         nobracket: true,
@@ -13304,20 +13315,20 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         frequent: true,
                                         filter: function (event, player) {
-                                            if (player.storage.xinao != []) {
-                                                for (var i = 0; i < player.storage.xinao.length; i++) {
-                                                    if (player.storage.xinao[i][0].isAlive) return true;
+                                            if (player.storage.pachina_xinao != []) {
+                                                for (var i = 0; i < player.storage.pachina_xinao.length; i++) {
+                                                    if (player.storage.pachina_xinao[i][0].isAlive) return true;
                                                 }
                                             }
                                             return false;
                                         },
                                         content: function () {
                                             "step 0";
-                                            var count = 0;
+                                            event.count = 0;
                                             "step 1";
-                                            if (player.storage.xinao[count][0].isAlive) {
-                                                event.target = player.storage.xinao[count][0];
-                                                event.num = Math.min(event.target.countCards("he"), player.storage.xinao[count][1]);
+                                            if (player.storage.pachina_xinao[event.count][0].isAlive) {
+                                                event.target = player.storage.pachina_xinao[event.count][0];
+                                                event.num = Math.min(event.target.countCards("he"), player.storage.pachina_xinao[event.count][1]);
                                                 event.target.chooseCard('he', true, event.num, '交给' + get.translation(player) + event.num + '张牌').set('ai', function (card) {
                                                     var attitude = get.attitude(event.target, player);
                                                     if (attitude <= 0) return -get.value(card);
@@ -13328,21 +13339,21 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             if (result.bool) {
                                                 event.target.give(result.cards, player);
                                             }
-                                            count++;
-                                            if (count < player.storage.xinao.length) { goto(1); }
-                                            player.storage.xinao = [];
+                                            event.count++;
+                                            if (event.count < player.storage.pachina_xinao.length) { goto(1); }
+                                            player.storage.pachina_xinao = [];
                                         },
                                     },
                                 },
                             },
-                            xiance: {
+                            loki_xiance: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 round: 1,
                                 init: function (player) {
-                                    player.storage.xiance = [];
-                                    player.storage.xiance2 = [];
-                                    player.storage.xiance2.push(player);
+                                    player.storage.loki_xiance = [];
+                                    player.storage.loki_xiance2 = [];
+                                    player.storage.loki_xiance2.push(player);
                                 },
                                 trigger: {
                                     global: "phaseUseBegin",
@@ -13367,29 +13378,29 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     "step 2";
                                     if (result.bool) {
                                         player.give(result.cards, trigger.player);
-                                        if (!trigger.player.hasSkill("xiance2")) {
-                                            trigger.player.addTempSkill("xiance2", { global: "phaseEnd" });
+                                        if (!trigger.player.hasSkill("loki_xiance2")) {
+                                            trigger.player.addTempSkill("loki_xiance2", { global: "phaseEnd" });
                                         }
-                                        trigger.player.storage.xiance2 = [];
-                                        trigger.player.storage.xiance2.push(player);
+                                        trigger.player.storage.loki_xiance2 = [];
+                                        trigger.player.storage.loki_xiance2.push(player);
 
-                                        if (!trigger.player.hasSkill("xiance4")) {
-                                            trigger.player.addSkill("xiance4");
+                                        if (!trigger.player.hasSkill("loki_xiance4")) {
+                                            trigger.player.addSkill("loki_xiance4");
                                         }
-                                        trigger.player.storage.xiance4 = [];
-                                        trigger.player.storage.xiance4.push(player);
+                                        trigger.player.storage.loki_xiance4 = [];
+                                        trigger.player.storage.loki_xiance4.push(player);
                                     }
                                 },
-                                group: ["xiance2"],
+                                group: ["loki_xiance2"],
                                 ai: {
                                     threaten: 1.4,
                                 },
                             },
-                            xiance2: {
+                            loki_xiance2: {
                                 enable: "phaseUse",
                                 usable: 1,
                                 filter: function (event, player) {
-                                    if (!player.storage.xiance2 || player.storage.xiance2 == [] || !player.getStorage('xiance2')[0].isAlive()) { return false; }
+                                    if (!player.storage.loki_xiance2 || player.storage.loki_xiance2 == [] || !player.getStorage('loki_xiance2')[0].isAlive()) { return false; }
                                     if (player.countCards("h") >= 2) {
                                         for (var i of lib.inpile) {
                                             var type = get.type2(i);
@@ -13403,8 +13414,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         var list = [];
                                         for (var i = 0; i < lib.inpile.length; i++) {
                                             var name = lib.inpile[i];
-                                            var xiancePlayer = player.getStorage('xiance2');
-                                            if (xiancePlayer[0].getStorage('xiance').includes(name)) { continue; }
+                                            var loki_xiancePlayer = player.getStorage('loki_xiance2');
+                                            if (loki_xiancePlayer[0].getStorage('loki_xiance').includes(name)) { continue; }
                                             if (name == "sha") {
                                                 if (event.filterCard(get.autoViewAs({ name }, "unsure"), player, event)) list.push(["基本", "", "sha"]);
                                                 for (var nature of lib.inpile_nature) {
@@ -13429,7 +13440,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             filterCard: function (card) {
                                                 return 1;
                                             },
-                                            audio: "xiance2",
+                                            audio: "loki_xiance2",
                                             popname: true,
                                             check: function (card) {
                                                 return 8 - get.value(card);
@@ -13438,9 +13449,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             position: "h",
                                             viewAs: { name: links[0][2], nature: links[0][3] },
                                             onuse: function () {
-                                                var xiancePlayer = player.getStorage('xiance2');
-                                                if (xiancePlayer[0].isAlive()) {
-                                                    xiancePlayer[0].markAuto('xiance', [links[0][2]]);
+                                                var loki_xiancePlayer = player.getStorage('loki_xiance2');
+                                                if (loki_xiancePlayer[0].isAlive()) {
+                                                    loki_xiancePlayer[0].markAuto('loki_xiance', [links[0][2]]);
                                                 }
                                             },
                                         };
@@ -13452,7 +13463,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 hiddenCard: function (player, name) {
                                     if (!lib.inpile.includes(name)) return false;
                                     var type = get.type2(name);
-                                    return (type == "basic" || type == "trick") && player.countCards("h") > 0 && !player.hasSkill("xiance2");
+                                    return (type == "basic" || type == "trick") && player.countCards("h") > 0 && !player.hasSkill("loki_xiance2");
                                 },
                                 ai: {
                                     fireAttack: true,
@@ -13469,18 +13480,18 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
                             },
-                            xiance3: {
+                            loki_xiance3: {
                                 trigger: {
                                     source: "dieAfter",
                                 },
                                 forced: true,
                                 audio: false,
                                 content: function () {
-                                    player.removeSkill("xiance4");
+                                    player.removeSkill("loki_xiance4");
                                 },
                                 "_priority": 0,
                             },
-                            xiance4: {
+                            loki_xiance4: {
                                 trigger: {
                                     player: "phaseUseEnd",
                                 },
@@ -13492,26 +13503,26 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 charlotte: true,
                                 content: function () {
-                                    while (player.storage.xiance4.length) {
-                                        var current = player.storage.xiance4.shift();
+                                    while (player.storage.loki_xiance4.length) {
+                                        var current = player.storage.loki_xiance4.shift();
                                         if (current.isDead()) continue;
-                                        current.logSkill("xiance");
+                                        current.logSkill("loki_xiance");
                                         /* current.gainPlayerCard(player, 'ej', [1, 2], 'visible').set('ai', function (card) {
                                             if (get.type(card) == "delay") return 1;
                                             return -get.value(card);
                                         }); */
                                         player.damage(current, "nocard");
                                     }
-                                    player.removeSkill("xiance4");
+                                    player.removeSkill("loki_xiance4");
                                 },
-                                group: "xiance3",
+                                group: "loki_xiance3",
                                 "_priority": 0,
                             },
-                            gumei: {
-                                global: ["gumei_phaseUse"],
+                            southdakota_gumei: {
+                                global: ["southdakota_gumei_phaseUse"],
                                 nobracket: true,
                                 init: function (player) {
-                                    player.storage.temp_ban_gumei = false;
+                                    player.storage.temp_ban_southdakota_gumei = false;
 
                                 },
                                 trigger: {
@@ -13519,14 +13530,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 forced: true,
                                 filter: function (event, player) {
-                                    var evt = event.getParent("gumei_phaseUse");
-                                    return evt && evt == "gumei_phaseUse" && evt.targets[1] == player;
+                                    var evt = event.getParent("southdakota_gumei_phaseUse");
+                                    return evt && evt == "southdakota_gumei_phaseUse" && evt.targets[1] == player;
                                 },
                                 content: function () {
-                                    if (typeof player.storage.temp_ban_gumei === 'undefined') player.storage.temp_ban_gumei = false;
-                                    player.player.storage.temp_ban_gumei == true;
+                                    if (typeof player.storage.temp_ban_southdakota_gumei === 'undefined') player.storage.temp_ban_southdakota_gumei = false;
+                                    player.player.storage.temp_ban_southdakota_gumei == true;
                                 },
-                                group: ["gumei_reflash"],
+                                group: ["southdakota_gumei_reflash"],
                                 subSkill: {
                                     reflash: {
                                         trigger: {
@@ -13534,17 +13545,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         forced: true,
                                         filter: function (event, player) {
-                                            return player.storage.temp_ban_gumei == true;
+                                            return player.storage.temp_ban_southdakota_gumei == true;
                                         },
                                         content: function () {
-                                            player.storage.temp_ban_gumei = false;
+                                            player.storage.temp_ban_southdakota_gumei = false;
                                         },
                                         sub: true,
                                         "_priority": 0,
                                     },
                                 },
                             },
-                            gumei_phaseUse: {
+                            southdakota_gumei_phaseUse: {
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 enable: "phaseUse",
                                 usable: 1,
@@ -13561,13 +13572,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 multitarget: true,
                                 filterTarget: function (card, player, target) {
                                     if (ui.selected.targets.length == 1) {
-                                        return (target.hasSkill("gumei") && target.getStorage('temp_ban_gumei') != true) && target.canUse({ name: "juedou" }, ui.selected.targets[0]);
+                                        return (target.hasSkill("southdakota_gumei") && target.getStorage('temp_ban_southdakota_gumei') != true) && target.canUse({ name: "juedou" }, ui.selected.targets[0]);
                                     }
                                     return true;
                                 },
                                 filter: function (event, player) {
-                                    if (player.hasSkill("gumei") || (!player.countCards("h"))) { return false; }
-                                    return game.countPlayer(current => current != player && current.hasSkill("gumei") && current.getStorage('temp_ban_gumei') != true) >= 1;
+                                    if (player.hasSkill("southdakota_gumei") || (!player.countCards("h"))) { return false; }
+                                    return game.countPlayer(current => current != player && current.hasSkill("southdakota_gumei") && current.getStorage('temp_ban_southdakota_gumei') != true) >= 1;
                                 },
                                 content: function () {
                                     player.give(cards[0], event.targets[1]);
@@ -13586,7 +13597,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
-                            jianmiemoshi: {
+                            southdakota_jianmiemoshi: {
                                 nobracket: true,
                                 direct: true,
                                 trigger: {
@@ -13598,7 +13609,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player.getHistory("lose", function (evt) {
                                             if (evt.getParent() != event) return false;
                                             for (var i in evt.gaintag_map) {
-                                                if (evt.gaintag_map[i].includes("jianmiemoshi")) return false;
+                                                if (evt.gaintag_map[i].includes("southdakota_jianmiemoshi")) return false;
                                             }
                                             return true;
                                         }).length > 0
@@ -13609,7 +13620,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     trigger.nowuxie = true;
                                     trigger.directHit.addArray(game.players);
                                 },
-                                group: ["jianmiemoshi_end"],
+                                group: ["southdakota_jianmiemoshi_end"],
                                 subSkill: {
                                     end: {
                                         trigger: {
@@ -13617,13 +13628,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         direct: true,
                                         content: function () {
-                                            player.addGaintag(player.getCards("h"), "jianmiemoshi");
+                                            player.addGaintag(player.getCards("h"), "southdakota_jianmiemoshi");
                                         },
                                     },
                                 },
                                 "_priority": 0,
                             },
-                            zhaopin: {
+                            southdakota_zhaopin: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 skillAnimation: true,
@@ -13634,7 +13645,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 zhuSkill: true,
                                 filter: function (event, player) {
                                     if (player.hp > 0) return false;
-                                    if (!player.hasZhuSkill("zhaopin")) return false;
+                                    if (!player.hasZhuSkill("southdakota_zhaopin")) return false;
                                     return true;
                                 },
                                 mark: true,
@@ -13645,7 +13656,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     "step 0";
-                                    player.awakenSkill("zhaopin");
+                                    player.awakenSkill("southdakota_zhaopin");
                                     player.discard(player.getCards("hej"));
                                     var targets = game.filterPlayer();
                                     targets.remove(player);
@@ -13824,7 +13835,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                     'step 2';
                                     if (event.num < targets.length) { event.goto(1); }
-                                    game.log("技能结束");
+                                    //game.log("技能结束");
                                 },
                                 group: ["guishen_change"],
                                 subSkill: {
@@ -13935,7 +13946,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
-                            sudaren: {
+                            sukhbaatar_sudaren: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 mark: true,
@@ -13944,11 +13955,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 marktext: "☯",
                                 intro: {
                                     content(storage, player, skill) {
-                                        if (player.storage.sudaren == true) return "你使用基本牌或普通锦囊牌时，可以弃置一张“军辅”牌让那张牌额外结算1次。";
+                                        if (player.storage.sukhbaatar_sudaren == true) return "你使用基本牌或普通锦囊牌时，可以弃置一张“军辅”牌让那张牌额外结算1次。";
                                         return "一名角色对你使用牌时，可以摸一张牌，并将一张手牌置于在武将牌上，视作“军辅”牌";
                                     },
                                 },
-                                group: ["sudaren_1", "sudaren_2", "sudaren_3"],
+                                group: ["sukhbaatar_sudaren_1", "sukhbaatar_sudaren_2", "sukhbaatar_sudaren_3"],
                                 subSkill: {
                                     "1": {
                                         prompt: "一名角色对你使用牌时，可以摸一张牌，并将一张手牌置于在武将牌上，视作“军辅”牌",
@@ -13958,7 +13969,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         direct: true,
                                         filter(event, player) {
-                                            if (player.storage.sudaren) return false;
+                                            if (player.storage.sukhbaatar_sudaren) return false;
                                             return true;
                                         },
                                         check: function (event, player) {
@@ -13966,7 +13977,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         content() {
                                             'step 0'
-                                            //player.changeZhuanhuanji("sudaren");
+                                            //player.changeZhuanhuanji("sukhbaatar_sudaren");
                                             trigger.player.draw(1);
                                             if (!trigger.player.hasSkill("junfu_mark")) { trigger.player.addSkill("junfu_mark"); }
                                             trigger.player.chooseCard('h', 1, '将一张手牌置于你的武将牌上，称为【军辅】', true).set('ai', function (card) {
@@ -13987,7 +13998,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             player: "useCard",
                                         },
                                         filter(event, player) {
-                                            if (!player.storage.sudaren) return false;
+                                            if (!player.storage.sukhbaatar_sudaren) return false;
                                             return player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length > 0 && (get.type(event.card) == 'trick' || get.type(event.card) == "basic" && get.name(event.card) != "shan");
                                         },
                                         check: function (event, player) {
@@ -13996,13 +14007,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         content() {
                                             "step 0";
                                             var card1 = trigger.card;
-                                            player.chooseCardButton(get.prompt2('sudaren', player), player.getCards('s', function (card) { return card.hasGaintag('junfu') }), 1).set('ai', function (card) {
+                                            player.chooseCardButton(get.prompt2('sukhbaatar_sudaren', player), player.getCards('s', function (card) { return card.hasGaintag('junfu') }), 1).set('ai', function (card) {
                                                 return get.value(_status.event.card1) - get.value(card);
                                             }).set('card1', card1);
                                             "step 1";
                                             if (result.bool) {
-                                                //player.changeZhuanhuanji("sudaren");
-                                                player.logSkill("sudaren");
+                                                //player.changeZhuanhuanji("sukhbaatar_sudaren");
+                                                player.logSkill("sukhbaatar_sudaren");
                                                 player.discard(result.links);
                                                 trigger.effectCount++;
                                             }
@@ -14035,16 +14046,16 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                     win = false;
                                                 }
                                             }
-                                            if ((player.storage.sudaren != true && win) || (player.storage.sudaren == true && !win)) player.changeZhuanhuanji("sudaren");
+                                            if ((player.storage.sukhbaatar_sudaren != true && win) || (player.storage.sukhbaatar_sudaren == true && !win)) player.changeZhuanhuanji("sukhbaatar_sudaren");
                                         },
                                     },
                                 },
                                 ai: {
-                                    combo: "sudaren",
+                                    combo: "sukhbaatar_sudaren",
                                 },
                                 "_priority": 0,
                             },
-                            zuiqiang: {
+                            sukhbaatar_zuiqiang: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 force: true,
@@ -14070,7 +14081,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                 },
                             },
-                            ganggenier: {
+                            odin_ganggenier: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 direct: true,
@@ -14093,7 +14104,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
 
                                 },
-                                group: ["ganggenier_1"],
+                                group: ["odin_ganggenier_1"],
                                 subSkill: {
                                     1: {
                                         nobracket: true,
@@ -14128,8 +14139,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             "step 3";
                                             var targets1 = game.filterPlayer(current => current != player);
                                             for (target of targets1) {
-                                                target.addTempSkill("ganggenier_ban", { global: "phaseEnd" });
-                                                target.markAuto("ganggenier_ban", event.suits);
+                                                target.addTempSkill("odin_ganggenier_ban", { global: "phaseEnd" });
+                                                target.markAuto("odin_ganggenier_ban", event.suits);
                                             }
                                         },
                                         ai: {
@@ -14147,13 +14158,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         charlotte: true,
                                         mod: {
                                             cardEnabled: function (card, player) {
-                                                if (player.getStorage('ganggenier_ban').includes(get.suit(card))) return false;
+                                                if (player.getStorage('odin_ganggenier_ban').includes(get.suit(card))) return false;
                                             },
                                             cardRespondable: function (card, player) {
-                                                if (player.getStorage('ganggenier_ban').includes(get.suit(card))) return false;
+                                                if (player.getStorage('odin_ganggenier_ban').includes(get.suit(card))) return false;
                                             },
                                             cardSavable: function (card, player) {
-                                                if (player.getStorage('ganggenier_ban').includes(get.suit(card))) return false;
+                                                if (player.getStorage('odin_ganggenier_ban').includes(get.suit(card))) return false;
                                             },
                                         },
                                         mark: true,
@@ -14274,14 +14285,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     threaten: 1.5,
                                 }
                             },
-                            chajin: {
+                            bismarck_chajin: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
                                     global: "drawEnd",
                                 },
                                 filter: function (event, player) {
-                                    if (player.hasSkill("chajin_tempBan")) return false;
+                                    if (player.hasSkill("bismarck_chajin_tempBan")) return false;
                                     var skipEventList = ["phaseDraw", "_yuanhang_mopai", "_yuanhang_bingsimopai", "bahu"];
                                     if (skipEventList.includes(event.getParent().name)) return false;
                                     return event.player != player;
@@ -14295,7 +14306,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             var suits = lib.suit.slice();
                                             return suits.randomGet();
                                         })
-                                        .set("prompt", get.prompt2("chajin", trigger.player));
+                                        .set("prompt", get.prompt2("bismarck_chajin", trigger.player));
                                     "step 1";
                                     if (!result.control || result.control == "cancel2") { event.finish(); return; }
                                     event.suit = result.control;
@@ -14334,14 +14345,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger.player.damage(player, "nocard");
                                     } else {
                                         player.loseHp(1);
-                                        player.addTempSkill("chajin_tempBan", { global: "roundStart" });
+                                        player.addTempSkill("bismarck_chajin_tempBan", { global: "roundStart" });
                                     }
                                 },
                                 ai: {
                                     threaten: 3.1,
                                 }
                             },
-                            chajin_tempBan: {
+                            bismarck_chajin_tempBan: {
                                 mark: true,
                                 charlotte: true,
                                 marktext: "禁",
@@ -14351,7 +14362,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
-                            fanji: {
+                            bismarck_fanji: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
@@ -14397,15 +14408,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
-                            jinshu: {
+                            tirpitz_jinshu: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
                                     global: "roundStart",
                                 },
                                 init(player) {
-                                    if (!player.storage.jinshu) return player.storage.jinshu = 0;
-                                    if (!player.storage.jinshuSuit) return player.storage.jinshuSuit = "";
+                                    if (!player.storage.tirpitz_jinshu) return player.storage.tirpitz_jinshu = 0;
+                                    if (!player.storage.tirpitz_jinshuSuit) return player.storage.tirpitz_jinshuSuit = "";
                                 },
                                 filter(event, player) {
                                     return player.countCards("h");
@@ -14413,9 +14424,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 frequent: true,
                                 content() {
                                     "step 0"
-                                    player.chooseCard(get.prompt2("jinshu")).set("ai", function (card) {
+                                    player.chooseCard(get.prompt2("tirpitz_jinshu")).set("ai", function (card) {
                                         var player = get.player();
-                                        if (player.storage.jinshu >= 1) { return Math.random() + 1; }
+                                        if (player.storage.tirpitz_jinshu >= 1) { return Math.random() + 1; }
                                         if (player.countCards("j") || player.countCards("h", function (card) {
                                             return get.tag(card) == "damage" && get.type(card == "trick") || get.type(card) == "equip";
                                         }) < 3) {
@@ -14426,11 +14437,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     "step 1"
                                     if (result.bool) {
                                         player.showCards(result.cards[0]);
-                                        if (player.storage.jinshu == 0) {
-                                            player.addTempSkill("jinshu_skip", { global: "roundStart" });
+                                        if (player.storage.tirpitz_jinshu == 0) {
+                                            player.addTempSkill("tirpitz_jinshu_skip", { global: "roundStart" });
                                         }
-                                        player.addTempSkill("jinshu_draw", { global: "roundStart" });
-                                        player.storage.jinshuSuit = get.suit(result.cards[0]);
+                                        player.addTempSkill("tirpitz_jinshu_draw", { global: "roundStart" });
+                                        player.storage.tirpitz_jinshuSuit = get.suit(result.cards[0]);
                                     }
 
                                 },
@@ -14450,7 +14461,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             player: ["phaseUseBefore", "phaseDiscardBefore"],
                                         },
                                         filter(event, player) {
-                                            if (player.storage.jinshuSuit) return true;
+                                            if (player.storage.tirpitz_jinshuSuit) return true;
                                             return false;
                                         },
                                         async content(event, trigger, player) {
@@ -14464,7 +14475,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         onremove: true,
                                         intro: {
                                             content(storage, player, skill) {
-                                                return get.translation(player.storage.jinshuSuit);
+                                                return get.translation(player.storage.tirpitz_jinshuSuit);
                                             },
                                         },
                                         init: (player) => {
@@ -14474,11 +14485,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             global: ["useCardAfter", "respond"],
                                         },
                                         filter: function (event, player) {
-                                            if (player.getStorage("jinshuSuit") == "") { return false; }
+                                            if (player.getStorage("tirpitz_jinshuSuit") == "") { return false; }
                                             if (get.itemtype(event.cards) != 'cards') { return false; }
                                             for (var i = 0; i < event.cards.length; i++) {
                                                 if (event.cards[i].isInPile()) {
-                                                    return player.getStorage("jinshuSuit") == get.suit(event.cards[i], false);;
+                                                    return player.getStorage("tirpitz_jinshuSuit") == get.suit(event.cards[i], false);;
                                                 }
                                             }
                                             return false;
@@ -14495,12 +14506,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 player: (card, player, target) => {
                                                     let num = 0, nohave = true;
                                                     game.countPlayer(i => {
-                                                        if (i.hasSkill('jinshu')) {
+                                                        if (i.hasSkill('tirpitz_jinshu')) {
                                                             nohave = false;
-                                                            if (i.isIn() && lib.skill.jinshu_draw.filter({ card: card }, i)) num += get.sgnAttitude(player, i);
+                                                            if (i.isIn() && lib.skill.tirpitz_jinshu_draw.filter({ card: card }, i)) num += get.sgnAttitude(player, i);
                                                         }
                                                     }, true);
-                                                    if (nohave) game.removeGlobalSkill('jinshu_global');
+                                                    if (nohave) game.removeGlobalSkill('tirpitz_jinshu_global');
                                                     else return [1, 0.8 * num];
                                                 }
                                             }
@@ -14511,7 +14522,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     threaten: 3.1,
                                 },
                             },
-                            chuanyue: {
+                            tirpitz_chuanyue: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
@@ -14525,7 +14536,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content() {
                                     "step 0"
-                                    player.chooseCard(get.prompt2("chuanyue")).set("ai", function (card) {
+                                    player.chooseCard(get.prompt2("tirpitz_chuanyue")).set("ai", function (card) {
                                         var player = get.player();
                                         var evt = _status.event.player;
                                         return get.value(card, evt);
@@ -14533,11 +14544,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     "step 1"
                                     if (result.bool) {
                                         player.give(result.cards[0], trigger.player);
-                                        if (trigger.player.hasSkill("chuanyue_shadow")) {
-                                            trigger.player.addTempSkill("chuanyue_shadow", { global: "phaseEnd" });
+                                        if (trigger.player.hasSkill("tirpitz_chuanyue_shadow")) {
+                                            trigger.player.addTempSkill("tirpitz_chuanyue_shadow", { global: "phaseEnd" });
                                         }
-                                        if (!trigger.player.storage.chuanyue_shadow) { trigger.player.storage.chuanyue_shadow = []; }
-                                        trigger.player.storage.chuanyue_shadow.push(get.suit(result.cards[0]));
+                                        if (!trigger.player.storage.tirpitz_chuanyue_shadow) { trigger.player.storage.tirpitz_chuanyue_shadow = []; }
+                                        trigger.player.storage.tirpitz_chuanyue_shadow.push(get.suit(result.cards[0]));
                                     } else {
                                         event.finish();
                                         return;
@@ -14554,7 +14565,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         intro: {
                                             content: function (player) {
                                                 var str = "";
-                                                var shadow = player.getStorage("chuanyue_shadow")
+                                                var shadow = player.getStorage("tirpitz_chuanyue_shadow")
                                                 for (var i = 0; i < shadow.length; i++) {
                                                     if (i > 0) str += get.translation(shadow[i]);
                                                 }
@@ -14563,7 +14574,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         mod: {
                                             cardDiscardable: function (card, player) {
-                                                var list = player.storage.chuanyue_shadow;
+                                                var list = player.storage.tirpitz_chuanyue_shadow;
                                                 for (var i = 0; i < list.length; i++) {
                                                     if (list[i] == card.suit) return false;
                                                 }
@@ -14573,7 +14584,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
 
                             },
-                            nvwangfugui: {
+                            tirpitz_nvwangfugui: {
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 nobracket: true,
                                 trigger: {
@@ -14585,19 +14596,19 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 skillAnimation: true,
                                 animationColor: "gray",
                                 filter: function (event, player) {
-                                    if (player.storage.nvwangfugui) return false;
-                                    return player.hasSkill("nvwangfugui") && (event.player.name == "bisimai" || event.player.name == "bismarck");
+                                    if (player.storage.tirpitz_nvwangfugui) return false;
+                                    return player.hasSkill("tirpitz_nvwangfugui") && (event.player.name == "bisimai" || event.player.name == "bismarck");
                                 },
                                 content: function () {
                                     'step 0'
-                                    player.awakenSkill('nvwangfugui');
-                                    if (player.hasSkill("jinshu")) { player.storage.jinshu = 1; }
+                                    player.awakenSkill('tirpitz_nvwangfugui');
+                                    if (player.hasSkill("tirpitz_jinshu")) { player.storage.tirpitz_jinshu = 1; }
                                     'step 1'
                                     event.hp = player.hp;
                                     player.loseHp(player.hp - 1);
                                     'step 2'
                                     player.changeHujia(event.hp - 1);
-                                    player.removeSkill('nvwangfugui');
+                                    player.removeSkill('tirpitz_nvwangfugui');
                                 },
                             },
                             shuangzi: {
@@ -14622,10 +14633,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter: function (event, player) {
                                     if (typeof player.storage.shuangzi === 'undefined') player.storage.shuangzi = false;
                                     if (player.storage.shuangzi) {
-                                        game.log("阳");
+                                        //game.log("阳");
                                         return (get.type(event.card) == 'trick' || get.type(event.card) == 'delay');
                                     } else {
-                                        game.log("阴");
+                                        //game.log("阴");
                                         return (get.type(event.card) == 'basic');
 
                                     }
@@ -15451,45 +15462,45 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhanxianyuanhu: "战线援护", "zhanxianyuanhu_info": "游戏开始时，你选择一名角色，其受到伤害时防止之，改为你受到此伤害值-1的伤害。",
                             //第二次配音到这里
 
-                            xinao: "嬉闹", "xinao_info": "每轮限一次，你受到伤害后,若你正面朝上且没有嬉闹对象，你可以将任意张手牌交给一名其他角色并记录，然后你翻面。若如此做，你回复X点体力然后获得“装甲”直到下回合开始。(x为你交出的手牌数/2向下取整)。你的出牌阶段开始时，你令嬉闹对象交给你所有手牌并清空记录。",
-                            xinao_back: "嬉闹",
-                            xiance: "献策", "xiance_info": "你拥有决策：出牌阶段限一次，你可以将两张手牌当作一张基本牌或非延时锦囊牌使用，本局每种牌名的牌限一次。每轮限一次，其他角色的出牌阶段开始时，你可以交给其两张牌并令其本阶段获得“决策”。本阶段结束时，若其没有杀死过角色，则你对其造成一点伤害。",
-                            xiance2: "决策", "xiance2_info": "出牌阶段限一次，你可以将两张手牌当作一张基本牌或非延时锦囊牌使用，本局每种牌名的牌限一次。",
-                            xiance3: "献策",
-                            xiance4: "献策",
-                            gumei: "蛊魅", "gumei_info": "其他角色出牌阶段限一次，其可以选择除你以外的一名角色并交给你一张牌，若如此做，视作你对选择的角色使用一张“决斗”。如果你因此技能受到伤害，此技能失效直到本轮结束。",
-                            gumei_phaseUse: "蛊魅_出牌阶段", "gumei_phaseUse_info": "出牌阶段限一次，你可以选择除蛊魅拥有者以外的一名角色并交给拥有者一张牌，若如此做，视作拥有者对选择的角色使用一张“决斗”。",
-                            jianmiemoshi: "歼灭模式", "jianmiemoshi_info": "你的回合内，其他角色无法对非“歼灭”牌进行响应。回合结束时，你的手牌标记为“歼灭”牌。",
-                            zhaopin: "招聘", "zhaopin_info": "限定技，主公技，你进入濒死状态时，可以弃置自己区域所有牌选择令其他角色依次选择是否响应，若有角色响应，则你与其互换身份牌，然后其可以获得一点体力上限并恢复一点体力，你失去一点体力上限，摸4张手牌，并将体力恢复至1点。",
+                            pachina_xinao: "嬉闹", "pachina_xinao_info": "你受到伤害后,若你没有嬉闹对象，你可以将任意张手牌交给一名其他角色并记录，然后你翻面。若如此做，你回复X点体力然后获得“装甲”直到下回合开始。(x为你交出的手牌数/2向下取整)。你的出牌阶段开始时，你令嬉闹对象交给你X张手牌并清空记录。",
+                            pachina_xinao_back: "嬉闹",
+                            loki_xiance: "献策", "loki_xiance_info": "你拥有决策：出牌阶段限一次，你可以将两张手牌当作一张基本牌或非延时锦囊牌使用，本局每种牌名的牌限一次。每轮限一次，其他角色的出牌阶段开始时，你可以交给其两张牌并令其本阶段获得“决策”。本阶段结束时，若其没有杀死过角色，则你对其造成一点伤害。",
+                            loki_xiance2: "决策", "loki_xiance2_info": "出牌阶段限一次，你可以将两张手牌当作一张基本牌或非延时锦囊牌使用，本局每种牌名的牌限一次。",
+                            loki_xiance3: "献策",
+                            loki_xiance4: "献策",
+                            southdakota_gumei: "蛊魅", "southdakota_gumei_info": "其他角色出牌阶段限一次，其可以选择除你以外的一名角色并交给你一张牌，若如此做，视作你对选择的角色使用一张“决斗”。如果你因此技能受到伤害，此技能失效直到本轮结束。",
+                            southdakota_gumei_phaseUse: "蛊魅_出牌阶段", "southdakota_gumei_phaseUse_info": "出牌阶段限一次，你可以选择除蛊魅拥有者以外的一名角色并交给拥有者一张牌，若如此做，视作拥有者对选择的角色使用一张“决斗”。",
+                            southdakota_jianmiemoshi: "歼灭模式", "southdakota_jianmiemoshi_info": "你的回合内，其他角色无法对非“歼灭”牌进行响应。回合结束时，你的手牌标记为“歼灭”牌。",
+                            southdakota_zhaopin: "招聘", "southdakota_zhaopin_info": "限定技，主公技，你进入濒死状态时，可以弃置自己区域所有牌选择令其他角色依次选择是否响应，若有角色响应，则你与其互换身份牌，然后其可以获得一点体力上限并恢复一点体力，你失去一点体力上限，摸4张手牌，并将体力恢复至1点。",
                             huodezhuangbei: "获得装备", "huodezhuangbei_info": "从牌堆中获得一张装备。测试用。",
                             zhanxian: "斩仙", "zhanxian_info": "出牌阶段开始前，你可以将任意张手牌作为“斩”扣置在武将牌上至本回合结束。锁定技，手牌数不多于你“斩”张数的角色不能响应你使用的牌。",
                             guishen: "鬼神", "guishen_info": "锁定技，你的出牌阶段内，体力值大于体力上限一半的其他角色所有技能失效。",
                             guishen_fengyin: "鬼神_封印",
                             sukhbaatar_rumeng: "入梦", "sukhbaatar_rumeng_info": "锁定技,准备阶段，你选择一名角色与其拼点。你发起拼点或成为拼点目标时可以获得场上一张“军辅”牌。",
                             sukhbaatar_rumeng_1: "入梦", "sukhbaatar_rumeng_1_info": "锁定技，你发起拼点或成为拼点目标时可以获得场上一张“军辅”牌。",
-                            sudaren: "苏大人", "sudaren_info": "转换技,你拼点赢时，转换为阳；拼点没赢，转换为阴。阳：你使用牌时，可以弃置一张“军辅”牌让那张牌额外结算1次。阴：其他角色对你使用牌时，可以摸一张牌，并将一张手牌置于在武将牌上，视作“军辅”牌",
-                            zuiqiang: "最强", "zuiqiang_info": "锁定技,一名武将牌上没有“军辅”牌的其他角色受到你造成的伤害时，若此伤害会令其进入濒死状态，防止之并将你的一张手牌作为“军辅”牌置于其武将牌上。",
-                            ganggenier: "冈格尼尔", "ganggenier_info": "准备阶段，依次从牌堆顶给所有没有“军辅”牌的角色武将牌上放置一张牌，视作“军辅”牌。出牌阶段限一次，你可以弃置两名角色各一张“军辅”牌，直到回合结束，其他所有角色无法使用或打出与被以此法弃置的牌相同花色的牌。",
-                            ganggenier_1: "冈格尼尔", "ganggenier_1_info": "出牌阶段限一次，你可以弃置两名角色各一张“军辅”牌，直到回合结束，其他所有角色无法使用或打出与被以此法弃置的牌相同花色的牌。",
+                            sukhbaatar_sudaren: "苏大人", "sukhbaatar_sudaren_info": "转换技,你拼点赢时，转换为阳；拼点没赢，转换为阴。阳：你使用牌时，可以弃置一张“军辅”牌让那张牌额外结算1次。阴：其他角色对你使用牌时，可以摸一张牌，并将一张手牌置于在武将牌上，视作“军辅”牌",
+                            sukhbaatar_zuiqiang: "最强", "sukhbaatar_zuiqiang_info": "锁定技,一名武将牌上没有“军辅”牌的其他角色受到你造成的伤害时，若此伤害会令其进入濒死状态，防止之并将你的一张手牌作为“军辅”牌置于其武将牌上。",
+                            odin_ganggenier: "冈格尼尔", "odin_ganggenier_info": "准备阶段，依次从牌堆顶给所有没有“军辅”牌的角色武将牌上放置一张牌，视作“军辅”牌。出牌阶段限一次，你可以弃置两名角色各一张“军辅”牌，直到回合结束，其他所有角色无法使用或打出与被以此法弃置的牌相同花色的牌。",
+                            odin_ganggenier_1: "冈格尼尔", "odin_ganggenier_1_info": "出牌阶段限一次，你可以弃置两名角色各一张“军辅”牌，直到回合结束，其他所有角色无法使用或打出与被以此法弃置的牌相同花色的牌。",
                             vestal_mowang: "魔王", "vestal_mowang_info": "当有角色陷入濒死时，你可以将自己或其武将牌上的“军辅”牌当做【桃】对其使用。当场上有角色脱离濒死状态时，你可以选择恢复一点体力或摸一张牌。",
                             vestal_mowang1: "魔王",
                             xiwangdeshuguang: "希望的曙光", "xiwangdeshuguang_info": "每个回合结束时，你可以弃置一张手牌，令一名本回合受到过伤害的角色回复一点体力。",
-                            chajin: "查禁", "chajin_info": "其他角色于摸牌阶段及“远航”技能效果外从牌堆摸牌时，你可以声明一个花色，之后其可以选择交给你任意张手牌。执行完上述流程后，你可以选择质疑其手牌中还有你声明的花色，然后展示其所有手牌，若其手牌有你声明的花色，你获得之，并对其造成1点伤害；否则，你流失1点体力，并且此技能本轮失效。",
+                            bismarck_chajin: "查禁", "bismarck_chajin_info": "其他角色于摸牌阶段及“远航”技能效果外从牌堆摸牌时，你可以声明一个花色，之后其可以选择交给你任意张手牌。执行完上述流程后，你可以选择质疑其手牌中还有你声明的花色，然后展示其所有手牌，若其手牌有你声明的花色，你获得之，并对其造成1点伤害；否则，你流失1点体力，并且此技能本轮失效。",
                             doubts: "质疑",
                             noDoubts: "不质疑",
-                            chajin_tempBan: "查禁失效",
-                            fanji: "反击", "fanji_info": "你受到伤害后，你可以对伤害来源使用一张无视距离的【杀】",
-                            jinshu: "禁书", "jinshu_info": "每轮开始时，你可以展示一张手牌，并且跳过你本轮的出牌阶段和弃牌阶段。若如此做，每当一张与展示牌花色相同的牌进入弃牌堆时，你摸一张牌。",
-                            chuanyue: "传阅", "chuanyue_info": "其他角色准备阶段开始时，你可以展示并交给其一张牌，其本回合无法弃置与展示牌相同花色的牌。",
-                            nvwangfugui: "女王复归", "": "觉醒技，场上的“俾斯麦”死亡时，你将体力值调整至1点，获得X点护甲并修改“禁书”（X为因“女王复归”而减少的体力值数量）（修改禁书：每轮开始时，你可以展示一张手牌，若如此做，每当一张与弃置牌花色相同的牌进入弃牌堆时，你摸一张牌。）",
+                            bismarck_chajin_tempBan: "查禁失效",
+                            bismarck_fanji: "反击", "bismarck_fanji_info": "你受到伤害后，你可以对伤害来源使用一张无视距离的【杀】",
+                            tirpitz_jinshu: "禁书", "tirpitz_jinshu_info": "每轮开始时，你可以展示一张手牌，并且跳过你本轮的出牌阶段和弃牌阶段。若如此做，每当一张与展示牌花色相同的牌进入弃牌堆时，你摸一张牌。",
+                            tirpitz_chuanyue: "传阅", "tirpitz_chuanyue_info": "其他角色准备阶段开始时，你可以展示并交给其一张牌，其本回合无法弃置与展示牌相同花色的牌。",
+                            tirpitz_nvwangfugui: "女王复归", "": "觉醒技，场上的“俾斯麦”死亡时，你将体力值调整至1点，获得X点护甲并修改“禁书”（X为因“女王复归”而减少的体力值数量）（修改禁书：每轮开始时，你可以展示一张手牌，若如此做，每当一张与弃置牌花色相同的牌进入弃牌堆时，你摸一张牌。）",
                             shuangzi: "双子", shuangzi_info: "转换技，阳：你使用或打出基本牌时摸一张牌；阴：你使用或打出锦囊牌时摸一张牌",
                             akagikaga_zongyu: "纵欲", akagikaga_zongyu_info: "锁定技，你使用【酒】无次数限制，你不能使用【桃】，你可以将【桃】当作【桃园结义】使用。若场上一名角色一轮中成为【酒】【桃】【桃园结义】目标的次数不小于其的体力值时，清空计数，并将其武将牌翻面。",
                             akagikaga_zongyu_turnOver: "纵欲_翻面",
                             savoy_xiuzhu: "修筑", savoy_xiuzhu_info: "出牌阶段限一次，你可以与一名角色拼点：没有赢的角色，直到回合结束，无法使用或打出与拼点牌相同颜色的牌，若你和其拼点牌点数之和大于13，则你和其各恢复1点体力。",
                             savoy_wangong: "完工", savoy_wangong_info: "觉醒技 结束阶段，若你不为已受伤状态时，你获得技能“装甲”和“要塞群”",
                             savoy_yaosaiqun: "要塞群", savoy_yaosaiqun_info: "你每次进入濒死状态限一次，你可以发动一次“修筑”。",
-                            cassone_yibing: "疑兵", yibing_info: "当你和其他角色进行拼点时，你可以：阳：将自己区域的一张牌移到其他角色相应位置。阴：将其他角色场上一张牌移动到自己相应位置。疑兵处于阴状态时，你参与的拼点，所有人点数视为14-X（X为牌原本的点数）。",
-                            cassone_weizhuangqixi: "伪装奇袭", weizhuangqixi_info: "出牌阶段限一次，你可以与一名角色：若你赢，你与其之间距离视作1，且每回合你对其使用的第一张牌不可响应，直到其回合结束；若其赢，你失去一点体力，那之后，直到其回合结束，你受到其造成的伤害后，恢复1点体力",
+                            cassone_yibing: "疑兵", cassone_yibing_info: "当你和其他角色进行拼点时，你可以：阳：将自己区域的一张牌移到其他角色相应位置。阴：将其他角色场上一张牌移动到自己相应位置。疑兵处于阴状态时，你参与的拼点，所有人点数视为14-X（X为牌原本的点数）。",
+                            cassone_weizhuangqixi: "伪装奇袭", cassone_weizhuangqixi_info: "出牌阶段限一次，你可以与一名角色：若你赢，你与其之间距离视作1，且每回合你对其使用的第一张牌不可响应，直到其回合结束；若其赢，你失去一点体力，那之后，直到其回合结束，你受到其造成的伤害后，恢复1点体力",
                             cassone_weizhuangqixi_win: "伪装奇袭_赢",
                             cassone_weizhuangqixi_lose: "伪装奇袭_没赢",
 
