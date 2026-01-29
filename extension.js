@@ -1089,8 +1089,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger: { player: "loseAfter", global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"], },
                                         filter: function (event, player) {
                                             if (lib.config.extension_舰R牌将__yuanhang === false) return false;
-                                            var d = (player.getHandcardLimit() / 2), a = 0;
-                                            if (player == _status.currentPhase) { a += (1) };
+                                            var d = (player.getHandcardLimit() / 2);//, a = 0;
+                                            //if (player == _status.currentPhase) { a += (1) };
                                             if (player.countCards('h') > d) return false;
                                             var evt = event.getl(player);
                                             if (!player.countMark('_yuanhang_mopai')) return false;
@@ -1101,14 +1101,21 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                     kaishi: {
                                         name: "远航回合开始时", fixed: true, silent: true, friquent: true,
-                                        trigger: { global: "phaseBegin", },
+                                        trigger: { 
+                                            player: "phaseBegin", 
+                                        },
                                         filter: function (event, player) {
                                             if (lib.config.extension_舰R牌将__yuanhang === false) return false;
                                             return true;
                                         },
-                                        content: function () {//else if(!player.countMark('mopaiup')<1&&player.countCards('h','shan')<1){player.draw()}
-                                            var a = player.countMark('mopaiup'); var b = player.countMark('_yuanhang_mopai'); //game.log(event.skill != 'huijiahuihe');
-                                            if (player == _status.currentPhase && event.getParent('phase').skill != 'huijiahuihe') { a += (1); if (a - b > 0) player.addMark('_yuanhang_mopai', a - b); };
+                                        content: function () {
+                                            //else if(!player.countMark('mopaiup')<1&&player.countCards('h','shan')<1){player.draw()}
+                                            var a = player.countMark('mopaiup'); var b = player.countMark('_yuanhang_mopai'); 
+                                            //game.log(event.skill != 'huijiahuihe');
+                                            if (player == _status.currentPhase && event.getParent('phase').skill != 'huijiahuihe') { 
+                                                a += (1); 
+                                                if (a - b > 0) player.addMark('_yuanhang_mopai', a - b); 
+                                            };
                                             /*if(a>b&&player!=_status.currentPhase){player.addMark('_yuanhang_mopai',1);};*/
                                         },//远航每回合恢复标记被砍掉了。现在只有每轮开始恢复标记。
                                         sub: true,
@@ -3739,7 +3746,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player: function (player, target) {
                                             return 2;
                                         }
-                                    }
+                                    },
+                                    threaten: 1.1,
                                 },
                             },
                             manchangzhanyi: {
@@ -15237,7 +15245,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qianting_xiji: "袭击", "qianting_xiji_info": "每回合限两次，将♦/♥牌当做顺手牵羊，♣/♠牌当做兵粮寸断使用<br>你使用的锦囊牌可以对距离你2以内的角色使用。",
                             qianting: "潜艇", "qianting_info": "（可强化）准备阶段，你可以弃置一张红桃或黑桃/红桃或黑桃或方片/牌，视为对一个目标使用一张雷杀。",
                             qianting_jiezi: "截辎", "qianting_jiezi_info": "其他角色跳过阶段时，你摸一张牌",
-                            "_yuanhang": "远航", "_yuanhang_info": "若你已受伤，你的手牌上限+1。挑战模式不屈时手牌上限+1。<br>当你失去手牌后，且手牌数<手牌上限值时，你摸一张牌。使用次数上限0/1/2次，处于自己的回合时+1，每回合回复一次使用次数。<br>当你进入濒死状态时，你摸一张牌，体力上限大于二时需减少一点体力上限，额外摸一张牌；死亡后，你可以按自己的身份，令一名角色摸-/2/1/1（主/忠/反/内）张牌。",
+                            "_yuanhang": "远航", "_yuanhang_info": "若你已受伤，你的手牌上限+1。挑战模式不屈时手牌上限+1。<br>当你失去手牌后，且手牌数<手牌上限的一半时，你摸一张牌。使用次数上限0/1/2次，处于自己的回合时+1，每回合回复一次使用次数。<br>当你进入濒死状态时，你摸一张牌，体力上限大于二时需减少一点体力上限，额外摸一张牌；死亡后，你可以按自己的身份，令一名角色摸-/2/1/1（主/忠/反/内）张牌。",
                             kaishimopai: "开始摸牌", "kaishimopai_info": "<br>，判定阶段你可以减少一次摸牌阶段的摸牌，然后在回合结束时摸一张牌。",
                             "_jianzaochuan": "建造", "_jianzaochuan_info": "每局游戏限一次，当你进行了至少一次强化后<br>1.出牌阶段<br>你可以弃置3张不同花色的牌，提升一点血量上限与强化上限。",//<br>2.当你濒死时，<br>你可以弃置4张不同花色的牌，回复一点体力。<br>（未开启强化，则无需强化即可使用建造。未开启建造，则强化上限仅为1级。）",
                             "_qianghuazhuang": "强化装备",
