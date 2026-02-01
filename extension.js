@@ -13344,7 +13344,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 event.target.give(result.cards, player);
                                             }
                                             event.count++;
-                                            if (event.count < player.storage.pachina_xinao.length) { goto(1); }
+                                            if (event.count < player.storage.pachina_xinao.length) { event.goto(1); }
                                             player.storage.pachina_xinao = [];
                                         },
                                     },
@@ -14327,7 +14327,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         if (att > 2 && evt.player.isDamaged() && get.tag(card, "recover")) return 10;
                                         if (att > 0) return 0;
                                         if (att <= 0 && player.countCards("h", function (card) { return get.suit(card) == event.suit; }) <= 0) { return 0 };
-                                        if (att <= 0 && get.suit(card) == event.suit && ui.selected.cards.length < 2) { return 8.5 - get.value(card); }
+                                        if (att <= 0 && get.suit(card) == event.suit && ui.selected.cards.length < 2&&Math.random()>0.6) { return 8.5 - get.value(card); }
                                         if (att <= 0 && get.suit(card) == event.suit && ui.selected.cards.length >= 2) { return 7 - get.value(card); }
                                         return 0;
                                     });
@@ -14357,7 +14357,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                 },
                                 ai: {
-                                    threaten: 3.1,
+                                    threaten: 2.6,
                                 }
                             },
                             bismarck_chajin_tempBan: {
