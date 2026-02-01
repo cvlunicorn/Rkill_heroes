@@ -1054,8 +1054,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             savoy: ["female", "RM", "2/4/1", ["yaosai", "savoy_xiuzhu", "savoy_wangong"], ["des:自称“吸血鬼”,坚称自己是人类幻想文学中的一员。在月圆之夜喜欢看着月亮发呆。一直随身带着石榴汁……？"]],
                             cassone: ["female", "RM", 4, ["zhuangjiafh", "cassone_yibing", "cassone_weizhuangqixi"], ["des:深海版战列巡洋舰卡萨诺方案。"]],
 
-
-                            skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "zhiqiu", "zhiqiu2", "shuiji1", "paoxiao"], ["forbidai", "des:测试用"]],
+                            skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "paoxiao"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
                             _yuanhang: {
@@ -1101,8 +1100,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                     kaishi: {
                                         name: "远航回合开始时", fixed: true, silent: true, friquent: true,
-                                        trigger: { 
-                                            player: "phaseBegin", 
+                                        trigger: {
+                                            player: "phaseBegin",
                                         },
                                         filter: function (event, player) {
                                             if (lib.config.extension_舰R牌将__yuanhang === false) return false;
@@ -1110,11 +1109,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         content: function () {
                                             //else if(!player.countMark('mopaiup')<1&&player.countCards('h','shan')<1){player.draw()}
-                                            var a = player.countMark('mopaiup'); var b = player.countMark('_yuanhang_mopai'); 
+                                            var a = player.countMark('mopaiup'); var b = player.countMark('_yuanhang_mopai');
                                             //game.log(event.skill != 'huijiahuihe');
-                                            if (player == _status.currentPhase && event.getParent('phase').skill != 'huijiahuihe') { 
-                                                a += (1); 
-                                                if (a - b > 0) player.addMark('_yuanhang_mopai', a - b); 
+                                            if (player == _status.currentPhase && event.getParent('phase').skill != 'huijiahuihe') {
+                                                a += (1);
+                                                if (a - b > 0) player.addMark('_yuanhang_mopai', a - b);
                                             };
                                             /*if(a>b&&player!=_status.currentPhase){player.addMark('_yuanhang_mopai',1);};*/
                                         },//远航每回合恢复标记被砍掉了。现在只有每轮开始恢复标记。
@@ -13528,10 +13527,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 nobracket: true,
                                 init: function (player) {
                                     player.storage.temp_ban_southdakota_gumei = false;
-
                                 },
                                 trigger: {
-                                    player: "damageBegin2",
+                                    source: "damageSource",
                                 },
                                 forced: true,
                                 filter: function (event, player) {
@@ -13961,13 +13959,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 intro: {
                                     content(storage, player, skill) {
                                         if (player.storage.sukhbaatar_sudaren == true) return "你使用基本牌或普通锦囊牌时，可以弃置一张“军辅”牌让那张牌额外结算1次。";
-                                        return "一名角色对你使用牌时，可以摸一张牌，并将一张手牌置于在武将牌上，视作“军辅”牌";
+                                        return "一名角色对你使用牌时，可以摸一张牌，并将一张手牌置于在武将牌上，视作“军辅”牌(至多五张)";
                                     },
                                 },
                                 group: ["sukhbaatar_sudaren_1", "sukhbaatar_sudaren_2", "sukhbaatar_sudaren_3"],
                                 subSkill: {
                                     "1": {
-                                        prompt: "一名角色对你使用牌时，可以摸一张牌，并将一张手牌置于在武将牌上，视作“军辅”牌",
+                                        prompt: "一名角色对你使用牌时，可以摸一张牌，并将一张手牌置于在武将牌上，视作“军辅”牌(至多五张)",
                                         audio: "ext:舰R牌将/audio/skill:true",
                                         trigger: {
                                             target: "useCardToBefore",
@@ -13975,6 +13973,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         direct: true,
                                         filter(event, player) {
                                             if (player.storage.sukhbaatar_sudaren) return false;
+                                            if (player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length > 4) { return false;}
                                             return true;
                                         },
                                         check: function (event, player) {
@@ -13985,10 +13984,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             //player.changeZhuanhuanji("sukhbaatar_sudaren");
                                             trigger.player.draw(1);
                                             if (!trigger.player.hasSkill("junfu_mark")) { trigger.player.addSkill("junfu_mark"); }
+                                            
                                             trigger.player.chooseCard('h', 1, '将一张手牌置于你的武将牌上，称为【军辅】', true).set('ai', function (card) {
                                                 var player = get.player();
                                                 if (ui.selected.cards.type == "equip") return -get.value(card);
-                                                return 9 - get.value(card);
+                                                return get.value(card);
                                             });
                                             'step 1'
                                             if (result.bool) {
@@ -14057,6 +14057,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 ai: {
                                     combo: "sukhbaatar_sudaren",
+                                    threaten: 3,
                                 },
                                 "_priority": 0,
                             },
@@ -15475,7 +15476,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             loki_xiance2: "决策", "loki_xiance2_info": "出牌阶段限一次，你可以将两张手牌当作一张基本牌或非延时锦囊牌使用，本局每种牌名的牌限一次。",
                             loki_xiance3: "献策",
                             loki_xiance4: "献策",
-                            southdakota_gumei: "蛊魅", "southdakota_gumei_info": "其他角色出牌阶段限一次，其可以选择除你以外的一名角色并交给你一张牌，若如此做，视作你对选择的角色使用一张“决斗”。如果你因此技能受到伤害，此技能失效直到本轮结束。",
+                            southdakota_gumei: "蛊魅", "southdakota_gumei_info": "其他角色出牌阶段限一次，其可以选择除你以外的一名角色并交给你一张牌，若如此做，视作你对选择的角色使用一张“决斗”。如果你因此技能造成伤害，此技能失效直到本轮结束。",
                             southdakota_gumei_phaseUse: "蛊魅_出牌阶段", "southdakota_gumei_phaseUse_info": "出牌阶段限一次，你可以选择除蛊魅拥有者以外的一名角色并交给拥有者一张牌，若如此做，视作拥有者对选择的角色使用一张“决斗”。",
                             southdakota_jianmiemoshi: "歼灭模式", "southdakota_jianmiemoshi_info": "你的回合内，其他角色无法对非“歼灭”牌进行响应。回合结束时，你的手牌标记为“歼灭”牌。",
                             southdakota_zhaopin: "招聘", "southdakota_zhaopin_info": "限定技，主公技，你进入濒死状态时，可以弃置自己区域所有牌选择令其他角色依次选择是否响应，若有角色响应，则你与其互换身份牌，然后其可以获得一点体力上限并恢复一点体力，你失去一点体力上限，摸4张手牌，并将体力恢复至1点。",
@@ -15485,7 +15486,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             guishen_fengyin: "鬼神_封印",
                             sukhbaatar_rumeng: "入梦", "sukhbaatar_rumeng_info": "锁定技,准备阶段，你选择一名角色与其拼点。你发起拼点或成为拼点目标时可以获得场上一张“军辅”牌。",
                             sukhbaatar_rumeng_1: "入梦", "sukhbaatar_rumeng_1_info": "锁定技，你发起拼点或成为拼点目标时可以获得场上一张“军辅”牌。",
-                            sukhbaatar_sudaren: "苏大人", "sukhbaatar_sudaren_info": "转换技,你拼点赢时，转换为阳；拼点没赢，转换为阴。阳：你使用牌时，可以弃置一张“军辅”牌让那张牌额外结算1次。阴：其他角色对你使用牌时，可以摸一张牌，并将一张手牌置于在武将牌上，视作“军辅”牌",
+                            sukhbaatar_sudaren: "苏大人", "sukhbaatar_sudaren_info": "转换技,你拼点赢时，转换为阳；拼点没赢，转换为阴。阳：你使用牌时，可以弃置一张“军辅”牌让那张牌额外结算1次。阴：一名角色对你使用牌时，可以摸一张牌，并将一张手牌置于在武将牌上，视作“军辅”牌(至多五张)",
                             sukhbaatar_zuiqiang: "最强", "sukhbaatar_zuiqiang_info": "锁定技,一名武将牌上没有“军辅”牌的其他角色受到你造成的伤害时，若此伤害会令其进入濒死状态，防止之并将你的一张手牌作为“军辅”牌置于其武将牌上。",
                             odin_ganggenier: "冈格尼尔", "odin_ganggenier_info": "准备阶段，依次从牌堆顶给所有没有“军辅”牌的角色武将牌上放置一张牌，视作“军辅”牌。出牌阶段限一次，你可以弃置两名角色各一张“军辅”牌，直到回合结束，其他所有角色无法使用或打出与被以此法弃置的牌相同花色的牌。",
                             odin_ganggenier_1: "冈格尼尔", "odin_ganggenier_1_info": "出牌阶段限一次，你可以弃置两名角色各一张“军辅”牌，直到回合结束，其他所有角色无法使用或打出与被以此法弃置的牌相同花色的牌。",
