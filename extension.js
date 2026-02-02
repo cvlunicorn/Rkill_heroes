@@ -604,7 +604,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             name: "减速",
                             intro: {
                                 marktext: "减速",
-                                content: function (player) {
+                                content: function (storage, player) {
                                     return ('减少1点与其他角色的防御距离，令舰船更容易被对手集火，雷杀的效果，不叠加计算');
                                 },
                             },
@@ -642,7 +642,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             name: "进水",
                             intro: {
                                 marktext: "进水",
-                                content: function (player) {
+                                content: function (storage, player) {
                                     return ('减少1点手牌上限，在结束阶段会恢复，冰杀与袭击运输船的效果，不叠加计算也很可怕了');
                                 },
                             },
@@ -687,7 +687,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 player.removeSkill('_wulidebuff_ranshao');
                             },
                             intro: {
-                                marktext: "燃烧", content: function (player) {//+player.countMark('_wulidebuff_ranshao')+'次，'+tishi
+                                marktext: "燃烧", content: function (storage, player) {//+player.countMark('_wulidebuff_ranshao')+'次，'+tishi
                                     var player = get.player(); var tishi = '回合结束受到一点火焰伤害，摸两张牌（有护甲则不会触发摸牌），火杀带来的负面效果，本回合被攻击了' + player.countMark('_wulidebuff_ranshao') + '次，'; if (player.countMark('_wulidebuff_ranshao') > 0 && player.hp <= 2) { tishi += ('可能小命不保，求求队友给点力，发挥抽卡游戏的玄学力量。”') }; if (player.countMark('_wulidebuff_ranshao') > 2 && player.hp <= 2) { tishi += ('“被集火了，希望队友能能继续扛起重任。') }; if (player.identity == 'nei') { tishi += ('为了自己的光辉岁月，我内奸一定能苟住，一定要苟住') }; if (player.identity == 'zhu') { tishi += ('我的生命在燃烧，') }; if (player.identity == 'zho') { tishi += ('同志，救我，我被火力压制了。') }; if (player.identity == 'fan') { tishi += ('就怕火攻一大片啊，我们的大好前程被火杀打到功亏一篑') };
                                     return tishi;
                                 },
@@ -946,7 +946,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 shixinrumoR_chen: [],
                                 shixinrumoR_chi: ["southdakota", "pachina", "loki"],
                                 shixinrumoR_man: ["sukhbaatar", "odin", "vestal"],
-                                shixinrumoR_yi: ["savoy", "cassone"],
+                                shixinrumoR_yi: ["savoy", "cassone", "Xfliegerkorps"],
                             },
                         },
                         character: {
@@ -1053,6 +1053,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             akagikaga: ["female", "IJN", 4, ["hangmucv", "shuangzi", "akagikaga_zongyu"], ["des:对某些人类非常执着。每次回来，都是遍体鳞伤。而且，一直躺着会对素体产生影响。"]],
                             savoy: ["female", "RM", "2/4/1", ["yaosai", "savoy_xiuzhu", "savoy_wangong"], ["des:自称“吸血鬼”,坚称自己是人类幻想文学中的一员。在月圆之夜喜欢看着月亮发呆。一直随身带着石榴汁……？"]],
                             cassone: ["female", "RM", 4, ["zhuangjiafh", "cassone_yibing", "cassone_weizhuangqixi"], ["des:深海版战列巡洋舰卡萨诺方案。"]],
+                            Xfliegerkorps: ["female", "KMS", 4, ["yaosai", "Xfliegerkorps_piaobodeying"], ["des:漂泊的“鹰”，戴着奇怪的帽子，不喜欢与其他人交流。但，实力很强。"]],
 
                             skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "paoxiao"], ["forbidai", "des:测试用"]],
                         },
@@ -1448,7 +1449,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         name: "减速",
                                         intro: {
                                             marktext: "减速",
-                                            content: function (player) {
+                                            content: function (storage, player) {
                                                 return ('减少1点与其他角色的防御距离，令舰船更容易被对手集火，雷杀的效果，不叠加计算');
                                             },
                                         },
@@ -1489,7 +1490,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         name: "进水",
                                         intro: {
                                             marktext: "进水",
-                                            content: function (player) {
+                                            content: function (storage, player) {
                                                 return ('减少1点手牌上限，在结束阶段会恢复，冰杀与袭击运输船的效果，不叠加计算也很可怕了');
                                             },
                                         },
@@ -1536,7 +1537,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             player.removeSkill('_wulidebuff_ranshao');
                                         },
                                         intro: {
-                                            marktext: "燃烧", content: function (player) {//+player.countMark('_wulidebuff_ranshao')+'次，'+tishi
+                                            marktext: "燃烧", content: function (storage, player) {//+player.countMark('_wulidebuff_ranshao')+'次，'+tishi
                                                 var player = get.player(); var tishi = '回合结束受到一点火焰伤害，摸两张牌（有护甲则不会触发摸牌），火杀带来的负面效果，本回合被攻击了' + player.countMark('_wulidebuff_ranshao') + '次，'; if (player.countMark('_wulidebuff_ranshao') > 0 && player.hp <= 2) { tishi += ('可能小命不保，求求队友给点力，发挥抽卡游戏的玄学力量。”') }; if (player.countMark('_wulidebuff_ranshao') > 2 && player.hp <= 2) { tishi += ('“被集火了，希望队友能能继续扛起重任。') }; if (player.identity == 'nei') { tishi += ('为了自己的光辉岁月，我内奸一定能苟住，一定要苟住') }; if (player.identity == 'zhu') { tishi += ('我的生命在燃烧，') }; if (player.identity == 'zho') { tishi += ('同志，救我，我被火力压制了。') }; if (player.identity == 'fan') { tishi += ('就怕火攻一大片啊，我们的大好前程被火杀打到功亏一篑') };
                                                 return tishi;
                                             },
@@ -1751,7 +1752,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             if ((player.hasSkill('quzhudd') | player.hasSkill('qianting'))) { trigger.nature = 'thunder' }; if ((player.hasSkill('zhanliebb') | player.hasSkill('hangmucv'))) { trigger.nature = 'ice'; };
                                             player.removeSkill('danzong_damage');
                                         },
-                                        mark: true, intro: { marktext: "增强", content: function (player) { return ('下一次造成伤害时，可以改变伤害属性（接近伤害的触发时机,几乎就是个特效）'); }, },
+                                        mark: true, intro: { marktext: "增强", content: function (storage, player) { return ('下一次造成伤害时，可以改变伤害属性（接近伤害的触发时机,几乎就是个特效）'); }, },
                                         sub: true,
                                     },
                                 },
@@ -1787,7 +1788,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             if (lib.config.extension_舰R牌将__kaishimopai === false) return false;
                                             if (trigger.name == 'gain' && !player.isPhaseUsing()) trigger.gaintag.add('kaishimopai'); else player.removeGaintag('kaishimopai');
                                         },
-                                        mark: false, intro: { marktext: "摸牌", content: function (player) { return ('摸牌阶段获得的一些牌'); }, }, sub: true,
+                                        mark: false, intro: { marktext: "摸牌", content: function (storage, player) { return ('摸牌阶段获得的一些牌'); }, }, sub: true,
                                     },
                                     discover: {
                                         trigger: { player: "phaseDrawEnd", }, forced: true,
@@ -1836,7 +1837,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         content: function () {
                                             'step 0'
                                             for (var i = 0; i < trigger.num; i += (1)) { if (trigger.num > 0 && player.countMark('_kaishimopai_draw')) { trigger.num -= (1); player.removeMark('_kaishimopai_draw', 1) } }
-                                        }, sub: true, intro: { marktext: "减摸牌数", content: function (player) { return ('减少摸牌阶段摸牌数'); }, },
+                                        }, sub: true, intro: { marktext: "减摸牌数", content: function (storage, player) { return ('减少摸牌阶段摸牌数'); }, },
                                     },
                                     jieshudraw: {
                                         trigger: { player: "phaseJudgeBefore", },
@@ -1850,10 +1851,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             player.chooseControl('<span class=yellowtext>少摸一张牌' + '</span>', 'cancel2').set('prompt', get.prompt('判定藏牌')).set('prompt2', '准备阶段，若你的判定区有牌时，<br>你可以令自己的摸牌阶段少摸一张牌，<br>然后在自己的回合结束时摸一张牌。').set('ai', function (event, player) { var player = get.player(); return 0; });
                                             'step 1'
                                             if (result.control != 'cancel2') { player.addMark('_kaishimopai_jieshudraw'); player.addMark('_kaishimopai_draw'); };
-                                        }, sub: true, mark: false, intro: { marktext: "闭月", content: function (player) { return ('结束时摸一张牌'); }, },
+                                        }, sub: true, mark: false, intro: { marktext: "闭月", content: function (storage, player) { return ('结束时摸一张牌'); }, },
                                     },
                                 },
-                                intro: { marktext: "摸牌", content: function (player) { return ('获得一个技能时的标记'); }, },
+                                intro: { marktext: "摸牌", content: function (storage, player) { return ('获得一个技能时的标记'); }, },
                             },
                             zhongpaoduijue: {
                                 enable: "phaseUse", usable: 1, position: "hejs", complexCard: true,
@@ -2560,7 +2561,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         intro: {
                                             marktext: "给了杀",
-                                            content: function (player) {
+                                            content: function (storage, player) {
                                                 return ('此角色于其回合开始前，不能立即使用获得到的杀。<br>（通过改良仁德与改良递杀获得的杀）');
                                             },
                                         },
@@ -2642,7 +2643,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         intro: {
                                             marktext: "",
-                                            content: function (player) {
+                                            content: function (storage, player) {
                                                 return ('使用无懈的次数');
                                             },
                                         },
@@ -2666,7 +2667,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         intro: {
                                             marktext: "给了杀",
-                                            content: function (player) {
+                                            content: function (storage, player) {
                                                 return ('使用无懈的次数');
                                             },
                                         },
@@ -8969,7 +8970,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 name: "修葺",
                                 intro: {
                                     marktext: "修葺",
-                                    content: function (player) { return ('您的舰种技能【航空】临时提升了一级！在您发动【航空】后该效果消失。'); },
+                                    content: function (storage, player) { return ('您的舰种技能【航空】临时提升了一级！在您发动【航空】后该效果消失。'); },
                                 },
                                 forced: true,
                                 trigger: {
@@ -10305,7 +10306,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     //if (player.storage.pangguanzhe.length) return false;
                                     return true;
                                 },
-                                bannedList: ["pangguanzhe", "zhanliebb", "hangmucv", "zhongxunca", "qingxuncl", "quzhudd", "qianting", "junfu", "daoqu", "fangqu", "zhuangjiafh", "dajiaoduguibi", "huokongld", "fangkong2", "shixiangquanneng", "tiaozhanzhuangbei", "zhongleizhuangjiantuxi", "juejingfengsheng"],
+                                bannedList: ["pangguanzhe", "zhanliebb", "hangmucv", "zhongxunca", "qingxuncl", "quzhudd", "qianting", "junfu", "daoqu", "fangqu", "zhuangjiafh", "dajiaoduguibi", "huokongld", "fangkong2", "shixiangquanneng", "yaosai", "tiaozhanzhuangbei", "zhongleizhuangjiantuxi", "juejingfengsheng"],
                                 content: function () {
                                     "step 0"
                                     if (player.storage.pangguanzhe.length) {
@@ -13106,7 +13107,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player
                                         .chooseToDiscard(get.prompt2("xiandaihuagaizao"), Math.min(num, 3), "hes")
                                         .set("ai", card => {
-                                            if (ui.selected.cards.length == 2&&player.maxHp < 5) return 10 - get.value(card);
+                                            if (ui.selected.cards.length == 2 && player.maxHp < 5) return 10 - get.value(card);
                                             if (player.maxHp < 5) {
                                                 return 7.5 - get.value(card);
                                             }
@@ -13327,7 +13328,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 });
                                             }
                                             "step 2";
-                                            if (result.bool&&event.targets0) {
+                                            if (result.bool && event.targets0) {
                                                 event.targets0.give(result.cards, player);
                                             }
                                             event.count++;
@@ -13961,7 +13962,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         direct: true,
                                         filter(event, player) {
                                             if (player.storage.sukhbaatar_sudaren) return false;
-                                            if (player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length > 4) { return false;}
+                                            if (player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length > 4) { return false; }
                                             return true;
                                         },
                                         check: function (event, player) {
@@ -13972,7 +13973,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             //player.changeZhuanhuanji("sukhbaatar_sudaren");
                                             trigger.player.draw(1);
                                             if (!trigger.player.hasSkill("junfu_mark")) { trigger.player.addSkill("junfu_mark"); }
-                                            
+
                                             trigger.player.chooseCard('h', 1, '将一张手牌置于你的武将牌上，称为【军辅】', true).set('ai', function (card) {
                                                 var player = get.player();
                                                 if (ui.selected.cards.type == "equip") return -get.value(card);
@@ -14315,7 +14316,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         if (att > 2 && evt.player.isDamaged() && get.tag(card, "recover")) return 10;
                                         if (att > 0) return 0;
                                         if (att <= 0 && player.countCards("h", function (card) { return get.suit(card) == event.suit; }) <= 0) { return 0 };
-                                        if (att <= 0 && get.suit(card) == event.suit && ui.selected.cards.length < 2&&Math.random()>0.6) { return 8.5 - get.value(card); }
+                                        if (att <= 0 && get.suit(card) == event.suit && ui.selected.cards.length < 2 && Math.random() > 0.6) { return 8.5 - get.value(card); }
                                         if (att <= 0 && get.suit(card) == event.suit && ui.selected.cards.length >= 2) { return 7 - get.value(card); }
                                         return 0;
                                     });
@@ -14559,7 +14560,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             if (!player.storage[skill]) player.storage[skill] = [];
                                         },
                                         intro: {
-                                            content: function (player) {
+                                            content: function (storage, player) {
                                                 var str = "";
                                                 var shadow = player.getStorage("tirpitz_chuanyue_shadow")
                                                 for (var i = 0; i < shadow.length; i++) {
@@ -15114,6 +15115,211 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
+                            Xfliegerkorps_piaobodeying: {
+                                nobracket: true,
+                                group: ["Xfliegerkorps_piaobodeying_gethangmucv", "Xfliegerkorps_piaobodeying_campare"],
+                                subSkill: {
+                                    gethangmucv: {
+                                        trigger: {
+                                            global: "gameStart",
+                                        },
+                                        frequent: true,
+                                        content: function () {
+                                            player.addSkill("hangmucv");
+                                        },
+                                    },
+                                    campare: {
+                                        audio: "ext:舰R牌将/audio/skill:true",
+                                        enable: "phaseUse",
+                                        usable: 1,
+                                        selectTarget: 1,
+                                        filterTarget: function (card, player, target) {
+                                            return player.canCompare(target);
+                                        },
+                                        filter: function (event, player) {
+                                            return player.countCards("h") > 0;
+                                        },
+                                        content: function () {
+                                            "step 0"
+                                            player.chooseToCompare(target);
+                                            "step 1"
+                                            if (result.bool) {
+                                                if (!player.hasSkill("Xfliegerkorps_piaobodeying_mark")) {
+                                                    player.addTempSkill("Xfliegerkorps_piaobodeying_mark");
+                                                }
+                                                player.storage.Xfliegerkorps_piaobodeying_mark.push(player);
+                                                var count = 0;
+                                                for (var i of game.filterPlayer()) {
+                                                    if (i.countMark("Xfliegerkorps_piaobodeying_mark") > 0) count += i.countMark("Xfliegerkorps_piaobodeying_mark");
+                                                }
+                                                player.draw(Math.min(3, count));
+                                            } else {
+                                                for (var i of game.filterPlayer()) {
+                                                    if (i.countMark("Xfliegerkorps_piaobodeying_mark") > 0) i.removeMark(i.countMark("Xfliegerkorps_piaobodeying_mark"));
+                                                    if (i.hasSkill("Xfliegerkorps_piaobodeying_mark")) i.storage.Xfliegerkorps_piaobodeying_mark = [];
+                                                }
+                                                if (!target.hasSkill("Xfliegerkorps_piaobodeying_mark")) {
+                                                    target.addTempSkill("Xfliegerkorps_piaobodeying_mark");
+                                                }
+                                                target.storage.Xfliegerkorps_piaobodeying_mark.push(player);
+                                            }
+                                        },
+
+                                    },
+                                    die: {
+                                        charlotte: true,
+                                        trigger: { player: "die" },
+                                        direct: true,
+                                        forceDie: true,
+                                        content: function () {
+                                            for (var i of game.filterPlayer()) {
+                                                if (i.countMark("Xfliegerkorps_piaobodeying_mark") > 0) i.removeMark(i.countMark("Xfliegerkorps_piaobodeying_mark"));
+                                                if (i.hasSkill("Xfliegerkorps_piaobodeying_mark")) i.storage.Xfliegerkorps_piaobodeying_mark = [];
+                                            }
+                                        },
+                                    },
+                                },
+                            },
+                            Xfliegerkorps_piaobodeying_mark: {
+                                init: function (player, skill) {
+                                    if (!player.storage.Xfliegerkorps_piaobodeying_mark) player.storage.Xfliegerkorps_piaobodeying_mark = [];
+                                },
+                                mark: true,
+                                marktext: "鹰",
+                                onremove: true,
+                                intro: {
+                                    name: "鹰",
+                                    content: function (storage, player) {
+                                        if (player.hasSkill("Xfliegerkorps_piaobodeying")) { return "拥有" + player.countMark("Xfliegerkorps_piaobodeying_mark") + "枚鹰标记"; }
+                                        if (player.hasSkill("hangmucv")) { return "拥有" + player.countMark("Xfliegerkorps_piaobodeying_mark") + "枚鹰标记,摸牌阶段摸牌数+1"; }
+                                        return "拥有与" + get.translation(player.storage.Xfliegerkorps_piaobodeying_mark[0]) + "相同等级的航母";
+                                    },
+                                },
+                                group: ["Xfliegerkorps_piaobodeying_mark_hangmucv", "Xfliegerkorps_piaobodeying_mark_yingzi"],
+                                subSkill: {
+                                    hangmucv: {
+                                        trigger: { player: "phaseUseBegin" },
+                                        filter: function (event, player) {
+                                            return !player.getStorage("player.storage.Xfliegerkorps_piaobodeying_mark").includes(player) && !player.hasSkill("hangmucv") && player.countCards('h') > 0;
+                                        },
+                                        frequent: true,
+                                        content: function () {
+                                            "step 0"
+                                            let sourcePlayer = player.getStorage("player.storage.Xfliegerkorps_piaobodeying_markspurce");
+                                            if (sourcePlayer[0] && sourcePlayer[0].isAlive) {
+                                                let level = sourcePlayer[0].countMark('jinengup');
+                                            } else {
+                                                let level = 0;
+                                            }
+                                            if (level <= 0) {
+                                                player.chooseCardTarget({
+                                                    prompt: "弃置任意张黑桃或梅花手牌，视为使用【万箭齐发】",
+                                                    filterCard: { color: 'black' },
+                                                    position: 'h',
+                                                    selectCard: [1, Infinity],
+                                                    selectTarget: [1, Infinity],
+                                                    filterOk: function () {
+                                                        return ui.selected.cards.length == ui.selected.targets.length;
+                                                    },
+                                                    filterTarget: function (card, player, target) {
+                                                        return player.canUse({ name: 'wanjian' }, target);
+                                                    },
+                                                    ai1: function (card) {
+                                                        return 9 - get.value(card);
+                                                    },
+                                                    ai2: function (target) {
+                                                        return get.effect(target, { name: 'wanjian' }, player, player);
+                                                    }
+
+                                                });
+                                            } else if (level == 1) {
+                                                player.chooseCardTarget({
+                                                    prompt: "弃置任意张黑桃或梅花或红桃手牌，视为使用【万箭齐发】",
+                                                    filterCard: { suit: ['spade', 'club', 'heart'] },
+                                                    position: 'h',
+                                                    selectCard: [1, Infinity],
+                                                    selectTarget: [1, Infinity],
+                                                    filterOk: function () {
+                                                        return ui.selected.cards.length == ui.selected.targets.length;
+                                                    },
+                                                    filterTarget: function (card, player, target) {
+                                                        return player.canUse({ name: 'wanjian' }, target);
+                                                    },
+                                                    ai1: function (card) {
+                                                        return 9 - get.value(card);
+                                                    },
+                                                    ai2: function (target) {
+                                                        return get.effect(target, { name: 'wanjian' }, player, player);
+                                                    }
+                                                });
+                                            } else if (level >= 2) {
+                                                player.chooseCardTarget({
+                                                    prompt: "弃置任意手牌，视为使用【万箭齐发】",
+                                                    filterCard: true,
+                                                    position: 'h',
+                                                    selectCard: [1, Infinity],
+                                                    selectTarget: [1, Infinity],
+                                                    filterOk: function () {
+                                                        return ui.selected.cards.length == ui.selected.targets.length;
+                                                    },
+                                                    filterTarget: function (card, player, target) {
+                                                        return player.canUse({ name: 'wanjian' }, target);
+                                                    },
+                                                    ai1: function (card) {
+                                                        return 9 - get.value(card);
+                                                    },
+                                                    ai2: function (target) {
+                                                        return get.effect(target, { name: 'wanjian' }, player, player);
+                                                    }
+                                                });
+                                            }
+                                            "step 1"
+                                            if (result.targets && result.targets.length > 0) {
+                                                player.useCard({ name: 'wanjian' }, result.cards, result.targets);
+                                            }
+                                        },
+                                        ai: {
+                                            basic: {
+                                                order: 8.5,
+                                                useful: 1,
+                                                value: 7,
+                                            },
+                                            wuxie: function (target, card, player, viewer) {
+                                                if (get.attitude(viewer, target) > 0 && target.countCards('h', 'shan')) {
+                                                    if (!target.countCards('h') || target.hp == 1 || Math.random() < 0.7) return 0;
+                                                }
+                                            },
+                                            result: {
+                                                player: function (player) {
+                                                    return 1;
+                                                },
+                                            },
+                                            tag: {
+                                                respond: 1,
+                                                respondShan: 1,
+                                                damage: 1,
+                                                multitarget: 1,
+                                                multineg: 1,
+                                            },
+                                        },
+                                    },
+                                    yingzi: {
+                                        trigger: { player: 'phaseDrawBegin2' },
+                                        preHidden: true,
+                                        frequent: true,
+                                        filter: function (event, player) {
+                                            return !player.getStorage("player.storage.Xfliegerkorps_piaobodeying_mark").includes(player) && player.hasSkill(hangmucv) && !event.numFixed;
+                                        },
+                                        content: function () {
+                                            trigger.num++;
+                                        },
+                                        ai: {
+                                            threaten: 1.1
+                                        },
+                                    },
+                                },
+
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -15217,6 +15423,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             akagikaga: "贪赤城加贺",
                             savoy: "疑萨沃尼亚",
                             cassone: "疑卡萨诺方案",
+                            Xfliegerkorps: "疑第十航空军团",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -15499,6 +15706,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             cassone_weizhuangqixi: "伪装奇袭", cassone_weizhuangqixi_info: "出牌阶段限一次，你可以与一名角色：若你赢，你与其之间距离视作1，且每回合你对其使用的第一张牌不可响应，直到其回合结束；若其赢，你失去一点体力，那之后，直到其回合结束，你受到其造成的伤害后，恢复1点体力",
                             cassone_weizhuangqixi_win: "伪装奇袭_赢",
                             cassone_weizhuangqixi_lose: "伪装奇袭_没赢",
+                            Xfliegerkorps_piaobodeying: "漂泊的鹰", "Xfliegerkorps_piaobodeying_info": "游戏开始时，你获得技能“航母”。出牌阶段限一次，你可以与一名角色拼点：若你赢，你获得一枚“鹰”标记，并摸X张牌（X为场上“鹰”标记数量且最多为3）；若你没赢，移去场上所有“鹰”标记，并给其一枚“鹰”标记。拥有“鹰”标记的其他角色若没有技能“航母”，视作拥有和你一样等级的“航母”，否则，摸牌阶段摸牌数+1。",
+                            Xfliegerkorps_piaobodeying_mark: "漂泊的鹰",
+                            Xfliegerkorps_piaobodeying_mark_yingzi: "漂泊的鹰_摸牌+1",
+                            Xfliegerkorps_piaobodeying_mark_hangmucv: "漂泊的鹰_开幕航空",
+
 
                             jianrbiaozhun: "舰r标准",
                             lishizhanyi: '历史战役',
