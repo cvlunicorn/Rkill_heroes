@@ -4795,7 +4795,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player.logSkill('wufenzhong1', result.targets);
                                         player.storage.AttTarget = result.targets[0]
                                         var list = ["thunder", "fire"];
-                                        //game.log(JSON.stringify(list));
                                         player.chooseControl(list).set('prompt', get.prompt('mingyundewufenzhong')).set('prompt2', '视为使用一张属性杀');
                                     } else {
                                         event.finish();
@@ -4855,7 +4854,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player.discard(result.cards[0]);
                                         player.storage.AttTarget = result.targets[0]
                                         var list = ["thunder", "fire"];
-                                        //game.log(JSON.stringify(list));
                                         player.chooseControl(list).set('prompt', get.prompt('mingyundewufenzhong')).set('prompt2', '视为使用一张属性杀');
                                     } else {
                                         event.finish();
@@ -4894,7 +4892,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player.storage.AttTarget = result.targets[0]
                                         player.turnOver();
                                         var list = ["thunder", "fire"];
-                                        //game.log(JSON.stringify(list));
                                         player.chooseControl(list).set('prompt', get.prompt('mingyundewufenzhong')).set('prompt2', '视为使用一张属性杀');
                                     } else {
                                         event.finish();
@@ -6187,8 +6184,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 filterCard(card, player) {
                                     var player = get.player();
-                                    //var event = _status.event;
-                                    //game.log("选择卡牌过滤器" + JSON.stringify(player.storage.duomianshou));
                                     var numbers = [];
 
                                     if (player.storage.duomianshou.length) {
@@ -6220,13 +6215,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     'step 0'
-                                    game.log("记录的卡牌" + JSON.stringify(player.storage.duomianshou));
                                     var card = cards[0];
                                     //var cardtype=get.type(card);
                                     //game.log("卡牌价值" + get.value(card));
                                     // game.log("卡牌类型" + get.type(card));
                                     var list = [];
-                                    //game.log(JSON.stringify(lib.cardPile));
                                     for (var i of ui.cardPile.childNodes) {
 
                                         var name = get.name(i);
@@ -6302,7 +6295,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
 
                                     if (result && result.bool && result.links[0]) {
-                                        //game.log("选中的结果" + JSON.stringify(get.name(result.links[0])));
                                         player.discard(cards[0]);
                                         //player.addTempSkill("duomianshou_1", "useCardToTargeted");
                                         player.chooseUseTarget(true, get.name(result.links[0]));
@@ -7214,9 +7206,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     "step1"
                                     if (result1.bool) {
                                         game.log("给牌免伤");
-                                        //game.log(result1.cards);
-                                        // game.log(result1.bool);
-                                        //game.log(JSON.stringify(result1));
                                         trigger.player.give(result1.cards, player);
                                         trigger.player.draw(1);
                                         trigger.cancel();
@@ -10105,14 +10094,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     "step 1"
                                     //game.log(result.targets);
                                     if (result.targets) {
-                                        event.target = result.targets[0];
-                                        event.target.chooseControlList([
+                                        event.targets0 = result.targets[0];
+                                        event.targets0.chooseControlList([
                                             '视为对' + player.name + '使用一张杀',
                                             '令' + player.name + '从牌堆中获得一张基本牌',
-                                        ]).set('prompt', get.prompt('houfu', event.target)).setHiddenSkill('houfu').set('ai', function () {
+                                        ]).set('prompt', get.prompt('houfu', event.targets0)).setHiddenSkill('houfu').set('ai', function () {
                                             //var player = get.player();
                                             //game.log(get.attitude(event.target, player));
-                                            if (get.attitude(event.target, player) < 0) {
+                                            if (get.attitude(event.targets0, player) < 0) {
                                                 return 0;
                                             }
                                             return 1;
@@ -10813,9 +10802,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     'step 1'
                                     if (result.bool) {//只能判断你有没有选择，然后给你true与false，没其他文本。
                                         player.discard(result.cards);//前面有卡牌card，可以返回card，不同于仁德主动技能直接写card。
-                                        event.target = result.targets;//前面有目标target，可以返回target。
-                                        if (event.target != undefined) { for (var i = 0; i < trigger.targets.length; i += (1)) { if (event.target.includes(trigger.targets[i])) { trigger.getParent().excluded.add(trigger.targets[i]); trigger.targets[i].addSkill('fangkong2_aibiexuan'); game.log('取消卡牌目标', trigger.targets[i], '编号', i) } } };//三级选择，集合target是否包含trigger.target。同时测试是否选到了目标。
-                                        player.logSkill('duikongzhiwei', event.target);
+                                        event.targets0 = result.targets;//前面有目标target，可以返回target。
+                                        if (event.targets0 != undefined) { for (var i = 0; i < trigger.targets.length; i += (1)) { if (event.targets0.includes(trigger.targets[i])) { trigger.getParent().excluded.add(trigger.targets[i]); trigger.targets[i].addSkill('fangkong2_aibiexuan'); game.log('取消卡牌目标', trigger.targets[i], '编号', i) } } };//三级选择，集合target是否包含trigger.target。同时测试是否选到了目标。
+                                        player.logSkill('duikongzhiwei', event.targets0);
                                     }//让技能发语音，发历史记录。
                                 },
 
@@ -11415,7 +11404,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     "step 0"
-                                    event.target = target;
                                     var list = [];
                                     var dialog = ["舰队训练：与" + get.translation(target) + "交换一种花色的所有手牌"];
                                     for (var suit of lib.suit.concat("none")) {
@@ -12435,7 +12423,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 continue;
                                             }
                                             var info = get.info(skill);
-                                            //game.log(JSON.stringify(info));
                                             if (!info || typeof info !== "object") {
                                                 continue;
                                             }
@@ -13119,7 +13106,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player
                                         .chooseToDiscard(get.prompt2("xiandaihuagaizao"), Math.min(num, 3), "hes")
                                         .set("ai", card => {
-                                            if (ui.selected.cards.length == 2) return 10 - get.value(card);
+                                            if (ui.selected.cards.length == 2&&player.maxHp < 5) return 10 - get.value(card);
                                             if (player.maxHp < 5) {
                                                 return 7.5 - get.value(card);
                                             }
@@ -13331,20 +13318,21 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             event.count = 0;
                                             "step 1";
                                             if (player.storage.pachina_xinao[event.count][0].isAlive) {
-                                                event.target = player.storage.pachina_xinao[event.count][0];
-                                                event.num = Math.min(event.target.countCards("he"), player.storage.pachina_xinao[event.count][1]);
-                                                event.target.chooseCard('he', true, event.num, '交给' + get.translation(player) + event.num + '张牌').set('ai', function (card) {
-                                                    var attitude = get.attitude(event.target, player);
+                                                event.targets0 = player.storage.pachina_xinao[event.count][0];
+                                                event.num = Math.min(event.targets0.countCards("he"), player.storage.pachina_xinao[event.count][1]);
+                                                event.targets0.chooseCard('he', true, event.num, '交给' + get.translation(player) + event.num + '张牌').set('ai', function (card) {
+                                                    var attitude = get.attitude(event.targets0, player);
                                                     if (attitude <= 0) return -get.value(card);
                                                     return get.value(card, player);
                                                 });
                                             }
                                             "step 2";
-                                            if (result.bool) {
-                                                event.target.give(result.cards, player);
+                                            if (result.bool&&event.targets0) {
+                                                event.targets0.give(result.cards, player);
                                             }
                                             event.count++;
                                             if (event.count < player.storage.pachina_xinao.length) { event.goto(1); }
+                                            "step 3";
                                             player.storage.pachina_xinao = [];
                                         },
                                     },
@@ -13935,8 +13923,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             });
                                             "step 1";
                                             if (result.bool) {
-                                                event.target = result.targets[0];
-                                                let cards = event.target.getCards("s", function (card) { return card.hasGaintag('junfu') });
+                                                event.targets0 = result.targets[0];
+                                                let cards = event.targets0.getCards("s", function (card) { return card.hasGaintag('junfu') });
                                                 player.chooseCardButton("获得一张【军辅】牌", true, cards).set('ai', function (button) {
                                                     return get.number(button.link);
                                                 }).set('selectButton', 1);
