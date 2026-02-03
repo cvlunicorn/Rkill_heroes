@@ -10684,7 +10684,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 frequent: true,
                                 filter: function (event, player) {
-                                    return event.card.name == "sha" && player.countCards("h") > event.player.countCards("h") && event.notLink();
+                                    return event.card&&event.card.name == "sha" && player.countCards("h") > event.player.countCards("h") && event.notLink();
                                 },
                                 content: function () {
                                     trigger.num += 1;
