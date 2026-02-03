@@ -1262,7 +1262,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter: function (event, player) {
                                     if (lib.config.extension_舰R牌将__qianghuazhuang === false) return false;
                                     if (player.hasSkill("guzhuyizhi2")) { return 0; }//孤注一掷发动后禁用强化。
-                                    var a = player.countMark('mopaiup'), b = player.countMark('jinengup'), c = player.countMark('wuqiup'), d = player.countMark('useshaup'), e = player.countMark('jidongup'), f = player.countMark('shoupaiup'), g = player.countMark('songpaiup'), h = player.countMark('Expup'), k = player.countMark('_jianzaochuan') + 1, lv = 0; if (k < 3) { lv = k * 6 };//if(k>=3){lv=k+10};//远航上限降低为2，总可用强化数量公式作相应修改
+                                    var a = player.countMark('mopaiup'), b = player.countMark('jinengup'), c = player.countMark('wuqiup'), d = player.countMark('useshaup'), e = player.countMark('jidongup'), f = player.countMark('shoupaiup'), g = player.countMark('songpaiup'), h = player.countMark('Expup'), k = player.countMark('_jianzaochuan') + 1, lv = 0; 
+                                    lv = k * 6;//远航上限降低为2，总可用强化数量公式作相应修改
                                     if (player.countCards('h') > 0) { if ((a + b + c + d + e + f + g) >= (lv)) return false };
                                     return player.countCards('h') > 1 || player.countMark('Expup') > 1;
                                     //比较保守的设计，便于设计与更改。
@@ -1286,7 +1287,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {//choiceList.unshift
                                     'step 0'
-                                    var a = player.countMark('mopaiup'), b = player.countMark('jinengup'), c = player.countMark('wuqiup'), d = player.countMark('useshaup'), e = player.countMark('jidongup'), f = player.countMark('shoupaiup'), g = player.countMark('songpaiup'), h = player.countMark('Expup'), k = player.countMark('_jianzaochuan') + 1, exp1 = 0;
+                                    var a = player.countMark('mopaiup'), b = player.countMark('jinengup'), c = player.countMark('wuqiup'), d = player.countMark('useshaup'), e = player.countMark('jidongup'), f = player.countMark('shoupaiup'), g = player.countMark('songpaiup'), h = player.countMark('Expup'), k = player.countMark('_jianzaochuan') + 1;
                                     player.storage._qianghuazhuang = [a, b, c, d, e, f, g, h, k];
                                     event.exp1 = cards.length;
                                     var choiceList = [];
@@ -10611,7 +10612,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
                                 ai: {
-                                    threaten: 1.5,
+                                    threaten: function (player, target) {
+                                        if (target.maxHp <= 4) return 1.2;
+                                        if (target.maxHp <= 6) return 1;
+                                        return 0.8;
+                                    },
                                 },
                             },
                             saqijian: {
