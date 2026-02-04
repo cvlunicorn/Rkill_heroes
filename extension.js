@@ -10132,8 +10132,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             name: "sha",
                                             isCard: true,
                                         };
-                                        if (target.canUse(card, player, false)) {
-                                            target.useCard(card, player, false);
+                                        if (event.targets0.canUse(card, player, false)) {
+                                            event.targets0.useCard(card, player, false);
                                         }
                                     }
                                     else if (result.index == 1) {
