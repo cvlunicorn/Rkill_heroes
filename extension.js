@@ -1262,7 +1262,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter: function (event, player) {
                                     if (lib.config.extension_舰R牌将__qianghuazhuang === false) return false;
                                     if (player.hasSkill("guzhuyizhi2")) { return 0; }//孤注一掷发动后禁用强化。
-                                    var a = player.countMark('mopaiup'), b = player.countMark('jinengup'), c = player.countMark('wuqiup'), d = player.countMark('useshaup'), e = player.countMark('jidongup'), f = player.countMark('shoupaiup'), g = player.countMark('songpaiup'), h = player.countMark('Expup'), k = player.countMark('_jianzaochuan') + 1, lv = 0; 
+                                    var a = player.countMark('mopaiup'), b = player.countMark('jinengup'), c = player.countMark('wuqiup'), d = player.countMark('useshaup'), e = player.countMark('jidongup'), f = player.countMark('shoupaiup'), g = player.countMark('songpaiup'), h = player.countMark('Expup'), k = player.countMark('_jianzaochuan') + 1, lv = 0;
                                     lv = k * 6;//远航上限降低为2，总可用强化数量公式作相应修改
                                     if (player.countCards('h') > 0) { if ((a + b + c + d + e + f + g) >= (lv)) return false };
                                     return player.countCards('h') > 1 || player.countMark('Expup') > 1;
@@ -6620,7 +6620,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 nobracket: true,
                                 enable: "phaseUse",
                                 usable: 1,
-
+                                filter: function (card, player, target) {
+                                    return player.countCards("h");
+                                },
                                 filterTarget: function (card, player, target) {
                                     return player != target && target.countCards("h");
                                 },
@@ -6633,7 +6635,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                     const targets = event.targets.sortBySeat();
                                     targets.push(player);
-                                    //game.log(targets);
                                     const next = player.chooseCardOL(targets, '请展示一张手牌', true).set('ai', card => {
                                         return -get.value(card);
                                     }).set('aiCard', target => {
@@ -6646,8 +6647,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     const videoId = lib.status.videoId++;
 
                                     for (let i = 0; i < targets.length; i++) {
+                                        if(result&&result[i]&&result[i].cards&&result[i].cards[0]){
                                         cardsA.push(result[i].cards[0]);
                                         game.log(get.translation(targets[i]), '展示了', result[i].cards[0]);
+                                        }else{
+                                            game.log(get.translation(targets[i]),"未能展示牌，技能中止");
+                                            player.getStat('skill').xinqidian -= 1;
+                                            return;
+                                        }
                                     }
                                     game.broadcastAll((targets, cardsA, id, player) => {
                                         var dialog = ui.create.dialog(get.translation(player) + '发动了【新起点】', cardsA);
@@ -10684,7 +10691,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 frequent: true,
                                 filter: function (event, player) {
-                                    return event.card&&event.card.name == "sha" && player.countCards("h") > event.player.countCards("h") && event.notLink();
+                                    return event.card && event.card.name == "sha" && player.countCards("h") > event.player.countCards("h") && event.notLink();
                                 },
                                 content: function () {
                                     trigger.num += 1;
