@@ -3198,7 +3198,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             global: ["useCard"],
                                         },
                                         filter: function (event, player) {
-                                            return player.countCards("s") > 0 && get.type(event.card) == "trick";
+                                            return player.countCards('s', function (card) { return card.hasGaintag('daodan') }) > 0 && get.type(event.card) == "trick";
                                         },
                                         check: function (event, player) {
                                             var effect = 0;
@@ -3223,8 +3223,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         content: function () {
                                             "step 0";
-                                            game.log(player.getCards('s', function (card) { return card.hasGaintag('daodan') }));
-                                            player.chooseCardButton('移去一张防空导弹', player.getCards('s', function (card) { return card.hasGaintag('daodan') }), 1).set('ai', function (button) {
+                                            if (player.getCards('s', function (card) { return card.hasGaintag('daodan') }).length <= 0) { return; }
+                                            player.chooseCardButton('移去一张防空导弹', player.getCards('s', function (card) { return card.hasGaintag('daodan') }), true, 1).set('ai', function (button) {
                                                 return 1;
                                             });
                                             "step 1";
@@ -6647,11 +6647,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     const videoId = lib.status.videoId++;
 
                                     for (let i = 0; i < targets.length; i++) {
-                                        if(result&&result[i]&&result[i].cards&&result[i].cards[0]){
-                                        cardsA.push(result[i].cards[0]);
-                                        game.log(get.translation(targets[i]), '展示了', result[i].cards[0]);
-                                        }else{
-                                            game.log(get.translation(targets[i]),"未能展示牌，技能中止");
+                                        if (result && result[i] && result[i].cards && result[i].cards[0]) {
+                                            cardsA.push(result[i].cards[0]);
+                                            game.log(get.translation(targets[i]), '展示了', result[i].cards[0]);
+                                        } else {
+                                            game.log(get.translation(targets[i]), "未能展示牌，技能中止");
                                             player.getStat('skill').xinqidian -= 1;
                                             return;
                                         }
