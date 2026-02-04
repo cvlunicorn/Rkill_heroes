@@ -2262,7 +2262,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 popup: false,
                                 ai: {
                                     expose: 0.3,
-                                    threaten: 1.8,
+                                    threaten: 1.6,
                                     order: 5,
                                     result: {
                                         player: 1,
@@ -4248,7 +4248,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player.gain(cards2, 'log', 'gain2');
                                 },
                                 ai: {
-                                    threaten: 3,
+                                    threaten: 1.6,
                                 },
                             },
                             gaosusheji: {
@@ -6342,7 +6342,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (result.bool == false) player.draw();
                                 },
                                 ai: {
-                                    threaten: 2.6,
+                                    threaten: 1.4,
                                 },
                                 "_priority": 0,
                             },
@@ -13301,16 +13301,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         var num = cards.length;
                                         player.give(cards, target);
                                         player.storage.pachina_xinao.push([target, num]);
-                                        for (var i = 0; i < player.storage.pachina_xinao.length; i++) {
-                                            // 取出数组中的每一项（[target, num]）
-                                            var item = player.storage.pachina_xinao[i];
-                                            var targetItem = item[0]; // 目标玩家对象
-                                            var numItem = item[1]; // 牌的数量
-
-                                            // 只打印玩家名称（简单字符串），不直接打印 target 对象
-                                            var targetName = targetItem ? targetItem.name : "未知目标";
-                                            game.log("pachina_xinao 第 " + (i + 1) + " 项：[目标：" + targetName + "，牌数：" + numItem + "]");
-                                        }
                                         player.turnOver();
                                         player.recover(Math.floor(num / 2));
                                         player.addTempSkill("zhuangjiafh", { player: "phaseBegin" });
@@ -14078,7 +14068,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 ai: {
                                     combo: "sukhbaatar_sudaren",
-                                    threaten: 3,
+                                    threaten: 1.9,
                                 },
                                 "_priority": 0,
                             },
@@ -14378,7 +14368,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                 },
                                 ai: {
-                                    threaten: 2.6,
+                                    threaten: 1.8,
                                 }
                             },
                             bismarck_chajin_tempBan: {
@@ -14548,7 +14538,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                 },
                                 ai: {
-                                    threaten: 3.1,
+                                    threaten: 2.1,
                                 },
                             },
                             tirpitz_chuanyue: {
