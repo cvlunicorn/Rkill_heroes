@@ -6473,7 +6473,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     mianyi: {
                                         nobracket: true,
                                         audio: "ext:舰R牌将/audio/skill:true",
-                                        round: 1,
                                         trigger: {
                                             target: "useCardToBefore",
                                         },
@@ -6487,18 +6486,25 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                         content() {
                                             trigger.cancel();
+                                            player.addTempSkill("yishisheji_mianyi_used", { global: "roundStart" });
                                         },
                                         ai: {
                                             effect: {
                                                 target(card, player, target, current) {
-                                                    if (player.storage[yishisheji_mianyi] && player.storage[yishisheji_mianyi] && (1 - (game.roundNumber - player.storage[yishisheji_mianyi] < 0))) {
+                                                    if (!player.hasSkill("yishisheji_mianyi_used")) {
                                                         if ((get.type(card, "trick") == "trick" || get.name(card) == "sha" || get.name(card) == "sheji9") && target != player) return "zerotarget";
                                                     }
                                                 },
                                             },
                                         },
                                         "_priority": 1500,
-                                    }
+                                    },
+                                    mianyi_used: {
+                                        mark: true,
+                                        intro: {
+                                            content: '本轮已发动'
+                                        },
+                                    },
 
                                 },
                             },
@@ -9144,7 +9150,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         respondSha: 2,
                                         damage: 1,
                                     },
-                                    threaten:1.3,
+                                    threaten: 1.3,
                                 },
                                 group: ["tiaobangzuozhan_self", "tiaobangzuozhan_damage"],
                                 subSkill: {
