@@ -866,7 +866,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         if (target == player.previous) {
                             var evt = _status.event.getParent('phaseUse');
                             if (evt && evt.name == 'phaseUse') {//player.turnOver();
-                                if (player.hasSkill('_yidong_yidong2')) { target.insertPhase(); palyer.addSkill('_yidong_yidong2'); }; event.finish();
+                                if (player.hasSkill('_yidong_yidong2')) { target.insertPhase(); player.addSkill('_yidong_yidong2'); }; event.finish();
                             }
                         };
                         if (target == player.next) { target.turnOver(); event.finish() };
@@ -1295,7 +1295,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     //game.log(cards);
                                     event.cao = cards;
                                     //game.log(event.cao);
-                                    jieshao = ['后勤保障：上限+' + (a + 1) + '→' + (a + 2) + '远航（用一摸一）标记上限，<br>手牌少于手牌上限1/2时，失去手牌会摸一张牌。防守反击的保障<br>每轮上限1/2/3，在自己的回合重置使用次数。', '技能升级：+' + (b) + '→' + (b + 1) + '，重巡-降低必中攻击限制(杀/黑牌/任意牌)、轻巡-增加无效群体锦囊牌范围(1/2/3)、航母-降低万箭齐发限制(黑桃与梅花/黑桃与梅花与红桃/任意牌);<br>战列舰-增加防护范围(杀造成的伤害/杀和锦囊牌造成的伤害/所有伤害)，导驱-增加射程(2/3/4)降低导弹条件（武器/装备/任意牌）、潜艇-降低雷杀条件(红桃/红桃或黑桃/红桃或黑桃或方块);<br>驱逐-增加回避概率(0.25/0.50/0.75)、军辅-增加存牌上限(1/2/3)、要塞-增加血量上限（0/1/2）。', '射程升级：+' + c + '→' + (c + 1) + '武器（出杀）攻击距离，<br>增加出杀攻击范围，虽然不增加锦囊牌距离，但胜在永久', '速射炮管：+' + d + '→' + (d + 1) + '出杀次数，<br>作为连弩的临时替代，进行多刀输出。', '改良推进器：+' + e + '→' + (e + 1) + '武器（被杀）防御距离<br>对手有更远的出杀范围才能对你出杀时，但不能防御锦囊牌。', '物流运输：+' + f + '→' + (f + 1) + '手牌上限，且蝶舞递装备给杀的距离提升，<br>双方状态差距越大，保牌效果越强。', '经验：+' + h + '→' + event.exp1 + '，将卡牌转为经验，供下次升级。（直接点确定也行）<br>1级技能需要两张牌才能强化，2级技能需要三张牌才能强化。<br>但无名杀不能读取这个界面的文本，导致四点经验即可强化两个不同等级技能']//player.getEquip(1)，定义空数组，push填充它，事件变量可以自定义名字，什么都可以存。game.log('已强化:',a+b+c+d);
+                                    var jieshao = ['后勤保障：上限+' + (a + 1) + '→' + (a + 2) + '远航（用一摸一）标记上限，<br>手牌少于手牌上限1/2时，失去手牌会摸一张牌。防守反击的保障<br>每轮上限1/2/3，在自己的回合重置使用次数。', '技能升级：+' + (b) + '→' + (b + 1) + '，重巡-降低必中攻击限制(杀/黑牌/任意牌)、轻巡-增加无效群体锦囊牌范围(1/2/3)、航母-降低万箭齐发限制(黑桃与梅花/黑桃与梅花与红桃/任意牌);<br>战列舰-增加防护范围(杀造成的伤害/杀和锦囊牌造成的伤害/所有伤害)，导驱-增加射程(2/3/4)降低导弹条件（武器/装备/任意牌）、潜艇-降低雷杀条件(红桃/红桃或黑桃/红桃或黑桃或方块);<br>驱逐-增加回避概率(0.25/0.50/0.75)、军辅-增加存牌上限(1/2/3)、要塞-增加血量上限（0/1/2）。', '射程升级：+' + c + '→' + (c + 1) + '武器（出杀）攻击距离，<br>增加出杀攻击范围，虽然不增加锦囊牌距离，但胜在永久', '速射炮管：+' + d + '→' + (d + 1) + '出杀次数，<br>作为连弩的临时替代，进行多刀输出。', '改良推进器：+' + e + '→' + (e + 1) + '武器（被杀）防御距离<br>对手有更远的出杀范围才能对你出杀时，但不能防御锦囊牌。', '物流运输：+' + f + '→' + (f + 1) + '手牌上限，且蝶舞递装备给杀的距离提升，<br>双方状态差距越大，保牌效果越强。', '经验：+' + h + '→' + event.exp1 + '，将卡牌转为经验，供下次升级。（直接点确定也行）<br>1级技能需要两张牌才能强化，2级技能需要三张牌才能强化。<br>但无名杀不能读取这个界面的文本，导致四点经验即可强化两个不同等级技能']//player.getEquip(1)，定义空数组，push填充它，事件变量可以自定义名字，什么都可以存。game.log('已强化:',a+b+c+d);
                                     var info = lib.skill._qianghuazhuang.getInfo(player);
                                     //game.log(info);
                                     if (info[0] < k && (info[0] + 2 <= info[6] + event.exp1) && info[0] <= 2) {
@@ -1546,9 +1546,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         ai: {
                                             effect: {
                                                 player: function (card, player) {
-                                                    var a = game.countPlayer(function (current) { return current != player && (!get.attitude(player, current) < 0 && (player.hasSkill == 'zhongxunca' || player.hasSkill == 'qingxun')); });
+                                                    var a = game.countPlayer(function (current) {
+                                                        return current != player && (!get.attitude(player, current) < 0 && (player.hasSkill('zhongxunca') || player.hasSkill('qingxun')));
+
+                                                    });
                                                     if (card.name == 'tengjia') {
-                                                        var equip1 = player.getEquip(1); if (a > 0 || player.hasSkill == '_wulidebuff_ranshao') { return -10; };
+                                                        var equip1 = player.getEquip(1); if (a > 0 || player.hasSkill('_wulidebuff_ranshao')) { return -10; };
                                                         if (a > 0) return -1;
                                                     }
                                                 },
@@ -1681,7 +1684,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter: function (event, player, card) {
                                     var chusha = player.getAllHistory('useCard', function (evt) {
                                         return get.name(evt.card, 'sha') == 'sha';
-                                    }).length, danzong = player.getAllHistory('useSkill', function (evt) { return evt.skill == "danzong"; }).length; var e = Math.random(), f = 0.4; if (player.hasSkill('quzhudd')) var f = 0.35; if (player.hasSkill('qingxuncl')) var f = 0.45; if (player.hasSkill('zhongxunca')) var f = 0.55;
+                                    }).length, danzong = player.getAllHistory('useSkill', function (evt) { return evt.skill == "danzong"; }).length;
+                                    var e = Math.random(), f = 0.4;
+                                    if (player.hasSkill('quzhudd')) var f = 0.35;
+                                    if (player.hasSkill('qingxuncl')) var f = 0.45;
+                                    if (player.hasSkill('zhongxunca')) var f = 0.55;
                                     return event.card.name == 'sha' && !event.card.nature && !player.hasSkill('danzong_damage') && e < f || chusha > danzong * 4 + 4;
                                 },
                                 audio: "ext:1牌将修改:true",
@@ -1726,19 +1733,19 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }).length, danzong = player.getAllHistory('useSkill', function (evt) { return evt.skill == "danzong"; }).length;
                                     //return event.card.name=='sha'&&!event.card.nature&&chusha/2-danzong>0;   
                                     //game.log(chusha, danzong);
-                                    if (1 > 2) {
-                                        trigger.card.nature = 'fire';
-                                        if ((player.hasSkill('quzhudd') | player.hasSkill('qianting'))) { trigger.card.nature = 'thunder' }; if ((player.hasSkill('zhanliebb') | player.hasSkill('hangmucv'))) { trigger.card.nature = 'thunder'; };
-                                        if (get.itemtype(trigger.card) == 'card') {
-                                            var next = game.createEvent('zhuque_clear');
-                                            next.card = trigger.card;
-                                            event.next.remove(next);
-                                            trigger.after.push(next);
-                                            next.setContent(function () {
-                                                delete card.nature;
-                                            });
-                                        }
-                                    } else player.addSkill('danzong_damage');
+
+                                    /* trigger.card.nature = 'fire';
+                                    if ((player.hasSkill('quzhudd') | player.hasSkill('qianting'))) { trigger.card.nature = 'thunder' }; if ((player.hasSkill('zhanliebb') | player.hasSkill('hangmucv'))) { trigger.card.nature = 'thunder'; };
+                                    if (get.itemtype(trigger.card) == 'card') {
+                                        var next = game.createEvent('zhuque_clear');
+                                        next.card = trigger.card;
+                                        event.next.remove(next);
+                                        trigger.after.push(next);
+                                        next.setContent(function () {
+                                            delete card.nature;
+                                        });
+                                    } */
+                                    player.addSkill('danzong_damage');
                                 },
                                 subSkill: {
                                     damage: {
@@ -1896,12 +1903,32 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     });
                                     'step 1'
                                     if (result.bool) {
-                                        event.target = result.targets[0]; player.draw(event.num); event.target.draw(event.num - player.countMark('jinengup'));
-                                        if (event.num > 1) { player.useCard({ name: 'juedou' }, event.target); event.target.useCard({ name: 'juedou' }, player); };
-                                        if (event.num > 2) { player.useCard({ name: 'juedou' }, event.target); event.target.useCard({ name: 'juedou' }, player); };
-                                        if (event.num > 3) { player.useCard({ name: 'juedou', nature: 'fire', isCard: false }, event.target); event.target.useCard({ name: 'juedou' }, player); };
-                                        if (event.num > 4) { player.useCard({ name: 'juedou', nature: 'fire', isCard: false }, event.target); event.target.useCard({ name: 'juedou' }, player); };
-                                    } else event.finish();
+                                        event.target = result.targets[0];
+                                        player.draw(event.num);
+                                        event.target.draw(event.num - player.countMark('jinengup'));
+                                        if (event.num > 1) {
+                                            player.useCard({ name: 'juedou' }, event.target);
+                                            event.target.useCard({ name: 'juedou' }, player);
+                                        };
+                                    } else {
+                                        event.finish();
+                                        return;
+                                    }
+                                    'step 2'
+                                    if (event.num > 2) {
+                                        player.useCard({ name: 'juedou' }, event.target);
+                                        event.target.useCard({ name: 'juedou' }, player);
+                                    };
+                                    'step 3'
+                                    if (event.num > 3) {
+                                        player.useCard({ name: 'juedou', nature: 'fire', isCard: false }, event.target);
+                                        event.target.useCard({ name: 'juedou' }, player);
+                                    };
+                                    'step 4'
+                                    if (event.num > 4) {
+                                        player.useCard({ name: 'juedou', nature: 'fire', isCard: false }, event.target);
+                                        event.target.useCard({ name: 'juedou' }, player);
+                                    };
                                 },
                                 ai: {
                                     expose: 0,
@@ -1981,7 +2008,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (target == player.previous) {
                                         var evt = _status.event.getParent('phaseUse');
                                         if (evt && evt.name == 'phaseUse') {//player.turnOver();
-                                            if (player.hasSkill('_yidong_yidong2')) { target.insertPhase(); palyer.addSkill('_yidong_yidong2'); }; event.finish();
+                                            if (player.hasSkill('_yidong_yidong2')) { target.insertPhase(); player.addSkill('_yidong_yidong2'); }; event.finish();
                                         }
                                     };
                                     if (target == player.next) { target.turnOver(); event.finish() };
@@ -2282,7 +2309,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         if (renshu < 2 || chusha) return 1; if (renshu >= 2 && !chusha) return 0;
                                     });
                                     'step 1'
-                                    if (result.contron != 'cancel2') { var i = result.index; game.log(i, 'xianjinld'); if (i == 0 && !player.hasMark('xianjinld_difend')) { player.addMark('xianjinld_difend'); player.removeMark('xianjinld_attack') }; if (i == 1 && !player.hasMark('xianjinld_attack')) { player.addMark('xianjinld_attack'); player.removeMark('xianjinld_difend') }; };
+                                    if (result.control != 'cancel2') { var i = result.index; game.log(i, 'xianjinld'); if (i == 0 && !player.hasMark('xianjinld_difend')) { player.addMark('xianjinld_difend'); player.removeMark('xianjinld_attack') }; if (i == 1 && !player.hasMark('xianjinld_attack')) { player.addMark('xianjinld_attack'); player.removeMark('xianjinld_difend') }; };
                                 },
                                 ai: {
                                     order: function (player) { if (lib.filter.cardEnabled({ name: 'sha' }, player)) { return 8; } return 3; },
@@ -2597,7 +2624,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
-                            kanpolimitai: {
+                            /* kanpolimitai: {//人杰写的半成品的可强化看破，当下没有调用，先注释了
                                 enable: "chooseToUse",
                                 locked: false,
                                 filter: function (event, player) {
@@ -2632,15 +2659,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 subSkill: {
                                     wuxiele: {
                                         trigger: {
-                                            golbal: "phaseJieshuBegin",
-                                            player: "phaseJieshuBegin",
+                                            global: "roundStart",
                                         },
                                         forced: true,
                                         silent: true,
-                                        content: function () {//,player.countMark('diewulimitai_2_shale')player.removeSkill('kanpolimitai_wuxiele');
-                                            // if(player.hasMark('kanpolimitai_wuxiele')){
+                                        content: function () {
                                             player.removeMark('kanpolimitai_wuxiele', player.countMark('kanpolimitai_wuxiele'));
-                                            // };
                                         },
                                         intro: {
                                             marktext: "",
@@ -2692,7 +2716,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         return get.translation(skill + '_info');
                                     },
                                 },
-                            },
+                            }, */
                             kaifa: {
                                 position: "hejs",
                                 audio: "xinfu_jingxie",
@@ -13463,14 +13487,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 nature: links[0][3],
                                                 isCard: false,
                                             },
-                                            filterCard:true,
+                                            filterCard: true,
                                             selectCard: 1,
                                             audio: "loki_xiance2",
                                             popname: true,
                                             check: function (card) {
                                                 return 8 - get.value(card);
                                             },
-                                            position: "h", 
+                                            position: "h",
                                             onuse: function (result, player) {
                                                 var loki_xiancePlayer = player.getStorage('loki_xiance2');
                                                 if (loki_xiancePlayer[0].isAlive()) {
@@ -15485,7 +15509,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             tiaozhanzhuangbei: "挑战装备",
                             "tiaozhanzhuangbei_info": "挑战锁定技，游戏开始时，你将一张【回避】【此舰种的武器】和一张【望远镜】置入你的装备区。你装备区内的武器牌和宝物牌不能被其他角色弃置。",
                             danzong: "增强杀",
-                            "danzong_info": "每使用六张杀，你便可以在造成无属性伤害附加属性：<br>潜艇、驱逐：获得雷属性的效果，<br>战列、航母：获得雷属性与改进型冰杀的效果。<br>其他舰种时：获得火属性,点燃目标。<br>效果持续到伤害结算完成时（打不穿藤甲的高爆弹与暴击藤甲的决斗）",
+                            "danzong_info": "你使用杀后，有概率可以在造成无属性伤害附加属性：<br>潜艇、驱逐：获得雷属性的效果，<br>战列、航母：获得雷属性与改进型冰杀的效果。<br>其他舰种时：获得火属性,点燃目标。<br>效果持续到伤害结算完成时（打不穿藤甲的高爆弹与暴击藤甲的决斗）",
                             /* "paohuozb_skill": "炮火准备1", "paohuozb_skill_info": "装备技能", */
                             dajiaoduguibi: "规避",
                             "dajiaoduguibi_info": "（可强化）若你没有装备防具，你需要使用或打出闪时可以进行一次判定，判定结果为：零级强化，方块/一级强化，红桃或方块/二级强化，不为黑桃，防止此伤害。",
@@ -15506,8 +15530,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "misscoversha": "回出杀数", "misscoversha_info": "杀被回避会回复当回合出杀次数",
                             "xianjinld": "先进雷达",
                             "xianjinld_info": "可以选择一个增益：1.攻击，实际距离此角色为1的队友：武器攻击距离+1;但防御杀的距离-1，队友的摸牌阶段多摸一张牌。或：2.防御距离+1，但是攻击距离-1，自己的摸牌阶段少抽一张牌。",
-                            "kanpolimitai": "制空权",
-                            "kanpolimitai_info": "每轮限一次，你可以将一张黑色手牌当无懈可击使用。可强化",
+                            //"kanpolimitai": "制空权",
+                            //"kanpolimitai_info": "每轮限一次，你可以将一张黑色手牌当无懈可击使用。可强化",
                             kaifa: "开发装备",
                             "kaifa_info": "出牌阶段，你可以展示一张未强化过的【诸葛连弩】或标准包/军争包/SP包中的防具牌，然后对其进行强化。当你处于濒死状态时，你可以重铸一张防具牌，然后将体力回复至1点。",
                             huijiahuihe: "额外回合",
