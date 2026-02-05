@@ -13449,7 +13449,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                     check: function (button) {
                                         if (_status.event.getParent().type != "phase") return 1;
-                                        var player = get.player();;
+                                        var player = get.player();
                                         if (["wugu", "zhulu_card", "yiyi", "lulitongxin", "lianjunshengyan", "diaohulishan"].includes(button.link[2])) return 0;
                                         return player.getUseValue({
                                             name: button.link[2],
@@ -13458,22 +13458,23 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                     backup: function (links, player) {
                                         return {
-                                            filterCard: function (card) {
-                                                return 1;
+                                            viewAs: {
+                                                name: links[0][2],
+                                                nature: links[0][3],
+                                                isCard: false,
                                             },
+                                            filterCard:true,
+                                            selectCard: 1,
                                             audio: "loki_xiance2",
                                             popname: true,
                                             check: function (card) {
                                                 return 8 - get.value(card);
                                             },
-                                            selectCard: 2,
-                                            position: "h",
-                                            viewAs: { name: links[0][2], nature: links[0][3] },
-                                            onuse: function () {
+                                            position: "h", 
+                                            onuse: function (result, player) {
                                                 var loki_xiancePlayer = player.getStorage('loki_xiance2');
-                                                game.log("献策2" + get.translation(loki_xiancePlayer[0]));
                                                 if (loki_xiancePlayer[0].isAlive()) {
-                                                    loki_xiancePlayer[0].markAuto('loki_xiance', [links[0][2]]);
+                                                    loki_xiancePlayer[0].markAuto('loki_xiance', result.card.name);
                                                 }
                                             },
                                         };
