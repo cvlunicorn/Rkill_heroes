@@ -6560,7 +6560,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             player: "useCard",
                                         },
                                         filter: function (event, player) {
-                                            return player == _status.currentPhase && player.countMark('jueshengzhibing_count') < 2 && event.card.isCard && get.type2(event.card) == 'trick';
+                                            return player == _status.currentPhase && player.countMark('jueshengzhibing_count') < 2 && event.card.isCard && get.type(event.card) == 'trick';
                                         },
                                         content: function () {
                                             player.draw();
@@ -13421,10 +13421,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 enable: "phaseUse",
                                 usable: 1,
                                 filter: function (event, player) {
-                                    if (!player.storage.loki_xiance2 || player.storage.loki_xiance2 == [] || !player.getStorage('loki_xiance2')[0].isAlive()) { return false; }
+                                    if (!player.getStorage('loki_xiance2') || player.getStorage('loki_xiance2').length == 0 || !player.getStorage('loki_xiance2')[0].isAlive()) { return false; }
                                     if (player.countCards("h") >= 2) {
                                         for (var i of lib.inpile) {
-                                            var type = get.type2(i);
+                                            var type = get.type(i);
                                             if ((type == "basic" || type == "trick") && event.filterCard(get.autoViewAs({ name: i }, "unsure"), player, event)) return true;
                                         }
                                     }
@@ -13442,14 +13442,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 for (var nature of lib.inpile_nature) {
                                                     if (event.filterCard(get.autoViewAs({ name, nature }, "unsure"), player, event)) list.push(["基本", "", "sha", nature]);
                                                 }
-                                            } else if (get.type2(name) == "trick" && event.filterCard(get.autoViewAs({ name }, "unsure"), player, event)) list.push(["锦囊", "", name]);
+                                            } else if (get.type(name) == "trick" && event.filterCard(get.autoViewAs({ name }, "unsure"), player, event)) list.push(["锦囊", "", name]);
                                             else if (get.type(name) == "basic" && event.filterCard(get.autoViewAs({ name }, "unsure"), player, event)) list.push(["基本", "", name]);
                                         }
                                         return ui.create.dialog("献策", [list, "vcard"]);
                                     },
                                     check: function (button) {
                                         if (_status.event.getParent().type != "phase") return 1;
-                                        var player = _status.event.player;
+                                        var player = get.player();;
                                         if (["wugu", "zhulu_card", "yiyi", "lulitongxin", "lianjunshengyan", "diaohulishan"].includes(button.link[2])) return 0;
                                         return player.getUseValue({
                                             name: button.link[2],
@@ -13471,6 +13471,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             viewAs: { name: links[0][2], nature: links[0][3] },
                                             onuse: function () {
                                                 var loki_xiancePlayer = player.getStorage('loki_xiance2');
+                                                game.log("献策2" + get.translation(loki_xiancePlayer[0]));
                                                 if (loki_xiancePlayer[0].isAlive()) {
                                                     loki_xiancePlayer[0].markAuto('loki_xiance', [links[0][2]]);
                                                 }
@@ -13483,7 +13484,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 hiddenCard: function (player, name) {
                                     if (!lib.inpile.includes(name)) return false;
-                                    var type = get.type2(name);
+                                    var type = get.type(name);
                                     return (type == "basic" || type == "trick") && player.countCards("h") > 0 && !player.hasSkill("loki_xiance2");
                                 },
                                 ai: {
@@ -15723,7 +15724,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             bismarck_fanji: "反击", "bismarck_fanji_info": "你受到伤害后，你可以对伤害来源使用一张无视距离的【杀】",
                             tirpitz_jinshu: "禁书", "tirpitz_jinshu_info": "每轮开始时，你可以展示一张手牌，并且跳过你本轮的出牌阶段和弃牌阶段。若如此做，每当一张与展示牌花色相同的牌进入弃牌堆时，你摸一张牌。",
                             tirpitz_chuanyue: "传阅", "tirpitz_chuanyue_info": "其他角色准备阶段开始时，你可以展示并交给其一张牌，其本回合无法弃置与展示牌相同花色的牌。",
-                            tirpitz_nvwangfugui: "女王复归", "": "觉醒技，场上的“俾斯麦”死亡时，你将体力值调整至1点，获得X点护甲并修改“禁书”（X为因“女王复归”而减少的体力值数量）（修改禁书：每轮开始时，你可以展示一张手牌，若如此做，每当一张与弃置牌花色相同的牌进入弃牌堆时，你摸一张牌。）",
+                            tirpitz_nvwangfugui: "女王复归", "tirpitz_nvwangfugui_info": "觉醒技，场上的“俾斯麦”死亡时，你将体力值调整至1点，获得X点护甲并修改“禁书”（X为因“女王复归”而减少的体力值数量）（修改禁书：每轮开始时，你可以展示一张手牌，若如此做，每当一张与弃置牌花色相同的牌进入弃牌堆时，你摸一张牌。）",
                             shuangzi: "双子", shuangzi_info: "转换技，阳：你使用或打出基本牌时摸一张牌；阴：你使用或打出锦囊牌时摸一张牌",
                             akagikaga_zongyu: "纵欲", akagikaga_zongyu_info: "锁定技，你使用【酒】无次数限制，你不能使用【桃】，你可以将【桃】当作【桃园结义】使用。若场上一名角色一轮中成为【酒】【桃】【桃园结义】目标的次数不小于其的体力值时，清空计数，并将其武将牌翻面。",
                             akagikaga_zongyu_turnOver: "纵欲_翻面",
