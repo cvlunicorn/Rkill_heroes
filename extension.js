@@ -3520,7 +3520,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         .set('prompt', '开幕雷击')
                                         .set('prompt2', '弃置一张符合要求的牌视为使用一张雷杀')
                                         .set('ai', card => {
-                                            return 5 - get.useful(card);
+                                            card1 = {
+                                                name: 'sha',
+                                                nature: 'thunder',
+                                                isCard: true,
+                                            };
+                                            return get.useful(card1) - get.useful(card);
                                         }).set('logSkill', '潜艇');
 
                                     /*var next = player.chooseCardTarget({
@@ -3575,7 +3580,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             name: 'sha',
                                             nature: 'thunder',
                                             isCard: true,
-                                        }, false,);
+                                        }, false,"nodistance");
                                     } else event.finish();
                                 },
                                 ai: {
@@ -4685,8 +4690,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         filter: function (event, player) {
                                             if (event._notrigger.includes(event.player)) return false;
                                             return (event.card && (event.card.name == 'sha' || event.card.name == 'sheji9') && (event.getParent().name == 'sha' || event.getParent().name == 'sheji9') &&
-                                                event.player.isIn() &&
-                                                player.canCompare(event.player));
+                                                event.player.isIn());
                                         },
                                         check: function (event, player) {
                                             return get.attitude(player, event.player) < 0 && player.countCards('h') > 1;
@@ -16522,7 +16526,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "fangqu_wuxie": "发射防空导弹",
                             hangmucv: "航母", "hangmucv_info": "(可强化)你的出牌阶段开始时，<br>你可以将任意张：零级强化，黑桃或梅花手牌；一级强化，黑桃或梅花或红桃手牌；二级强化，任意手牌。当作万箭齐发对等量个目标使用",
                             qianting_xiji: "袭击", "qianting_xiji_info": "每回合限两次，将♦/♥牌当做顺手牵羊，♣/♠牌当做兵粮寸断使用<br>你使用的锦囊牌可以对距离你2以内的角色使用。",
-                            qianting: "潜艇", "qianting_info": "（可强化）准备阶段，你可以弃置一张红桃或黑桃/红桃或黑桃或方片/牌，视为对一个目标使用一张雷杀。",
+                            qianting: "潜艇", "qianting_info": "（可强化）准备阶段，你可以弃置一张红桃或黑桃/红桃或黑桃或方片/牌，视为对一个目标使用一张无距离限制的雷杀。",
                             qianting_jiezi: "截辎", "qianting_jiezi_info": "其他角色跳过阶段时，你摸一张牌",
                             "_yuanhang": "远航", "_yuanhang_info": "若你已受伤，你的手牌上限+1。挑战模式不屈时手牌上限+1。<br>当你失去手牌后，且手牌数<手牌上限的一半时，你摸一张牌。使用次数上限0/1/2次，处于自己的回合时+1，每回合回复一次使用次数。<br>当你进入濒死状态时，你摸一张牌，体力上限大于二时需减少一点体力上限，额外摸一张牌；死亡后，你可以按自己的身份，令一名角色摸-/2/1/1（主/忠/反/内）张牌。",
                             kaishimopai: "开始摸牌", "kaishimopai_info": "<br>，判定阶段你可以减少一次摸牌阶段的摸牌，然后在回合结束时摸一张牌。",
