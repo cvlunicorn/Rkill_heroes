@@ -1177,6 +1177,142 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             _jianzaochuan: {
                                 name: "建造",
+                                prompt: function (event, player) {
+                                    if (event.parent.name == 'phaseUse') {
+                                        return '1.出牌阶段，<br>你可以弃置3张不同花色的牌，提升一点血量上限与强化上限。';
+                                    }
+                                },
+                                limited: false,
+                                complexCard: true,
+                                enable: "chooseToUse",
+                                position: "hejs",
+                                filter: function (event, player) {
+                                    if (lib.config.extension_舰R牌将__jianzaochuan === false) return false;
+
+                                    // 获取当前强化信息
+                                    var totalLevels = 0;
+                                    var keys = ['mopaiup', 'jinengup', 'wuqiup', 'useshaup', 'jidongup', 'shoupaiup'];
+                                    for (var i = 0; i < keys.length; i++) {
+                                        totalLevels += player.countMark(keys[i]);
+                                    }
+
+                                    // 检查是否有进行过至少一次强化
+                                    if (totalLevels === 0) return false;
+
+                                    // 每局游戏限一次，且需要至少3张手牌或装备
+                                    if (event.parent.name == 'phaseUse' && !player.hasMark('_jianzaochuan')) {
+                                        return (player.countCards('hejs') >= 3);
+                                    }
+
+                                    return false;
+                                },
+                                selectCard: function (event, player) {
+                                    return 3;
+                                },
+                                filterCard: function (card) {
+                                    var suit = get.suit(card);
+                                    for (var i = 0; i < ui.selected.cards.length; i++) {
+                                        if (get.suit(ui.selected.cards[i]) == suit) return false;
+                                    }
+                                    return true;
+                                },
+                                check: function (card) {
+                                    var player = get.player();
+                                    var event = _status.event;
+                                    var huifu = player.countCards('h', 'jiu') + player.countCards('h', 'tao');
+
+                                    // 优先弃置价值较低的牌
+                                    if (player.hp < player.maxHp) return 9 - get.value(card);
+                                    return 6 - get.value(card);
+                                },
+                                content: function () {
+                                    'step 0'
+                                    // 添加建造标记，增加1点建造等级
+                                    var currentBuildLevel = player.countMark('_jianzaochuan') || 0;
+                                    player.addMark('_jianzaochuan', 1);
+
+                                    // 增加血量上限
+                                    player.gainMaxHp(1);
+
+                                    game.log(player, '发动了建造技能，提升1点血量上限和强化上限');
+
+                                    // 更新存储结构
+                                    if (!player.storage._qianghuazhuang) {
+                                        player.storage._qianghuazhuang = {
+                                            mopaiup: player.countMark('mopaiup'),
+                                            jinengup: player.countMark('jinengup'),
+                                            wuqiup: player.countMark('wuqiup'),
+                                            useshaup: player.countMark('useshaup'),
+                                            jidongup: player.countMark('jidongup'),
+                                            shoupaiup: player.countMark('shoupaiup'),
+                                            Expup: player.countMark('Expup'),
+                                            _jianzaochuan: player.countMark('_jianzaochuan')
+                                        };
+                                    } else {
+                                        // 更新建造等级
+                                        player.storage._qianghuazhuang._jianzaochuan = player.countMark('_jianzaochuan');
+                                    }
+
+                                    'step 1'
+                                    // 弃置卡牌
+                                    if (event.cards && event.cards.length > 0) {
+                                        player.discard(event.cards);
+                                    }
+                                },
+                                ai: {
+                                    save: true,
+                                    expose: 0,
+                                    threaten: 0,
+                                    order: 2,
+                                    result: {
+                                        player: function (player) {
+                                            // 检查是否有进行过强化
+                                            var totalLevels = 0;
+                                            var keys = ['mopaiup', 'jinengup', 'wuqiup', 'useshaup', 'jidongup', 'shoupaiup'];
+                                            for (var i = 0; i < keys.length; i++) {
+                                                totalLevels += player.countMark(keys[i]);
+                                            }
+
+                                            // 没有强化过，则AI不会发动建造
+                                            if (totalLevels === 0) return 0;
+
+                                            // 检查是否有足够的牌
+                                            if (player.countCards('hejs') < 3) return 0;
+
+                                            // 计算收益
+                                            var benefit = 0;
+
+                                            // 血量上限提升的收益
+                                            if (player.hp < player.maxHp) benefit += 1.5;
+
+                                            // 强化上限提升的收益
+                                            var currentBuildLevel = player.countMark('_jianzaochuan') || 0;
+                                            if (currentBuildLevel === 0) benefit += 2.0; // 第一次建造收益最高
+
+                                            // 根据手牌质量调整
+                                            var cardValues = 0;
+                                            var handcards = player.getCards('h');
+                                            for (var i = 0; i < Math.min(handcards.length, 3); i++) {
+                                                cardValues += get.value(handcards[i]);
+                                            }
+
+                                            // 如果手牌质量较高，则发动意愿降低
+                                            if (cardValues > 15) benefit -= 0.5;
+                                            else if (cardValues < 10) benefit += 0.5;
+
+                                            return benefit;
+                                        }
+                                    }
+                                },
+                                mark: true,
+                                intro: {
+                                    content: function () {
+                                        return '已建造提升体力上限';
+                                    }
+                                },
+                            },
+                            /* _jianzaochuan: {
+                                name: "建造",
                                 prompt: function (event, player) {//<br>或弃置三张牌，回复一点血量。或弃置四张牌，回复两点体力,两个改动的测试结果是过于强悍.
                                     if (event.parent.name == 'phaseUse') { return '1.出牌阶段，<br>你可以弃置3张不同花色的牌，提升一点血量上限。' }; //if (event.type == 'dying') { return "2.当你濒死时，<br>你可以弃置4张不同花色的牌，回复一点体力。" };
                                 }, limited: false, complexCard: true,
@@ -1224,7 +1360,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 intro: {
                                     content: function () { return get.translation('建造的次数，用于提升升级上限。'); },
                                 },
-                            },
+                            }, */
                             _qianghuazhuang: {//2026.2.6，使用DS和gemini重置强化装备代码结构
                                 name: "强化装备",
                                 prompt: "每回合限一次，你可以弃置最多四张牌（或使用存储的经验）获得强化点数。<br>每2点强化点数可升级一次技能，二级需要3点。<br>升级时可以选择多个不同技能，每个技能每回合只能升一次。<br><b>建造</b>后技能等级上限提升至2级。<br>未使用的点数会存储为经验供下次使用。",
