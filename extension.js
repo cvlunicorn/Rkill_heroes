@@ -14144,7 +14144,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     threaten: 1.05,
                                 },
                             },
-                            pachina_xinao: {
+                            /* pachina_xinao: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
@@ -14246,6 +14246,178 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             player.storage.pachina_xinao = [];
                                         },
                                     },
+                                },
+                            }, */
+                            pachina_xinao: {
+                                audio: 2,
+                                name: "嬉闹",
+                                trigger: {
+                                    player: "damageEnd",
+                                },
+                                filter: function (event, player) {
+                                    return player.countCards('h') > 0;
+                                },
+                                direct: true,
+                                content: function () {
+                                    'step 0'
+                                    // 初始化嬉闹对象存储
+                                    if (!player.storage.pachina_xinao) {
+                                        player.storage.pachina_xinao = [];
+                                    }
+
+                                    // 获取可以选择的玩家（不包括自己）
+                                    var availableTargets = game.filterPlayer(function (current) {
+                                        return current != player && current.isAlive();
+                                    });
+
+                                    // 如果没有可选目标，则结束
+                                    if (availableTargets.length === 0) {
+                                        event.finish();
+                                        return;
+                                    }
+
+                                    player.chooseCardTarget({
+                                        prompt: "是否发动【嬉闹】？",
+                                        prompt2: "你可以将任意张手牌交给一名其他角色并记录其为嬉闹对象，然后你翻面。若如此做，你回复X点体力并暂时获得装甲效果。(X为你交出的手牌数/2向下取整)",
+                                        selectCard: [1, Infinity],
+                                        filterCard: true,
+                                        filterTarget: function (card, player, target) {
+                                            return player != target && target.isAlive();
+                                        },
+                                        ai1: function (card) {
+                                            var player = _status.event.player;
+                                            var target = ui.selected.targets ? ui.selected.targets[0] : null;
+
+                                            if (!target) return 6 - get.value(card);
+
+                                            // AI逻辑：根据目标身份决定给牌策略
+                                            var attitude = get.attitude(player, target);
+
+                                            if (attitude > 0) {
+                                                return get.effect(target, card, player, player);
+                                            } else {
+                                                return 6 - get.value(card);
+                                            }
+                                        },
+                                        ai2: function (target) {
+                                            var player = _status.event.player;
+                                            var attitude = get.attitude(player, target);
+                                            var isAlreadyMarked = player.storage.pachina_xinao &&
+                                                player.storage.pachina_xinao.includes(target.name);
+
+                                            // 如果目标已标记，优先选择其他目标
+                                            if (isAlreadyMarked) {
+                                                return attitude - 1;
+                                            }
+
+                                            // 优先选择未标记的敌人
+                                            if (attitude <= 0) return 2;
+                                            // 其次选择队友传牌
+                                            return attitude;
+                                        }
+                                    });
+
+                                    'step 1'
+                                    if (result.bool) {
+                                        var target = result.targets[0];
+                                        var cards = result.cards;
+                                        // 记录嬉闹对象（如果未记录过）
+                                        if (player.storage.pachina_xinao && !player.storage.pachina_xinao.includes(target)) {
+                                            player.storage.pachina_xinao.push(target);
+                                        } else if (!player.storage.pachina_xinao) {
+                                            player.storage.pachina_xinao = [target];
+                                        }
+
+                                        // 给牌
+                                        target.gain(cards, player, 'giveAuto');
+
+                                        // 翻面
+                                        player.turnOver();
+
+                                        // 回复体力
+                                        var healNum = Math.floor(cards.length / 2);
+                                        if (healNum > 0) {
+                                            player.recover(healNum);
+                                        }
+
+                                        // 获得装甲效果（直到下回合开始）
+                                        player.addTempSkill("zhuangjiafh", { player: "phaseBegin" });
+                                    }
+                                },
+                                mark: true,
+                                intro: {
+                                    content: function (storage, player) {
+                                        if (!player.storage.pachina_xinao || player.storage.pachina_xinao.length === 0) {
+                                            return '无嬉闹对象';
+                                        }
+                                        return '嬉闹对象：' + get.translation(player.storage.pachina_xinao);
+                                    }
+                                },
+                                ai: {
+                                    maixie_defend: true,
+                                    effect: {
+                                        target: function (card, player, target) {
+                                            if (player.countCards('he') > 1 && get.tag(card, 'damage')) {
+                                                if (player.hasSkillTag('jueqing', false, target)) return [1, -1.5];
+                                                if (get.attitude(target, player) < 0) return [1, 1];
+                                            }
+                                        }
+                                    }
+                                },
+                                group: ["pachina_xinao_steal"],
+                                subSkill: {
+                                    steal: {
+                                        name: "嬉闹窃取",
+                                        trigger: {
+                                            player: "turnOverAfter",
+                                        },
+                                        filter: function (event, player) {
+                                            if (player.storage.pachina_xinao) {
+                                                for (var i = 0; i < player.storage.pachina_xinao.length; i++) {
+                                                    if (player.storage.pachina_xinao[i].isAlive) return player.storage.pachina_xinao[i].countCards("hej");
+                                                }
+                                            }
+                                            return false;
+                                        },
+                                        content: function () {
+                                            'step 0'
+
+                                            if (player.storage.pachina_xinao.length === 0) {
+                                                event.finish();
+                                                return;
+                                            }
+
+                                            // 如果只有一个对象，直接选择
+                                            if (player.storage.pachina_xinao.length === 1) {
+                                                event.selectedTarget = player.storage.pachina_xinao;
+                                                event.goto(2);
+                                            } else {
+                                                // 让玩家选择一个嬉闹对象
+                                                player.chooseTarget("请选择一名嬉闹对象，获得其区域内的一张牌", 1, function (card, player, target) {
+                                                    return target != player && player.storage.pachina_xinao.includes(target);
+                                                })
+                                                    .set('ai', function (target) {
+                                                        var attitude = get.attitude(player, target);
+                                                        return -attitude;
+                                                    });
+                                            }
+
+                                            'step 1'
+                                            if (result.bool) {
+                                                event.selectedTarget = result.targets;
+                                            } else {
+                                                event.finish();
+                                                return;
+                                            }
+
+                                            'step 2'
+                                            // 从选择的嬉闹对象处获得一张牌
+                                            if (event.selectedTarget) {
+                                                player.gainPlayerCard(event.selectedTarget[0], 'hej', true);
+                                                game.log(player, '从', event.selectedTarget[0], '处获得了一张牌');
+                                            }
+                                        }
+                                    }
                                 },
                             },
                             loki_xiance: {
@@ -16576,7 +16748,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhanxianyuanhu: "战线援护", "zhanxianyuanhu_info": "游戏开始时，你选择一名角色，其受到伤害时防止之，改为你受到此伤害值-1的伤害。",
                             //第二次配音到这里
 
-                            pachina_xinao: "嬉闹", "pachina_xinao_info": "你受到伤害后,若你没有嬉闹对象，你可以将任意张手牌交给一名其他角色并记录，然后你翻面。若如此做，你回复X点体力然后获得“装甲”直到下回合开始。(x为你交出的手牌数/2向下取整)。你的出牌阶段开始时，你令嬉闹对象交给你X张手牌并清空记录。",
+                            pachina_xinao: "嬉闹", "pachina_xinao_info": "你受到伤害后,可以将任意张手牌交给一名其他角色并记录，然后你翻面。若如此做，你回复X点体力然后获得“装甲”直到下回合开始。(x为你交出的手牌数/2向下取整)。你翻面后，你可以获得嬉闹对象区域内的一张牌。",
                             pachina_xinao_back: "嬉闹",
                             loki_xiance: "献策", "loki_xiance_info": "你拥有决策：出牌阶段限一次，你可以将两张手牌当作一张基本牌或非延时锦囊牌使用，本局每种牌名的牌限一次。每轮限一次，其他角色的出牌阶段开始时，你可以交给其两张牌并令其本阶段获得“决策”。本阶段结束时，若其没有杀死过角色，则你对其造成一点伤害。",
                             loki_xiance2: "决策", "loki_xiance2_info": "出牌阶段限一次，你可以将两张手牌当作一张基本牌或非延时锦囊牌使用，本局每种牌名的牌限一次。",
