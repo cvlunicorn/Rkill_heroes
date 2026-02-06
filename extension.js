@@ -14023,12 +14023,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player
                                         .chooseToDiscard(get.prompt2("xiandaihuagaizao"), Math.min(num, 3), "hes")
                                         .set("ai", card => {
-                                            if (ui.selected.cards.length == 2 && player.maxHp < 5) return 10 - get.value(card);
+                                            if (!player.hasSkill("xianjinkongguan") && player.maxHp == 4 && player.isTurnedOver()) {
+                                                return 12 - get.value(card);
+                                            }
                                             if (player.maxHp < 5) {
-                                                return 7.5 - get.value(card);
+                                                return 9 - get.value(card);
                                             }
                                             if (_status.event.effect > 0) {
-                                                return 6 - get.value(card);
+                                                return 7 - get.value(card);
                                             }
                                             return 0;
                                         })
@@ -14041,6 +14043,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             '回复一点体力',
                                             '增加一点体力上限',
                                         ]).set('ai', function () {
+                                            if (player.hp >= 3 && player.maxHp == 4) return 1;
                                             if (player.hp != player.maxHp) return 0;
                                             return 1;
                                         });
