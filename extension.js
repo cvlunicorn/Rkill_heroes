@@ -3580,7 +3580,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             name: 'sha',
                                             nature: 'thunder',
                                             isCard: true,
-                                        }, false,"nodistance");
+                                        }, false, "nodistance");
                                     } else event.finish();
                                 },
                                 ai: {
@@ -10820,44 +10820,41 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             liaowangtai: {
                                 nobracket: true,
-                                usable: 1,
                                 enable: "phaseUse",
-
+                                init: function (player) {
+                                    if (!player.storage.liaowangtai) player.storage.liaowangtai = 0;
+                                },
+                                mod: {
+                                    globalFrom: function (from, to, distance) {
+                                        var totalLevels = 0;
+                                        var keys = ['mopaiup', 'jinengup', 'wuqiup', 'useshaup', 'jidongup', 'shoupaiup'];
+                                        for (var i = 0; i < keys.length; i++) {
+                                            totalLevels += from.countMark(keys[i]);
+                                        }
+                                        if (from.hasSkill("liaowangtai")) {
+                                            totalLevels -= from.countMark("liaowangtai");
+                                        }
+                                        game.log(from.countMark("liaowangtai"));
+                                        return distance - totalLevels;
+                                    },
+                                },
                                 filter: function (event, player) {
                                     return game.hasPlayer(function (current) {
-                                        return current.countCards("h") && player.inRangeOf(current);
+                                        return current.countCards("h") && get.distance(player, current) == 1;
                                     });
                                 },
-                                check: function (event, player) {
-                                    return game.hasPlayer(function (current) {
-                                        return current.countCards("h") && player.inRangeOf(current) && get.attitude(player, current);
-                                    });
+                                selectTarget: 1,
+                                filterTarget: function (card, player, target) {
+                                        return target.countCards("h") && get.distance(player, target) == 1;
                                 },
-                                logTarget: function (event, player) {
-                                    return game.filterPlayer(function (current) {
-                                        return current.countCards("h") && player.inRangeOf(current);
-                                    });
-                                },
-                                check: () => false,
                                 content: function () {
                                     "step 0";
-                                    event.targets = game
-                                        .filterPlayer(function (current) {
-                                            return current.countCards("h") && player.inRangeOf(current);
-                                        })
-                                        .sortBySeat();
-                                    "step 1";
-                                    var target = event.targets.shift();
-                                    if (target.isIn()) {
-                                        event.target = target;
-                                        player.useCard({ name: "huogong", isCard: true }, target, "liaowangtai");
-                                    } else if (targets.length) event.redo();
-                                    else event.finish();
-                                    "step 2";
-                                    if (targets.length) event.goto(1);
+                                    player.draw(player.countMark("liaowangtai") + 1);
+                                    player.addMark("liaowangtai", 1);
+                                    player.useCard({ name: "huogong", isCard: true }, event.targets, "liaowangtai");
                                 },
                                 ai: {
-                                    order: 10,
+                                    order: 3,
                                     expose: 0.2,
                                 },
                                 "_priority": 0,
@@ -16686,7 +16683,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             yuanjun: "援军", yuanjun_info: "限定技，若你有至少6个“风”标记，你可以移去所有“风”视为使用万箭齐发。",
                             buju_wuxie: "不惧_无懈", buju_wuxie_disable: "无懈_不可用",
                             buju_jiu: "不惧_酒", buju_jiu_disable: "酒_不可用",
-                            liaowangtai: "瞭望台", liaowangtai_info: "出牌阶段限一次，你视为对所有攻击范围包括你的角色依次使用一张【火攻】。",
+                            liaowangtai: "瞭望台", liaowangtai_info: "锁定技，你计算与其他角色的距离-X(X为你的强化总数)。出牌阶段，你可以视为对距离为1的目标使用一张火攻并摸Y张牌，若此做，你计算与其他角色的距离+Y，(Y为你使用此法的次数)",
                             jingruizhuangbei: "精锐装备", jingruizhuangbei_info: "当你装备武器时，你使用射击造成伤害时可以摸一张牌；当你使用射击指定目标时，你可以进行一次判定，若与此“射击”颜色相同，则你可以额外指定一个目标",
                             jingruizhuangbei_mopai: "精锐装备_摸牌",
                             jingruizhuangbei_fencha: "精锐装备_分叉",
