@@ -1225,7 +1225,420 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     content: function () { return get.translation('建造的次数，用于提升升级上限。'); },
                                 },
                             },
-                            _qianghuazhuang: {
+                            _qianghuazhuang: {//2026.2.6，使用DS和gemini重置强化装备代码结构
+                                name: "强化装备",
+                                prompt: "每回合限一次，你可以弃置最多四张牌（或使用存储的经验）获得强化点数。<br>每2点强化点数可升级一次技能，二级需要3点。<br>升级时可以选择多个不同技能，每个技能每回合只能升一次。<br><b>建造</b>后技能等级上限提升至2级。<br>未使用的点数会存储为经验供下次使用。",
+                                mark: true,
+                                discard: false,
+                                lose: false,
+                                intro: {
+                                    marktext: "装备",
+                                    content: function (storage, player) {
+                                        var map = {
+                                            mopaiup: '用一摸一',
+                                            jinengup: '技能升级',
+                                            wuqiup: '出杀距离',
+                                            useshaup: '攻击次数',
+                                            jidongup: '被杀距离',
+                                            shoupaiup: '手牌上限',
+                                            Expup: '经验'
+                                        };
+
+                                        var str = '<div class="text center">';
+                                        str += '<span class=greentext>' + map.mopaiup + ':' + player.countMark('mopaiup') + '<br>' +
+                                            map.jinengup + ':' + player.countMark('jinengup') + '</span><br>';
+                                        str += '<span class=firetext>出杀距离:-' + player.countMark('wuqiup') + '<br>' +
+                                            map.useshaup + ':' + player.countMark('useshaup') + '</span><br>';
+                                        str += '<span class=thundertext>被杀距离:+' + player.countMark('jidongup') + '<br>' +
+                                            map.shoupaiup + ':' + player.countMark('shoupaiup') + '<br>' +
+                                            map.Expup + ':' + player.countMark('Expup') + '</span>';
+                                        str += '</div>';
+                                        return str;
+                                    }
+                                },
+                                mod: {
+                                    attackFrom: function (from, to, distance) {
+                                        if (lib.config.extension_舰R牌将__qianghuazhuang === false) return distance;
+                                        return distance - from.countMark('wuqiup');
+                                    },
+                                    attackTo: function (from, to, distance) {
+                                        if (lib.config.extension_舰R牌将__qianghuazhuang === false) return distance;
+                                        return distance + to.countMark('jidongup');
+                                    },
+                                    cardUsable: function (card, player, num) {
+                                        if (lib.config.extension_舰R牌将__qianghuazhuang === false) return num;
+                                        if (card.name == 'sha') return num + player.countMark('useshaup');
+                                    },
+                                    maxHandcard: function (player, num) {
+                                        if (lib.config.extension_舰R牌将__qianghuazhuang === false) return num;
+                                        return num + player.countMark('shoupaiup');
+                                    }
+                                },
+                                enable: "phaseUse",
+                                usable: 1,
+                                init: function (player) {
+                                    if (!player.storage._qianghuazhuang) {
+                                        player.storage._qianghuazhuang = {
+                                            mopaiup: 0,
+                                            jinengup: 0,
+                                            wuqiup: 0,
+                                            useshaup: 0,
+                                            jidongup: 0,
+                                            shoupaiup: 0,
+                                            Expup: 0,
+                                            _jianzaochuan: player.countMark('_jianzaochuan') || 0
+                                        };
+                                    }
+                                    for (var key in player.storage._qianghuazhuang) {
+                                        if (key !== '_jianzaochuan') {
+                                            player.setMark(key, player.storage._qianghuazhuang[key]);
+                                        }
+                                    }
+                                },
+                                getInfo: function (player) {
+                                    if (!player.storage._qianghuazhuang) {
+                                        player.storage._qianghuazhuang = {
+                                            mopaiup: 0,
+                                            jinengup: 0,
+                                            wuqiup: 0,
+                                            useshaup: 0,
+                                            jidongup: 0,
+                                            shoupaiup: 0,
+                                            Expup: 0,
+                                            _jianzaochuan: player.countMark('_jianzaochuan') || 0
+                                        };
+                                    }
+                                    return player.storage._qianghuazhuang;
+                                },
+                                filter: function (event, player) {
+                                    if (lib.config.extension_舰R牌将__qianghuazhuang === false) return false;
+                                    if (player.hasSkill("guzhuyizhi2")) return false;
+
+                                    var currentExp = player.countMark('Expup');
+                                    var hasUpgrade = false;
+                                    var keys = ['mopaiup', 'jinengup', 'wuqiup', 'useshaup', 'jidongup', 'shoupaiup'];
+                                    var buildLevel = player.countMark('_jianzaochuan') + 1;
+
+                                    for (var i = 0; i < keys.length; i++) {
+                                        var key = keys[i];
+                                        var currentLv = player.countMark(key);
+                                        if (currentLv < 2 && currentLv < buildLevel) {
+                                            hasUpgrade = true;
+                                            break;
+                                        }
+                                    }
+
+                                    var maxCards = Math.min(player.countCards('h'), 4);
+                                    if (maxCards + currentExp >= 2 && hasUpgrade) return true;
+
+                                    return false;
+                                },
+                                filterCard: function (card) {
+                                    return true;
+                                },
+                                position: "h",
+                                selectCard: function () {
+                                    var player = get.player();
+                                    var currentExp = player.countMark('Expup');
+
+                                    var minCards = Math.max(0, 2 - currentExp);
+                                    var maxCards = Math.min(4, player.countCards('h'));
+
+                                    return [minCards, maxCards];
+                                },
+                                check: function (card) {
+                                    var player = get.player();
+                                    if (player.countCards("h") > player.maxHandcard) return 9 - get.value(card);
+                                    return 6 - get.value(card);
+                                },
+                                content: function () {
+                                    'step 0'
+                                    var currentExp = player.countMark('Expup');
+                                    var gainedExp = event.cards ? event.cards.length : 0;
+                                    var totalPoints = currentExp + gainedExp;
+
+                                    if (currentExp > 0) {
+                                        player.removeMark('Expup', currentExp);
+                                    }
+
+                                    var buildLevel = player.countMark('_jianzaochuan') + 1;
+                                    var upgradeConfig = [
+                                        {
+                                            mark: 'mopaiup',
+                                            name: '后勤保障',
+                                            desc: '用一摸一标记上限提升，手牌少于手牌上限一半时，失去手牌会摸一张牌。',
+                                            cost: function (lv) { return lv + 2; }
+                                        },
+                                        {
+                                            mark: 'jinengup',
+                                            name: '技能升级',
+                                            desc: '强化各类技能效果（重巡-降低必中攻击限制(杀/黑牌/任意牌)、轻巡-增加无效群体锦囊牌范围(1/2/3)、航母-降低万箭齐发限制(黑桃与梅花/黑桃与梅花与红桃/任意牌);<br>战列舰-增加防护范围(杀造成的伤害/杀和锦囊牌造成的伤害/所有伤害)，导驱-增加射程(2/3/4)降低导弹条件（武器/装备/任意牌）、潜艇-降低雷杀条件(红桃/红桃或黑桃/红桃或黑桃或方块);<br>驱逐-增加回避概率(0.25/0.50/0.75)、军辅-增加存牌上限(1/2/3)、要塞-增加血量上限（0/1/2）。）。',
+                                            cost: function (lv) { return lv + 2; },
+                                            ban: player.hasSkill("shixiangquanneng")
+                                        },
+                                        {
+                                            mark: 'wuqiup',
+                                            name: '射程升级',
+                                            desc: '增加出杀攻击距离。',
+                                            cost: function (lv) { return lv + 2; }
+                                        },
+                                        {
+                                            mark: 'useshaup',
+                                            name: '速射炮管',
+                                            desc: '增加出杀次数上限。',
+                                            cost: function (lv) { return lv + 2; }
+                                        },
+                                        {
+                                            mark: 'jidongup',
+                                            name: '改良推进器',
+                                            desc: '增加防御距离（被杀距离）。',
+                                            cost: function (lv) { return lv + 2; }
+                                        },
+                                        {
+                                            mark: 'shoupaiup',
+                                            name: '物流运输',
+                                            desc: '增加手牌上限。',
+                                            cost: function (lv) { return lv + 2; }
+                                        }
+                                    ];
+
+                                    var choiceList = [];
+                                    var availableUpgrades = [];
+
+                                    for (var i = 0; i < upgradeConfig.length; i++) {
+                                        var item = upgradeConfig[i];
+                                        if (item.ban) continue;
+
+                                        var currentLv = player.countMark(item.mark);
+                                        var cost = item.cost(currentLv);
+
+                                        if (currentLv < 2 && currentLv < buildLevel && totalPoints >= cost) {
+                                            availableUpgrades.push({
+                                                mark: item.mark,
+                                                name: item.name,
+                                                cost: cost,
+                                                currentLv: currentLv,
+                                                desc: item.desc
+                                            });
+
+                                            choiceList.push([
+                                                item.mark,
+                                                item.name + ' (消耗' + cost + '点)<br>当前:' + currentLv + '→' + (currentLv + 1) + '级<br>' + item.desc
+                                            ]);
+                                        }
+                                    }
+
+                                    choiceList.push(['store_only', '<b>仅存储经验</b><br>不进行任何升级，将所有' + totalPoints + '点存储为经验。']);
+
+                                    event.totalPoints = totalPoints;
+                                    event.availableUpgrades = availableUpgrades;
+                                    event.gainedExp = gainedExp;
+                                    event.currentExp = currentExp;
+                                    event.choiceList = choiceList;
+
+                                    if (availableUpgrades.length === 0) {
+                                        player.addMark('Expup', totalPoints);
+                                        player.storage._qianghuazhuang.Expup = totalPoints;
+                                        game.log(player, '没有可升级的技能，存储了', totalPoints, '点经验');
+                                        return;
+                                    }
+
+                                    'step 1'
+                                    // 计算最多可以选择多少个选项
+                                    var maxSelectable = 0;
+                                    // 计算最少消耗2点的项目数量
+                                    var tempPoints = event.totalPoints;
+                                    // 修复：使用 event.availableUpgrades 而不是 availableUpgrades
+                                    var sortedUpgrades = event.availableUpgrades.slice().sort(function (a, b) {
+                                        return a.cost - b.cost;
+                                    });
+
+                                    for (var i = 0; i < sortedUpgrades.length; i++) {
+                                        if (tempPoints >= sortedUpgrades[i].cost) {
+                                            tempPoints -= sortedUpgrades[i].cost;
+                                            maxSelectable++;
+                                        } else {
+                                            break;
+                                        }
+                                    }
+
+                                    // 至少可以选择1个（存储经验），最多可以选择所有可升级的项目
+                                    maxSelectable = Math.max(1, maxSelectable);
+
+                                    // 使用原代码的格式
+                                    player.chooseButton([
+                                        '将手牌转化为强化点数强化以下能力；取消将返还卡牌，未使用完的点数将保留。<br>强化上限默认为1，发动建造技能后提高。<br>一级强化需要2点，二级强化需要3点强化点数。<br>鼠标滚轮或下拉查看所有选项。',
+                                        [event.choiceList, 'textbutton'],
+                                    ]).set('filterButton', function (button) {
+                                        // 检查点数是否足够
+                                        var selectedButtons = ui.selected.buttons || [];
+                                        var totalCost = 0;
+
+                                        // 计算已选按钮的总消耗
+                                        for (var i = 0; i < selectedButtons.length; i++) {
+                                            var mark = selectedButtons[i].link || selectedButtons[i];
+                                            if (mark === 'store_only') continue;
+
+                                            for (var j = 0; j < event.availableUpgrades.length; j++) {
+                                                if (event.availableUpgrades[j].mark === mark) {
+                                                    totalCost += event.availableUpgrades[j].cost;
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                        // 如果当前按钮是存储经验，总是可选（但与其他选项互斥）
+                                        if (button.link === 'store_only') {
+                                            // 如果已经选择了其他升级选项，则存储经验不可选
+                                            for (var i = 0; i < selectedButtons.length; i++) {
+                                                var mark = selectedButtons[i].link || selectedButtons[i];
+                                                if (mark !== 'store_only') return false;
+                                            }
+                                            return true;
+                                        }
+
+                                        // 如果已经选择了存储经验，则其他选项不可选
+                                        for (var i = 0; i < selectedButtons.length; i++) {
+                                            var mark = selectedButtons[i].link || selectedButtons[i];
+                                            if (mark === 'store_only') return false;
+                                        }
+
+                                        // 检查这个按钮是否已经被选中（允许取消）
+                                        var isSelected = false;
+                                        for (var i = 0; i < selectedButtons.length; i++) {
+                                            if ((selectedButtons[i].link || selectedButtons[i]) === button.link) {
+                                                isSelected = true;
+                                                break;
+                                            }
+                                        }
+
+                                        if (isSelected) {
+                                            return true; // 允许取消已选项目
+                                        }
+
+                                        // 检查点数是否足够选择这个新项目
+                                        for (var j = 0; j < event.availableUpgrades.length; j++) {
+                                            if (event.availableUpgrades[j].mark === button.link) {
+                                                if (totalCost + event.availableUpgrades[j].cost <= event.totalPoints) {
+                                                    return true;
+                                                } else {
+                                                    return false;
+                                                }
+                                            }
+                                        }
+
+                                        return true;
+                                    }).set('ai', function (button) {
+                                        var choice = button.link;
+                                        var player = _status.event.player;
+
+                                        // 定义不同选项的优先级
+                                        var priority = {
+                                            'mopaiup': 4.0,    // 后勤保障优先级最高（摸牌）
+                                            'jinengup': 3.5,   // 技能升级次之
+                                            'wuqiup': 3.0,     // 出杀距离
+                                            'useshaup': player.countCards('h', { name: 'sha' }) > 1 ? 3.5 : 2.5,
+                                            'jidongup': 2.5,   // 防御距离
+                                            'shoupaiup': player.countCards('h') > player.maxHandcard * 0.8 ? 3.0 : 2.0,
+                                            'store_only': 0.1   // 存储经验优先级最低
+                                        };
+
+                                        return priority[choice] || 1.0;
+                                    }).set('selectButton', [0, maxSelectable]); // 设置选择范围
+
+                                    'step 2'
+                                    var selected = [];
+                                    if (result && result.bool && result.links) {
+                                        selected = result.links;
+                                    } else {
+                                        if (event.currentExp > 0) {
+                                            player.addMark('Expup', event.currentExp);
+                                        }
+                                        game.log(player, '取消了强化，返还了经验和卡牌');
+                                        return;
+                                    }
+
+                                    var totalPoints = event.totalPoints;
+                                    var usedPoints = 0;
+                                    var upgraded = [];
+
+                                    if (selected.includes('store_only')) {
+                                        player.addMark('Expup', totalPoints);
+                                        game.log(player, '存储了', totalPoints, '点经验');
+                                    } else {
+                                        for (var i = 0; i < selected.length; i++) {
+                                            var mark = selected[i];
+                                            var upgrade = null;
+
+                                            for (var j = 0; j < event.availableUpgrades.length; j++) {
+                                                if (event.availableUpgrades[j].mark === mark) {
+                                                    upgrade = event.availableUpgrades[j];
+                                                    break;
+                                                }
+                                            }
+
+                                            if (upgrade && totalPoints - usedPoints >= upgrade.cost) {
+                                                player.addMark(mark, 1);
+                                                usedPoints += upgrade.cost;
+                                                upgraded.push(upgrade.name);
+
+                                                game.log(player, '强化了', upgrade.name, '（消耗', upgrade.cost, '点）');
+                                            }
+                                        }
+
+                                        var remainingPoints = totalPoints - usedPoints;
+                                        if (remainingPoints > 0) {
+                                            player.addMark('Expup', remainingPoints);
+                                            if (upgraded.length > 0) {
+                                                game.log(player, '剩余', remainingPoints, '点存储为经验');
+                                            }
+                                        }
+                                    }
+
+                                    player.storage._qianghuazhuang = {
+                                        mopaiup: player.countMark('mopaiup'),
+                                        jinengup: player.countMark('jinengup'),
+                                        wuqiup: player.countMark('wuqiup'),
+                                        useshaup: player.countMark('useshaup'),
+                                        jidongup: player.countMark('jidongup'),
+                                        shoupaiup: player.countMark('shoupaiup'),
+                                        Expup: player.countMark('Expup'),
+                                        _jianzaochuan: player.countMark('_jianzaochuan')
+                                    };
+
+                                    if (selected.length > 0 && event.gainedExp > 0) {
+                                        player.discard(event.cards);
+                                    }
+                                },
+                                ai: {
+                                    order: 8,
+                                    result: {
+                                        player: function (player) {
+                                            var currentExp = player.countMark('Expup');
+                                            var handcards = player.countCards('h');
+                                            var maxCards = Math.min(handcards, 4);
+
+                                            if (currentExp + maxCards >= 2) {
+                                                var buildLevel = player.countMark('_jianzaochuan') + 1;
+                                                var keys = ['mopaiup', 'jinengup', 'wuqiup', 'useshaup', 'jidongup', 'shoupaiup'];
+
+                                                for (var i = 0; i < keys.length; i++) {
+                                                    var key = keys[i];
+                                                    var currentLv = player.countMark(key);
+                                                    if (currentLv < 2 && currentLv < buildLevel) {
+                                                        return 1.5;
+                                                    }
+                                                }
+
+                                                return 0.3;
+                                            }
+
+                                            return 0;
+                                        }
+                                    }
+                                }
+                            },
+                            /* _qianghuazhuang: { //2026.2.6，强化装备代码结构重置,原手工诗山代码转为注释保存
                                 name: "强化装备", prompt: "每回合限一次，你可以弃置二至四张牌，将手牌转化为强化点数，<br>每2点强化点数换一级永久的效果升级。二级需要3点。<br>（可选择如减少技能消耗、增加武器攻击距离、提高手牌上限等）<br>建造前强化上限一级，建造后强化上限2级。<br>已存储的经验会降低弃牌最低牌数", mark: true, intro: {
                                     marktext: "装备", content: function (storage, player) {//只有content与mark可以function吧，内容，介绍的文字与内容。
                                         var info = lib.skill._qianghuazhuang.getInfo(player);
@@ -1400,7 +1813,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                     },
                                 },//装备上装备以后，ai剩下的装备可以考虑强化，应该会保留防具吧。
-                            },
+                            }, */
                             _wulidebuff: {
                                 name: "属性效果", lastDo: true, forced: true, trigger: { source: "damageBefore", },
                                 filter: function (event, player) {
@@ -5261,13 +5674,317 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             Z_qianghua: {
                                 nobracket: true,
+                                name: "Z强化",
+                                prompt: "出牌阶段，你可以移去一张Z，强化一项或摸两张牌。<br>强化规则与'强化装备'技能相同。",
+                                mark: true,
+                                enable: "phaseUse",
+                                filter: function (event, player) {
+                                    // 检查是否有Z卡牌
+                                    if (!player.getExpansions('Z').length) return false;
+
+                                    // 检查是否达到强化上限
+                                    var buildLevel = player.countMark('_jianzaochuan') + 1;
+                                    var maxLevels = buildLevel * 6; // 最多6项，每项最多buildLevel级
+
+                                    // 计算当前总等级
+                                    var keys = ['mopaiup', 'jinengup', 'wuqiup', 'useshaup', 'jidongup', 'shoupaiup'];
+                                    var totalLevels = 0;
+                                    for (var i = 0; i < keys.length; i++) {
+                                        totalLevels += player.countMark(keys[i]);
+                                    }
+
+                                    // 如果已经达到上限，只能摸牌
+                                    if (totalLevels >= maxLevels) return true; // 仍然可以发动，但只能摸牌
+
+                                    return true;
+                                },
+                                mod: {
+                                    attackFrom: function (from, to, distance) {
+                                        if (lib.config.extension_舰R牌将__qianghuazhuang === true) return distance;
+                                        return distance - from.countMark('wuqiup');
+                                    },
+                                    attackTo: function (from, to, distance) {
+                                        if (lib.config.extension_舰R牌将__qianghuazhuang === true) return distance;
+                                        return distance + to.countMark('jidongup');
+                                    },
+                                    cardUsable: function (card, player, num) {
+                                        if (lib.config.extension_舰R牌将__qianghuazhuang === true) return num;
+                                        if (card.name == 'sha') return num + player.countMark('useshaup');
+                                    },
+                                    maxHandcard: function (player, num) {
+                                        if (lib.config.extension_舰R牌将__qianghuazhuang === true) return num;
+                                        return num + player.countMark('shoupaiup');
+                                    }
+                                },
+                                content: function () {
+                                    'step 0'
+                                    // 获取所有Z卡牌
+                                    var zCards = player.getExpansions('Z');
+                                    if (zCards.length === 0) {
+                                        event.finish();
+                                        return;
+                                    }
+
+                                    // 让玩家选择一张Z卡牌
+                                    player.chooseCardButton('请选择要移去的一张Z卡牌', true, zCards)
+                                        .set('ai', function (button) {
+                                            return 1;
+                                        });
+
+                                    'step 1'
+                                    // 移去选择的Z卡牌
+                                    event.zCard = result.links[0];
+                                    player.loseToDiscardpile(event.zCard);
+
+                                    // 检查是否可以强化
+                                    var buildLevel = player.countMark('_jianzaochuan') + 1;
+                                    var upgradeConfig = [
+                                        {
+                                            mark: 'mopaiup',
+                                            name: '后勤保障',
+                                            desc: '用一摸一标记上限提升，手牌少于手牌上限一半时，失去手牌会摸一张牌。',
+                                            cost: function (lv) { return lv + 2; }
+                                        },
+                                        {
+                                            mark: 'jinengup',
+                                            name: '技能升级',
+                                            desc: '强化舰种技能效果。',
+                                            cost: function (lv) { return lv + 2; },
+                                            ban: player.hasSkill("shixiangquanneng")
+                                        },
+                                        {
+                                            mark: 'wuqiup',
+                                            name: '射程升级',
+                                            desc: '增加出杀攻击距离。',
+                                            cost: function (lv) { return lv + 2; }
+                                        },
+                                        {
+                                            mark: 'useshaup',
+                                            name: '速射炮管',
+                                            desc: '增加出杀次数上限。',
+                                            cost: function (lv) { return lv + 2; }
+                                        },
+                                        {
+                                            mark: 'jidongup',
+                                            name: '改良推进器',
+                                            desc: '增加防御距离（被杀距离）。',
+                                            cost: function (lv) { return lv + 2; }
+                                        },
+                                        {
+                                            mark: 'shoupaiup',
+                                            name: '物流运输',
+                                            desc: '增加手牌上限。',
+                                            cost: function (lv) { return lv + 2; }
+                                        }
+                                    ];
+
+                                    // 生成可选列表
+                                    var choiceList = [];
+                                    var availableUpgrades = [];
+
+                                    for (var i = 0; i < upgradeConfig.length; i++) {
+                                        var item = upgradeConfig[i];
+                                        if (item.ban) continue;
+
+                                        var currentLv = player.countMark(item.mark);
+                                        var cost = item.cost(currentLv);
+
+                                        // 检查是否可升级（消耗2点，因为一张Z=2点）
+                                        if (currentLv < 2 && currentLv < buildLevel && 2 >= cost) {
+                                            availableUpgrades.push({
+                                                mark: item.mark,
+                                                name: item.name,
+                                                cost: cost,
+                                                currentLv: currentLv,
+                                                desc: item.desc
+                                            });
+
+                                            choiceList.push([
+                                                item.mark,
+                                                item.name + ' (消耗' + cost + '点)<br>当前:' + currentLv + '→' + (currentLv + 1) + '级<br>' + item.desc
+                                            ]);
+                                        }
+                                    }
+
+                                    // 添加摸牌选项
+                                    choiceList.push(['draw_cards', '<b>摸两张牌</b><br>不进行强化，改为摸两张牌。']);
+
+                                    event.availableUpgrades = availableUpgrades;
+                                    event.choiceList = choiceList;
+
+                                    // 如果没有可升级选项，直接摸牌
+                                    if (availableUpgrades.length === 0) {
+                                        player.draw(2);
+                                        game.log(player, '没有可升级的技能，摸两张牌');
+                                        return;
+                                    }
+
+                                    'step 2'
+                                    // 计算最多可以选择多少个选项（一张Z=2点，最多只能升级一个项目）
+                                    var maxSelectable = 1;
+
+                                    // 使用与通用强化一致的界面
+                                    player.chooseButton([
+                                        '移去一张Z获得2点强化点数，选择要强化的项目；取消将摸两张牌。<br>强化上限默认为1，发动建造技能后提高。<br>一级强化需要2点，二级强化需要3点强化点数。',
+                                        [event.choiceList, 'textbutton'],
+                                    ]).set('filterButton', function (button) {
+                                        // 检查点数是否足够
+                                        var selectedButtons = ui.selected.buttons || [];
+                                        var totalCost = 0;
+
+                                        // 计算已选按钮的总消耗
+                                        for (var i = 0; i < selectedButtons.length; i++) {
+                                            var mark = selectedButtons[i].link || selectedButtons[i];
+                                            if (mark === 'draw_cards') continue;
+
+                                            for (var j = 0; j < event.availableUpgrades.length; j++) {
+                                                if (event.availableUpgrades[j].mark === mark) {
+                                                    totalCost += event.availableUpgrades[j].cost;
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                        // 如果当前按钮是摸牌，总是可选（但与其他选项互斥）
+                                        if (button.link === 'draw_cards') {
+                                            // 如果已经选择了其他升级选项，则摸牌不可选
+                                            for (var i = 0; i < selectedButtons.length; i++) {
+                                                var mark = selectedButtons[i].link || selectedButtons[i];
+                                                if (mark !== 'draw_cards') return false;
+                                            }
+                                            return true;
+                                        }
+
+                                        // 如果已经选择了摸牌，则其他选项不可选
+                                        for (var i = 0; i < selectedButtons.length; i++) {
+                                            var mark = selectedButtons[i].link || selectedButtons[i];
+                                            if (mark === 'draw_cards') return false;
+                                        }
+
+                                        // 检查这个按钮是否已经被选中（允许取消）
+                                        var isSelected = false;
+                                        for (var i = 0; i < selectedButtons.length; i++) {
+                                            if ((selectedButtons[i].link || selectedButtons[i]) === button.link) {
+                                                isSelected = true;
+                                                break;
+                                            }
+                                        }
+
+                                        if (isSelected) {
+                                            return true; // 允许取消已选项目
+                                        }
+
+                                        // 检查点数是否足够选择这个新项目（一张Z固定2点）
+                                        for (var j = 0; j < event.availableUpgrades.length; j++) {
+                                            if (event.availableUpgrades[j].mark === button.link) {
+                                                if (totalCost + event.availableUpgrades[j].cost <= 2) {
+                                                    return true;
+                                                } else {
+                                                    return false;
+                                                }
+                                            }
+                                        }
+
+                                        return true;
+                                    }).set('ai', function (button) {
+                                        var choice = button.link;
+
+                                        // 定义不同选项的优先级
+                                        var priority = {
+                                            'mopaiup': 4.0,    // 后勤保障优先级最高（摸牌）
+                                            'jinengup': 3.5,   // 技能升级次之
+                                            'wuqiup': 3.0,     // 出杀距离
+                                            'useshaup': player.countCards('h', { name: 'sha' }) > 1 ? 3.5 : 2.5,
+                                            'jidongup': 2.5,   // 防御距离
+                                            'shoupaiup': player.countCards('h') > player.maxHandcard * 0.8 ? 3.0 : 2.0,
+                                            'draw_cards': 1.0   // 摸牌优先级中等
+                                        };
+
+                                        return priority[choice] || 1.0;
+                                    }).set('selectButton', [0, maxSelectable]);
+
+                                    'step 3'
+                                    var selected = [];
+                                    if (result && result.bool && result.links) {
+                                        selected = result.links;
+                                    } else {
+                                        // 取消选择，摸两张牌
+                                        player.draw(2);
+                                        game.log(player, '取消了强化，摸两张牌');
+                                        return;
+                                    }
+
+                                    if (selected.includes('draw_cards')) {
+                                        player.draw(2);
+                                        game.log(player, '选择了摸两张牌');
+                                    } else {
+                                        for (var i = 0; i < selected.length; i++) {
+                                            var mark = selected[i];
+                                            var upgrade = null;
+
+                                            for (var j = 0; j < event.availableUpgrades.length; j++) {
+                                                if (event.availableUpgrades[j].mark === mark) {
+                                                    upgrade = event.availableUpgrades[j];
+                                                    break;
+                                                }
+                                            }
+
+                                            if (upgrade) {
+                                                // 执行升级
+                                                player.addMark(mark, 1);
+                                                game.log(player, '使用Z强化了', upgrade.name);
+                                            }
+                                        }
+                                    }
+
+                                    // 同步存储结构（与通用强化保持一致）
+                                    if (!player.storage._qianghuazhuang) {
+                                        player.storage._qianghuazhuang = {
+                                            mopaiup: 0,
+                                            jinengup: 0,
+                                            wuqiup: 0,
+                                            useshaup: 0,
+                                            jidongup: 0,
+                                            shoupaiup: 0,
+                                            Expup: 0,
+                                            _jianzaochuan: player.countMark('_jianzaochuan') || 0
+                                        };
+                                    }
+
+                                    // 更新存储
+                                    player.storage._qianghuazhuang = {
+                                        mopaiup: player.countMark('mopaiup'),
+                                        jinengup: player.countMark('jinengup'),
+                                        wuqiup: player.countMark('wuqiup'),
+                                        useshaup: player.countMark('useshaup'),
+                                        jidongup: player.countMark('jidongup'),
+                                        shoupaiup: player.countMark('shoupaiup'),
+                                        Expup: player.countMark('Expup'),
+                                        _jianzaochuan: player.countMark('_jianzaochuan')
+                                    };
+                                },
+                                ai: {
+                                    save: true,
+                                    expose: 0,
+                                    threaten: 1,
+                                    order: 2,
+                                    result: {
+                                        player: function (player) {
+                                            if (player.getExpansions('Z').length > 0) return 6;
+                                            return 0;
+                                        }
+                                    }
+                                },
+                            },
+                            /* Z_qianghua: {//2026.2.6强化重置，原代码注释保存
+                                nobracket: true,
                                 init: function (player) {//初始化数组，也可以运行事件再加if后面的内容
                                     if (!player.storage._qianghuazhuang) player.storage._qianghuazhuang = [0, 0, 0, 0, 0, 0, 0, 0, 0];
                                 },
                                 enable: "phaseUse",
                                 prompt: "你可以移去一张Z，强化一项或摸两张牌",
                                 filter: function (event, player) {
-                                    var a = player.countMark('mopaiup'), b = player.countMark('jinengup'), c = player.countMark('wuqiup'), d = player.countMark('useshaup'), e = player.countMark('jidongup'), f = player.countMark('shoupaiup'), g = player.countMark('songpaiup'), h = player.countMark('Expup'), k = player.countMark('_jianzaochuan') + 1, lv = 0; if (k < 3) { lv = k * 6 };/*if(k>=3){lv=k+10};*///远航上限降低为2，总可用强化数量公式作相应修改
+                                    var a = player.countMark('mopaiup'), b = player.countMark('jinengup'), c = player.countMark('wuqiup'), d = player.countMark('useshaup'), e = player.countMark('jidongup'), f = player.countMark('shoupaiup'), g = player.countMark('songpaiup'), h = player.countMark('Expup'), k = player.countMark('_jianzaochuan') + 1, lv = 0; if (k < 3) { lv = k * 6 };//远航上限降低为2，总可用强化数量公式作相应修改
                                     if (player.countCards('h') > 0) { if ((a + b + c + d + e + f + g) >= (lv)) return false };
                                     return player.getExpansions('Z').length;
 
@@ -5367,7 +6084,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                     'step 3'
                                     //game.log(result.links, result.bool)//只能返还这两个，所以更适合技能，更需要循环的方式进行计算。
-                                    if (!result.bool) { player.draw(2);/*player.addToExpansion(player, 'give', event.cards).gaintag.add('Z');*/ player.removeMarkevent.finish(); };//返还牌再计算
+                                    if (!result.bool) { player.draw(2); player.removeMarkevent.finish(); };//返还牌再计算
                                     if (result.bool) {  //player.addMark('Expup',event.cadechangdu);//先给经验再计算扣除经验升级，随着此项目的升级，花费也越多。通过一个有序的清单，遍历比对返回的内容，来定位要增加的标记/数组。
                                         for (var i = 0; i < result.links.length; i += (1)) {
                                             if (!result.links.includes('Expup')) {
@@ -5392,7 +6109,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         },
                                     },
                                 },
-                            },
+                            }, */
                             wuziliangjiangdao: {//军争可用的五子良将纛
                                 nobracket: true,
                                 trigger: {
