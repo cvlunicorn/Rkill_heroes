@@ -1048,7 +1048,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             sukhbaatar: ["female", "OTHER", 3, ["junfu", "sukhbaatar_rumeng", "sukhbaatar_sudaren", "sukhbaatar_zuiqiang"], ["des:CLASSIFIED*。"]],
                             odin: ["female", "OTHER", 3, ["junfu", "odin_ganggenier"], ["des:CLASSIFIED*。"]],
                             vestal: ["female", "USN", 3, ["junfu", "vestal_mowang"], ["des:CLASSIFIED*。"]],
-                            nvzaoshen: ["female", "USN", 3, ["junfu", "dajiaoduguibi", "xiwangdeshuguang"], ["des:女灶神号（舷号AR-4）是一艘在1913年至1946年期间服役于美国海军的修理船。在改装为修理船之前，女灶神是一条运煤船（从1909年开始）。女灶神号参与了全部两次世界大战，在日本空袭珍珠港期间，该舰在港口内遭到重创。打满整场第二次世界大战的女灶神共获得了两枚战斗之星。"]],
+                            nvzaoshen: ["female", "USN", 3, ["junfu", "dajiaoduguibi", "xiwangdeshuguang", "qiangxiu"], ["des:女灶神号（舷号AR-4）是一艘在1913年至1946年期间服役于美国海军的修理船。在改装为修理船之前，女灶神是一条运煤船（从1909年开始）。女灶神号参与了全部两次世界大战，在日本空袭珍珠港期间，该舰在港口内遭到重创。打满整场第二次世界大战的女灶神共获得了两枚战斗之星。"]],
                             bismarck: ["female", "KMS", 4, ["zhuangjiafh", "bismarck_chajin", "bismarck_fanji"], ["des:表里不一的“野猫”虽然一直说着带攻击性的话，但意外是个很单纯的人。长期相处，应该就能听懂她真正的意思。"]],
                             tirpitz: ["female", "KMS", 4, ["zhuangjiafh", "tirpitz_jinshu", "tirpitz_chuanyue", "tirpitz_nvwangfugui"], ["des:无表情的“人偶”总是盯着手里的东西，对其他的事情缺乏兴趣。但却喜欢为他人解说姐姐说的话，这一点上，很有趣。"]],
                             akagikaga: ["female", "IJN", 4, ["hangmucv", "shuangzi", "akagikaga_zongyu"], ["des:对某些人类非常执着。每次回来，都是遍体鳞伤。而且，一直躺着会对素体产生影响。"]],
@@ -11593,7 +11593,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger: {
                                             player: "logSkill",
                                         },
-                                        frequent:true,
+                                        frequent: true,
                                         filter: function (event, player) {
                                             return event.skill == 'fangkong2' || event.skill == 'hangmucv';
                                         },
@@ -15378,6 +15378,41 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     threaten: 1.2,
                                 }
                             },
+                            qiangxiu: {
+                                obracket: true,
+                                audio: "ext:舰R牌将/audio/skill:true",
+                                enable: "phaseUse",
+                                usable: 1,
+                                selectTarget: 1,
+                                filterTarget: true,
+                                filter: function (event, player) {
+                                    return true;
+                                },
+                                content: function () {
+                                    "step 0"
+                                    target.damage("nocard");
+                                    "step 1"
+                                    target.recover(1);
+                                },
+                                ai: {
+                                    order: 2,
+                                    damage: true,
+                                    recover: true,
+                                    result: {
+                                        target: function (player, target) {
+                                            var att = get.attitude(player, target);
+                                            if (att >= 0 && target.hp >= 1) {
+                                                if (target.hasSkillTag("maixue")) return 2;
+                                                if (target.isDamaged) return 0.5;
+                                            } else if (target.hp <= 1) {
+                                                return get.damageEffect(target, player) - 0.5;
+                                            } else {
+                                                return 0;
+                                            }
+                                        },
+                                    },
+                                },
+                            },
                             bismarck_chajin: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
@@ -16784,6 +16819,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             vestal_mowang: "魔王", "vestal_mowang_info": "当有角色陷入濒死时，你可以将自己或其武将牌上的“军辅”牌当做【桃】对其使用。当场上有角色脱离濒死状态时，你可以选择恢复一点体力或摸一张牌。",
                             vestal_mowang1: "魔王",
                             xiwangdeshuguang: "希望的曙光", "xiwangdeshuguang_info": "每个回合结束时，你可以弃置一张手牌，令一名本回合受到过伤害的角色回复一点体力。",
+                            qiangxiu: "抢修", "qiangxiu_info": "出牌阶段限一次，你可以对一名角色造成一点伤害，然后使其回复一点体力",
                             bismarck_chajin: "查禁", "bismarck_chajin_info": "其他角色于摸牌阶段及“远航”技能效果外从牌堆摸牌时，你可以声明一个花色，之后其可以选择交给你任意张手牌。执行完上述流程后，你可以选择质疑其手牌中还有你声明的花色，然后展示其所有手牌，若其手牌有你声明的花色，你获得之，并对其造成1点伤害；否则，你流失1点体力，并且此技能本轮失效。",
                             doubts: "质疑",
                             noDoubts: "不质疑",
