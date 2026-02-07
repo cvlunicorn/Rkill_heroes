@@ -28,6 +28,7 @@ yield需要无名杀版本1.10.10或更高版本的支持
                         return false;
                     }).length > 0
                 ); */
+                //主动技能的ai中需要写明result例如result:{player:1,},AI才会发动技能。
 let connect;
 try {
     const ws = require("ws");
@@ -3633,7 +3634,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     } else event.finish();
 
                                 },
-                                ai: { combo: "junfu", },
                                 group: ["junfu_choose", "junfu_mark"],
                                 onremove: function (player, skill) {
                                     var cards = player.getExpansions(skill);
@@ -3701,7 +3701,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             }
                                         },
                                         //sub: true,
-
+                                        ai: { combo: "junfu", },
                                         mod: {
                                             aiOrder: function (player, card, num) {
                                                 if (get.itemtype(card) == "card" && card.hasGaintag("junfu")) return num + 0.5;
@@ -3758,7 +3758,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                 },
                                 ai: {
-                                    combo: "daodan",
+                                    combo: "fangqu_wuxie",
                                 },
                                 group: ["fangqu_wuxie"],
                                 onremove: function (player, skill) {
@@ -7990,6 +7990,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger.player.storage.u47_xinbiao_hp.sort();
                                         trigger.player.markAuto("u47_xinbiao_cards", [trigger.player.countCards('h')]);
                                         trigger.player.storage.u47_xinbiao_cards.sort();
+                                        player.logSkill("u47_xinbiao");
                                     }
                                 },
                             },
@@ -8023,11 +8024,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 enable: "phaseUse",
                                 usable: 1,
                                 filter: function (event, player) {
-                                    return game.countPlayer(function (current) {
+                                    var filterHuxi = game.countPlayer(function (current) {
                                         return current.hasSkill('u47_xinbiao_hp');
-                                    }) /*&& get.tag(event.card, 'damage') && !event.player.hasHistory('sourceDamage', function (evt) {
-                                        return evt.card == event.card;
-                                    });*/
+                                    });
+                                    return filterHuxi > 0;
                                 },
                                 content: function () {
                                     "step 0"
@@ -8082,7 +8082,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                 },
                                 ai: {
-                                    order: 10,
+                                    order: 5,
+                                    result: {
+                                        player: function (player) {
+                                            return 1;
+                                        },
+                                    },
                                 },
                                 "_priority": 0,
                             },
@@ -10845,7 +10850,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 selectTarget: 1,
                                 filterTarget: function (card, player, target) {
-                                        return target.countCards("h") && get.distance(player, target) == 1;
+                                    return target.countCards("h") && get.distance(player, target) == 1;
                                 },
                                 content: function () {
                                     "step 0";
@@ -10856,6 +10861,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 ai: {
                                     order: 3,
                                     expose: 0.2,
+                                    result: {
+                                        target: function (player, target) {
+                                            return -1;
+                                        },
+                                    },
                                 },
                                 "_priority": 0,
 
