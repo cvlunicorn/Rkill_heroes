@@ -12419,7 +12419,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 ai: {
                                     order: 4,
                                     expose: 0.2,
-                                    threaten: 1.1,
                                     result: {
                                         target: -1,
                                         player: function (player, target) {
