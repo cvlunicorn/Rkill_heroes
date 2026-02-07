@@ -28,7 +28,7 @@ yield需要无名杀版本1.10.10或更高版本的支持
                         return false;
                     }).length > 0
                 ); */
-                //主动技能的ai中需要写明result例如result:{player:1,},AI才会发动技能。
+//主动技能的ai中需要写明result例如result:{player:1,},AI才会发动技能。
 let connect;
 try {
     const ws = require("ws");
@@ -1012,7 +1012,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             dafeng: ["female", "IJN", 4, ["hangmucv", "chuansuohongzha", "hangkongyazhi"], ["des:　大凤号是日本设计建造的装甲航空母舰。与其它日本海军航空母舰不同的是，大凤号预备在舰队中承担起支援其他航母作战的功能，因此大凤号将船舰的防护性摆在首位，重点增强装甲。竣工后被编入第三舰队第一航空战队，担任旗舰参加了马里亚纳海战。6月19日，大凤号在飞机起飞作业时，被美国潜艇大青花鱼号发射鱼雷并命中其右舷，最终因损管不当而沉没。"]],
                             dahuangfeng: ["female", "USN", 4, ["hangmucv", "yuanyangpoxi"], ["des:　　大黄蜂号是约克城级航母3号舰。她服役后第一项作战任务就是搭载B25轰炸机轰炸东京。在4月18日，杜立特带领的B25机群从大黄蜂号上起飞，完成了轰炸任务并在中国迫降。5月中旬，大黄蜂号在内的全部约克级航母作为主力参加了中途岛海战并击溃了日本机动部队，可以说正是她们三位扭转了太平洋的局势。在42年10月的圣克鲁斯海战中，大黄蜂号击伤了翔鹤号和筑摩号，但是自身也被重创，之后被驱逐舰击沉。"]],
                             biaoqiang: ["female", "RN", 1, ["dajiaoduguibi", "quzhudd", "juejingfengsheng"], ["des:　标枪级驱逐舰首舰。英国于部族级之后建造的驱逐舰，其设计也成为战时应急驱逐舰的范本。二战中标枪号参加了纳尔维克海战，战斗中标枪号被德国驱逐舰击伤了船首。修复之后主要在地中海作战，并于1949年退役。"]],
-                            yuekecheng: ["female", "USN", 4, ["hangmucv", "saqijian", "fangkong"], ["des:　　约克城级是美国二战前期的主力航母，她的设计吸取了之前级别的经验，布局更加合理。约克城号同列克星敦号一起参加了珊瑚海海战，在海战中被击伤。因为前线急需航母应对中途岛战事，在短短72小时内她就修复完毕。中途岛战役中，三艘约克城级航母联手将日军最精锐的航母部队歼灭，但约克城号自己也被飞龙号两波攻击击伤，最后被I168号潜艇击沉。值得一提的是著名的萨奇少校当时就在约克城号上，他发明的萨奇剪战术使得美军战机可以发挥优势对付零战。"]],
+                            yuekecheng: ["female", "USN", 4, ["hangmucv", "saqijian"], ["des:　　约克城级是美国二战前期的主力航母，她的设计吸取了之前级别的经验，布局更加合理。约克城号同列克星敦号一起参加了珊瑚海海战，在海战中被击伤。因为前线急需航母应对中途岛战事，在短短72小时内她就修复完毕。中途岛战役中，三艘约克城级航母联手将日军最精锐的航母部队歼灭，但约克城号自己也被飞龙号两波攻击击伤，最后被I168号潜艇击沉。值得一提的是著名的萨奇少校当时就在约克城号上，他发明的萨奇剪战术使得美军战机可以发挥优势对付零战。"]],
                             shengqiaozhi: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "jupaohuoli"], ["des:针对日德兰和之前经验设计的皇家海军新式战列舰N3型。和之前战舰不同，该级战列舰在设计上有很多创新，圣乔治采用了独特的前中置主炮塔布局。优点是可以缩短主装甲带，集中更多的防护在武器系统。圣乔治的主炮也远大于之前的战列舰，达到了18英寸。由于华盛顿条约的签订，明显超出规格的N3型战列舰受到限制，圣乔治从未完工。"]],
                             weiershiqinwang: ["female", "RN", 4, ["zhuangjiafh", "zhanliebb", "guanjianyiji"], ["des:英王乔治五世级2号舰。服役之后同胡德号一同参与了截击俾斯麦号的战斗，在战斗中被击伤撤退，不过她也击伤了俾斯麦号的油舱。修复之后威尔士亲王号搭载英国首相与美国总统进行了会晤，之后双方发表了著名的《大西洋宪章》。41年年末，威尔士亲王号编入Z舰队被派往远东对日本作战，在海战中包括反击号与威尔士亲王号在内的Z舰队被日本空袭击沉。"]],
                             qiuyue: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "duikongzhiwei",], ["des:　秋月型是日本少有的以护卫和对空为任务的驱逐舰，为了区别雷击用的甲驱而被称做乙驱，主炮使用100毫米双联高炮。秋月号建成后主要伴随航母提供防空掩护，经历了马里亚纳海战，目睹了日本航母部队的失败。同年10月在恩加诺海战中被美军飞机炸沉。"]],
@@ -2660,7 +2660,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 check: function (event, player) {
                                     return 1;
                                 },
-                                frequent: true,
+                                direct: true,
                                 content: function () {
                                     "step 0"
                                     if (player.countMark('jinengup') <= 0) {
@@ -2750,8 +2750,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }*/
                                     "step 1"
                                     if (result.targets && result.targets.length > 0) {
+                                        player.logSkill("hangmucv");
                                         player.useCard({ name: 'wanjian' }, result.cards, result.targets);
-                                        //player.useCard({ name: 'wanjian' }, result.targets, false);
                                     }
                                 },
                                 ai: {
@@ -11586,6 +11586,25 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                     expose: 0.2,
                                 },
+                                group: ["fangkong2", "saqijian_ying"],
+                                subSkill: {
+                                    ying: {
+                                        charlotte: true,
+                                        trigger: {
+                                            player: "logSkill",
+                                        },
+                                        frequent:true,
+                                        filter: function (event, player) {
+                                            return event.skill == 'fangkong2' || event.skill == 'hangmucv';
+                                        },
+                                        content: function () {
+                                            player.gain(lib.card.ying.getYing(1), "gain2");
+                                        },
+                                        popup: false,
+                                        sub: true,
+                                        "_priority": 0,
+                                    },
+                                },
                                 "_priority": 0,
                             },
                             jupaohuoli: {
@@ -12096,7 +12115,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         player.chooseButton(["选择至多三张牌？", cards], [1, 3], true).set("ai", get.buttonValue);
                                     } else event._result = { bool: false };
                                     "step 1"
-                                    if (result.links&&result.links.length) {
+                                    if (result.links && result.links.length) {
                                         event.cards2 = result.links;
                                         var suits = event.cards2.map(card => get.suit(card));
                                         var uniqueSuits = [...new Set(suits)];
@@ -16694,7 +16713,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             hangkongyazhi_fengyin: "航空压制_封印",
                             yuanyangpoxi: "远洋破袭", "yuanyangpoxi_info": "锁定技，你使用锦囊牌对攻击范围内的角色造成伤害+1；你出牌阶段使用杀的次数-1.",
                             juejingfengsheng: "绝境逢生", juejingfengsheng_info: "每轮开始时或你进入濒死状态时，你可以弃置任意张未记录点数的牌并记录其点数，然后你获得X点体力上限并恢复X点体力，摸X张牌（X为以此法弃置的手牌数量）",
-                            saqijian: "萨奇剪", "saqijian_info": "你获得【防空】。你可以将一张黑色牌当无懈可击使用",
+                            saqijian: "萨奇剪", "saqijian_info": "你获得【防空】。你可以将一张黑色牌当无懈可击使用。当你使用【开幕航空】或【防空】后，你获得一张【影】（黑桃A）。",
                             jupaohuoli: "巨炮火力", "jupaohuoli_info": "你使用杀造成伤害时，若你手牌数大于目标手牌数，此伤害+1。",
                             guanjianyiji: "关键一击", "guanjianyiji_info": "每回合对每名角色限一次，你使用牌指定目标后，你可以扣置目标的一张牌于武将牌上，其准备阶段开始时获得之。若目标为战列舰，不计入发动次数限制。",
                             duikongzhiwei: "对空直卫", "duikongzhiwei_info": "每轮限一次，当一名角色使用锦囊牌指定至少两名角色为目标时，你可以弃置一张牌，令此牌对你和距离1的角色无效。",
