@@ -12092,28 +12092,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     trigger.player.getHistory("lose", evt => {
                                         if (evt.type == "discard" && evt.getParent("phaseDiscard") == trigger) cards.addArray(evt.cards2.filterInD("d"));
                                     });
-                                    //game.log(get.translation(cards));
-                                    /* var history = game.getGlobalHistory("cardMove", evt => {
-                                        if (evt.name == "lose") return evt.position == ui.discardPile;
-                                        return evt.name == "cardsDiscard";
-                                    });
-                                    for (var i = history.length - 1; i >= 0; i--) {
-                                        var evt = history[i];
-                                        var cards2 = evt.cards.filter(card => {
-                                            return cards.includes(card);
-                                        });
-                                        if (cards2.length) {
-                                            gains.addArray(cards2);
-                                            cards.removeArray(cards2);
-                                        }
-                                        if (!cards.length) break; 
-                                    }*/
-                                    //game.log(gains);
                                     if (cards.length) {
                                         player.chooseButton(["选择至多三张牌？", cards], [1, 3], true).set("ai", get.buttonValue);
                                     } else event._result = { bool: false };
                                     "step 1"
-                                    if (result.links.length) {
+                                    if (result.links&&result.links.length) {
                                         event.cards2 = result.links;
                                         var suits = event.cards2.map(card => get.suit(card));
                                         var uniqueSuits = [...new Set(suits)];
