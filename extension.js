@@ -7330,7 +7330,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 ai: {
                                     expose: 0.2,
-                                    threaten: 1.3,
                                 },
                                 "_priority": 0,
                                 group: ["yishisheji_mianyi"],
@@ -7370,12 +7369,42 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             player.addTempSkill("yishisheji_mianyi_used", { global: "roundStart" });
                                         },
                                         ai: {
-                                            effect: {
-                                                target(card, player, target, current) {
-                                                    if (!player.hasSkill("yishisheji_mianyi_used")) {
-                                                        if ((get.type(card, "trick") == "trick" || get.name(card) == "sha" || get.name(card) == "sheji9") && target != player) return "zerotarget";
+                                            threaten: 0.9,
+                                            target: function (card, player, target) {
+                                                if (player._yishisheji_mianyi_tmp) return;
+                                                if (_status.event.getParent("useCard", true) || _status.event.getParent("_wuxie", true)) return;
+                                                if (get.tag(card, "damage")) {
+                                                    if (target.hasSkill("yishisheji_mianyi_used")) {
+                                                        return [1, -2];
+                                                    } else {
+                                                        if (get.attitude(player, target) > 0 && target.hp > 1) {
+                                                            return 0;
+                                                        }
+                                                        if (get.attitude(player, target) < 0 ) {
+                                                            if (card.name == "sha") return;
+                                                            var sha = false;
+                                                            player._yishisheji_mianyi = true;
+                                                            var num = player.countCards("h", function (card) {
+                                                                if (card.name == "sha") {
+                                                                    if (sha) {
+                                                                        return false;
+                                                                    } else {
+                                                                        sha = true;
+                                                                    }
+                                                                }
+                                                                return player.canUse(card, target) && get.effect(target, card, player, player) > 0;
+                                                            });
+                                                            delete player._yishisheji_mianyi_tmp;
+                                                            if (num < 2) {
+                                                                var enemies = player.getEnemies();
+                                                                if (enemies.length == 1 && enemies[0] == target && player.needsToDiscard()) {
+                                                                    return;
+                                                                }
+                                                                return 0;
+                                                            }
+                                                        }
                                                     }
-                                                },
+                                                }
                                             },
                                         },
                                         "_priority": 1500,
