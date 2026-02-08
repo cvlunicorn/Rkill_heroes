@@ -10203,10 +10203,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         var number = 2 * game.dead.length;
                                         return distance = (distance + number + from.storage.zuihouderongyao);
                                     },
-                                    maxHandcard: function (player, num) {
+                                    /* maxHandcard: function (player, num) {
                                         var number = 2 * game.dead.length;
                                         return num + number;
-                                    },
+                                    }, */
                                 },
                                 trigger: {
                                     player: "phaseDrawBegin2",
@@ -10219,13 +10219,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     "step 0";
                                     player.chooseControl("zuihouderongyao_less", "zuihouderongyao_more", function () {
                                         var player = get.player();
-                                        if (player.countCards("h") > 3) {
+                                        if (player.countCards("h") >= 3) {
                                             return "zuihouderongyao_less";
                                         }
                                         if (player.hp - player.countCards("h") > 1) {
                                             return "zuihouderongyao_more";
                                         }
-                                        return "zuihouderongyao_less";
+                                        return "zuihouderongyao_more";
                                     });
                                     "step 1";
                                     if (result.control == "zuihouderongyao_less") {
@@ -10251,7 +10251,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     //game.log('29jienaerxun');
-                                    if (player.getAttackRange() >= 3) {
+                                    if (player.getAttackRange() > 3) {
                                         game.log(trigger.card, '不可被', trigger.target, '响应');
                                         trigger.directHit.add(trigger.target);
                                     }
@@ -16746,8 +16746,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             tiaobangzuozhan: "跳帮作战", tiaobangzuozhan_info: "出牌阶段限一次，你可以视为对一名角色使用决斗。若你以此法造成伤害，你观看其手牌并获得其区域内一张牌；若你因此受到伤害，你令其获得你一张手牌，然后防止此伤害。",
                             baixiang: "白象", baixiang_info: "锁定技，你无法使用防具牌。当你受到雷属性伤害时，防止之。",
                             guochuan: "过穿", guochuan_info: "锁定技，你受到伤害时，你可以弃置一张防具牌或失去一点体力防止此伤害。然后你可以选择一名与你距离为一的角色(不能是伤害来源)，令其承受此伤害并摸伤害值张牌。",
-                            zuihouderongyao: "最后的荣耀", zuihouderongyao_info: "锁定技，摸牌阶段开始时，你选择以下一项：1，多摸一张牌且你的攻击范围-1。2，你的攻击范围+1。你的攻击范围与手牌上限+2X。(X已阵亡角色数)",
-                            '29jienaerxun': "29节纳尔逊", '29jienaerxun_info': "当你本回合内第一次使用“杀”指定目标时，若你的攻击范围大于等于3，此杀不可响应。",/* 若你的体力为全场最高时，此杀伤害+1。 */
+                            zuihouderongyao: "最后的荣耀", zuihouderongyao_info: "锁定技，摸牌阶段开始时，你选择以下一项：1，多摸一张牌且你的攻击范围-1。2，你的攻击范围+1。你的攻击范围+2X。(X已阵亡角色数)",
+                            '29jienaerxun': "29节纳尔逊", '29jienaerxun_info': "当你本回合内第一次使用“杀”指定目标时，若你的攻击范围大于3，此杀不可响应。",/* 若你的体力为全场最高时，此杀伤害+1。 */
                             zuihouderongyao_less: "少摸加距离",
                             zuihouderongyao_more: "多摸减距离",
                             hongseqiangwei: "红色蔷薇", hongseqiangwei_info: "你使用伤害类牌后，可以将一张手牌置于武将牌上称为[花],然后摸一张牌。[花]包含对应座次（点数超出游戏人数则减去游戏人数）的角色受到伤害时，你须弃置一张对应点数的[花]并防止此伤害。",
