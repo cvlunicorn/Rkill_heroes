@@ -13499,6 +13499,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         if (event.targets0.isDamaged()) {
                                             event.targets0.recover(1);
                                         }
+                                    } else {
+                                         delete player.storage["shuqinzhiyin_roundcount"];
                                     }
                                 },
                                 "_priority": 0,
