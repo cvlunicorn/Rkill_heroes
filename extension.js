@@ -2597,21 +2597,23 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 frequent: true,
                                 firstDo: true,
                                 usable: 1,
-                                filter: function (event, player) { return true },
+                                filter: function (event, player) {
+                                    return !event.hujia && player.hujia == 0;
+                                },
                                 content: function () {
                                     //  game.log(event.triggername,!trigger.hujia);//灵血&&!player.countCards('h',{color:'red'})
                                     if (player.countMark('jinengup') <= 0) {
-                                        if (trigger.card && (trigger.card.name == 'sha' || trigger.card.name == 'sheji9') && trigger.source && event.triggername == 'damageEnd' && !trigger.hujia && player.hujia == 0) {
+                                        if (event.triggername == 'damageEnd' && trigger.card && (trigger.card.name == 'sha' || trigger.card.name == 'sheji9') && trigger.source && !trigger.nature) {
                                             player.changeHujia(1);
                                             game.log(get.translation(player), '发动了技能【装甲防护】，增加了 1 点护甲值！');
                                         }
                                     } else if (player.countMark('jinengup') == 1) {
-                                        if (trigger.cards && event.triggername == 'damageEnd' && !trigger.hujia && player.hujia == 0) {
+                                        if (event.triggername == 'damageEnd' && (trigger.cards && (trigger.card.name == 'sha' || trigger.card.name == 'sheji9') || (trigger.nature && trigger.nature == "fire"))) {
                                             player.changeHujia(1);
                                             game.log(get.translation(player), '发动了技能【装甲防护】，增加了 1 点护甲值！');
                                         }
                                     } else if (player.countMark('jinengup') >= 2) {
-                                        if (event.triggername == 'damageEnd' && !trigger.hujia && player.hujia == 0) {
+                                        if (event.triggername == 'damageEnd' && (trigger.cards && (trigger.card.name == 'sha' || trigger.card.name == 'sheji9') || trigger.nature)) {
                                             player.changeHujia(1);
                                             game.log(get.translation(player), '发动了技能【装甲防护】，增加了 1 点护甲值！');
                                         }
@@ -3999,9 +4001,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         if (player.countMark('jinengup') <= 0) {
                                             return (get.suit(card) == 'diamond') ? 1.6 : -0.5;
                                         } else if (player.countMark('jinengup') == 1) {
-                                            return (get.suit(card) == 'heart' || get.suit(card) == 'diamond') ? 1.6 : -0.5;
+                                            return ((get.name(card) == 'tao'||get.name(card) == 'kuaixiu9' ||get.name(card) == 'shan' || get.name(card) == 'huibi9' ) || get.suit(card) == 'diamond') ? 1.6 : -0.5;
                                         } else if (player.countMark('jinengup') >= 2) {
-                                            return (get.suit(card) != 'spade') ? 1.6 : -0.5;
+                                            return (get.suit(card) == 'heart' || get.suit(card) == 'diamond')  ? 1.6 : -0.5;
                                         }
                                     }).judge2 = function (result) {
                                         return result.bool;
@@ -7380,7 +7382,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                         if (get.attitude(player, target) > 0 && target.hp > 1) {
                                                             return 0;
                                                         }
-                                                        if (get.attitude(player, target) < 0 ) {
+                                                        if (get.attitude(player, target) < 0) {
                                                             if (card.name == "sha") return;
                                                             var sha = false;
                                                             player._yishisheji_mianyi = true;
@@ -16617,7 +16619,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "danzong_info": "你使用杀后，有概率可以在造成无属性伤害附加属性：<br>潜艇、驱逐：获得雷属性的效果，<br>战列、航母：获得雷属性与改进型冰杀的效果。<br>其他舰种时：获得火属性,点燃目标。<br>效果持续到伤害结算完成时（打不穿藤甲的高爆弹与暴击藤甲的决斗）",
                             /* "paohuozb_skill": "炮火准备1", "paohuozb_skill_info": "装备技能", */
                             dajiaoduguibi: "规避",
-                            "dajiaoduguibi_info": "（可强化）若你没有装备防具，你需要使用或打出闪时可以进行一次判定，判定结果为：零级强化，方块/一级强化，红桃或方块/二级强化，不为黑桃，防止此伤害。",
+                            "dajiaoduguibi_info": "（可强化）若你没有装备防具，你需要使用或打出闪时可以进行一次判定，判定结果为：零级强化，方块/一级强化，桃、闪或方块/二级强化，红桃或方块，视为你使用或打出了闪。",
                             "rendeonly2": "仁德界改",
                             "rendeonly2_info": "给实际距离为2的队友最多两张牌，一回合限2次，给出第二张牌时，你视为使用一张基本牌。可强化",
                             zhiyangai: "直言",
@@ -16631,7 +16633,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "zhongpaoduijue": "对决",
                             "zhongpaoduijue_info": "当你无法使用杀时，你可以指定一个目标，弃置最多（2/3/4）张相同花色的牌，并与目标摸等量的牌,<br>然后你与目标轮流视为对对方使用一张决斗,<br>直到双方的决斗次数超过2n，n为你弃置的牌数。强化以-1对方摸的牌",
                             "zhuangjiafh": "装甲防护",
-                            "zhuangjiafh_info": "（可强化）每回合限一次，当你受到：零级强化，杀的伤害/一级强化，杀和锦囊牌的伤害/二级强化，任意伤害时,若你没有用护甲承受过此次伤害，你可以获得1点护甲。",
+                            "zhuangjiafh_info": "（可强化）每回合限一次，当你受到：零级强化，普通杀的伤害/一级强化，杀的伤害和火属性的伤害/二级强化，杀的伤害和任意属性伤害时,若你没有用护甲承受过此次伤害，你可以获得1点护甲。",
                             "misscoversha": "回出杀数", "misscoversha_info": "杀被回避会回复当回合出杀次数",
                             "xianjinld": "先进雷达",
                             "xianjinld_info": "可以选择一个增益：1.攻击，实际距离此角色为1的队友：武器攻击距离+1;但防御杀的距离-1，队友的摸牌阶段多摸一张牌。或：2.防御距离+1，但是攻击距离-1，自己的摸牌阶段少抽一张牌。",
