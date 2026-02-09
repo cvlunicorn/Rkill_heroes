@@ -2111,6 +2111,62 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 intro: { content: function () { return "属性效果"; }, },
                             },
+                            hanbing_skill: {//寒冰剑技能添加config控制，同名覆盖标包寒冰剑技能
+                                equipSkill: true,
+                                trigger: { source: "damageBegin2" },
+                                //direct:true,
+                                audio: true,
+                                filter: function (event) {
+                                    if (lib.config.extension_舰R牌将__hanbing_gai === true) return false;
+                                    return (
+                                        event.card &&
+                                        event.card.name == "sha" &&
+                                        event.notLink() &&
+                                        event.player.getCards("he").length > 0
+                                    );
+                                },
+                                //priority:1,
+                                check: function (event, player) {
+                                    var target = event.player;
+                                    var eff = get.damageEffect(target, player, player, event.nature);
+                                    if (get.attitude(player, target) > 0) {
+                                        if (eff >= 0) return false;
+                                        return true;
+                                    }
+                                    if (eff <= 0) return true;
+                                    if (target.hp == 1) return false;
+                                    if (
+                                        event.num > 1 ||
+                                        player.hasSkill("tianxianjiu") ||
+                                        player.hasSkill("luoyi2") ||
+                                        player.hasSkill("reluoyi2")
+                                    )
+                                        return false;
+                                    if (target.countCards("he") < 2) return false;
+                                    var num = 0;
+                                    var cards = target.getCards("he");
+                                    for (var i = 0; i < cards.length; i++) {
+                                        if (get.value(cards[i]) > 6) num++;
+                                    }
+                                    if (num >= 2) return true;
+                                    return false;
+                                },
+                                logTarget: "player",
+                                content: function () {
+                                    "step 0";
+                                    trigger.cancel();
+                                    "step 1";
+                                    if (trigger.player.countDiscardableCards(player, "he")) {
+                                        player.line(trigger.player);
+                                        player.discardPlayerCard("he", trigger.player, true);
+                                    }
+                                    "step 2";
+                                    if (trigger.player.countDiscardableCards(player, "he")) {
+                                        player.line(trigger.player);
+                                        player.discardPlayerCard("he", trigger.player, true);
+                                    }
+                                },
+                            },
                             _hanbing_gai: {
                                 inherit: "hanbing_skill",
                                 trigger: { source: "damageBegin2", },
