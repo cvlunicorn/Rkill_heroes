@@ -15986,7 +15986,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     "step 0"
+                                    if(target){
                                     player.chooseToCompare(target);
+                                    }else{
+                                        event.finish();
+                                        return;
+                                    }
                                     "step 1"
                                     if (result.bool) {
                                         var color = get.color(result.target, false);
