@@ -4565,7 +4565,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }
                                     }, result: {
                                         target: function (player, target) {
-                                            if (!ui.selected.cards||ui.selected.cards.length==0) return 0;
+                                            if (!ui.selected.cards || ui.selected.cards.length == 0) return 0;
                                             if (get.value(ui.selected.cards[0], false, 'raw') < 0) return -1;
                                             return 1;
                                         }
@@ -5035,7 +5035,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                                     } else if (result.index == 1) {
                                         game.log(get.translation(event.target1) + "不能使用手牌");
-                                        event.target1.addTempSkill('qixi_cv_block',{global:"phaseEnd"});
+                                        event.target1.addTempSkill('qixi_cv_block', { global: "phaseEnd" });
 
                                     } else {
                                         game.log(get.translation(event.target1) + "翻面");
@@ -5215,6 +5215,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 viewAsFilter(player) {
                                     if (!player.countCards('hes', { color: 'black' })) return false;
+                                    return true;
                                 },
                                 prompt: "将一张黑色牌当雷杀使用",
                                 check(card) { return 4 - get.value(card) },
@@ -5386,7 +5387,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     target: "useCardToTarget",
                                 },
                                 filter: function (event, player) {
-                                    return event.player != player && event.targets.length == 1;
+                                    return event.player != player && event.targets && event.targets.length == 1;
                                 },
                                 check: function (event, player) {
                                     return get.effect(player, event.card, event.player, player) < 0;
@@ -5595,7 +5596,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     //game.log("拼点结果" + result.bool);
                                     if (result.bool) {
                                         player.markAuto('qijianshashou_1', [target]);
-                                        player.addTempSkill("qijianshashou_1");
+                                        player.addTempSkill("qijianshashou_1",{global:"phaseEnd"});
                                         game.log("拼点赢");
                                     } else {
                                         var evt = _status.event.getParent("phaseUse");
@@ -5629,6 +5630,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             qijianshashou_1: {
                                 mark: "character",
                                 onremove: true,
+                                init: function (player, skill) {
+                                    if (!player.storage.qijianshashou_1) player.storage.qijianshashou_1 = [];
+                                },
                                 intro: {
                                     content: "到$的距离视为1",
                                 },
