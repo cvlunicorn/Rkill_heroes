@@ -4326,7 +4326,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         filterTarget: function (card, player, target) {
                                             if (_status.event.targets.includes(target) && !target.hasSkill('fangkong2_aibiexuan')) {
                                                 if (player.hasSkill('duikongfangyu')) {
-                                                    return get.distance(player, target) <= (5);//对空防御的技能效果。若玩家拥有对空防御，则视为满级强化。
+                                                    return get.distance(player, target) <= 5;//对空防御的技能效果。若玩家拥有对空防御，则视为满级强化。
                                                 }
                                                 return get.distance(player, target) <= (1 + 2 * player.countMark('jinengup'));
                                             }
@@ -4337,7 +4337,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         ai2: function (target) {
                                             var player = get.player(); var trigger = _status.event.getTrigger();
                                             //game.log(get.translation(_status.event.player)); 
-                                            if (!target.hasSkill("fangkong2_aibiexuan")) { return -get.effect(target, trigger.card, trigger.player, _status.event.player); }
+                                            if (!target.hasSkill("fangkong2_aibiexuan")) { 
+                                                return -get.effect(target, trigger.card, trigger.player, _status.event.player); 
+                                            }
                                             return 0;
                                         }, targets: trigger.targets,//这个代码不能照搬到content以外的地方。贯石斧、朱雀羽扇有类似代码。还有recover版的。
                                     });//技能还没扩起来，括起来。
@@ -4345,7 +4347,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (result.bool) {//只能判断你有没有选择，然后给你true与false，没其他文本。
                                         player.discard(result.cards);//前面有卡牌card，可以返回card，不同于仁德主动技能直接写card。
                                         event.target = result.targets;//前面有目标target，可以返回target。
-                                        if (event.target != undefined) { for (var i = 0; i < trigger.targets.length; i += (1)) { if (event.target.includes(trigger.targets[i])) { trigger.getParent().excluded.add(trigger.targets[i]); trigger.targets[i].addSkill('fangkong_aibiexuan'); game.log('取消卡牌目标', trigger.targets[i], '编号', i) } } };//三级选择，集合target是否包含trigger.target。同时测试是否选到了目标。
+                                        if (event.target && event.target.length > 0) { 
+                                            for (var i = 0; i < trigger.targets.length; i += 1) { 
+                                                if (event.target.includes(trigger.targets[i])) { 
+                                                    trigger.getParent().excluded.add(trigger.targets[i]); 
+                                                    trigger.targets[i].addSkill('fangkong2_aibiexuan'); 
+                                                    game.log('取消卡牌目标', trigger.targets[i], '编号', i) 
+                                                } 
+                                            } 
+                                        };//三级选择，集合target是否包含trigger.target。同时测试是否选到了目标。
                                         player.logSkill('fangkong2', event.target);
                                         //if (player.hasSkill('duikongfangyu') && _status.currentPhase != player) player.draw(2);//对空防御的技能效果。若玩家拥有对空防御，则发动防空后可以摸牌。
                                     }//让技能发语音，发历史记录。
@@ -13500,7 +13510,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             event.targets0.recover(1);
                                         }
                                     } else {
-                                         delete player.storage["shuqinzhiyin_roundcount"];
+                                        delete player.storage["shuqinzhiyin_roundcount"];
                                     }
                                 },
                                 "_priority": 0,
@@ -15986,9 +15996,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     "step 0"
-                                    if(target){
-                                    player.chooseToCompare(target);
-                                    }else{
+                                    if (target) {
+                                        player.chooseToCompare(target);
+                                    } else {
                                         event.finish();
                                         return;
                                     }
