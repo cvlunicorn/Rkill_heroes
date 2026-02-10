@@ -29,6 +29,7 @@ yield需要无名杀版本1.10.10或更高版本的支持
                     }).length > 0
                 ); */
 //主动技能的ai中需要写明result例如result:{player:1,},AI才会发动技能。
+//.set()是链式调用，每一步处理的都是前一步是结果，是有顺序要求的
 let connect;
 try {
     const ws = require("ws");
@@ -13435,6 +13436,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         event.targets0 = result.targets[0];
                                         player
                                             .chooseToDiscard(2, "hes", get.prompt("shuqinzhiyin"))
+                                            .set("target", event.targets0)
                                             .set("ai", function (card) {
                                                 var target = event.target;
                                                 if (target.isDamaged() && target.hp < 3) return 9 - get.value(card);
@@ -13467,7 +13469,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                     }
                                                 }
                                                 return 7 - get.value(card);
-                                            }).set("target", event.targets0);
+                                            });
                                     }
                                     "step 2";
                                     if (result.bool) {
