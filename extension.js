@@ -10491,7 +10491,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             var cards = player.getExpansions('hongseqiangwei');
                                             var num = event.player.getSeatNum();
                                             //game.log(num);
-                                            for (i = 0; i < player.getExpansions('hongseqiangwei').length; i++) {
+                                            for (var i = 0; i < player.getExpansions('hongseqiangwei').length; i++) {
                                                 if (get.number(cards[i]) % game.countPlayer() == num) {
                                                     return event.player.isAlive();
                                                 }
