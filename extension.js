@@ -13388,6 +13388,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 check(event, player) {
                                     return true;
                                 },
+                                direct:true,
                                 content() {
                                     "step 0";
                                     player.chooseTarget(get.prompt2("shuqinzhiyin"), function (card, player, target) {
@@ -13438,7 +13439,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             .chooseToDiscard(2, "hes", get.prompt("shuqinzhiyin"))
                                             .set("target", event.targets0)
                                             .set("ai", function (card) {
-                                                var target = event.target;
+                                                var target = event.targets0;
                                                 if (target.isDamaged() && target.hp < 3) return 9 - get.value(card);
                                                 var skills = target.getOriginalSkills();
                                                 for (var i = 0; i < skills.length; i++) {
@@ -13473,6 +13474,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                     "step 2";
                                     if (result.bool) {
+                                        player.logSkill("shuqinzhiyin");
                                         var skills = event.targets0.getStockSkills(true, true);
                                         game.expandSkills(skills);
                                         //game.log(skills);
