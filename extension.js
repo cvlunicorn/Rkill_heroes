@@ -5081,7 +5081,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         "_priority": 0,
                                     },
                                 },
-                                ai: {
+                                /* ai: {//2026.2.10旧版本AI
                                     order: 10,
                                     result: {
 
@@ -5099,6 +5099,101 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return 0;
                                         },
                                     },
+                                }, */
+                                ai: {
+                                    order: 10,
+                                    result: {
+                                        // 核心：是否发动该限定技（player为当前AI玩家）
+                                        player: function (player) {
+                                            // 1. 基础校验：限定技已用/非出牌阶段/无操作空间 → 不发动
+                                            if (player.storage.qixi_cv == true || game.countPlayer(function (p) { return p != player && p.isIn(); }) == 0) {
+                                                return 0;
+                                            }
+                                            if (game.roundNumber < 2) {
+                                                return 0;
+                                            }
+                                            var damageCards = player.getCards('h', function (card) {
+                                                return get.tag(card, 'damage') && get.type(card) == 'trick';
+                                            });
+                                            // 2. 核心收益计算：评估技能对全场的净收益
+                                            var totalProfit = 0;
+                                            var enemies = player.getEnemies(); // 敌方角色
+                                            var friends = player.getFriends(); // 友方角色（包括自己，但排除）
+
+                                            // 遍历所有其他角色，计算对每个角色的收益
+                                            var alltargets = game.filterPlayer(current => current != player).sortBySeat();
+                                            for (var target of alltargets) {
+                                                if (target == player || !target.isIn()) continue;
+
+                                                // 2.1 评估该角色的「被技能影响的收益」
+                                                var targetProfit = 0;
+                                                // 判定该角色的最优选择（AI会预判对方选对自己最有利的选项）
+                                                var bestChoice = lib.skill.qixi_cv.getTargetBestChoice(target, player);
+                                                var att = get.attitude(player, target);
+                                                // 2.2 按对方选择计算收益（敌方/友方收益反向）
+                                                if (att <= 0) {
+                                                    // 敌方：对方选的选项越差，我方收益越高
+                                                    targetProfit = lib.skill.qixi_cv.getChoiceCost(target, bestChoice);
+                                                    var eff = get.sgn(get.effect(target, { name: 'wanjian' }, player, player));
+                                                    if (target.hp == 1) {
+                                                        eff *= 1.5;
+                                                    }
+                                                    if (damageCards.length >= 1) {
+                                                        eff += get.sgn(get.damageEffect(target, player, player));
+                                                    }
+                                                    targetProfit += eff;
+                                                } else {
+                                                    // 友方：对方选的选项越优，我方收益越高（避免误伤友方）
+                                                    targetProfit = -lib.skill.qixi_cv.getChoiceCost(target, bestChoice);
+                                                }
+                                                console.log("奇袭target" + get.translation(target) + targetProfit);
+                                                totalProfit += targetProfit;
+                                            }
+                                            console.log("奇袭total" + totalProfit);
+                                            // 限定技阈值：收益≥1 才发动（避免浪费）
+                                            return totalProfit > 2 ? 1 : 0;
+                                        },
+                                    },
+                                },
+
+                                // 【辅助函数】预判目标角色会选哪个选项（1=弃2牌，2=禁手牌，3=翻面）
+                                getTargetBestChoice(target, player) {
+                                    // 计算每个选项对目标的成本（成本越低，目标越可能选）
+                                    var cost1 = lib.skill.qixi_cv.getChoiceCost(target, 1); // 弃2牌的成本
+                                    var cost2 = lib.skill.qixi_cv.getChoiceCost(target, 2); // 禁手牌的成本
+                                    var cost3 = lib.skill.qixi_cv.getChoiceCost(target, 3); // 翻面的成本
+
+                                    // 返回成本最低的选项（目标的最优选择）
+                                    var minCost = Math.min(cost1, cost2, cost3);
+                                    if (minCost == cost1) return 1;
+                                    if (minCost == cost2) return 2;
+                                    return 3;
+                                },
+
+                                // 【辅助函数】计算某个选项对目标的成本（数值越大，成本越高）
+                                getChoiceCost(target, choice) {
+                                    switch (choice) {
+                                        case 1: // 弃置2张牌
+                                            var cardNum = target.countCards('he'); // 手牌+装备区牌数
+                                            // 牌越多，弃牌成本越高；关键牌（桃/酒/闪）权重更高
+                                            var keyCardWeight = target.countCards('h', function (card) {
+                                                return ['tao', 'jiu', 'shan', 'kuaixiu9', 'Zziqi9', 'huibi9'].includes(get.name(card));
+                                            });
+                                            return Math.min(cardNum, 2) + keyCardWeight;
+
+                                        case 2: // 本回合不能使用/打出手牌
+                                            // 手牌越多/输出型角色，禁手牌成本越高
+                                            var SaveCardNum = target.countCards('h', function (card) {
+                                                return ['tao', 'jiu', 'shan', 'kuaixiu9', 'Zziqi9', 'huibi9'].includes(get.name(card));
+                                            });
+                                            return SaveCardNum * (target.hp < 2 ? 1.5 : 1);
+
+                                        case 3: // 翻面
+                                            // 回合外防御弱/血量低，翻面成本越高
+                                            var hpRatio = target.hp / target.maxHp;
+                                            var defenseWeak = target.countCards('h', card => get.type(card) == 'basic') < 2;
+                                            return (1 - hpRatio) * 2 + (defenseWeak ? 1 : 0);
+                                    }
                                 },
                                 intro: {
                                     content: "limited",
@@ -13388,7 +13483,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 check(event, player) {
                                     return true;
                                 },
-                                direct:true,
+                                direct: true,
                                 content() {
                                     "step 0";
                                     player.chooseTarget(get.prompt2("shuqinzhiyin"), function (card, player, target) {
