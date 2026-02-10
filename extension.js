@@ -29,7 +29,7 @@ yield需要无名杀版本1.10.10或更高版本的支持
                     }).length > 0
                 ); */
 //主动技能的ai中需要写明result例如result:{player:1,},AI才会发动技能。
-//.set()是链式调用，每一步处理的都是前一步是结果，是有顺序要求的
+//.set("key",vel)传递参数后使用数值时应当取后一个参数（vel）。
 let connect;
 try {
     const ws = require("ws");
@@ -2665,12 +2665,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             game.log(get.translation(player), '发动了技能【装甲防护】，增加了 1 点护甲值！');
                                         }
                                     } else if (player.countMark('jinengup') == 1) {
-                                        if (event.triggername == 'damageEnd' && (trigger.cards && (trigger.card.name == 'sha' || trigger.card.name == 'sheji9') || (trigger.nature && trigger.nature == "fire"))) {
+                                        if (event.triggername == 'damageEnd' && (trigger.card && (trigger.card.name == 'sha' || trigger.card.name == 'sheji9') || (trigger.nature && trigger.nature == "fire"))) {
                                             player.changeHujia(1);
                                             game.log(get.translation(player), '发动了技能【装甲防护】，增加了 1 点护甲值！');
                                         }
                                     } else if (player.countMark('jinengup') >= 2) {
-                                        if (event.triggername == 'damageEnd' && (trigger.cards && (trigger.card.name == 'sha' || trigger.card.name == 'sheji9') || trigger.nature)) {
+                                        if (event.triggername == 'damageEnd' && (trigger.card && (trigger.card.name == 'sha' || trigger.card.name == 'sheji9') || trigger.nature)) {
                                             player.changeHujia(1);
                                             game.log(get.translation(player), '发动了技能【装甲防护】，增加了 1 点护甲值！');
                                         }
