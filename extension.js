@@ -8159,7 +8159,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (player.countCards('he', { color: 'black' }) <= 0) return false;
                                     if (!event.player.isIn()) return false;
                                     var i = 0;
-                                    var allplayers = game.players.sortBySeat(player);
+                                    var allplayers = game.filterPlayer().sortBySeat(player);
                                     //game.log(allplayers.length);
                                     for (i = 0; i < allplayers.length; i++) {
                                         //game.log(allplayers[i], i);
@@ -8200,6 +8200,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger.player.storage.u47_xinbiao_cards.sort();
                                         player.logSkill("u47_xinbiao");
                                     }
+                                },
+                                ai: {
+                                    combo: "u47_huxi",
                                 },
                             },
                             u47_xinbiao_hp: {
@@ -8244,9 +8247,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }).set('ai', target => {
                                         var att = get.attitude(player, target);
                                         if (att >= 0) {
-                                            return (target.storage.u47_xinbiao_hp - target.hp) * 2 + (target.storage.u47_xinbiao_cards - target.countCards("h"));
+                                            return (target.countMark('u47_xinbiao_hp') - target.hp) * 2 + (target.countMark('u47_xinbiao_cards') - target.countCards("h"));
                                         } else if (att < 0) {
-                                            return (target.hp - target.storage.u47_xinbiao_hp) * 2 + (target.countCards("h") - target.storage.u47_xinbiao_cards);
+                                            return (target.hp - target.countMark('u47_xinbiao_hp')) * 2 + (target.countCards("h") - target.countMark('u47_xinbiao_cards'));
                                         } else {
                                             return 1;
                                         }
@@ -8255,9 +8258,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (result.bool) {
                                         player.logSkill('u47_huxi');
                                         var target = result.targets[0];
-                                        var i1 = target.storage.u47_xinbiao_hp;
+                                        var i1 = target.countMark('u47_xinbiao_hp');
                                         target.removeMark('u47_xinbiao_hp', target.countMark('u47_xinbiao_hp'));
-                                        var i2 = target.storage.u47_xinbiao_cards;
+                                        var i2 = target.countMark('u47_xinbiao_cards');
                                         target.removeMark('u47_xinbiao_cards', target.countMark('u47_xinbiao_cards'));
                                         var hp = target.hp - i1;
                                         var cards = target.countCards("h") - i2;
@@ -8296,6 +8299,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return 1;
                                         },
                                     },
+                                    combo: "u47_xinbiao",
                                 },
                                 "_priority": 0,
                             },
@@ -8773,7 +8777,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     'step 0'
-                                    event.num = 0;
                                     event.targets = game.filterPlayer(current => current != player && current.getExpansions('Z').length).sortBySeat();
                                     'step 1'
                                     event.target1 = event.targets.shift();
@@ -8791,7 +8794,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                     event.goto(2);
                                     'step 4'
-                                    if (event.num < targets.length) event.goto(1);
+                                    if (event.targets.length > 0) event.goto(1);
                                     else game.delayx();
 
                                 },
@@ -9342,7 +9345,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter: function (event, player) {
                                     if (player.countCards('he') == 0) return false;
                                     var cards = player.getExpansions('Z');
-                                    for (i = 0; i < player.getExpansions('Z').length; i++) {
+                                    for (var i = 0; i < player.getExpansions('Z').length; i++) {
                                         if (get.type(cards[i]) == get.type(event.card)) return true;
                                     }
                                     return false;
@@ -9594,7 +9597,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 if (!trigger.source.hasSkill('cardsDisabled_color')) {
                                                     trigger.source.addTempSkill('cardsDisabled_color', { player: 'phaseAfter' });
                                                 }
-                                                trigger.source.markAuto('cardsDisabled_color', [get.suit(card)]);
+                                                trigger.source.markAuto('cardsDisabled_color', [get.color(card)]);
                                             });
                                             event.finish();
                                         },
@@ -9606,7 +9609,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 charlotte: true,
                                 direct: true,
                                 trigger: {
-                                    player: 'phaseEnd',
+                                    player: ['phaseEnd','dieAfter'],
                                 },
                                 intro: {
                                     content: "不可使用的颜色：$",
@@ -9645,7 +9648,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 filter: function (event, player) {
                                     if (event.getParent().triggeredTargets3.length > 1) return false;
                                     if (get.type(event.card) == 'trick') return true;
-
+                                    return false;
                                 },
                                 ai: {
 
@@ -16946,7 +16949,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             z18_weisebaoxingdong_huogong: "火攻", z18_weisebaoxingdong_huogong_info: "你可以移去一张Z，观看一名角色的手牌，然后视为使用一张火攻。",
                             z17_naerweikejingjie: "纳尔维克警戒", z17_naerweikejingjie_info: "出牌阶段，你可以将任意张手牌置于武将牌上，称为Z，然后将一名角色至多等量张手牌置于其武将牌上，也称为Z。(全局)对有Z的角色造成伤害时，可以摸一张牌。",
                             z21_tuxi: "突袭", z21_tuxi_info: "出牌阶段开始时，你可以选择攻击范围内的一名角色，将其一张牌置于你的武将牌上，称为Z。（全局）若你有Z，你使用牌指定其他角色为目标后，你可以令其随机弃置一张牌，然后移去一张Z",
-                            z22_tuxixiawan: "突袭峡湾", z22_tuxixiawan_info: "出牌阶段开始时，你可以将任意角色一张牌置于自己的武将牌上，称为Z。(全局）其他角色造成伤害后，若你有Z，你可以移去一枚Z，进行一次判定，令当前回合角色不能使用或打出与判定牌花色相同的牌直到回合结束。",
+                            z22_tuxixiawan: "突袭峡湾", z22_tuxixiawan_info: "出牌阶段开始时，你可以将任意角色一张牌置于自己的武将牌上，称为Z。(全局）其他角色造成伤害后，若你有Z，你可以移去一枚Z，进行一次判定，令当前回合角色不能使用或打出与判定牌颜色相同的牌直到回合结束。",
                             cardsDisabled_color: "不能使用_颜色", cardsDisabled_color_info: "你不能使用或打出对应颜色的手牌。",
                             matapanjiaozhijian: "马塔潘角之箭", matapanjiaozhijian_info: "你使用锦囊牌指定目标后，你可以弃置任意张牌，令等量目标不可响应此牌。",
                             zhongbangtuxi: "重磅突袭", zhongbangtuxi_info: "限定技，出牌阶段，你可以弃置任意张红色牌对等量角色各造成一点火焰伤害。",
