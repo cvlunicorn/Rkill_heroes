@@ -6761,7 +6761,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             }
                                         }
                                         game.log("巨舰梦想列表已生成");
-                                        if (list == "") {
+                                        if (list.length == 0) {
                                             game.log("没有可用的牌了！");
                                             player.storage.jujianmengxiang_error = true;
                                             event.finish();
@@ -7043,8 +7043,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 content: function () {
                                     player.awakenSkill('wuweizhuangji');
                                     var num = player.maxHp;
-                                    player.loseHp(player.hp);
-                                    target.damage(num);
+                                    if (player.hp > 0) {
+                                        player.loseHp(player.hp);
+                                        target.damage(num);
+                                    }
 
                                 },
                             },
@@ -7074,7 +7076,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger.target.markSkill('qinggang2');
                                     }
                                     //game.log("重装刺客1执行结束");
-                                    event.finish;
+                                    event.finish();
                                 },
                                 prompt: "你装备区内有牌时，你使用的杀无视防具",
                             },
@@ -7197,7 +7199,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             }
                                         }
                                     }
-                                    if (list == "") {
+                                    if (list.length == 0) {
                                         game.log('牌堆中没有符合要求的牌');
                                         player.getStat('skill').duomianshou -= 1;
                                         player.storage.duomianshou.push(card);
@@ -16801,7 +16803,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             jujianmengxiang: "巨舰梦想", "jujianmengxiang_info": "出牌阶段，你可以失去一点体力，视为使用一张基本牌或非延时锦囊牌（每回合每种牌名限一次）。",
                             sidajingang: "四大金刚", "sidajingang_info": "你使用杀造成伤害后，你可以与目标拼点，若你赢你获得其一张牌。你发动[远航摸牌]后可以摸一张牌。",
                             jiujingzhanzhen: "久经战阵", "jiujingzhanzhen_info": "出牌阶段限两次，你可以重铸一张红牌。结束阶段，你可以选择X名角色，其各选择一项:1摸一张牌，2令你获得一点护甲(至多为一)。X为你本回合弃置的红牌数。",
-                            wuweizhuangji: "无畏撞击", "wuweizhuangji_info": "限定技，出牌阶段，若你的体力值最少，你可以失去所有体力，然后对一名角色造成x点伤害(x为你当前的体力上限)",
+                            wuweizhuangji: "无畏撞击", "wuweizhuangji_info": "限定技，出牌阶段，若你的体力值最少，你可以失去所有体力（至少一点），然后对一名角色造成x点伤害(x为你当前的体力上限)",
                             zhongzhuangcike: "重装刺客", "zhongzhuangcike_info": "你装备区内有牌时，你使用的杀无视防具；你即将造成的伤害视为体力流失",
                             duomianshou: "多面手", "duomianshou_info": "出牌阶段限三次，你可以弃置一张手牌，视为使用一张牌堆中点数相同的不同类型的牌(不受次数限制），若牌堆中没有相同点数的牌名，重置该技能发动次数，且本回合不能再使用该点数发动技能.",/*每回合限一次，你对其他中小型船使用转化牌时，其选择弃置一张牌或令你摸一张牌。*/
                             duomianshou_1: "多面手", "duomianshou_1_info": "每回合限一次，你对其他中小型船使用转化后的牌时其选择一项：1弃置一张牌，2令你摸一张牌。",
