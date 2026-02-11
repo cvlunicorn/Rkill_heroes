@@ -15407,8 +15407,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                                 ai: {
-                                    combo: "sukhbaatar_sudaren",
-                                    threaten: 1.9,
+                                    combo: "sukhbaatar_rumeng",
+                                    threaten: 1.1,
                                 },
                                 "_priority": 0,
                             },
