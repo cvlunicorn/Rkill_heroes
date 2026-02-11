@@ -7541,6 +7541,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return get.effect(event.target, event.card, event.player, player) < 0;
                                         },
                                         filter(event, player) {
+                                            if (player.hasSkill("yishisheji_mianyi_used")) return false;
                                             return (get.type(event.card, "trick") == "trick" || get.name(event.card) == "sha" || get.name(event.card) == "sheji9") && event.player != player;
                                         },
                                         content() {
