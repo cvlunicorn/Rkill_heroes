@@ -15084,6 +15084,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     player: "phaseUseBefore",
                                 },
                                 frequent: true,
+                                mod: {
+                                    maxHandcard: function (player, num) {
+                                        return player.maxHp;
+                                    }
+                                },
                                 filter(event, player) {
                                     return player.countCards("h") > 0;
                                 },
@@ -15091,7 +15096,19 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     "step 0";
                                     player.chooseCard("h", [1, player.countCards("h")], get.prompt("zhanxian"), "将任意张牌作为“斩”置于武将牌上").set("ai", function (card) {
                                         var player = _status.event.player;
-                                        if (!player.hasValueTarget(card)) return 1;
+                                        var list = game.filterPlayer();
+                                        var maxhs = 0;
+                                        for (var i = 0; i < list.length; i++) {
+                                            if (list[i] != player && list[i].isMaxHandcard() && get.attitude(player, list[i]) < 0) {
+                                                maxhs = list[i].countCards("h");
+                                                break;
+                                            }
+                                        }
+                                        if (ui.selected.cards.length > maxhs) return 0;
+                                        if (player.countCards("h", function (cards) {
+                                            return get.tag(card, "damage");
+                                        }) <= 0) return 0;
+                                        if (!player.hasValueTarget(card) && get.value(card) < 7.5) return 1;
                                         return 0;
                                     });
                                     "step 1";
@@ -15124,7 +15141,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         content() {
                                             "step 0";
                                             var cards = player.getExpansions("zhanxian");
-                                            if (cards.length) player.gain(cards, "gain2");
+                                            if (cards.length) player.discard(cards);//player.gain(cards, "gain2");
                                         },
                                         sub: true,
                                         "_priority": 0,
@@ -15137,7 +15154,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         filter: function (event, player) {
                                             return (
                                                 game.hasPlayer(function (current) {
-                                                    return /* current != player && */player.getExpansions("zhanxian") && current.countCards("h") > player.getExpansions('zhanxian').length;
+                                                    return /* current != player && */player.getExpansions("zhanxian") && current.countCards("h") <= player.getExpansions('zhanxian').length;
                                                 })
                                             );
                                         },
@@ -15145,7 +15162,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             var hs = player.getExpansions('zhanxian').length;
                                             trigger.directHit.addArray(
                                                 game.filterPlayer(function (current) {
-                                                    return /* current != player && */ current.countCards("h") > hs;
+                                                    return /* current != player && */ current.countCards("h") <= hs;
                                                 })
                                             );
                                         },
@@ -17078,7 +17095,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             southdakota_jianmiemoshi: "歼灭模式", "southdakota_jianmiemoshi_info": "你的回合内，其他角色无法对非“歼灭”牌进行响应。回合结束时，你的手牌标记为“歼灭”牌。",
                             southdakota_zhaopin: "招聘", "southdakota_zhaopin_info": "限定技，主公技，你进入濒死状态时，可以弃置自己区域所有牌选择令其他角色依次选择是否响应，若有角色响应，则你与其互换身份牌，然后其可以获得一点体力上限并恢复一点体力，你失去一点体力上限，摸4张手牌，并将体力恢复至1点。",
                             huodezhuangbei: "获得装备", "huodezhuangbei_info": "从牌堆中获得一张装备。测试用。",
-                            zhanxian: "斩仙", "zhanxian_info": "出牌阶段开始前，你可以将任意张手牌作为“斩”扣置在武将牌上至本回合结束。锁定技，手牌数多于你“斩”张数的角色不能响应你使用的牌。",
+                            zhanxian: "斩仙", "zhanxian_info": "出牌阶段开始前，你可以将任意张手牌作为“斩”扣置在武将牌上,本回合结束时弃置所有“斩”。锁定技，手牌数小于等于你“斩”张数的角色不能响应你使用的牌。你的手牌上限等于体力上限。",
                             guishen: "鬼神", "guishen_info": "锁定技，你的出牌阶段内，体力值大于体力上限一半的其他角色所有技能失效。",
                             guishen_fengyin: "鬼神_封印",
                             sukhbaatar_rumeng: "入梦", "sukhbaatar_rumeng_info": "锁定技,准备阶段，你选择一名角色与其拼点。你发起拼点或成为拼点目标时可以获得场上一张“军辅”牌。",
