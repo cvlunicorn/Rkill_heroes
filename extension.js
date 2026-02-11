@@ -9412,14 +9412,36 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                 },
                                 ai: {
-                                    "unequip_ai": true,
-                                    skillTagFilter: function (player, tag, arg) {
-                                        if (!arg || !arg.name) return false;
-                                        if (!arg.target) return false;
-                                        var card = arg.target.getEquip(2);
-                                        return card && get.value(card) > 0 && player.hasCard(cardx => {
-                                            return lib.filter.cardDiscardable(cardx, player, 'jsrgjuelie_discard') && get.value(cardx) < 5;
-                                        });
+                                    order: 9,
+                                    result: {
+                                        player: function (player) {
+                                            return -1;
+                                        },
+                                        target: function (player, target) {
+                                            const att = get.attitude(player, target);
+                                            const hs = target.getDiscardableCards(player, 'h');
+                                            const es = target.getDiscardableCards(player, 'e');
+                                            if (!hs.length && !es.length) return 0;
+                                            if (att > 0) {
+                                                if (target.isDamaged() && es.some(card => card.name == 'baiyin') &&
+                                                    get.recoverEffect(target, player, player) > 0) {
+                                                    if (target.hp == 1 && !target.hujia) return 1.6;
+                                                }
+                                                if (es.some(card => {
+                                                    return get.value(card, target) < 0;
+                                                })) return 1;
+                                                return -1.5;
+                                            }
+                                            else {
+                                                const noh = (hs.length == 0 || target.hasSkillTag('noh'));
+                                                const noe = (es.length == 0 || target.hasSkillTag('noe'));
+                                                const noe2 = (noe || !es.some(card => {
+                                                    return get.value(card, target) > 0;
+                                                }));
+                                                if (noh && noe2) return 1.5;
+                                                return -1.5;
+                                            }
+                                        },
                                     },
                                 },
                             },
@@ -9609,7 +9631,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 charlotte: true,
                                 direct: true,
                                 trigger: {
-                                    player: ['phaseEnd','dieAfter'],
+                                    player: ['phaseEnd', 'dieAfter'],
                                 },
                                 intro: {
                                     content: "不可使用的颜色：$",
@@ -16947,7 +16969,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             Z_judge: "水雷布置",
                             z18_weisebaoxingdong: "威瑟堡行动", z18_weisebaoxingdong_info: "每回合限一次，你可以将至多两张手牌置于等量角色的武将牌上，称为Z。出牌阶段，你可以移去一张Z，观看一名角色的手牌，然后视为使用一张火攻。(全局)武将牌上有Z的角色出牌阶段使用杀的次数+1；使用与Z中包含类型相同的牌时须弃一张牌(没有则不弃)，然后可以弃置一张与使用的牌相同牌名的Z。",
                             z18_weisebaoxingdong_huogong: "火攻", z18_weisebaoxingdong_huogong_info: "你可以移去一张Z，观看一名角色的手牌，然后视为使用一张火攻。",
-                            z17_naerweikejingjie: "纳尔维克警戒", z17_naerweikejingjie_info: "出牌阶段，你可以将任意张手牌置于武将牌上，称为Z，然后将一名角色至多等量张手牌置于其武将牌上，也称为Z。(全局)对有Z的角色造成伤害时，可以摸一张牌。",
+                            z17_naerweikejingjie: "纳尔维克警戒", z17_naerweikejingjie_info: "出牌阶段，你可以将任意张牌置于武将牌上，称为Z，然后将一名角色至多等量张牌置于其武将牌上，也称为Z。(全局)对有Z的角色造成伤害时，可以摸一张牌。",
                             z21_tuxi: "突袭", z21_tuxi_info: "出牌阶段开始时，你可以选择攻击范围内的一名角色，将其一张牌置于你的武将牌上，称为Z。（全局）若你有Z，你使用牌指定其他角色为目标后，你可以令其随机弃置一张牌，然后移去一张Z",
                             z22_tuxixiawan: "突袭峡湾", z22_tuxixiawan_info: "出牌阶段开始时，你可以将任意角色一张牌置于自己的武将牌上，称为Z。(全局）其他角色造成伤害后，若你有Z，你可以移去一枚Z，进行一次判定，令当前回合角色不能使用或打出与判定牌颜色相同的牌直到回合结束。",
                             cardsDisabled_color: "不能使用_颜色", cardsDisabled_color_info: "你不能使用或打出对应颜色的手牌。",
