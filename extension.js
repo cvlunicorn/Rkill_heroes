@@ -11095,6 +11095,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 ai: {
                                     order: 3,
                                     expose: 0.2,
+                                    threaten: 1.2,
                                     result: {
                                         target: function (player, target) {
                                             return -1;
