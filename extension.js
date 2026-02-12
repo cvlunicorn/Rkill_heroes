@@ -195,6 +195,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             document.head.appendChild(style2);
 
             // Sueyuki DEV 扩展专用alert对话框（允许自定义样式）
+            //2026.2.12豆包修改样式
             game.jianRAlert = (str, options = {}) => {
                 const {
                     containerStyle = {},
@@ -207,53 +208,92 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     }
                 });
                 Object.assign(promptContainer.style, {
-                    overflowY: "auto",     // 垂直滚动条
-                    overflowX: "hidden",   // 不允许横向滚动
+                    overflowY: "auto",     // 仅垂直滚动，水平不截断
+                    overflowX: "visible",  // 关键：取消水平隐藏，改为可见（避免截断右侧）
+                    boxSizing: "border-box", // 盒模型：padding/border计入宽度，不挤压内容
                     ...containerStyle
                 });
 
                 // 主容器
                 let dialogContainer = ui.create.div(".prompt-container", promptContainer);
+                Object.assign(dialogContainer.style, {
+                    width: "100%",         // 占满父容器宽度
+                    boxSizing: "border-box",
+                    padding: "0 5px",      // 给主容器左右预留基础边距
+                });
 
-                // 内容框
+                // 内容框：flex布局，文本在上，按钮在下
                 let dialog = ui.create.div(".menubg", dialogContainer, function () {
                     promptContainer.clicked = true;
                 });
-                Object.assign(dialog.style, dialogStyle);
-                ui.create.div("", str || "", dialog);
+                Object.assign(dialog.style, {
+                    textAlign: 'left',
+                    lineHeight: '1.8',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    minHeight: '300px',
+                    width: '100%',
+                    boxSizing: "border-box", // 核心：padding不超出宽度
+                    padding: '15px 20px',    // 优化：右侧padding从15px增至20px，预留更多空间
+                    ...dialogStyle
+                });
+
+                // 文本容器：承载所有说明文本，避免文字贴边
+                let textContainer = ui.create.div("", str || "", dialog);
+                Object.assign(textContainer.style, {
+                    width: "100%",
+                    boxSizing: "border-box",
+                    wordWrap: "break-word",  // 关键：长文本自动换行，不溢出
+                    wordBreak: "break-all",  // 兼容：中英文混排时强制换行
+                    paddingRight: "5px",     // 文本容器额外右侧边距，双重保障
+                });
+
+                // 按钮容器：强制占满宽度 + 居中
                 let controls = ui.create.div(dialog);
+                Object.assign(controls.style, {
+                    textAlign: 'center',
+                    width: '100%',
+                    marginTop: '20px',
+                    padding: '10px 0',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    boxSizing: "border-box"
+                });
+
                 let clickConfirm = function () {
                     promptContainer.remove();
                 };
+                // 确定按钮：双重居中保障
                 let confirmButton = ui.create.div(".menubutton.large", "确定", controls, clickConfirm);
-                Object.assign(confirmButton.style, confirmStyle);
+                Object.assign(confirmButton.style, {
+                    padding: '8px 30px',
+                    margin: '0 auto',
+                    display: 'block',
+                    ...confirmStyle
+                });
             }
-
-            // 参考全能搜索创建舰r教程指南的按钮与实例
             const getSystem = setInterval(() => {
                 if (ui.system1 || ui.system2) {
                     // @ts-ignore
                     clearInterval(getSystem);
                     ui.jian_R_readme = ui.create.system('舰r杀机制介绍', function () {
                         game.jianRAlert(
-                            "所有全局技能均可在扩展详情中查看说明和配置开关，" +
-                            "以下是默认开启的全局技能<br><br>" +
-                            "<b>远航:</b>你受伤时手牌上限+1，挑战模式不屈时手牌上限+1；每轮限1/2/3次，失去手牌后，若手牌数少于一半，你可以摸一张牌。<br>" +
-                            "当你进入濒死状态时，若你的体力上限大于2，你可以减少一点体力上限，摸两张牌，否则摸一张牌；<br>" +
-                            "你死亡后，若你为忠臣，你可以令主公摸一张牌。<br><br>" +
-                            "<b>建造:</b>若你进行了至少一次强化：出牌阶段" +
-                            "你可以弃置3张不同花色的牌，提升一点血量上限，解锁强化二级效果。<br>" +
-                            "<b>强化:</b>出牌阶段限一次，你可以弃置二至四张牌，选择一至两个效果升级。（如摸牌、攻击距离、手牌上限等）。一级效果需要两张牌；二级效果需要3张牌。<br><br>" +
-                            "<b>属性伤害:</b>火杀燃烧:令目标回合结束后，受到一点火焰伤害，摸两张张牌。<br>" +
-                            "冰杀减速:对有护甲的目标加1伤害；减少1点其他角色计算与目标的距离。<br>" +
-                            "雷杀进水:有护甲时改为造成目标流失体力；减少目标1点手牌上限。<br>" +
-                            "目标回合结束后或濒死时移除进水、减速、燃烧。",
+                            // 保留悬挂缩进的文本结构
+                            "<p style='margin: 0; padding: 0; margin-bottom: 12px;'><b>开启军争篇卡牌包或舰r美化包战术包时装备栏共有五个，分别是：武器、防具、+1马、-1马、宝物。</b></p>" +
+                            "<p style='margin: 0; padding: 0; margin-bottom: 12px;'>所有全局技能均可在扩展详情中查看说明和配置开关，以下是默认开启的全局技能</p>" +
+                            "<p style='margin: 0; padding: 0; margin-bottom: 10px; text-indent: -3em; padding-left: 3em;'><b>远航：</b>你受伤时手牌上限+1，挑战模式不屈时手牌上限+1；<br>每轮限1/2/3次，失去手牌后，若手牌数少于一半，你可以摸一张牌。<br>当你进入濒死状态时，若你的体力上限大于2，你可以减少一点体力上限，摸两张牌，否则摸一张牌；<br>你死亡后，若你为忠臣，你可以令主公摸一张牌。</p>" +
+                            "<p style='margin: 0; padding: 0; margin-bottom: 10px; text-indent: -3em; padding-left: 3em;'><b>建造：</b>若你进行了至少一次强化：出牌阶段你可以弃置3张不同花色的牌，提升一点血量上限，解锁强化二级效果。</p>" +
+                            "<p style='margin: 0; padding: 0; margin-bottom: 10px; text-indent: -3em; padding-left: 3em;'><b>强化：</b>出牌阶段限一次，你可以弃置二至四张牌，选择一至两个效果升级。（如摸牌、攻击距离、手牌上限等）。一级效果需要两张牌；二级效果需要3张牌。</p>" +
+                            "<p style='margin: 0; padding: 0; text-indent: -3em; padding-left: 3em;'><b>属性：</b>火杀燃烧:令目标回合结束后，受到一点火焰伤害，摸两张张牌。<br>冰杀减速:对有护甲的目标加1伤害；减少1点其他角色计算与目标的距离。<br>雷杀进水:有护甲时改为造成目标流失体力；减少目标1点手牌上限。<br>目标回合结束后或濒死时移除进水、减速、燃烧。</p>",
                             {
                                 containerStyle: {
-                                    width: '60%',
-                                    // height: '80%',
-                                    padding: '5px 20px 5px 20px',
+                                    width: '60%',       // 建议：若仍遮挡，可改为max-width: '800px' + width: '90%'
+                                    maxWidth: '800px',  // 新增：限制最大宽度，避免宽屏时文本过长
+                                    padding: '5px 25px 5px 25px', // 优化：右侧padding从20px增至25px
                                 },
+                                dialogStyle: {
+                                    textAlign: 'left',
+                                }
                             }
                         );
                     });
