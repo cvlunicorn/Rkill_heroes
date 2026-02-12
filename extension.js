@@ -9427,11 +9427,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return player.countCards('h') > 0;
                                 },
                                 prompt: "出牌阶段，你可以将任意张手牌置于武将牌上，称为Z，然后将一名角色至多等量张手牌置于其武将牌上，也称为Z。",
-                                check: function (card) {
-                                    var player = get.player();
-                                    if ((36 - player.getExpansions('old_jijun').length) <= player.countCards('h')) return 1;
-                                    return 5 - get.value(card);
-                                },
+                                
                                 selectTarget: 1,
                                 filterTarget: true,
                                 content: function () {
@@ -9453,7 +9449,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                 },
                                 ai: {
-                                    order: 9,
+                                    order: function(item, player){
+                                        if(player.hasHistory('useSkill',function(evt){
+                                            return evt.skill=="z17_naerweikejingjie";
+                                        }))return 0;
+                                        return 7;
+                                    },
                                     result: {
                                         player: function (player) {
                                             return -1;
