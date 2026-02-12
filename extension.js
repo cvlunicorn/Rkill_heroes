@@ -14216,7 +14216,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     trigger.num -= 1;
                                 },
                                 ai: {
-                                    threaten: 1.3,
+                                    threaten: 0.9,
                                 },
                                 sub: true,
                                 "_priority": 0,
