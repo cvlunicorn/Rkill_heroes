@@ -2894,6 +2894,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         damage: 1,
                                         multitarget: 1,
                                         multineg: 1,
+                                        skillTagFilter(player, tag, arg) {
+                                            if (tag == 'respondShan' && arg == 'respond') return false;
+                                            return true;
+                                        },
                                     },
                                 },
                                 intro: {
@@ -4114,6 +4118,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 ai: {
                                     respondShan: true,
+                                    skillTagFilter(player, tag, arg) {
+                                        if (arg != 'respond') return false;
+                                        return true;
+                                    },
                                     effect: {
                                         target: function (card, player, target) {
                                             if (player == target && get.subtype(card) == 'equip2') {
@@ -4782,7 +4790,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                 },
                                 ai: {
-                                    directHit_ai: true,
+                                    "directHit_ai": true,
                                     skillTagFilter(player, tag, arg) {
                                         if (arg.card.name != 'sha' || arg.target.countCards('h', 'shan') > 1) return false;
                                     },
@@ -9427,7 +9435,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return player.countCards('h') > 0;
                                 },
                                 prompt: "出牌阶段，你可以将任意张手牌置于武将牌上，称为Z，然后将一名角色至多等量张手牌置于其武将牌上，也称为Z。",
-                                
+
                                 selectTarget: 1,
                                 filterTarget: true,
                                 content: function () {
@@ -9449,10 +9457,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                 },
                                 ai: {
-                                    order: function(item, player){
-                                        if(player.hasHistory('useSkill',function(evt){
-                                            return evt.skill=="z17_naerweikejingjie";
-                                        }))return 0;
+                                    order: function (item, player) {
+                                        if (player.hasHistory('useSkill', function (evt) {
+                                            return evt.skill == "z17_naerweikejingjie";
+                                        })) return 0;
                                         return 7;
                                     },
                                     result: {
@@ -9715,7 +9723,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     return false;
                                 },
                                 ai: {
-
+                                    "directHit_ai": true,
                                     result: {
                                         target: function (player, target) {
                                             var cards = ui.selected.cards.slice(0);
@@ -9726,10 +9734,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             if (get.attitude(player, target) >= 0) return -20;
                                             return 1;
                                         },
-                                    },
-                                    tag: {
-                                        respond: 1,
-                                        respondShan: 1,
                                     },
                                 },
                                 content: function () {
@@ -10240,6 +10244,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         damage: 1,
                                         multitarget: 1,
                                         multineg: 1,
+                                        skillTagFilter(player, tag, arg) {
+                                            if (tag == 'respondShan' && arg == 'respond') return false;
+                                            return true;
+                                        },
                                     },
                                 },
                                 intro: {
@@ -11090,6 +11098,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         damage: 1,
                                         multitarget: 1,
                                         multineg: 1,
+                                        skillTagFilter(player, tag, arg) {
+                                            if (tag == 'respondShan' && arg == 'respond') return false;
+                                            return true;
+                                        },
                                     },
                                 },
                                 intro: {
@@ -14044,7 +14056,43 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         value: 5.5,
                                     },
                                     result: {
-                                        target: -1.5,
+                                        target: function (player, target, card) {
+                                            if (
+                                                player.hasSkillTag(
+                                                    "directHit_ai",
+                                                    true,
+                                                    {
+                                                        target: target,
+                                                        card: card,
+                                                    },
+                                                    true
+                                                )
+                                            )
+                                                return -2;
+                                            let td = get.damageEffect(target, player, target);
+                                            if (td >= 0) return td / get.attitude(target, target);
+                                            let pd = get.damageEffect(player, target, player),
+                                                att = get.attitude(player, target);
+                                            if (att > 0 && get.damageEffect(target, player, player) > pd) return -2;
+                                            let ts = target.mayHaveSha(player, "respond", null, "count"),
+                                                ps = player.mayHaveSha(
+                                                    player,
+                                                    "respond",
+                                                    player.getCards("h", (i) => {
+                                                        return (
+                                                            card === i ||
+                                                            (card.cards && card.cards.includes(i)) ||
+                                                            ui.selected.cards.includes(i)
+                                                        );
+                                                    }),
+                                                    "count"
+                                                );
+                                            if (ts < 1) return -1.5;
+                                            if (att > 0) return -2;
+                                            if (ts - ps < 1) return -2 - ts;
+                                            if (pd >= 0) return -1;
+                                            return -ts;
+                                        },
                                         player: function (player, target, card) {
                                             if (player.hasSkillTag('directHit_ai', true, {
                                                 target: target,
@@ -15028,6 +15076,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             player.addGaintag(player.getCards("h"), "southdakota_jianmiemoshi");
                                         },
                                     },
+                                },
+                                ai: {
+                                    "directHit_ai": true,
                                 },
                                 "_priority": 0,
                             },
@@ -16762,6 +16813,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 damage: 1,
                                                 multitarget: 1,
                                                 multineg: 1,
+                                                skillTagFilter(player, tag, arg) {
+                                                    if (tag == 'respondShan' && arg == 'respond') return false;
+                                                    return true;
+                                                },
                                             },
                                         },
                                     },
