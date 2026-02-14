@@ -1993,6 +1993,27 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },//装备上装备以后，ai剩下的装备可以考虑强化，应该会保留防具吧。
                             }, */
                             _wulidebuff: {
+                                mod: {
+                                    maxHandcard: function (player, num) {//手牌上限
+                                        if (lib.config.extension_舰R牌将__wulidebuff === false) return num;
+                                        if (player.hasMark('_wulidebuff_jinshui')) {
+                                            game.log(get.translation(player) + "maxhandcard" + num);
+                                            num -= 1;
+                                            return num;
+                                        };
+                                        return num;
+
+                                    },
+                                    globalTo: function (from, to, distance) {
+                                        if (lib.config.extension_舰R牌将__wulidebuff === false) return distance;
+                                        if (to.hasMark('_wulidebuff_jiansu')) {
+                                            distance -= 1;
+                                            return distance
+                                        };
+                                        return distance;
+
+                                    },
+                                },
                                 name: "属性效果", lastDo: true, forced: true, trigger: { source: "damageBefore", },
                                 filter: function (event, player) {
                                     if (lib.config.extension_舰R牌将__wulidebuff === false) return false;
@@ -2054,12 +2075,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             return player.hasMark('_wulidebuff_jiansu');
 
                                         },
-                                        mod: {
-                                            globalTo: function (from, to, distance) {
-                                                if (lib.config.extension_舰R牌将__wulidebuff === false) return distance;
-                                                return distance - to.hasMark('_wulidebuff_jiansu');
-                                            },
-                                        },
                                         content: function () {
                                             player.removeMark('_wulidebuff_jiansu', player.countMark('_wulidebuff_jiansu'));
                                             if (player.hasSkill('_wulidebuff_jiansu')) {
@@ -2069,16 +2084,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }, sub: true,
                                     },
                                     jinshui: {
-                                        mod: {
-                                            maxHandcard: function (player, num) {//手牌上限
-                                                if (lib.config.extension_舰R牌将__wulidebuff === false) return num;
-                                                if (player.hasMark('_wulidebuff_jinshui')) {
-                                                    return num - 1;
-                                                };
-                                                return num;
 
-                                            },
-                                        },
                                         name: "进水",
                                         intro: {
                                             marktext: "进水",
@@ -11119,7 +11125,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 mod: {
                                     globalFrom: function (from, to, distance) {
                                         var totalLevels = 0;
-                                            totalLevels += 2;//from.countMark('jinengup');
+                                        totalLevels += 2;//from.countMark('jinengup');
                                         if (from.hasSkill("liaowangtai")) {
                                             totalLevels -= from.countMark("liaowangtai");
                                         }
