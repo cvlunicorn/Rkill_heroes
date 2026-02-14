@@ -1097,7 +1097,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             cassone: ["female", "RM", 4, ["zhuangjiafh", "cassone_yibing", "cassone_weizhuangqixi"], ["des:深海版战列巡洋舰卡萨诺方案。"]],
                             Xfliegerkorps: ["female", "KMS", 4, ["yaosai", "Xfliegerkorps_piaobodeying"], ["des:漂泊的“鹰”，戴着奇怪的帽子，不喜欢与其他人交流。但，实力很强。"]],
 
-                            skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "paoxiao"], ["forbidai", "des:测试用"]],
+                            skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "huodeyanshi","paoxiao"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
                             _yuanhang: {
@@ -15171,6 +15171,16 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (card) player.gain(card, "gain2", "log");
                                 },
                             },
+                            huodeyanshi: {
+                                nobracket: true,
+                                enable: "phaseUse",
+                                content: function () {
+                                    var card = get.cardPile2(function (card) {
+                                        return get.type(card) == "delay";
+                                    });
+                                    if (card) player.gain(card, "gain2", "log");
+                                },
+                            },
                             zhanxian: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
@@ -17228,6 +17238,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             Xfliegerkorps_piaobodeying_mark: "漂泊的鹰",
                             Xfliegerkorps_piaobodeying_mark_yingzi: "漂泊的鹰_摸牌+1",
                             Xfliegerkorps_piaobodeying_mark_hangmucv: "漂泊的鹰_开幕航空",
+                            huodeyanshi: "获得延时", "huodeyanshi_info": "从牌堆中获得一张延时锦囊牌。测试用。",
 
 
                             jianrbiaozhun: "舰r标准",
