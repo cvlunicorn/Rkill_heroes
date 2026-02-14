@@ -1097,7 +1097,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             cassone: ["female", "RM", 4, ["zhuangjiafh", "cassone_yibing", "cassone_weizhuangqixi"], ["des:深海版战列巡洋舰卡萨诺方案。"]],
                             Xfliegerkorps: ["female", "KMS", 4, ["yaosai", "Xfliegerkorps_piaobodeying"], ["des:漂泊的“鹰”，戴着奇怪的帽子，不喜欢与其他人交流。但，实力很强。"]],
 
-                            skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "huodeyanshi","paoxiao"], ["forbidai", "des:测试用"]],
+                            skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "huodeyanshi", "paoxiao"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
                             _yuanhang: {
@@ -11119,14 +11119,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 mod: {
                                     globalFrom: function (from, to, distance) {
                                         var totalLevels = 0;
-                                        var keys = ['mopaiup', 'jinengup', 'wuqiup', 'useshaup', 'jidongup', 'shoupaiup'];
-                                        for (var i = 0; i < keys.length; i++) {
-                                            totalLevels += from.countMark(keys[i]);
-                                        }
+                                            totalLevels += 2;//from.countMark('jinengup');
                                         if (from.hasSkill("liaowangtai")) {
                                             totalLevels -= from.countMark("liaowangtai");
                                         }
-                                        game.log(from.countMark("liaowangtai"));
+                                        //game.log(from.countMark("liaowangtai"));
                                         return distance - totalLevels;
                                     },
                                 },
@@ -11148,7 +11145,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 ai: {
                                     order: 3,
                                     expose: 0.2,
-                                    threaten: 1.2,
+                                    threaten: 1.4,
                                     result: {
                                         target: function (player, target) {
                                             return -1;
@@ -14887,7 +14884,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 isCard: false,
                                             },
                                             filterCard: true,
-                                            selectCard: 1,
+                                            selectCard: 2,
                                             audio: "loki_xiance2",
                                             popname: true,
                                             check: function (card) {
@@ -17126,7 +17123,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             yuanjun: "援军", yuanjun_info: "限定技，若你有至少6个“风”标记，你可以移去所有“风”视为使用万箭齐发。",
                             buju_wuxie: "不惧_无懈", buju_wuxie_disable: "无懈_不可用",
                             buju_jiu: "不惧_酒", buju_jiu_disable: "酒_不可用",
-                            liaowangtai: "瞭望台", liaowangtai_info: "锁定技，你计算与其他角色的距离-X(X为你的强化总数)。出牌阶段，你可以视为对距离为1的目标使用一张火攻并摸Y张牌，若此做，你计算与其他角色的距离+Y，(Y为你使用此法的次数)",
+                            liaowangtai: "瞭望台", liaowangtai_info: "锁定技，你计算与其他角色的距离-2。出牌阶段，你可以视为对距离为1的目标使用一张火攻并摸X张牌，若此做，你计算与其他角色的距离+X，(X为你使用此法的次数)",
                             jingruizhuangbei: "精锐装备", jingruizhuangbei_info: "当你装备武器时，你使用射击造成伤害时可以摸一张牌；当你使用射击指定目标时，你可以进行一次判定，若与此“射击”颜色相同，则你可以额外指定一个目标",
                             jingruizhuangbei_mopai: "精锐装备_摸牌",
                             jingruizhuangbei_fencha: "精锐装备_分叉",
