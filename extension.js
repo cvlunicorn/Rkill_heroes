@@ -35,6 +35,8 @@ yield需要无名杀版本1.10.10或更高版本的支持
 //getStorage() 获取对应的 storage 数组，非数组均可
 //setStorage() 直接赋值 storage 数组，非数组均可
 //markAuto() 像 storage 中添加元素 数组
+//mod尽量放在主技能中。放在子技能中时会由于未知原因结算两遍。
+//联机时客机出牌阶段所在的_state.event.name是game，不是phaseUse。
 let connect;
 try {
     const ws = require("ws");
@@ -1300,7 +1302,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     maxHandcard: function (player, num) {//手牌上限
                                         if (lib.config.extension_舰R牌将__wulidebuff === false) return num;
                                         if (player.hasMark('_wulidebuff_jinshui')) {
-                                            game.log(get.translation(player) + "maxhandcard" + num);
                                             num -= 1;
                                             return num;
                                         };
@@ -13993,7 +13994,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         }
 
                                         // 获得装甲效果（直到下回合开始）
-                                        player.addTempSkill("zhuangjiafh", { player: "phaseBegin" });
+                                        //player.addTempSkill("zhuangjiafh", { player: "phaseBegin" });
                                     }
                                 },
                                 mark: true,
@@ -14026,14 +14027,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         filter: function (event, player) {
                                             if (player.storage.pachina_xinao) {
                                                 for (var i = 0; i < player.storage.pachina_xinao.length; i++) {
-                                                    if (player.storage.pachina_xinao[i].isAlive) return player.storage.pachina_xinao[i].countCards("hej");
+                                                    if (player.storage.pachina_xinao[i].isAlive && player.storage.pachina_xinao[i].countCards("hej")) return true;
                                                 }
                                             }
                                             return false;
                                         },
                                         content: function () {
                                             'step 0'
-
                                             if (player.storage.pachina_xinao.length === 0) {
                                                 event.finish();
                                                 return;
@@ -14262,7 +14262,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     if (typeof player.storage.temp_ban_southdakota_gumei === 'undefined') player.storage.temp_ban_southdakota_gumei = false;
-                                    player.player.storage.temp_ban_southdakota_gumei == true;
+                                    player.storage.temp_ban_southdakota_gumei == true;
                                 },
                                 group: ["southdakota_gumei_reflash"],
                                 subSkill: {
@@ -16474,7 +16474,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             zhanxianyuanhu: "战线援护", "zhanxianyuanhu_info": "游戏开始时，你选择一名角色，其受到伤害时防止之，改为你受到此伤害值-1的伤害。",
                             //第二次配音到这里
 
-                            pachina_xinao: "嬉闹", "pachina_xinao_info": "你受到伤害后,可以将任意张手牌交给一名其他角色并记录，然后你翻面。若如此做，你回复X点体力然后获得“装甲”直到下回合开始。(x为你交出的手牌数/2向下取整)。你翻面后，你可以获得嬉闹对象区域内的一张牌。",
+                            pachina_xinao: "嬉闹", "pachina_xinao_info": "你受到伤害后,可以将任意张手牌交给一名其他角色并记录，然后你翻面。若如此做，你回复X点体力。(x为你交出的手牌数/2向下取整)。你翻面后，你可以获得嬉闹对象区域内的一张牌。",
                             pachina_xinao_back: "嬉闹",
                             loki_xiance: "献策", "loki_xiance_info": "你拥有决策：出牌阶段限一次，你可以将两张手牌当作一张基本牌或非延时锦囊牌使用，本局每种牌名的牌限一次。每轮限一次，其他角色的出牌阶段开始时，你可以交给其两张牌并令其本阶段获得“决策”。本阶段结束时，若其没有杀死过角色，则你对其造成一点伤害。",
                             loki_xiance2: "决策", "loki_xiance2_info": "出牌阶段限一次，你可以将两张手牌当作一张基本牌或非延时锦囊牌使用，本局每种牌名的牌限一次。",
