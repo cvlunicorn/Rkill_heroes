@@ -594,11 +594,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 limited: false,
                                 complexCard: true,
-                                enable: "chooseToUse",
+                                enable: "phaseUse",
                                 position: "hejs",
                                 filter: function (event, player) {
                                     if (lib.config.extension_舰R牌将__jianzaochuan === false) return false;
-
                                     // 获取当前强化信息
                                     var totalLevels = 0;
                                     var keys = ['mopaiup', 'jinengup', 'wuqiup', 'useshaup', 'jidongup', 'shoupaiup'];
@@ -630,7 +629,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     var huifu = player.countCards('h', 'jiu') + player.countCards('h', 'tao');
 
                                     // 优先弃置价值较低的牌
-                                    if (player.hp < player.maxHp) return 9 - get.value(card);
                                     return 6 - get.value(card);
                                 },
                                 content: function () {
@@ -865,7 +863,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 check: function (card) {
                                     var player = get.player();
-                                    if (player.countCards("h") > player.maxHandcard) return 9 - get.value(card);
+                                    if (player.countCards("h") > player.maxHandcard) return 8.5 - get.value(card);
                                     return 6 - get.value(card);
                                 },
                                 content: function () {
@@ -1096,7 +1094,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     // 移除 storage 更新逻辑，所有数据已通过 mark 存储
                                 },
                                 ai: {
-                                    order: 8,
+                                    order: 3,
                                     result: {
                                         player: function (player) {
                                             var currentExp = player.countMark('Expup');
