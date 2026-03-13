@@ -15948,9 +15948,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             "step 1"
                                             if (result.bool) {
                                                 if (!player.hasSkill("Xfliegerkorps_piaobodeying_mark")) {
-                                                    player.addTempSkill("Xfliegerkorps_piaobodeying_mark");
+                                                    player.addSkill("Xfliegerkorps_piaobodeying_mark");
                                                 }
-                                                player.storage.Xfliegerkorps_piaobodeying_mark.push(player);
+                                                player.storage.Xfliegerkorps_piaobodeying_markplayer.push(player);
+                                                player.addMark("Xfliegerkorps_piaobodeying_mark",1);
                                                 var count = 0;
                                                 for (var i of game.filterPlayer()) {
                                                     if (i.countMark("Xfliegerkorps_piaobodeying_mark") > 0) count += i.countMark("Xfliegerkorps_piaobodeying_mark");
@@ -15958,13 +15959,19 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                 player.draw(Math.min(3, count));
                                             } else {
                                                 for (var i of game.filterPlayer()) {
-                                                    if (i.countMark("Xfliegerkorps_piaobodeying_mark") > 0) i.removeMark(i.countMark("Xfliegerkorps_piaobodeying_mark"));
-                                                    if (i.hasSkill("Xfliegerkorps_piaobodeying_mark")) i.storage.Xfliegerkorps_piaobodeying_mark = [];
+                                                    if (i.countMark("Xfliegerkorps_piaobodeying_mark") > 0) {
+                                                        i.removeMark(i.countMark("Xfliegerkorps_piaobodeying_mark"));
+                                                    }
+                                                    if (i.hasSkill("Xfliegerkorps_piaobodeying_mark")) {
+                                                        i.storage.Xfliegerkorps_piaobodeying_markplayer = [];
+                                                        i.removeSkill("Xfliegerkorps_piaobodeying_mark");
+                                                    }
                                                 }
                                                 if (!target.hasSkill("Xfliegerkorps_piaobodeying_mark")) {
-                                                    target.addTempSkill("Xfliegerkorps_piaobodeying_mark");
+                                                    target.addSkill("Xfliegerkorps_piaobodeying_mark");
                                                 }
-                                                target.storage.Xfliegerkorps_piaobodeying_mark.push(player);
+                                                target.storage.Xfliegerkorps_piaobodeying_markplayer.push(player);
+                                                target.addMark("Xfliegerkorps_piaobodeying_mark",1);
                                             }
                                         },
 
@@ -15977,7 +15984,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         content: function () {
                                             for (var i of game.filterPlayer()) {
                                                 if (i.countMark("Xfliegerkorps_piaobodeying_mark") > 0) i.removeMark(i.countMark("Xfliegerkorps_piaobodeying_mark"));
-                                                if (i.hasSkill("Xfliegerkorps_piaobodeying_mark")) i.storage.Xfliegerkorps_piaobodeying_mark = [];
+                                                if (i.hasSkill("Xfliegerkorps_piaobodeying_mark")) {i.storage.Xfliegerkorps_piaobodeying_markplayer = [];
+                                                i.removeSkill("Xfliegerkorps_piaobodeying_mark");}
                                             }
                                         },
                                     },
@@ -15985,7 +15993,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             Xfliegerkorps_piaobodeying_mark: {
                                 init: function (player, skill) {
-                                    if (!player.storage.Xfliegerkorps_piaobodeying_mark) player.storage.Xfliegerkorps_piaobodeying_mark = [];
+                                    if (!player.storage.Xfliegerkorps_piaobodeying_markplayer) player.storage.Xfliegerkorps_piaobodeying_markplayer = [];
                                 },
                                 mark: true,
                                 marktext: "鹰",
@@ -15995,7 +16003,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     content: function (storage, player) {
                                         if (player.hasSkill("Xfliegerkorps_piaobodeying")) { return "拥有" + player.countMark("Xfliegerkorps_piaobodeying_mark") + "枚鹰标记"; }
                                         if (player.hasSkill("hangmucv")) { return "拥有" + player.countMark("Xfliegerkorps_piaobodeying_mark") + "枚鹰标记,摸牌阶段摸牌数+1"; }
-                                        return "拥有与" + get.translation(player.storage.Xfliegerkorps_piaobodeying_mark[0]) + "相同等级的航母";
+                                        return "拥有与" + get.translation(player.storage.Xfliegerkorps_piaobodeying_markplayer[0]) + "相同等级的航母";
                                     },
                                 },
                                 group: ["Xfliegerkorps_piaobodeying_mark_hangmucv", "Xfliegerkorps_piaobodeying_mark_yingzi"],
@@ -16003,16 +16011,16 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     hangmucv: {
                                         trigger: { player: "phaseUseBegin" },
                                         filter: function (event, player) {
-                                            return !player.getStorage("player.storage.Xfliegerkorps_piaobodeying_mark").includes(player) && !player.hasSkill("hangmucv") && player.countCards('h') > 0;
+                                            return player.getStorage("player.storage.Xfliegerkorps_piaobodeying_markplayer").includes(player) && !player.hasSkill("hangmucv") && player.countCards('h') > 0;
                                         },
                                         frequent: true,
                                         content: function () {
                                             "step 0"
-                                            let sourcePlayer = player.getStorage("player.storage.Xfliegerkorps_piaobodeying_markspurce");
+                                            var sourcePlayer = player.getStorage("player.storage.Xfliegerkorps_piaobodeying_markplayer");
                                             if (sourcePlayer[0] && sourcePlayer[0].isAlive) {
-                                                let level = sourcePlayer[0].countMark('jinengup');
+                                                var level = sourcePlayer[0].countMark('jinengup');
                                             } else {
-                                                let level = 0;
+                                                var level = 0;
                                             }
                                             if (level <= 0) {
                                                 player.chooseCardTarget({
@@ -16115,7 +16123,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         preHidden: true,
                                         frequent: true,
                                         filter: function (event, player) {
-                                            return !player.getStorage("player.storage.Xfliegerkorps_piaobodeying_mark").includes(player) && player.hasSkill(hangmucv) && !event.numFixed;
+                                            return player.getStorage("player.storage.Xfliegerkorps_piaobodeying_markplayer").includes(player) && player.hasSkill("hangmucv") && !event.numFixed;
                                         },
                                         content: function () {
                                             trigger.num++;
