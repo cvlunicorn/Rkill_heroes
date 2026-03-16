@@ -324,7 +324,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 },
                 content: function () {
                     //game.log("死亡台词触发");
-                    game.playAudio('..', 'extension', '舰R牌将/audio/die', trigger.player.name + ".mp3");
+                    // 这里必须使用扩展目录的真实文件夹名。
+                    // 扩展内部展示名是“舰R牌将”，但磁盘目录实际是“舰r牌将”。
+                    // 浏览器模式下通过静态路径读取资源时，目录名大小写不一致会导致资源 404。
+                    game.playAudio('..', 'extension', '舰r牌将/audio/die', trigger.player.name + ".mp3");
                 },
             }//即将替换为:为character实例的dieAudio属性赋值，例如
             //*eg.* `lib.character.guanyu.dieAudios = [true, "ext:无名扩展/audio/die:true"]`
@@ -336,6 +339,82 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
         },
         precontent: function (jianrjinji) {
             if (jianrjinji.enable) {
+                var jianrExtensionDisplayName = '舰R牌将';
+                var jianrExtensionDirectoryName = '舰r牌将';
+                // 这个扩展之前用 `lib.device || lib.node` 来判断角色图应该走 `ext:` 还是 `db:`。
+                // 这种写法会把“桌面浏览器 + 直接读取 extension 目录”的情况误判成 `db:`，
+                // 于是角色图会去 IndexedDB 里找资源，最终在浏览器模式下出现整包头像不显示的问题。
+                //
+                // 引擎真正区分“目录直读扩展”和“数据库导入扩展”的标志其实是 `_status.evaluatingExtension`：
+                // - `false`：当前扩展来自 `extension/舰R牌将/...` 目录，资源应该走 `ext:`
+                // - `true`：当前扩展来自浏览器本地数据库，资源应该走 `db:`
+                //
+                // 因此这里把图片路径解析抽出来，和引擎自己的判定逻辑保持一致。
+                // 另外顺手兼容两张不是标准 `.jpg` 命名的角色图，避免只修主分支后还残留个别空白头像。
+                var jianrCharacterImagePathOverrides = {
+                    weineituo: 'image/character/weineituo.JPG',
+                    yinghuochong: 'image/character/yinghuochong.png',
+                };
+                var getJianRCharacterImageRelativePath = function (characterName) {
+                    // 扩展若是从压缩包导入，`extensionInfo.file` 中会记录真实文件名。
+                    // 这里优先按“角色名 -> 实际文件路径”反查，可以保留正确的后缀和大小写。
+                    var extensionInfo = lib.config && lib.config.extensionInfo && lib.config.extensionInfo['舰R牌将'];
+                    var importedFileList = extensionInfo && Array.isArray(extensionInfo.file) ? extensionInfo.file : [];
+                    var normalizedCharacterName = String(characterName).toLowerCase();
+                    for (var index = 0; index < importedFileList.length; index++) {
+                        var filePath = importedFileList[index];
+                        if (typeof filePath !== 'string' || filePath.indexOf('image/character/') !== 0) continue;
+                        var fileName = filePath.slice('image/character/'.length);
+                        var dotIndex = fileName.lastIndexOf('.');
+                        if (dotIndex <= 0) continue;
+                        if (fileName.slice(0, dotIndex).toLowerCase() === normalizedCharacterName) {
+                            return filePath;
+                        }
+                    }
+                    // 目录模式下不会有这份数据库清单，此时回退到扩展目录里的默认路径。
+                    return jianrCharacterImagePathOverrides[characterName] || ('image/character/' + characterName + '.jpg');
+                };
+                var getJianRCharacterImageTag = function (characterName) {
+                    var relativePath = getJianRCharacterImageRelativePath(characterName);
+                    // 这里直接对齐引擎的资源选择方式，不再通过“是不是浏览器/设备”做环境猜测。
+                    if (_status.evaluatingExtension) {
+                        return 'db:extension-' + jianrExtensionDisplayName + ':' + relativePath;
+                    }
+                    return 'ext:' + jianrExtensionDirectoryName + '/' + relativePath;
+                };
+                var normalizeJianRDirectoryAssetReference = function (value) {
+                    // 目录直读模式下，所有 `ext:` 资源都必须指向真实文件夹名“舰r牌将”；
+                    // 但扩展源码里历史上大量写成了展示名“舰R牌将”。
+                    // 这里统一做一次前缀纠正，避免逐条手改数百个音频/贴图字段。
+                    if (_status.evaluatingExtension || typeof value !== 'string') return value;
+                    return value.split('ext:' + jianrExtensionDisplayName + '/').join('ext:' + jianrExtensionDirectoryName + '/');
+                };
+                var normalizeJianRDirectoryAssetReferenceDeep = function (target, seen) {
+                    if (_status.evaluatingExtension) return target;
+                    if (!target || typeof target !== 'object') return target;
+                    if (!seen) seen = [];
+                    if (seen.indexOf(target) !== -1) return target;
+                    seen.push(target);
+                    if (Array.isArray(target)) {
+                        for (var arrayIndex = 0; arrayIndex < target.length; arrayIndex++) {
+                            if (typeof target[arrayIndex] === 'string') {
+                                target[arrayIndex] = normalizeJianRDirectoryAssetReference(target[arrayIndex]);
+                            } else {
+                                normalizeJianRDirectoryAssetReferenceDeep(target[arrayIndex], seen);
+                            }
+                        }
+                        return target;
+                    }
+                    for (var key in target) {
+                        if (!Object.prototype.hasOwnProperty.call(target, key)) continue;
+                        if (typeof target[key] === 'string') {
+                            target[key] = normalizeJianRDirectoryAssetReference(target[key]);
+                        } else {
+                            normalizeJianRDirectoryAssetReferenceDeep(target[key], seen);
+                        }
+                    }
+                    return target;
+                };
                 //武将包,"qigong","qingnang"
                 game.import('character', function () {
                     var jianrjinji = {
@@ -16546,11 +16625,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             cangqinghuanying: '苍青幻影',
                         },
                     };
-                    if (lib.device || lib.node) {
-                        for (var i in jianrjinji.character) { jianrjinji.character[i][4].push('ext:舰R牌将/image/character/' + i + '.jpg'); }
-                    } else {
-                        for (var i in jianrjinji.character) { jianrjinji.character[i][4].push('db:extension-舰R牌将:image/character/' + i + '.jpg'); }
+                    // 这里统一通过上面的解析函数补角色图标签：
+                    // 1. 浏览器直接读取扩展目录时返回 `ext:` 路径；
+                    // 2. 浏览器读取本地数据库中的导入扩展时返回 `db:` 路径；
+                    // 3. 少数特殊后缀/大小写的角色图也会在这里被自动修正。
+                    for (var i in jianrjinji.character) {
+                        if (!Array.isArray(jianrjinji.character[i][4])) jianrjinji.character[i][4] = [];
+                        jianrjinji.character[i][4].push(getJianRCharacterImageTag(i));
                     }//由于以此法加入的武将包武将图片是用源文件的，所以要用此法改变路径。可以多指定x个目标数（x技能强化的次数），
+                    normalizeJianRDirectoryAssetReferenceDeep(jianrjinji);
                     return jianrjinji;
                 });
                 //lib.config.all.characters.push('jianrjinji');//无名杀新版本已弃用。如要兼容旧版本可以重新使用
@@ -17844,6 +17927,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         },
                         list: [/* ["heart", "1", "hangkongzhan"], ["diamond", "1", "xingyun"], ["spade", "1", "lianxugongji"], ["club", "1", "jinjuzy"], ["heart", "1", "jiakongls"] */],//牌堆添加
                     }
+                    normalizeJianRDirectoryAssetReferenceDeep(jianrjinjibao);
                     return jianrjinjibao
                 });
                 lib.translate['jianrjinjibao_card_config'] = '舰R卡牌';
