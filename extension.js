@@ -354,6 +354,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 var jianrCharacterImagePathOverrides = {
                     weineituo: 'image/character/weineituo.JPG',
                     yinghuochong: 'image/character/yinghuochong.png',
+                    R_401:'image/character/R_401.png',
                 };
                 var getJianRCharacterImageRelativePath = function (characterName) {
                     // 扩展若是从压缩包导入，`extensionInfo.file` 中会记录真实文件名。
@@ -543,6 +544,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             savoy: ["female", "RM", "2/4/1", ["yaosai", "savoy_xiuzhu", "savoy_wangong"], ["des:自称“吸血鬼”,坚称自己是人类幻想文学中的一员。在月圆之夜喜欢看着月亮发呆。一直随身带着石榴汁……？"]],
                             cassone: ["female", "RM", 4, ["zhuangjiafh", "cassone_yibing", "cassone_weizhuangqixi"], ["des:深海版战列巡洋舰卡萨诺方案。"]],
                             Xfliegerkorps: ["female", "KMS", 4, ["yaosai", "Xfliegerkorps_piaobodeying"], ["des:漂泊的“鹰”，戴着奇怪的帽子，不喜欢与其他人交流。但，实力很强。"]],
+                            "R_401": ["female", "IJN", 4, ["junfu", "shujuzaisheng"], ["des:401的诞生是由于获得Yamato智能模块的一半。后为了拯救暴走的芙蕾雅Cyou-yamato而把自己的智能模块捐献出来，捐献模块后消失。不过因为S113在之前留下了Yamato的数据备份而复活。"]],
 
                             skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "huodeyanshi", "paoxiao"], ["forbidai", "des:测试用"]],
                         },
@@ -16030,7 +16032,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                     player.addSkill("Xfliegerkorps_piaobodeying_mark");
                                                 }
                                                 player.storage.Xfliegerkorps_piaobodeying_markplayer.push(player);
-                                                player.addMark("Xfliegerkorps_piaobodeying_mark",1);
+                                                player.addMark("Xfliegerkorps_piaobodeying_mark", 1);
                                                 var count = 0;
                                                 for (var i of game.filterPlayer()) {
                                                     if (i.countMark("Xfliegerkorps_piaobodeying_mark") > 0) count += i.countMark("Xfliegerkorps_piaobodeying_mark");
@@ -16050,7 +16052,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                                     target.addSkill("Xfliegerkorps_piaobodeying_mark");
                                                 }
                                                 target.storage.Xfliegerkorps_piaobodeying_markplayer.push(player);
-                                                target.addMark("Xfliegerkorps_piaobodeying_mark",1);
+                                                target.addMark("Xfliegerkorps_piaobodeying_mark", 1);
                                             }
                                         },
 
@@ -16063,8 +16065,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         content: function () {
                                             for (var i of game.filterPlayer()) {
                                                 if (i.countMark("Xfliegerkorps_piaobodeying_mark") > 0) i.removeMark(i.countMark("Xfliegerkorps_piaobodeying_mark"));
-                                                if (i.hasSkill("Xfliegerkorps_piaobodeying_mark")) {i.storage.Xfliegerkorps_piaobodeying_markplayer = [];
-                                                i.removeSkill("Xfliegerkorps_piaobodeying_mark");}
+                                                if (i.hasSkill("Xfliegerkorps_piaobodeying_mark")) {
+                                                    i.storage.Xfliegerkorps_piaobodeying_markplayer = [];
+                                                    i.removeSkill("Xfliegerkorps_piaobodeying_mark");
+                                                }
                                             }
                                         },
                                     },
@@ -16214,6 +16218,140 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
 
                             },
+                            shujuzaisheng: {
+                                getCheck(card, player) {
+                                    // AI 只愿意把“亏得起”的黑桃牌转成过牌，因此先排除保命牌与最后的关键手牌。
+                                    if (!player) return 0;
+                                    if (get.tag(card, "save")) return 0;
+                                    if (get.name(card, player) == "shan" && player.hp <= 2) return 0;
+                                    if (get.position(card) == "h" && player.countCards("h") <= 1) return 0;
+                                    var score = 5.5 - get.value(card, player);
+                                    // 手牌较少时再额外压低评分，避免 AI 把节奏打空。
+                                    if (get.position(card) == "h" && player.countCards("h") <= 2) score -= 1.5;
+                                    if (get.position(card) == "e" && get.value(card, player) > 5) score -= 2;
+                                    return score;
+                                },
+                                // 数据再生：
+                                // 1. 锁定跳过摸牌阶段，手牌上限固定额外+2；
+                                // 2. 其他角色的黑桃牌因弃置/判定进入弃牌堆时，可获得等量的【影】；
+                                // 3. 出牌阶段可把自己手里的黑桃牌转化为等量过牌。
+                                group: ["shujuzaisheng_skip", "shujuzaisheng_discard", "shujuzaisheng_judge"],
+                                forced: true,
+                                enable: "phaseUse",
+                                usable: 1,
+                                position: "he",
+                                selectCard: [1, Infinity],
+                                filterCard: function (card, player) {
+                                    // 主动效果只接受黑桃牌，和被动产“影”的花色来源保持一致。
+                                    return get.suit(card, player) == "spade";
+                                },
+                                check: function (card) {
+                                    return lib.skill.shujuzaisheng.getCheck(card, get.player());
+                                },
+                                content: function () {
+                                    // 弃几张黑桃就补几张牌，简单直接地把冗余资源转为手牌质量。
+                                    player.draw(cards.length);
+                                },
+                                ai: {
+                                    order: function (item, player) {
+                                        return player.countCards("he", function (card) {
+                                            return get.suit(card, player) == "spade" && lib.skill.shujuzaisheng.getCheck(card, player) > 0;
+                                        }) > 1 ? 7 : 5.5;
+                                    },
+                                    result: {
+                                        player: function (player) {
+                                            return player.countCards("he", function (card) {
+                                                return get.suit(card, player) == "spade" && lib.skill.shujuzaisheng.getCheck(card, player) > 0;
+                                            }) > 0 ? 1 : 0;
+                                        },
+                                    },
+                                },
+                                mod: {
+                                    maxHandcard: function (player, num) {
+                                        return num + 2;
+                                    },
+                                },
+                                subSkill: {
+                                    skip: {
+                                        // 始终跳过自己的摸牌阶段。
+                                        trigger: {
+                                            player: "phaseDrawBefore",
+                                        },
+                                        forced: true,
+                                        content: function () {
+                                            trigger.cancel();
+                                        },
+                                    },
+                                    discard: {
+                                        // 其他角色弃牌时，统计其中进入弃牌堆的黑桃牌数量并决定是否获得【影】。
+                                        trigger: {
+                                            global: ["loseAfter", "loseAsyncAfter"],
+                                        },
+                                        forced: true,
+                                        filter: function (event, player) {
+                                            // 只处理真正“因弃置进入弃牌堆”的牌；移动但未落入弃牌堆的不算。
+                                            if (event.type != "discard" || event.getlx === false) return false;
+                                            var count = 0;
+                                            game.countPlayer(function (current) {
+                                                if (current == player) return;
+                                                var evt = event.getl(current);
+                                                if (!evt || !evt.cards2) return;
+                                                for (var i = 0; i < evt.cards2.length; i++) {
+                                                    if (get.suit(evt.cards2[i], current) == "spade") count++;
+                                                }
+                                            });
+                                            return count > 0;
+                                        },
+                                        content: function () {
+                                            // 重新遍历一次实际结算结果，避免直接沿用 filter 阶段的临时计数。
+                                            event.count = 0;
+                                            game.countPlayer(function (current) {
+                                                if (current == player) return;
+                                                var evt = trigger.getl(current);
+                                                if (!evt || !evt.cards2) return;
+                                                for (var i = 0; i < evt.cards2.length; i++) {
+                                                    if (get.suit(evt.cards2[i], current) == "spade") event.count++;
+                                                }
+                                            });
+                                            if (!event.count) {
+                                                event.finish();
+                                                return;
+                                            }
+                                            player.logSkill("shujuzaisheng");
+                                            player.gain(lib.card.ying.getYing(event.count), "gain2");
+                                        },
+                                    },
+                                    judge: {
+                                        // 其他角色判定牌结算后进入弃牌堆时，同样按黑桃数量结算等量【影】。
+                                        trigger: {
+                                            global: "cardsDiscardAfter",
+                                        },
+                                        forced: true,
+                                        filter: function (event, player) {
+                                            // cardsDiscardAfter 触发来源很多，这里只认判定牌结算后的弃牌。
+                                            var evt = event.getParent().relatedEvent;
+                                            if (!evt || evt.name != "judge" || evt.player == player || !event.cards || !event.cards.length) return false;
+                                            for (var i = 0; i < event.cards.length; i++) {
+                                                if (get.suit(event.cards[i]) == "spade") return true;
+                                            }
+                                            return false;
+                                        },
+                                        content: function () {
+                                            // 判定只会结算当前这批牌，因此直接统计 trigger.cards 即可。
+                                            event.count = 0;
+                                            for (var i = 0; i < trigger.cards.length; i++) {
+                                                if (get.suit(trigger.cards[i]) == "spade") event.count++;
+                                            }
+                                            if (!event.count) {
+                                                event.finish();
+                                                return;
+                                            }
+                                            player.logSkill("shujuzaisheng");
+                                            player.gain(lib.card.ying.getYing(event.count), "gain2");
+                                        },
+                                    },
+                                },
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -16318,6 +16456,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             savoy: "疑萨沃尼亚",
                             cassone: "疑卡萨诺方案",
                             Xfliegerkorps: "疑第十航空军团",
+                            "R_401": "嗔401",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -16606,6 +16745,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             Xfliegerkorps_piaobodeying_mark_yingzi: "漂泊的鹰_摸牌+1",
                             Xfliegerkorps_piaobodeying_mark_hangmucv: "漂泊的鹰_开幕航空",
                             huodeyanshi: "获得延时", "huodeyanshi_info": "从牌堆中获得一张延时锦囊牌。测试用。",
+                            shujuzaisheng: "数据再生",
+                            shujuzaisheng_info: "锁定技，你始终跳过摸牌阶段，且手牌上限+2。当其他角色的♠牌因弃置或判定而置入弃牌堆时，你可以获得等量的【影】。出牌阶段限一次，你可以弃置任意张♠牌，然后摸等量的牌。",
+
 
 
                             jianrbiaozhun: "舰r标准",
