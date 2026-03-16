@@ -354,7 +354,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 var jianrCharacterImagePathOverrides = {
                     weineituo: 'image/character/weineituo.JPG',
                     yinghuochong: 'image/character/yinghuochong.png',
-                    R_401:'image/character/R_401.png',
                 };
                 var getJianRCharacterImageRelativePath = function (characterName) {
                     // 扩展若是从压缩包导入，`extensionInfo.file` 中会记录真实文件名。
@@ -545,6 +544,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             cassone: ["female", "RM", 4, ["zhuangjiafh", "cassone_yibing", "cassone_weizhuangqixi"], ["des:深海版战列巡洋舰卡萨诺方案。"]],
                             Xfliegerkorps: ["female", "KMS", 4, ["yaosai", "Xfliegerkorps_piaobodeying"], ["des:漂泊的“鹰”，戴着奇怪的帽子，不喜欢与其他人交流。但，实力很强。"]],
                             "R_401": ["female", "IJN", 4, ["junfu", "shujuzaisheng"], ["des:401的诞生是由于获得Yamato智能模块的一半。后为了拯救暴走的芙蕾雅Cyou-yamato而把自己的智能模块捐献出来，捐献模块后消失。不过因为S113在之前留下了Yamato的数据备份而复活。"]],
+                            chaoyamato: ["female", "IJN", 4, ["zhuangjiafh", "zhanliebb", "yapogan"], ["des:日本战列舰A150。"]],
 
                             skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "huodeyanshi", "paoxiao"], ["forbidai", "des:测试用"]],
                         },
@@ -16352,6 +16352,91 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
+                            yapogan: {
+                                getTargetBaseScore(player, target) {
+                                    // 评估“从这名角色处获得一张牌”的基础收益。
+                                    if (target == player || target.countGainableCards(player, "he") <= 0) return -Infinity;
+                                    var score = get.effect(target, { name: "shunshou", isCard: true }, player, player);
+                                    if (get.attitude(player, target) >= 0) return score - 2;
+                                    if (player.canUse({ name: "sha", nature: "fire", isCard: true }, target, false)) {
+                                        // 若黑桃牌大概率会转成火【杀】，则把这部分期望伤害提前算进收益。
+                                        score += Math.max(get.effect(target, { name: "sha", nature: "fire", isCard: true }, player, player), 0) * 0.35;
+                                    }
+                                    if (target.countCards("he") == 1) score += 0.3;
+                                    return score;
+                                },
+                                getDrawCost(player, selectedCount) {
+                                    // “少摸一张”的代价会随着体力、手牌压力和已选目标数上升而变大。
+                                    var cost = 0.7 + selectedCount * 0.18;
+                                    if (player.hp <= 2) cost += 0.35;
+                                    if (player.hp <= 1) cost += 0.55;
+                                    if (player.countCards("h") <= 3) cost += 0.25;
+                                    if (player.countCards("h") <= 1) cost += 0.25;
+                                    return cost;
+                                },
+                                getTargetChoiceScore(player, target, selectedCount) {
+                                    return lib.skill.yapogan.getTargetBaseScore(player, target) - lib.skill.yapogan.getDrawCost(player, selectedCount || 0);
+                                },
+                                // 压迫感：
+                                // 摸牌阶段少摸X张，改为依次获得X名其他角色各一张牌。
+                                // 若拿到的是黑桃，则立即弃置之，并视为对对应目标使用一张无距离限制、且不计次数的火【杀】。
+                                trigger: {
+                                    player: "phaseDrawBegin2",
+                                },
+                                frequent:true,
+                                filter: function (event, player) {
+                                    if (event.numFixed) return false;
+                                    var num = typeof event.num == "number" ? event.num : 2;
+                                    return num > 0 && game.hasPlayer(function (current) {
+                                        return current != player && current.countGainableCards(player, "he") > 0;
+                                    });
+                                },
+                                check: function (event, player) {
+                                    return game.hasPlayer(function (current) {
+                                        return lib.skill.yapogan.getTargetChoiceScore(player, current, 0) > 0;
+                                    });
+                                },
+                                async content(event, trigger, player) {
+                                    var drawNum = typeof trigger.num == "number" ? trigger.num : 2;
+                                    var maxNum = Math.min(drawNum, game.filterPlayer(function (current) {
+                                        return current != player && current.countGainableCards(player, "he") > 0;
+                                    }).length);
+                                    if (maxNum <= 0) return;
+                                    var chooseTargetResult = await player
+                                        .chooseTarget(
+                                            get.prompt("yapogan"),
+                                            "获得至多" + get.cnNumber(maxNum) + "名其他角色的各一张牌，然后少摸等量的牌；若获得的牌为黑桃，则弃置之并视为对其使用一张无距离且不计次数的火【杀】",
+                                            [1, maxNum],
+                                            function (card, player, target) {
+                                                return _status.event.player != target && target.countGainableCards(_status.event.player, "he") > 0;
+                                            }
+                                        )
+                                        .set("ai", function (target) {
+                                            return lib.skill.yapogan.getTargetChoiceScore(_status.event.player, target, ui.selected.targets.length);
+                                        });
+                                    if (!chooseTargetResult.result || !chooseTargetResult.result.bool || !chooseTargetResult.result.targets || !chooseTargetResult.result.targets.length) return;
+                                    var targets = chooseTargetResult.result.targets;
+                                    player.logSkill("yapogan", targets);
+                                    // 真正减少摸牌数，后续改为逐个“夺牌”补偿。
+                                    trigger.num -= targets.length;
+                                    for (var i = 0; i < targets.length; i++) {
+                                        var target = targets[i];
+                                        player.line(target);
+                                        var gainResult = await player.gainPlayerCard(target, "he", true);
+                                        if (!gainResult.result || !gainResult.result.bool || !gainResult.result.cards || !gainResult.result.cards.length) continue;
+                                        var card = gainResult.result.cards[0];
+                                        if (get.suit(card, player) == "spade") {
+                                            // 黑桃代表“压迫升级”为直接炮击，因此先弃置该牌，再补一张火【杀】。
+                                            await player.discard(card);
+                                            if (target.isIn() && player.isIn() && player.canUse({ name: "sha", nature: "fire", isCard: true }, target, false)) {
+                                                var next = player.useCard({ name: "sha", nature: "fire", isCard: true }, target, false);
+                                                next.set("addCount", false);
+                                                next.set("nodistance", true);
+                                            }
+                                        }
+                                    }
+                                },
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -16457,6 +16542,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             cassone: "疑卡萨诺方案",
                             Xfliegerkorps: "疑第十航空军团",
                             "R_401": "嗔401",
+                            chaoyamato: "嗔超大和",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -16747,6 +16833,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             huodeyanshi: "获得延时", "huodeyanshi_info": "从牌堆中获得一张延时锦囊牌。测试用。",
                             shujuzaisheng: "数据再生",
                             shujuzaisheng_info: "锁定技，你始终跳过摸牌阶段，且手牌上限+2。当其他角色的♠牌因弃置或判定而置入弃牌堆时，你可以获得等量的【影】。出牌阶段限一次，你可以弃置任意张♠牌，然后摸等量的牌。",
+                            yapogan: "压迫感",
+                            yapogan_info: "摸牌阶段，你可以少摸任意张牌并获得等量其他角色各一张牌，若获得牌为♠️，你须弃置此牌并视为你对对应角色使用一张不计入次数，无视距离的【火杀】。",
 
 
 
