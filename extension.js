@@ -1,42 +1,42 @@
-//写在前面：本文件中变量名大小写敏感，且需要注意是否有s（例如target-targets）
-//filter中使用event.，不能使用trigger.。trigger.在contant中使用。
-//filter函数（条件函数）里的event是触发事件，但content函数（效果函数）里的trigger才是触发事件，event是当前的技能事件，event.getParent()是当前技能事件的上一级父事件，event.getParent(2)是当前技能事件的上二级父事件。
-//"step 0"必须从0开始，引号可以是单引号或双引号，但是整个技能里面不能变
-/*yield 可以跨步骤储存变量，用于一个技能里需要多次选择目标/牌等造成系统自带result.targets和result.links失效的情况。该方法需要content:function*(event,map),并且内容中player和trigger.player(已验证),result（待验证）需要分别使用map.player和map.trigger.player（已验证）,map.result（待验证）代替
-yield需要无名杀版本1.10.10或更高版本的支持
-示例： 
-    var result = yield player.chooseCardButton('Z驱领舰：选择一张“Z”移动', true, cards);
-    "step 2"
-    game.log("result.links");*/
-//player.useCard({ name: '牌名' }, result.card, result.targets);可以不使用viewas而使用转化牌.
-//dialog = ui.create.dialog在多人模式中不可用，目前使用chosebutton{}（参考神郭嘉佐幸）。
-//content中的ai返回值为正数越大越容易则选择目标，返回值为负数则不选择、不发动；ai里的ai返回值为正数则选择友方，返回值为负数则选择敌方，返回值0不发动技能。
-//注意每个全局技能（前面有下划线的）代码在本文件钟有两个，单机前一个（带lib.的）生效，多人后一个生效。
-//目录：全局技能、武将列表、武将技能、武将和技能翻译、卡牌包与卡牌技能、卡牌翻译、配置（config）、单机武将列表、扩展简介、全局函数模块
 
-//nobracket:true,该属性可以让技能显示完整名称（而不是只有前两个字）
-//var player = get.player();指的是当前正在做选择的角色，如果是玩家让其他角色选择，这个选择的ai里get.player()就是“其他角色“。此写法中获取到的player等价于_status.event.player但不包含对客机的广播（也就是_status.event.player在单机中可用，联机时可能出错）
-//useCard时机牌已经离开手牌区，牌上的tag已经清除。如果需要让特定标签的牌无法响应，参考国战刘琦问计：
-//JS中数组之间==比较的是数组地址，不比较内容。不能通过card==[]判断数组为空或不为空。
-//config在技能中使用例：lib.config.extension_舰R牌将__yuanhang。config后的内容为extension+扩展名（不是武将包名）+config里写的变量名，英文下划线连接。
-/*return (
-                    player.getHistory("lose", function (evt) {
-                        if (evt.getParent() != event) return false;
-                        for (var i in evt.gaintag_map) {
-                            if (evt.gaintag_map[i].includes("gzwenji")) return true;
-                        }
-                        return false;
-                    }).length > 0
-                ); */
+//===================================
+
+//【基础语法注意事项】
+//写在前面：本文件中变量名大小写敏感，且需要注意是否有s（例如target-targets）
+//filter中使用event.，不能使用trigger.。trigger.在content中使用。
+//filter函数（条件函数）里的event是触发事件，但content函数（效果函数）里的trigger才是触发事件，event是当前的技能事件。
+//event.getParent()是当前技能事件的上一级父事件，event.getParent(2)是当前技能事件的上二级父事件。
+//"step 0"必须从0开始，引号可以是单引号或双引号，但是整个技能里面不能变。
+
+//【yield用法】（需要无名杀版本1.10.10或更高版本）
+//yield可以跨步骤储存变量，用于一个技能里需要多次选择目标/牌等造成系统自带result.targets和result.links失效的情况。
+//该方法需要content:function*(event,map),并且内容中player和trigger.player需要分别使用map.player和map.trigger.player代替。
+//示例：var result = yield player.chooseCardButton('选择一张牌', true, cards);
+
+//【AI相关】
+//content中的ai返回值为正数越大越容易选择目标，返回值为负数则不选择、不发动。
+//ai里的ai返回值为正数则选择友方，返回值为负数则选择敌方，返回值0不发动技能。
 //主动技能的ai中需要写明result例如result:{player:1,},AI才会发动技能。
-//.set("key",vel)传递参数后使用数值时应当取后一个参数（vel）。
-//storage 的使用方式，有直接用 player.storage 的方式，但是更建议使用如下三个函数：（好处在于不仅会自己广播还自带初始值，所以联机用起来很方便）
-//函数 效果 可操作范围（对应的 storage 是什么类型？）
-//getStorage() 获取对应的 storage 数组，非数组均可
-//setStorage() 直接赋值 storage 数组，非数组均可
-//markAuto() 像 storage 中添加元素 数组
+
+//【storage使用方式】
+//有直接用player.storage的方式，但是更建议使用如下三个函数（好处在于不仅会自己广播还自带初始值，联机用起来很方便）：
+//getStorage() - 获取对应的storage数组，非数组均可
+//setStorage() - 直接赋值storage数组，非数组均可
+//markAuto()   - 向storage中添加元素（数组）
+
+//【其他注意事项】
+//nobracket:true - 该属性可以让技能显示完整名称（而不是只有前两个字）
+//var player = get.player(); - 指的是当前正在做选择的角色
+//useCard时机牌已经离开手牌区，牌上的tag已经清除。
+//JS中数组之间==比较的是数组地址，不比较内容。不能通过card==[]判断数组为空或不为空。
 //mod尽量放在主技能中。放在子技能中时会由于未知原因结算两遍。
-//联机时客机出牌阶段所在的_state.event.name是game，不是phaseUse。
+//联机时客机出牌阶段所在的_status.event.name是game，不是phaseUse。
+//.set("key",val)传递参数后使用数值时应当取后一个参数（val）。
+
+//【目录】
+//武将列表、武将技能、武将和技能翻译、卡牌包与卡牌技能、卡牌翻译、配置（config）、扩展简介
+
+//===================================
 let connect;
 try {
     const ws = require("ws");
