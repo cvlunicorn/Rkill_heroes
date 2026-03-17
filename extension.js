@@ -16240,7 +16240,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 enable: "phaseUse",
                                 usable: 1,
                                 position: "he",
-                                selectCard: [1, Infinity],
+                                selectCard: function (event, player) {
+                                    var player = _status.event.player;
+                                    return [1, player.hp];
+                                },
                                 filterCard: function (card, player) {
                                     // 主动效果只接受黑桃牌，和被动产“影”的花色来源保持一致。
                                     return get.suit(card, player) == "spade";
@@ -16287,38 +16290,33 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger: {
                                             global: ["loseAfter", "loseAsyncAfter"],
                                         },
-                                        forced: true,
+                                        frequent: true,
                                         filter: function (event, player) {
                                             // 只处理真正“因弃置进入弃牌堆”的牌；移动但未落入弃牌堆的不算。
-                                            if (event.type != "discard" || event.getlx === false) return false;
-                                            var count = 0;
-                                            game.countPlayer(function (current) {
-                                                if (current == player) return;
-                                                var evt = event.getl(current);
-                                                if (!evt || !evt.cards2) return;
-                                                for (var i = 0; i < evt.cards2.length; i++) {
-                                                    if (get.suit(evt.cards2[i], current) == "spade") count++;
+                                            if (event.type != 'discard' || event.getlx === false) return false;
+                                            var cards = event.cards.slice(0);
+                                            var evt = event.getl(player);
+                                            if (evt && evt.cards) cards.removeArray(evt.cards);
+                                            for (var i = 0; i < cards.length; i++) {
+                                                if (cards[i].original != 'j' && get.suit(cards[i], event.player) == 'spade' && get.position(cards[i], true) == 'd') {
+                                                    return true;
                                                 }
-                                            });
-                                            return count > 0;
+                                            }
+                                            return false;
                                         },
                                         content: function () {
-                                            // 重新遍历一次实际结算结果，避免直接沿用 filter 阶段的临时计数。
-                                            event.count = 0;
-                                            game.countPlayer(function (current) {
-                                                if (current == player) return;
-                                                var evt = trigger.getl(current);
-                                                if (!evt || !evt.cards2) return;
-                                                for (var i = 0; i < evt.cards2.length; i++) {
-                                                    if (get.suit(evt.cards2[i], current) == "spade") event.count++;
+                                            "step 0"
+                                            if (trigger.delay == false) game.delay();
+                                            "step 1"
+                                            var cards = [], cards2 = trigger.cards.slice(0), evt = trigger.getl(player);
+                                            if (evt && evt.cards) cards2.removeArray(evt.cards);
+                                            for (var i = 0; i < cards2.length; i++) {
+                                                if (cards2[i].original != 'j' && get.suit(cards2[i], trigger.player) == 'spade' && get.position(cards2[i], true) == 'd') {
+                                                    cards.push(cards2[i]);
                                                 }
-                                            });
-                                            if (!event.count) {
-                                                event.finish();
-                                                return;
                                             }
                                             player.logSkill("shujuzaisheng");
-                                            player.gain(lib.card.ying.getYing(event.count), "gain2");
+                                            player.gain(lib.card.ying.getYing(cards.length), "gain2");
                                         },
                                     },
                                     judge: {
@@ -16383,7 +16381,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 trigger: {
                                     player: "phaseDrawBegin2",
                                 },
-                                frequent:true,
+                                frequent: true,
                                 filter: function (event, player) {
                                     if (event.numFixed) return false;
                                     var num = typeof event.num == "number" ? event.num : 2;
@@ -16832,9 +16830,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             Xfliegerkorps_piaobodeying_mark_hangmucv: "漂泊的鹰_开幕航空",
                             huodeyanshi: "获得延时", "huodeyanshi_info": "从牌堆中获得一张延时锦囊牌。测试用。",
                             shujuzaisheng: "数据再生",
-                            shujuzaisheng_info: "锁定技，你始终跳过摸牌阶段，且手牌上限+2。当其他角色的♠牌因弃置或判定而置入弃牌堆时，你可以获得等量的【影】。出牌阶段限一次，你可以弃置任意张♠牌，然后摸等量的牌。",
+                            shujuzaisheng_info: "锁定技，你始终跳过摸牌阶段，且手牌上限+2。当其他角色的♠牌因弃置或判定而置入弃牌堆时，你可以获得等量的【影】。出牌阶段限一次，你可以弃置至多X张♠牌，然后摸等量的牌。（X为你的体力值）",
                             yapogan: "压迫感",
-                            yapogan_info: "摸牌阶段，你可以少摸任意张牌并获得等量其他角色各一张牌，若获得牌为♠️，你须弃置此牌并视为你对对应角色使用一张不计入次数，无视距离的【火杀】。",
+                            yapogan_info: "摸牌阶段，你可以少摸任意张牌并获得等量其他角色各一张牌，若获得牌为♠，你须弃置此牌并视为你对对应角色使用一张不计入次数，无视距离的【火杀】。",
 
 
 
