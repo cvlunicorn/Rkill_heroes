@@ -545,7 +545,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             Xfliegerkorps: ["female", "KMS", 4, ["yaosai", "Xfliegerkorps_piaobodeying"], ["des:漂泊的“鹰”，戴着奇怪的帽子，不喜欢与其他人交流。但，实力很强。"]],
                             "R_401": ["female", "IJN", 4, ["junfu", "shujuzaisheng"], ["des:401的诞生是由于获得Yamato智能模块的一半。后为了拯救暴走的芙蕾雅Cyou-yamato而把自己的智能模块捐献出来，捐献模块后消失。不过因为S113在之前留下了Yamato的数据备份而复活。"]],
                             chaoyamato: ["female", "IJN", 4, ["zhuangjiafh", "zhanliebb", "yapogan"], ["des:日本战列舰A150。"]],
-
+                            jiagu: ["female", "IJN", 4, ["zhongxunca", "xietongzuozhan"], ["des:　加古属古鹰型2番舰，于26年完工。同古鹰号一样，在37年也进行了全面的改装以提升性能。战争爆发时加古号和古鹰号编入相通的部队作战。42年，一同编入三川的第八舰队，在萨沃岛海战中，夜战熟练的日军重创了美军，不过在归途中，加古号被美军潜艇击沉。"]],
                             skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "huodeyanshi", "paoxiao"], ["forbidai", "des:测试用"]],
                         },
                         skill: {
@@ -7621,7 +7621,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             u47_xinbiao_hp: {
                                 mark: true,
                                 marktext: "体力",
-                                onremove:true,
+                                onremove: true,
                                 intro: {
                                     name: "体力",
                                     content: function (storage, player) {
@@ -7634,7 +7634,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             u47_xinbiao_cards: {
                                 mark: true,
                                 marktext: "手牌",
-                                onremove:true,
+                                onremove: true,
                                 intro: {
                                     name: "手牌",
                                     content: function (storage, player) {
@@ -16436,6 +16436,217 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                 },
                             },
+                            xietongzuozhan: {
+                                audio: false,
+                                enable: "phaseUse",  //出牌阶段可发动
+                                usable: 1,  //每阶段限一次
+                                //目标筛选：最多选择的目标数不能超过手牌数
+                                filterTarget: function (card, player, target) {
+                                    return ui.selected.targets.length < player.countCards("h");
+                                },
+                                //目标数量：1到手牌数
+                                selectTarget: function () {
+                                    var player = _status.event.player;
+                                    return [1, player.countCards("h")];
+                                },
+                                //发动条件：有手牌
+                                filter: function (event, player) {
+                                    return player.countCards("h") > 0;
+                                },
+                                multitarget: true,  //多目标技能
+                                multiline: true,    //多条连线
+                                content: function () {
+                                    "step 0"
+                                    //让玩家选择与目标数量相等的手牌
+                                    var num = targets.length;
+                                    player.chooseCard("协同作战：选择" + num + "张手牌展示", num, true).set("ai", function (card) {
+                                        return 6 - get.value(card);  //优先选择低价值牌
+                                    });
+                                    "step 1"
+                                    //展示选择的手牌并初始化变量
+                                    if (!result.bool || !result.cards || result.cards.length == 0) {
+                                        event.finish();
+                                        return;
+                                    }
+                                    var cards = result.cards;
+                                    player.showCards(cards, get.translation(player) + "发动了【协同作战】");
+                                    event.showedCards = cards.slice();  //保存展示的牌
+                                    event.cardMap = {};      //cardid -> {name, nature} 的映射
+                                    event.usedNames = [];    //已使用的牌名（用于去重）
+                                    event.currentIndex = 0;  //当前处理的目标索引
+                                    "step 2"
+                                    //循环：让每个目标为对应的牌选择牌名
+                                    if (event.currentIndex >= targets.length) {
+                                        event.goto(4);  //所有目标处理完毕，跳到step 4
+                                        return;
+                                    }
+                                    var target = targets[event.currentIndex];
+                                    var card = event.showedCards[event.currentIndex];
+                                    if (!card || !target) {
+                                        event.currentIndex++;
+                                        event.redo();
+                                        return;
+                                    }
+                                    //构建可选牌名列表（基本牌和锦囊牌，排除已选的）
+                                    var list = [];
+                                    for (var name in lib.card) {
+                                        var info = lib.card[name];
+                                        if (!info) continue;
+                                        if (info.type != "basic" && info.type != "trick" && info.type != "delay") continue;
+                                        if (event.usedNames.includes(name)) continue;
+                                        if (info.hidden) continue;
+                                        //杀需要特殊处理（普通杀、火杀、雷杀、冰杀）
+                                        if (name == "sha") {
+                                            list.push(["基本", "", "sha"]);
+                                            if (!event.usedNames.includes("sha_fire")) list.push(["基本", "", "sha", "fire"]);
+                                            if (!event.usedNames.includes("sha_thunder")) list.push(["基本", "", "sha", "thunder"]);
+                                            if (!event.usedNames.includes("sha_ice")) list.push(["基本", "", "sha", "ice"]);
+                                        } else {
+                                            var typeTrans = info.type == "basic" ? "基本" : (info.type == "delay" ? "延时锦囊" : "锦囊");
+                                            list.push([typeTrans, "", name]);
+                                        }
+                                    }
+                                    //让目标选择一个牌名
+                                    target.chooseButton([
+                                        "协同作战：为" + get.translation(card) + "选择一个牌名",
+                                        [list, "vcard"]
+                                    ], true).set("ai", function (button) {
+                                        var name = button.link[2];
+                                        //AI优先选择高价值牌名
+                                        if (["wuzhongshengyou", "shunshouqianyang", "guohechaiqiao", "jiedaosharen", "sha", "tao", "jiu"].includes(name)) {
+                                            return Math.random() + 1;
+                                        }
+                                        return Math.random();
+                                    });
+                                    "step 3"
+                                    //处理目标的选择结果
+                                    if (result.bool && result.links && result.links[0]) {
+                                        var link = result.links[0];
+                                        var cardName = link[2];
+                                        var nature = link[3] || null;  //杀的属性（fire/thunder/ice）
+                                        var card = event.showedCards[event.currentIndex];
+                                        var target = targets[event.currentIndex];
+
+                                        //记录已使用的牌名（带属性的杀需要特殊处理）
+                                        if (nature) {
+                                            event.usedNames.push(cardName + "_" + nature);
+                                        } else {
+                                            event.usedNames.push(cardName);
+                                        }
+
+                                        //保存牌名映射
+                                        event.cardMap[card.cardid] = {
+                                            name: cardName,
+                                            nature: nature
+                                        };
+
+                                        game.log(target, "将", card, "的牌名指定为", "#g【" + get.translation(cardName) + "】");
+                                    }
+                                    event.currentIndex++;
+                                    if (event.currentIndex < targets.length) {
+                                        event.goto(2);  //继续处理下一个目标
+                                    }
+                                    "step 4"
+                                    //将牌名映射保存到player.storage，并添加效果子技能
+                                    if (Object.keys(event.cardMap).length > 0) {
+                                        if (!player.storage.xietongzuozhan_cards) {
+                                            player.storage.xietongzuozhan_cards = {};
+                                        }
+                                        for (var cardid in event.cardMap) {
+                                            player.storage.xietongzuozhan_cards[cardid] = event.cardMap[cardid];
+                                        }
+                                        player.addSkill("xietongzuozhan_effect");  //添加子技能处理视为效果和还原
+                                    }
+                                },
+                                ai: {
+                                    order: 7,  //出牌顺序优先级
+                                    result: {
+                                        target: 1  //正数表示对目标有利，AI会发动
+                                    }
+                                }
+                            },
+                            //【协同作战】子技能 - 处理牌名视为效果和离开手牌时还原
+                            //通过mod.cardname和mod.cardnature改变手牌的牌名和属性
+                            //监控牌离开手牌的事件，从storage中移除对应记录
+                            xietongzuozhan_effect: {
+                                //触发时机：失去牌后、装备后、判定后、其他角色获得牌后等
+                                trigger: { player: "loseAfter", global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"] },
+                                forced: true,   //强制发动
+                                silent: true,   //不显示发动提示
+                                popup: false,   //不弹出提示
+                                filter: function (event, player) {
+                                    if (!player.storage.xietongzuozhan_cards) return false;
+                                    //获取离开的牌
+                                    var cards = [];
+                                    if (event.name == "gain") {
+                                        if (event.player == player) return false;  //自己获得不触发
+                                        cards = event.cards || [];
+                                    } else if (event.name == "loseAsync") {
+                                        if (!event.getl) return false;
+                                        var hs = event.getl(player);
+                                        if (!hs || !hs.cards) return false;
+                                        cards = hs.cards;
+                                    } else if (event.getl) {
+                                        var hs = event.getl(player);
+                                        if (!hs || !hs.cards) return false;
+                                        cards = hs.cards;
+                                    } else if (event.cards) {
+                                        cards = event.cards;
+                                    }
+                                    //检查是否有被标记的牌离开
+                                    for (var card of cards) {
+                                        if (player.storage.xietongzuozhan_cards[card.cardid]) {
+                                            return true;
+                                        }
+                                    }
+                                    return false;
+                                },
+                                content: function () {
+                                    //从storage中移除离开的牌的记录
+                                    var cards = [];
+                                    if (trigger.name == "gain") {
+                                        cards = trigger.cards || [];
+                                    } else if (trigger.name == "loseAsync") {
+                                        if (trigger.getl) {
+                                            var hs = trigger.getl(player);
+                                            if (hs && hs.cards) cards = hs.cards;
+                                        }
+                                    } else if (trigger.getl) {
+                                        var hs = trigger.getl(player);
+                                        if (hs && hs.cards) cards = hs.cards;
+                                    } else if (trigger.cards) {
+                                        cards = trigger.cards;
+                                    }
+                                    for (var card of cards) {
+                                        if (player.storage.xietongzuozhan_cards[card.cardid]) {
+                                            delete player.storage.xietongzuozhan_cards[card.cardid];
+                                        }
+                                    }
+                                    //如果没有被标记的牌了，清理storage并移除子技能
+                                    if (Object.keys(player.storage.xietongzuozhan_cards).length == 0) {
+                                        delete player.storage.xietongzuozhan_cards;
+                                        player.removeSkill("xietongzuozhan_effect");
+                                    }
+                                },
+                                //mod：修改牌的属性
+                                mod: {
+                                    //修改牌名
+                                    cardname: function (card, player) {
+                                        if (player.storage.xietongzuozhan_cards &&
+                                            player.storage.xietongzuozhan_cards[card.cardid]) {
+                                            return player.storage.xietongzuozhan_cards[card.cardid].name;
+                                        }
+                                    },
+                                    //修改牌的属性（用于火/雷/冰杀）
+                                    cardnature: function (card, player) {
+                                        if (player.storage.xietongzuozhan_cards &&
+                                            player.storage.xietongzuozhan_cards[card.cardid] &&
+                                            player.storage.xietongzuozhan_cards[card.cardid].nature) {
+                                            return player.storage.xietongzuozhan_cards[card.cardid].nature;
+                                        }
+                                    }
+                                }
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -16542,6 +16753,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             Xfliegerkorps: "疑第十航空军团",
                             "R_401": "嗔401",
                             chaoyamato: "嗔超大和",
+                            jiagu: "加古",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -16834,7 +17046,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             shujuzaisheng_info: "锁定技，你始终跳过摸牌阶段，且手牌上限+2。当其他角色的♠牌因弃置或判定而置入弃牌堆时，你可以获得等量的【影】。出牌阶段限一次，你可以弃置至多X张♠牌，然后摸等量的牌。（X为你的体力值）",
                             yapogan: "压迫感",
                             yapogan_info: "摸牌阶段，你可以少摸任意张牌并获得等量其他角色各一张牌，若获得牌为♠，你须弃置此牌并视为你对对应角色使用一张不计入次数，无视距离的【火杀】。",
-
+                            xietongzuozhan: "协同作战",
+                            xietongzuozhan_info: "出牌阶段限一次，你可以选择任意名角色并展示等量张手牌，目标角色依次为每张手牌选择一个不重复的基本或锦囊牌的牌名。展示的手牌在你的手牌区内视为选择的牌名（进弃牌堆或被其他角色获得时还原）。",
+                
 
 
                             jianrbiaozhun: "舰r标准",
