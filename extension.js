@@ -7583,6 +7583,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             //game.log(allplayers[i].group);
                                             //game.log(event.player.group);
                                             if (allplayers[i].group == event.player.group) {
+                                                //game.log(allplayers[i],event.player);
                                                 return false;
 
                                             }
@@ -7608,10 +7609,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger.player.addSkill("u47_xinbiao_cards");
                                         //trigger.player.addMark("u47_xinbiao_hp",math.max(trigger.player.hp,1));
                                         //trigger.player.addMark("u47_xinbiao_cards", math.max(trigger.player.countCards('h'),1));
-                                        trigger.player.markAuto("u47_xinbiao_hp", [trigger.player.hp]);
-                                        trigger.player.storage.u47_xinbiao_hp.sort();
-                                        trigger.player.markAuto("u47_xinbiao_cards", [trigger.player.countCards('h')]);
-                                        trigger.player.storage.u47_xinbiao_cards.sort();
+                                        trigger.player.setStorage("u47_xinbiao_hp", [trigger.player.hp]);
+                                        trigger.player.setStorage("u47_xinbiao_cards", [trigger.player.countCards('h')]);
                                         player.logSkill("u47_xinbiao");
                                     }
                                 },
@@ -7622,6 +7621,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             u47_xinbiao_hp: {
                                 mark: true,
                                 marktext: "体力",
+                                onremove:true,
                                 intro: {
                                     name: "体力",
                                     content: function (storage, player) {
@@ -7634,6 +7634,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             u47_xinbiao_cards: {
                                 mark: true,
                                 marktext: "手牌",
+                                onremove:true,
                                 intro: {
                                     name: "手牌",
                                     content: function (storage, player) {
@@ -7661,9 +7662,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }).set('ai', target => {
                                         var att = get.attitude(player, target);
                                         if (att >= 0) {
-                                            return (target.countMark('u47_xinbiao_hp') - target.hp) * 2 + (target.countMark('u47_xinbiao_cards') - target.countCards("h"));
+                                            return (target.getStorage('u47_xinbiao_hp') - target.hp) * 2 + (target.getStorage('u47_xinbiao_cards') - target.getStorage("h"));
                                         } else if (att < 0) {
-                                            return (target.hp - target.countMark('u47_xinbiao_hp')) * 2 + (target.countCards("h") - target.countMark('u47_xinbiao_cards'));
+                                            return (target.hp - target.getStorage('u47_xinbiao_hp')) * 2 + (target.getStorage("h") - target.getStorage('u47_xinbiao_cards'));
                                         } else {
                                             return 1;
                                         }
@@ -7672,10 +7673,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (result.bool) {
                                         player.logSkill('u47_huxi');
                                         var target = result.targets[0];
-                                        var i1 = target.countMark('u47_xinbiao_hp');
-                                        target.removeMark('u47_xinbiao_hp', target.countMark('u47_xinbiao_hp'));
-                                        var i2 = target.countMark('u47_xinbiao_cards');
-                                        target.removeMark('u47_xinbiao_cards', target.countMark('u47_xinbiao_cards'));
+                                        var i1 = target.getStorage('u47_xinbiao_hp');
+                                        //target.removeMark('u47_xinbiao_hp', target.getStorage('u47_xinbiao_hp'));
+                                        var i2 = target.getStorage('u47_xinbiao_cards');
+                                        //target.removeMark('u47_xinbiao_cards', target.getStorage('u47_xinbiao_cards'));
                                         var hp = target.hp - i1;
                                         var cards = target.countCards("h") - i2;
                                         //game.log("hp", hp, "cards", cards);
@@ -7696,8 +7697,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         } else {
                                             ;
                                         }
-                                        player.unmarkAuto("u47_xinbiao_hp", [i1]);
-                                        player.unmarkAuto("u47_xinbiao_cards", [i2]);
+                                        //target.unmarkAuto("u47_xinbiao_hp", [i1]);
+                                        //target.unmarkAuto("u47_xinbiao_cards", [i2]);
                                         target.removeSkill('u47_xinbiao_hp');
                                         target.removeSkill('u47_xinbiao_cards');
                                         player.draw(1);
