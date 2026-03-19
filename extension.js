@@ -451,7 +451,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "1913_R": ["female", "ROCN", 4, ["zhuangjiafh", "zhanliebb", "jujianmengxiang"], ["zhu", "des:1913年时，为针对邻国的海军威胁，国民政府参谋部在海军造舰计划书中提出了颇为夸张的海军扩建计划，其中便包括大量的战列巡洋舰。该型战列巡洋所设想的性能参数为：排水量28000吨，装备10门14英寸火炮，航速29节左右。当然在那个穷困动荡的年代，海军意图获取主力舰无非是不切实际的妄想罢了……"]],
                             kunxi_R: ["female", "USN", 4, ["huokongld", "zhongxunca", "gaosusheji"], ["des:新奥尔良级重巡洋舰6号舰。新奥尔良级是北安普顿级的改良版本，增强了防护。战争爆发后，昆西号先是执行了在大西洋的岛屿巡逻任务，后于42年5月通过巴拿马运河来到太平洋战场。在萨沃岛海战中，昆西号击中了鸟海号的舰桥，但是之后昆西号被日军集火射击，最终不幸被鱼雷击沉。"]],
                             ougengqi_R: ["female", "KMS", 4, ["huokongld", "zhongxunca", "zhanxianfangyu"], ["des:希佩尔海军上将级重巡3号舰，有着不死鸟的绰号。相比前两艘，她的外形设计进行了一些改进。服役之后她同俾斯麦号一起行动参加了丹麦海峡海战，战斗结束后，她和俾斯麦号分头行动。俾斯麦号最终被击沉，而欧根亲王号则安全抵达法国。42年欧根亲王号同两艘沙恩霍斯特级执行了瑟布鲁斯行动，44年欧根亲王号在德军沿岸提供火力支援。战败后，欧根亲王号被赔偿给美国，在经历核试验和海洋风暴后，于拖拽过程中沉没。"]],
-                            qingye_R: ["female", "IJN", 4, ["huokongld", "zhongxunca", "sawohaizhan", "qingye_Rqingye_Rqing"], ["des:青叶型本属古鹰型的后续，但是由于修改了设计，所以这二艘被单独列为青叶型。在37年，青叶型进行了大规模改装。战争中青叶型和古鹰型编入同一部队作战，42年10月的海战中，青叶号将美军误认为友军，对美军打出“我是青叶”的信号，遭到了美军射击，在友舰的掩护下青叶号幸运逃脱，然而古鹰号却因此沉没。青叶号在44年遭到了潜艇袭击，返回日本修理之后不再出动，在坐沉中迎来了日本战败。"]],
+                            qingye_R: ["female", "IJN", 4, ["huokongld", "zhongxunca", "sawohaizhan", "qingyeqingyeqing"], ["des:青叶型本属古鹰型的后续，但是由于修改了设计，所以这二艘被单独列为青叶型。在37年，青叶型进行了大规模改装。战争中青叶型和古鹰型编入同一部队作战，42年10月的海战中，青叶号将美军误认为友军，对美军打出“我是青叶”的信号，遭到了美军射击，在友舰的掩护下青叶号幸运逃脱，然而古鹰号却因此沉没。青叶号在44年遭到了潜艇袭击，返回日本修理之后不再出动，在坐沉中迎来了日本战败。"]],
                             beianpudun_R: ["female", "USN", 4, ["huokongld", "zhongxunca", "huhangyuanhu"], ["des:北安普顿级是美国最早重巡彭萨科拉号的改进版本。在战争爆发后，北安普顿号参加了针对日军的报复性反击，这些反击行动极大鼓舞了美国的士气。北安普顿号主要被用于航母护航，在圣克鲁斯海战中，北安普顿号一度试图拖带受创的大黄蜂号，但由于日军不断的攻击而被迫放弃。在塔萨法隆加海战中北安普顿号被日军鱼雷击中沉没，由于损管和撤退有序，大部分舰员得以幸存。"]],
                             jiujinshan_R: ["female", "USN", 4, ["huokongld", "zhongxunca", "jiujingzhanzhen"], ["des:旧金山号重巡洋舰属新奥尔良级重巡洋舰，和昆西等舰同级。旧金山号重巡洋舰作为旗舰参加了埃斯佩恩斯角海战。在第一次瓜岛海战中，旧金山依然担任舰队旗舰，尽管舰队指挥官牺牲，舰队损失较大，但是依然完成了拦截日军编队的任务，并重创比叡，导致其最终沉没。旧金山打满了战争全程，并获得了总统集体嘉奖。她17颗战役之星的获得数量仅次于企业和圣地亚哥。"]],
                             yixian_R: ["female", "ROCN", 3, ["fangkong2", "qingxuncl", "shizhibuyu"], ["des:逸仙号是30年代中国自行设计建造的一艘巡洋舰。该舰从规格上讲只相当于列强的大型炮舰。抗战中，在宁海级相继殉国后逸仙号接替担任旗舰，在缺乏高射弹药的情况下，她曾经用前部150毫米主炮击落日本飞机。逸仙号最终不幸殉国，然而日本将其打捞修理使用，并一直幸存到了1945年。在抗战胜利后，这艘军舰又回归了中国，一直使用到了60年代。"]],
@@ -545,7 +545,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "401_R": ["female", "IJN", 4, ["junfu", "shujuzaisheng"], ["des:401的诞生是由于获得yamato_R智能模块的一半。后为了拯救暴走的芙蕾雅Cyou-yamato_R而把自己的智能模块捐献出来，捐献模块后消失。不过因为S113在之前留下了yamato_R的数据备份而复活。"]],
                             chaoyamato_R: ["female", "IJN", 4, ["zhuangjiafh", "zhanliebb", "yapogan"], ["des:日本战列舰A150。"]],
                             jiagu_R: ["female", "IJN", 4, ["zhongxunca", "xietongzuozhan"], ["des:　加古属古鹰型2番舰，于26年完工。同古鹰号一样，在37年也进行了全面的改装以提升性能。战争爆发时加古号和古鹰号编入相通的部队作战。42年，一同编入三川的第八舰队，在萨沃岛海战中，夜战熟练的日军重创了美军，不过在归途中，加古号被美军潜艇击沉。"]],
-                            yamato_R: ["female", "IJN", 4, ["zhanliebb", "yamato_R_tongchou", "yamato_R_dikai", "yamato_R_nizhuanfanji"], ["des:深海化的大和级战列舰。她以自毁般的同仇反噬敌我，于濒死边缘掀起最后的逆转反击。"]],
+                            yamato_R: ["female", "IJN", 4, ["zhuangjiafh", "zhanliebb", "yamato_R_tongchou", "yamato_R_dikai", "yamato_R_nizhuanfanji"], ["des:深海化的大和级战列舰。她以自毁般的同仇反噬敌我，于濒死边缘掀起最后的逆转反击。"]],
+                            kelaosaiweici_R: ["female", "KMS", 4, ["zhuangjiafh", "zhanliebb", "kelaosaiweici_R_jinji", "kelaosaiweici_R_lunzhan"], ["des:以普鲁士军事理论家克劳塞维茨命名的德国战列舰方案。她强调持续压迫与战场调度，既能在炮战中不断寻找突破口，也能在战局开始前通过推演争夺主动。"]],
 
                             skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "huodeyanshi", "paoxiao"], ["forbidai", "des:测试用"]],
                         },
@@ -4914,7 +4915,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 "_priority": 0,
                             },
-                            qingye_Rqingye_Rqing: {
+                            qingyeqingyeqing: {
                                 nobracket: true,
                                 audio: "ext:舰R牌将/audio/skill:true",
                                 trigger: {
@@ -4928,7 +4929,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 content: function () {
                                     'step 0'
-                                    player.chooseTarget(get.prompt2('qingye_Rqingye_Rqing'), function (card, player, target) {
+                                    player.chooseTarget(get.prompt2('qingyeqingyeqing'), function (card, player, target) {
                                         var evt = _status.event.getTrigger();
                                         return target != player && !evt.targets.includes(target) && lib.filter.targetEnabled(evt.card, evt.player, target);
                                     }).set('ai', function (target) {
@@ -4938,7 +4939,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     'step 1'
                                     if (result.bool) {
                                         var target = result.targets[0];
-                                        player.logSkill('qingye_Rqingye_Rqing', target);
+                                        player.logSkill('qingyeqingyeqing', target);
                                         event.target = target;
                                         target.chooseToDiscard("he", '弃置一张非基本牌令此牌对' + get.translation(player) +
                                             '无效，或袖手旁观', function (card) {
@@ -16519,9 +16520,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         [list, "vcard"]
                                     ], true).set("ai", function (button) {
                                         var card = { name: button.link[2], type: button.link[0] };
-                                        var player=_status.event.getParent().player;
+                                        var player = _status.event.getParent().player;
                                         var target = get.player();
-                                        if (get.attitude(target,player)>0) {
+                                        if (get.attitude(target, player) > 0) {
                                             return get.value(card, player);
                                         } else {
                                             return 10 - get.value(card, player);
@@ -17052,6 +17053,211 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     },
                                 },
                             },
+                            kelaosaiweici_R_jinji: {
+                                // 进击：
+                                // 用【杀】后可先摸一张；若摸到基本牌，则可再弃掉它，
+                                // 把这张【杀】从本回合使用次数里“退款”，为连续进攻续航。
+                                nobracket: true,
+                                usable: 1,
+                                trigger: {
+                                    player: "useCard",
+                                },
+                                frequent: true,
+                                filter: function (event) {
+                                    return event.card && event.card.name == "sha";
+                                },
+                                prompt2: "摸一张牌，然后若此牌为基本牌，你可以弃置之令此【杀】不计入本回合的使用次数。",
+                                check: function (event, player) {
+                                    return true;
+                                },
+                                content: function () {
+                                    "step 0";
+                                    player.draw();
+                                    'step 1'
+                                    event.card = result[0];
+                                    if (get.type(event.card) != "basic") {
+                                        event.finish();
+                                        return;
+                                    }
+                                    // 只有摸到的牌仍在手里，才允许把它弃掉来换“不计次数”。
+                                    if (get.position(event.card) != "h") {
+                                        event.finish();
+                                        return;
+                                    }
+                                    player.chooseBool("进击：是否弃置" + get.translation(event.card) + "令此【杀】不计入本回合的使用次数？").set("ai", function () {
+                                        var player = get.player();
+                                        var card = _status.event.getParent().card;
+                                        if (!card || _status.currentPhase != player) return false;
+                                        if (card.name == "sha") {
+                                            return game.hasPlayer(function (current) {
+                                                return current != player && get.attitude(player, current) < 0 && player.canUse({ name: "sha" }, current);
+                                            });
+                                        }
+                                        if (card.name == "jiu") {
+                                            return player.countCards("h", function (current) {
+                                                return current != card && current.name == "sha";
+                                            }) > 0;
+                                        }
+                                        return false;
+                                    });
+                                    "step 2";
+                                    if (result.bool && get.position(event.card) == "h") {
+                                        player.discard(event.card);
+                                        if (trigger.addCount !== false) {
+                                            // 回退本次【杀】对次数统计的占用，和 addCount=false 的虚拟出牌保持一致。
+                                            trigger.addCount = false;
+                                            var stat = player.getStat().card;
+                                            if (stat && stat.sha > 0) player.getStat().card.sha--;
+                                        }
+                                        game.log(trigger.card, "不计入次数限制");
+                                    }
+                                },
+                                ai: {
+                                    expose: 0.15,
+                                },
+                            },
+                            kelaosaiweici_R_lunzhan: {
+                                // 论战：
+                                // 准备阶段在“控顶保资源”和“本回合杀伤强化”之间二选一。
+                                nobracket: true,
+                                trigger: {
+                                    player: "phaseZhunbeiBegin",
+                                },
+                                frequent: true,
+                                content: function () {
+                                    "step 0";
+                                    // KMS 角色数量直接决定控顶分支的手牌上限补正。
+                                    player.chooseControl().set("choiceList", [
+                                        "观看并排列牌堆顶的4张牌，本回合手牌上限+" + game.countPlayer(function (current) {
+                                            return current.group == "KMS";
+                                        }),
+                                        "本回合你使用【杀】造成的伤害+1",
+                                    ]).set("prompt", get.prompt("kelaosaiweici_R_lunzhan")).set("ai", function () {
+                                        var player = get.player();
+                                        if (player.countCards("h", function (card) {
+                                            return card.name == "sha";
+                                        }) > 0 && game.hasPlayer(function (current) {
+                                            return current != player && get.attitude(player, current) < 0 && player.canUse({ name: "sha" }, current);
+                                        })) return 1;
+                                        return 0;
+                                    });
+                                    "step 1";
+                                    if (result.index == 1) {
+                                        player.addTempSkill("kelaosaiweici_R_lunzhan_damage", { player: "phaseAfter" });
+                                        event.finish();
+                                        return;
+                                    }
+                                    else {
+                                        event.kelaosaiweici_R_lunzhan_hand = game.countPlayer(function (current) {
+                                            return current.group == "KMS";
+                                        });
+                                        var cards = get.cards(event.kelaosaiweici_R_lunzhan_hand);
+                                        game.cardsGotoOrdering(cards);
+                                        var next = player.chooseToMove();
+                                        next.set('list', [
+                                            ['牌堆顶', cards],
+                                            ['牌堆底'],
+                                        ]);
+                                        next.set('prompt', '点击将牌移动到牌堆顶或牌堆底');
+                                        next.processAI = function (list) {
+                                            var cards = list[0][1], player = _status.event.player;
+                                            var target = (_status.event.getTrigger().name == 'phaseZhunbei') ? player : player.next;
+                                            var att = get.sgn(get.attitude(player, target));
+                                            var top = [];
+                                            var judges = target.getCards('j');
+                                            var stopped = false;
+                                            if (player != target || !target.hasWuxie()) {
+                                                for (var i = 0; i < judges.length; i++) {
+                                                    var judge = get.judge(judges[i]);
+                                                    cards.sort(function (a, b) {
+                                                        return (judge(b) - judge(a)) * att;
+                                                    });
+                                                    if (judge(cards[0]) * att < 0) {
+                                                        stopped = true; break;
+                                                    }
+                                                    else {
+                                                        top.unshift(cards.shift());
+                                                    }
+                                                }
+                                            }
+                                            var bottom;
+                                            if (!stopped) {
+                                                cards.sort(function (a, b) {
+                                                    return (get.value(b, player) - get.value(a, player)) * att;
+                                                });
+                                                while (cards.length) {
+                                                    if ((get.value(cards[0], player) <= 5) == (att > 0)) break;
+                                                    top.unshift(cards.shift());
+                                                }
+                                            }
+                                            bottom = cards;
+                                            return [top, bottom];
+                                        }
+                                    }
+                                    "step 2"
+                                    var top = result.moved[0];
+                                    var bottom = result.moved[1];
+                                    top.reverse();
+                                    game.cardsGotoPile(
+                                        top.concat(bottom),
+                                        ['top_cards', top],
+                                        function (event, card) {
+                                            if (event.top_cards.includes(card)) return ui.cardPile.firstChild;
+                                            return null;
+                                        }
+                                    )
+                                    if (event.triggername == 'phaseZhunbeiBegin' && top.length == 0) {
+                                        player.addTempSkill('reguanxing_on');
+                                    }
+                                    player.popup(get.cnNumber(top.length) + '上' + get.cnNumber(bottom.length) + '下');
+                                    game.log(player, '将' + get.cnNumber(top.length) + '张牌置于牌堆顶');
+                                    "step 3"
+                                    game.delayx();
+                                    if (typeof event.kelaosaiweici_R_lunzhan_hand == "number") {
+                                        player.addTempSkill("kelaosaiweici_R_lunzhan_hand", { player: "phaseAfter" });
+                                        player.setStorage("kelaosaiweici_R_lunzhan_hand",event.kelaosaiweici_R_lunzhan_hand);
+
+                                    }
+                                }
+                            },
+                            kelaosaiweici_R_lunzhan_hand: {
+                                charlotte: true,
+                                mark: true,
+                                onremove: function (player, skill) {
+                                    // 临时上限在回合结束后清除，顺手把缓存值一并删掉。
+                                    delete player.storage[skill];
+                                },
+                                mod: {
+                                    maxHandcard: function (player, num) {
+                                        return num + (player.storage.kelaosaiweici_R_lunzhan_hand || 0);
+                                    },
+                                },
+                                intro: {
+                                    content: function (storage) {
+                                        return "本回合手牌上限+" + (storage || 0);
+                                    },
+                                },
+                            },
+                            kelaosaiweici_R_lunzhan_damage: {
+                                charlotte: true,
+                                mark: true,
+                                intro: {
+                                    content: "本回合你使用【杀】造成的伤害+1",
+                                },
+                                silent: true,
+                                popup: false,
+                                forced: true,
+                                trigger: {
+                                    source: "damageBegin1",
+                                },
+                                filter: function (event, player) {
+                                    return event.card && event.card.name == "sha" && event.player != player;
+                                },
+                                content: function () {
+                                    // 直接在 damageBegin1 增伤，兼容绝大多数【杀】的后续结算。
+                                    trigger.num++;
+                                },
+                            },
                             //在这里添加新技能。
 
                             //这下面的大括号是整个skill数组的末尾，有且只有一个大括号。
@@ -17159,6 +17365,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             chaoyamato_R: "嗔超大和",
                             jiagu_R: "加古",
                             yamato_R: "嗔大和",
+                            kelaosaiweici_R: "克劳塞维茨",
 
                             quzhudd: "驱逐", "quzhudd_info": "",
                             qingxuncl: "轻巡", "qingxuncl_info": "",
@@ -17239,7 +17446,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             sawohaizhan: "萨沃海战", "sawohaizhan_info": "每回合各限一次。你可以将一张红牌当做当作洞烛先机使用,你可以将一张黑牌当作雷杀使用。",
                             sawohaizhan_1: "雷杀", "sawohaizhan_1_info": "你可以将一张黑牌当作雷杀使用。",
                             sawohaizhan_2: "洞烛先机", "sawohaizhan_2_info": "你可以将一张红牌当作洞烛先机使用（洞烛先机：观星2，然后摸两张牌）。",
-                            qingye_Rqingye_Rqing: "青叶青叶青", "qingye_Rqingye_Rqing_info": "当你成为牌的唯一目标时，你可以指定一名其他角色，其可以选择弃置一张非基本牌令此牌对你无效。",
+                            qingyeqingyeqing: "青叶青叶青", "qingyeqingyeqing_info": "当你成为牌的唯一目标时，你可以指定一名其他角色，其可以选择弃置一张非基本牌令此牌对你无效。",
                             mingyundewufenzhong: "命运的五分钟", "mingyundewufenzhong_info": "你可以跳过判定和摸牌阶段，视为使用一张雷杀或火杀，你可以弃置一张装备牌并跳过出牌阶段，视为使用一张雷杀或火杀，你可以跳过弃牌阶段并翻面，视为使用一张雷杀或火杀。",
                             wufenzhong1: "命运的五分钟", "wufenzhong1_info": "你可以跳过判定和摸牌阶段，视为使用一张雷杀或火杀",
                             wufenzhong2: "命运的五分钟", "wufenzhong2_info": "你可以弃置一张装备牌并跳过出牌阶段，视为使用一张雷杀或火杀",
@@ -17463,7 +17670,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             yamato_R_dikai2_info: "你可以将任意两张牌当任意一张基本牌使用或打出。每回合最多通过此法使用一张【桃】。",
                             yamato_R_nizhuanfanji: "逆转反击",
                             yamato_R_nizhuanfanji_info: "使命技。成功：当“同仇”角色死亡后，你升级技能“同仇”和“敌忾”。失败：当你进入濒死状态时，你将体力回复至1点，然后你可以依次对当前回合角色使用你的手牌（无距离和次数限制）。",
-
+                            kelaosaiweici_R_jinji: "进击",
+                            kelaosaiweici_R_jinji_info: "每回合限一次，你使用【杀】后可以摸一张牌，然后若此牌为基本牌，则你可以弃置之令此【杀】不计入本回合的使用次数。",
+                            kelaosaiweici_R_lunzhan: "论战",
+                            kelaosaiweici_R_lunzhan_info: "准备阶段，你可以选择一项：1.观看并排列牌堆顶的4张牌，本回合你的手牌上限+X（X为本局G国角色数）；2.本回合你使用【杀】造成的伤害+1。",
+                            kelaosaiweici_R_lunzhan_hand: "论战：手牌上限",
+                            kelaosaiweici_R_lunzhan_damage: "论战：伤害加一",
 
 
                             jianrbiaozhun: "舰r标准",
