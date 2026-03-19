@@ -16972,6 +16972,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         trigger: { global: "dieAfter" },
                                         forced: true,
                                         locked: false,
+                                        dutySkill: true,
                                         filter: function (event, player) {
                                             return !player.awakenedSkills.includes("yamato_R_nizhuanfanji") && player.storage.yamato_R_tongchou == event.player;
                                         },
@@ -17020,19 +17021,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             if (event.num < event.cards.length) { event.goto(2); }
                                         },
                                         sub: true,
-                                    },
-                                },
-                            },
-                            yamato_R_nizhuanfanji_temp: {
-                                charlotte: true,
-                                mod: {
-                                    cardUsable: function () {
-                                        // 失败反击阶段彻底移除次数限制。
-                                        return Infinity;
-                                    },
-                                    targetInRange: function () {
-                                        // 同时无视距离，确保手牌能尽量打得出去。
-                                        return true;
                                     },
                                 },
                             },
