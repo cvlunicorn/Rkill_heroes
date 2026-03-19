@@ -16980,7 +16980,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             player.awakenSkill("yamato_R_nizhuanfanji");
                                             game.log(player, "成功完成使命");
                                             delete player.storage.yamato_R_tongchou;
-                                            player.unmarkSkill("yamato_R_tongchou");
                                             player.changeSkills(["yamato_R_tongchou2", "yamato_R_dikai2"], ["yamato_R_tongchou", "yamato_R_dikai"]);
                                         },
                                         sub: true,
@@ -17001,40 +17000,24 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             "step 1";
                                             // 反击对象锁定为当前回合角色，体现“临死反扑”。
                                             event.target = _status.currentPhase;
-                                            if (!event.target || !event.target.isIn() || !player.countCards("h")) {
+                                            if (!event.target || !event.target.isIn() || !player.countCards("h") || event.target == player) {
                                                 event.finish();
                                                 return;
                                             }
                                             event.cards = player.getCards("h").slice(0);
-                                            event.index = 0;
-                                            player.addTempSkill("yamato_R_nizhuanfanji_temp", { global: "phaseAfter" });
+                                            event.num = 0;
                                             "step 2";
-                                            // 顺序扫描原手牌列表，跳过已经离手的牌，逐张尝试朝固定目标打出。
-                                            event.card = null;
-                                            while (event.index < event.cards.length) {
-                                                var card = event.cards[event.index++];
-                                                if (card && get.owner(card) == player && get.position(card) == "h") {
-                                                    event.card = card;
-                                                    break;
-                                                }
+                                            if (player.canUse(event.cards[event.num], event.target)) {
+                                                player.chooseBool("是否对" + get.translation(event.target) + "使用" + get.translation(event.cards[event.num])).set("ai", function () {
+                                                    return get.effect(event.target, event.cards[event.num], player, player);
+                                                });
                                             }
-                                            if (!event.card || !player.isIn() || !event.target.isIn()) {
-                                                event.finish();
-                                                return;
-                                            }
-                                            player.chooseUseTarget(event.card, true, false, "nodistance")
-                                                .set("targetRequired", true)
-                                                .set("complexSelect", true)
-                                                .set("filterTarget", function (card, player, target) {
-                                                    var evt = _status.event;
-                                                    if (evt.name == "chooseTarget") evt = evt.getParent();
-                                                    // 只允许指向当前回合角色，避免“逆转反击”把火力分散给别人。
-                                                    return target == evt.yamato_R_target && lib.filter.targetEnabledx(card, player, target);
-                                                })
-                                                .set("yamato_R_target", event.target)
-                                                .set("prompt", "逆转反击：是否对" + get.translation(event.target) + "使用" + get.translation(event.card) + "？");
                                             "step 3";
-                                            if (event.index < event.cards.length && player.isIn() && event.target && event.target.isIn()) event.goto(2);
+                                            if (result.bool) {
+                                                player.useCard(event.cards[event.num], event.target);
+                                            }
+                                            event.num++;
+                                            if (event.num < event.cards.length) { event.goto(2); }
                                         },
                                         sub: true,
                                     },
@@ -17215,7 +17198,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     game.delayx();
                                     if (typeof event.kelaosaiweici_R_lunzhan_hand == "number") {
                                         player.addTempSkill("kelaosaiweici_R_lunzhan_hand", { player: "phaseAfter" });
-                                        player.setStorage("kelaosaiweici_R_lunzhan_hand",event.kelaosaiweici_R_lunzhan_hand);
+                                        player.setStorage("kelaosaiweici_R_lunzhan_hand", event.kelaosaiweici_R_lunzhan_hand);
 
                                     }
                                 }
