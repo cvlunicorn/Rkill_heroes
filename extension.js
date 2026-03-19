@@ -432,7 +432,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 weijingzhizhi: ["jifu", "dujiaoshou", "sp_lafei", "getelan", "sp_aisaikesi", "sp_ninghai", "sp_zhongtudao", "xukufu", "lingbo"],
                                 cangqinghuanying: ["mist_dujiaoshou", "mist_xiawu", "mist_shanhuhai"],
                                 shixinrumoR_tan: ["bismarck", "tirpitz", "akagikaga"],
-                                shixinrumoR_chen: ["R_401","chaoyamato","yamato"],
+                                shixinrumoR_chen: ["R_401", "chaoyamato", "yamato"],
                                 shixinrumoR_chi: ["southdakota", "pachina", "loki"],
                                 shixinrumoR_man: ["sukhbaatar", "odin", "vestal"],
                                 shixinrumoR_yi: ["savoy", "cassone", "Xfliegerkorps"],
@@ -16491,34 +16491,43 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                     //构建可选牌名列表（基本牌和锦囊牌，排除已选的）
                                     var list = [];
-                                    for (var name in lib.card) {
-                                        var info = lib.card[name];
-                                        if (!info) continue;
-                                        if (info.type != "basic" && info.type != "trick" && info.type != "delay") continue;
+                                    for (var i = 0; i < lib.inpile.length; i++) {
+                                        var name = lib.inpile[i];
+                                        var type = get.type(name);
+                                        if (!type) continue;
+                                        if (type != "basic" && type != "trick" && type != "delay") continue;
                                         if (event.usedNames.includes(name)) continue;
-                                        if (info.hidden) continue;
-                                        //杀需要特殊处理（普通杀、火杀、雷杀、冰杀）
-                                        if (name == "sha") {
-                                            list.push(["基本", "", "sha"]);
-                                            if (!event.usedNames.includes("sha_fire")) list.push(["基本", "", "sha", "fire"]);
-                                            if (!event.usedNames.includes("sha_thunder")) list.push(["基本", "", "sha", "thunder"]);
-                                            if (!event.usedNames.includes("sha_ice")) list.push(["基本", "", "sha", "ice"]);
-                                        } else {
-                                            var typeTrans = info.type == "basic" ? "基本" : (info.type == "delay" ? "延时锦囊" : "锦囊");
-                                            list.push([typeTrans, "", name]);
+                                        var typeTrans = type == "basic" ? "基本" : (type == "delay" ? "延时锦囊" : "锦囊");
+                                        list.push([typeTrans, "", name]);
+                                    }
+                                    if (list.length <= 0) {
+                                        game.log("没有可选的牌了");
+                                        event.finish();
+                                        return;
+                                    }
+                                    if (list.length > 3) {
+                                        //生成3个不重复的随机索引
+                                        const indices = new Set();
+                                        while (indices.size < 3) {
+                                            indices.add(Math.floor(Math.random() * list.length));
                                         }
+                                        //用这3个索引对应的元素替换原数组
+                                        list = [...indices].map(i => list[i]);
                                     }
                                     //让目标选择一个牌名
                                     target.chooseButton([
                                         "协同作战：为" + get.translation(card) + "选择一个牌名",
                                         [list, "vcard"]
                                     ], true).set("ai", function (button) {
-                                        var name = button.link[2];
-                                        //AI优先选择高价值牌名
-                                        if (["wuzhongshengyou", "shunshouqianyang", "guohechaiqiao", "jiedaosharen", "sha", "tao", "jiu"].includes(name)) {
-                                            return Math.random() + 1;
+                                        var card = { name: button.link[2], type: button.link[0] };
+                                        var player=_status.event.getParent().player;
+                                        var target = get.player();
+                                        if (get.attitude(target,player)>0) {
+                                            return get.value(card, player);
+                                        } else {
+                                            return 10 - get.value(card, player);
                                         }
-                                        return Math.random();
+
                                     });
                                     "step 3"
                                     //处理目标的选择结果
@@ -16529,12 +16538,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                         var card = event.showedCards[event.currentIndex];
                                         var target = targets[event.currentIndex];
 
-                                        //记录已使用的牌名（带属性的杀需要特殊处理）
-                                        if (nature) {
-                                            event.usedNames.push(cardName + "_" + nature);
-                                        } else {
-                                            event.usedNames.push(cardName);
-                                        }
+                                        //记录已使用的牌名
+                                        event.usedNames.push(cardName);
 
                                         //保存牌名映射
                                         event.cardMap[card.cardid] = {
@@ -16663,10 +16668,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 },
                                 mod: {
                                     ignoredHandcard: function (card, player) {
-                                        if (card.name=='ying') return true;
+                                        if (card.name == 'ying') return true;
                                     },
                                     cardDiscardable: function (card, player, name) {
-                                        if (name == 'phaseDiscard' && card.name=='ying') return false;
+                                        if (name == 'phaseDiscard' && card.name == 'ying') return false;
                                     },
                                 },
                                 trigger: { global: "phaseBefore", player: "enterGame" },
@@ -16928,7 +16933,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                             popname: true,
                                             precontent: function () {
                                                 // 本回合一旦通过敌忾用出【桃】，立刻挂上限制，避免重复救援。
-                                                var card=event.result.card;
+                                                var card = event.result.card;
                                                 if (get.name(card) == "tao") player.addTempSkill("yamato_dikai2_tao", { global: "phaseAfter" });
                                             },
                                         };
@@ -17448,7 +17453,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             yapogan: "压迫感",
                             yapogan_info: "摸牌阶段，你可以少摸任意张牌并获得等量其他角色各一张牌，若获得牌为♠，你须弃置此牌并视为你对对应角色使用一张不计入次数，无视距离的【火杀】。",
                             xietongzuozhan: "协同作战",
-                            xietongzuozhan_info: "出牌阶段限一次，你可以选择任意名角色并展示等量张手牌，目标角色依次为每张手牌选择一个不重复的基本或锦囊牌的牌名。展示的手牌在你的手牌区内视为选择的牌名（进弃牌堆或被其他角色获得时还原）。",
+                            xietongzuozhan_info: "出牌阶段限一次，你可以选择任意名角色并展示等量张手牌，目标角色依次为每张手牌从三个随机牌名中选择一个不重复的基本或锦囊牌的牌名。展示的手牌在你的手牌区内视为选择的牌名（进弃牌堆或被其他角色获得时还原）。",
                             yamato_tongchou: "同仇",
                             yamato_tongchou_info: "锁定技，游戏开始时，你选择一名其他角色，当其造成伤害后，你受到等量的伤害。每次你的体力变动时，你获得数量为体力变化值两倍的【影】；你的【影】不计入手牌上限。",
                             yamato_tongchou2: "同仇",
