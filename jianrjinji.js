@@ -28,7 +28,7 @@ var jianrjinji = {
             shixinrumoR_man: ["sukhbaatar_R", "odin_R", "vestal_R"],
             shixinrumoR_yi: ["savoy_R", "cassone_R", "Xfliegerkorps_R"],
             others: ["boerzhanuo_R", "dafeng_R", "dajingbeishang_R", "jialifuniya_R", "ninghai_R", "nvzaoshen_R", "jiate_R", "rangbaer_R", "wugelini_R", "yaergushuishou_R", "yi25_R", "yiahua_R", "skilltest"],
-            shuileizhandui: ["jiagu_R", "buzhihuo_R","chuannei_R","chuxue_R"],
+            shuileizhandui: ["jiagu_R", "buzhihuo_R", "chuannei_R", "chuxue_R"],
         },
     },
     character: {
@@ -144,6 +144,9 @@ var jianrjinji = {
         buzhihuo_R: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "yuleizhantujin"], ["des:阳炎型驱逐舰二号舰。她与姊妹舰同属日本海军主力雷击驱逐舰，在南方和所罗门方面多次投入夜战与护航任务。1944年，不知火号在菲律宾方面作战中因机动受限，最终于奥尔莫克湾附近遭美军围攻沉没。"]],
         chuannei_R: ["female", "IJN", 3, ["fangkong2", "qingxuncl", "zhanduiqijian"], ["des:川内级是5500吨轻巡的最后一批。这种轻巡被用于水雷战队旗舰。为了节约石油燃料，川内混装了一些燃煤锅炉，烟囱数量也因此达到了四个。在瓜岛战役期间，川内是田中的旗舰，田中赖三是东京快车行动（利用高速军舰向瓜岛补给）的指挥官。尽管在不利的环境下取得了一些战果，但是对局势帮助不大。川内号于43年在奥古斯塔皇后湾海战中被美军击沉。"]],
         chuxue_R: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "lingjupaoji"], ["des:吹雪型驱逐舰3号舰。35年在第四舰队事件中舰首断裂，这次事件暴露了日本军舰重心和强度上的问题，此后日本对有问题的军舰进行了加强。1941年编入第11驱逐舰队参与了南洋作战。42年投入到了瓜岛，参加了萨沃岛海战。1943年加入第八舰队，在库拉湾海战中受创。7月17日在布因被美军空袭击沉。"]],
+        dian_R: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "wuyizhuangji"], ["des:日本海军驱逐舰“电”号。她擅长高速逼近与近距离突进，一旦战局失控，往往会以近乎本能的撞击撕开敌阵。"]],
+
+
         //新武将写在这行上面
         skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "huodeyanshi", "paoxiao"], ["forbidai", "des:测试用"]],
     },
@@ -267,6 +270,7 @@ var jianrjinji = {
         buzhihuo_R: "不知火",
         chuannei_R: "川内",
         chuxue_R: "初雪",
+        dian_R: "电",
 
         //舰种技能与全局技能翻译
         quzhudd: "驱逐", "quzhudd_info": "",
@@ -589,7 +593,8 @@ var jianrjinji = {
         zhanduiqijian_info: "每轮限一次。一名角色的出牌阶段开始时，你可以观看牌堆顶的三张牌，并令其获得其中的0-2张牌。",
         lingjupaoji: "零距炮击",
         lingjupaoji_info: "出牌阶段限一次，你可以选择一名距离为1的角色，展示牌堆顶的三张牌，你可以对其使用其中一张伤害类牌，然后将其余牌置入弃牌堆。",
-
+        wuyizhuangji: "无意撞击",
+        wuyizhuangji_info: "出牌阶段限一次，你可以失去1点体力，然后对一名其他角色造成其当前体力值一半的伤害（向下取整）。",
 
         //新技能翻译写在这上面
         //包名翻译

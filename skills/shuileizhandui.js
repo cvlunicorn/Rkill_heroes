@@ -434,6 +434,37 @@ const shuileizhandui = {
             },
         },
     },
+    wuyizhuangji: {
+        enable: "phaseUse",
+        usable: 1,
+        nobracket: true,
+        filterTarget: function (card, player, target) {
+            return target != player;
+        },
+        async content(event, trigger, player) {
+            var target = event.target;
+            await player.loseHp();
+            if (!player.isIn() || !target.isIn()) return;
+            var damage = Math.floor(target.getHp() / 2);
+            if (damage > 0) {
+                await target.damage(damage, player);
+            }
+        },
+        ai: {
+            order: 8,
+            result: {
+                player: function (player, target) {
+                    if (player.hp > 2) return -1;
+                    return -2;
+                },
+                target: function (player, target) {
+                    var damage = Math.floor(Math.max(target.getHp(), 0) / 2);
+                    if (damage <= 0) return 0;
+                    return get.damageEffect(target, player, player) * damage;
+                },
+            },
+        },
+    },
 };
 
 export { shuileizhandui };
