@@ -1264,14 +1264,21 @@ const shiptypeskills = {
         },
         selectCard: 1,
         content: function () {
-            var card = {
-                name: "paohuofugai9",
-                isCard: true,
+            if (!target.isLinked()) {
+                target.link();
+            }
+            if (lib.card["paohuofugai9"]) {
+                var card = {
+                    name: "paohuofugai9",
+                    isCard: true,
 
-            };
-            player.useCard(card, target, false).set("oncard", function () {
-                _status.event.directHit.addArray(game.filterPlayer());
-            });
+                };
+                player.useCard(card, target, false).set("oncard", function () {
+                    _status.event.directHit.addArray(game.filterPlayer());
+                });
+            } else {
+                target.damage("fire");
+            }
             //target.damage("nocard");
         },
         check: function (card) {
