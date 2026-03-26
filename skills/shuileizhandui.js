@@ -216,6 +216,103 @@ const shuileizhandui = {
             }
         }
     },
+    yuleizhantujin: {
+        // 鱼雷战突进：
+        // 先按 X 亮出牌堆顶若干牌，再把其中能用的基本牌集中砸向同一名角色；
+        // 剩下能对自己生效的锦囊则尽量立即结算，最后处理未用掉的余牌。
+        enable: "phaseUse",
+        usable: 1,
+        filter: function (event, player) {
+            return player.countCards("e") + game.countPlayer(function (current) {
+                return current.hasSkill("quzhudd");
+            }) > 0;
+        },
+        async content(event, trigger, player) {
+            var count = player.countCards("e") + game.countPlayer(function (current) {
+                return current.hasSkill("quzhudd");
+            });
+            var cards = game.cardsGotoOrdering(get.cards(count)).cards;
+            var showCardsDelay = Math.min(20, 10 + cards.length * 5);
+            await player.showCards(cards, "鱼雷战突进").set("delay_time", showCardsDelay);
+
+            var basicTargetResult = { result: { bool: false } };
+            // 只有存在至少一张可合法使用的基本牌时，才需要先确定突击目标。
+            var hasBasicTarget = game.hasPlayer(function (current) {
+                return cards.some(function (currentCard) {
+                    return get.type(currentCard, "trick") == "basic" && player.canUse(currentCard, current, false);
+                });
+            });
+            if (hasBasicTarget) {
+                basicTargetResult = await player.chooseTarget(
+                    true,
+                    get.prompt("yuleizhantujin"),
+                    "选择一名角色，依次对其使用亮出牌中的可用基本牌",
+                    function (card, player, target) {
+                        return _status.event.cards.some(function (currentCard) {
+                            return get.type(currentCard, "trick") == "basic" && player.canUse(currentCard, target, false);
+                        });
+                    }
+                ).set("cards", cards).set("ai", function (target) {
+                    var player = _status.event.player;
+                    return _status.event.cards.reduce(function (sum, currentCard) {
+                        if (get.type(currentCard, "trick") != "basic" || !player.canUse(currentCard, target, false)) return sum;
+                        return sum + get.effect(target, currentCard, player, player);
+                    }, 0);
+                });
+            }
+
+            var basicTarget = null;
+            if (basicTargetResult.result && basicTargetResult.result.bool) {
+                basicTarget = basicTargetResult.result.targets[0];
+            }
+
+            if (basicTarget && player.isIn() && basicTarget.isIn()) {
+                var basicCards = cards.slice(0);
+                for (var i = 0; i < basicCards.length; i++) {
+                    var basicCard = basicCards[i];
+                    // 基本牌统一朝同一个目标倾泻，模拟驱逐舰一轮雷击全打同一处缺口。
+                    if (!cards.includes(basicCard) || get.type(basicCard, "trick") != "basic") continue;
+                    if (!player.isIn() || !basicTarget.isIn()) break;
+                    if (get.info(basicCard).notarget) {
+                        continue;
+                    } else {
+                        if (!player.canUse(basicCard, basicTarget, false)) continue;
+                        await player.useCard(basicCard, basicTarget, false);
+                    }
+                    cards.remove(basicCard);
+                }
+
+
+                var trickCards = cards.slice(0);
+                for (var j = 0; j < trickCards.length; j++) {
+                    var trickCard = trickCards[j];
+                    if (!cards.includes(trickCard) || get.type(trickCard, "trick") != "trick" || !player.isIn()) continue;
+                    if (get.info(trickCard).notarget) {
+                        continue;
+                    } else {
+                        if (!basicTarget.canUse(trickCard, player, false)) continue;
+                        await basicTarget.useCard(trickCard, player);
+                    }
+                    cards.remove(trickCard);
+                }
+            }
+
+            if (cards.length) {
+                // 既没法打向敌人、也没法给自己结算的剩余牌统一弃置。
+                await game.cardsDiscard(cards);
+            }
+        },
+        ai: {
+            order: 7.5,
+            result: {
+                player: function (player) {
+                    return Math.min((player.countCards("e") + game.countPlayer(function (current) {
+                        return current.hasSkill("quzhudd");
+                    })) / 2, 3);
+                },
+            },
+        },
+    },
 };
 
 export { shuileizhandui };
