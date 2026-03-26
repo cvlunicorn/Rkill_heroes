@@ -314,64 +314,126 @@ const shuileizhandui = {
         },
     },
     zhanduiqijian: {
-                    // 战队旗舰：
-                    // 其他角色出牌阶段开始时，可以先看牌堆顶三张，
-                    // 再按需要把其中 0~2 张“调拨”给该角色，剩余牌按原顺序放回牌堆顶。
-                    nobracket: true,
-                    audio: "ext:舰R牌将/audio/skill:true",
-                    round: 1,
-                    trigger: {
-                        global: "phaseUseBegin",
-                    },
-                    filter: function (event, player) {
-                        return event.player!=player && event.player.isIn();
-                    },
-                    prompt: function (event, player) {
-                        return get.prompt("zhanduiqijian", event.player, player);
-                    },
-                    prompt2: function (event) {
-                        return "观看牌堆顶的三张牌，并令" + get.translation(event.player) + "获得其中至多两张牌。";
-                    },
-                    check: function (event, player) {
-                        if (event.player == player) return true;
-                        return get.attitude(player, event.player) > 0;
-                    },
-                    async content(event, trigger, player) {
-                        var target = trigger.player;
-                        // 进入牌序区，确保挑完牌后还能把剩余牌稳定塞回牌堆顶。
-                        var cards = game.cardsGotoOrdering(get.cards(3)).cards;
-                        var chooseResult = await player
-                            .chooseButton(
-                                ["战队旗舰：选择令" + get.translation(target) + "获得的牌（至多两张）", cards],
-                                [0, Math.min(2, cards.length)]
-                            )
-                            .set("target", target)
-                            .set("ai", function (button) {
-                                var player = _status.event.player;
-                                var target = _status.event.target;
-                                if (get.attitude(player, target) <= 0) return 0;
-                                return get.value(button.link, target);
-                            });
-    
-                        var gains = [];
-                        if (chooseResult.result.bool && chooseResult.result.links && chooseResult.result.links.length) {
-                            gains = chooseResult.result.links.slice(0);
-                            await target.gain(gains, "draw");
-                            cards.removeArray(gains);
-                        }
-    
-                        // 剩余牌逆序插回牌堆顶，从而还原“未被选中的牌保持原先上下顺序”。
-                        cards.reverse();
-                        for (var i = 0; i < cards.length; i++) {
-                            ui.cardPile.insertBefore(cards[i], ui.cardPile.firstChild);
-                        }
-                        game.updateRoundNumber();
-                    },
-                    ai: {
-                        expose: 0.15,
-                        threaten: 1.1,
-                    },
+        // 战队旗舰：
+        // 其他角色出牌阶段开始时，可以先看牌堆顶三张，
+        // 再按需要把其中 0~2 张“调拨”给该角色，剩余牌按原顺序放回牌堆顶。
+        nobracket: true,
+        audio: "ext:舰R牌将/audio/skill:true",
+        round: 1,
+        trigger: {
+            global: "phaseUseBegin",
+        },
+        filter: function (event, player) {
+            return event.player != player && event.player.isIn();
+        },
+        prompt: function (event, player) {
+            return get.prompt("zhanduiqijian", event.player, player);
+        },
+        prompt2: function (event) {
+            return "观看牌堆顶的三张牌，并令" + get.translation(event.player) + "获得其中至多两张牌。";
+        },
+        check: function (event, player) {
+            if (event.player == player) return true;
+            return get.attitude(player, event.player) > 0;
+        },
+        async content(event, trigger, player) {
+            var target = trigger.player;
+            // 进入牌序区，确保挑完牌后还能把剩余牌稳定塞回牌堆顶。
+            var cards = game.cardsGotoOrdering(get.cards(3)).cards;
+            var chooseResult = await player
+                .chooseButton(
+                    ["战队旗舰：选择令" + get.translation(target) + "获得的牌（至多两张）", cards],
+                    [0, Math.min(2, cards.length)]
+                )
+                .set("target", target)
+                .set("ai", function (button) {
+                    var player = _status.event.player;
+                    var target = _status.event.target;
+                    if (get.attitude(player, target) <= 0) return 0;
+                    return get.value(button.link, target);
+                });
+
+            var gains = [];
+            if (chooseResult.result.bool && chooseResult.result.links && chooseResult.result.links.length) {
+                gains = chooseResult.result.links.slice(0);
+                await target.gain(gains, "draw");
+                cards.removeArray(gains);
+            }
+
+            // 剩余牌逆序插回牌堆顶，从而还原“未被选中的牌保持原先上下顺序”。
+            cards.reverse();
+            for (var i = 0; i < cards.length; i++) {
+                ui.cardPile.insertBefore(cards[i], ui.cardPile.firstChild);
+            }
+            game.updateRoundNumber();
+        },
+        ai: {
+            expose: 0.15,
+            threaten: 1.1,
+        },
+    },
+    lingjupaoji: {
+        // 零距炮击：
+        // 选择距离 1 的目标，亮出牌堆顶三张牌，
+        // 若其中存在能对该目标合法使用的伤害牌，则可选其中一张直接结算。
+        nobracket: true,
+        enable: "phaseUse",
+        usable: 1,
+        filter: function (event, player) {
+            return game.hasPlayer(function (current) {
+                return current != player && get.distance(player, current) == 1;
+            });
+        },
+        filterTarget: function (card, player, target) {
+            return target != player && get.distance(player, target) == 1;
+        },
+        async content(event, trigger, player) {
+            var target = event.target;
+            var cards = game.cardsGotoOrdering(get.cards(3)).cards;
+            await player.showCards(cards, get.translation(player) + "发动了【零距炮击】");
+
+            if (player.isIn() && target.isIn()) {
+                // 先从亮出的三张里筛掉无伤害或不能指定目标的废牌。
+                var damageCards = cards.filter(function (card) {
+                    if (!get.tag(card, "damage")) return false;
+                    if (!lib.filter.targetEnabled2(card, player, target)) return false;
+                    return player.canUse(card, target, false);
+                });
+                if (damageCards.length) {
+                    var result = await player
+                        .chooseButton(
+                            ["零距炮击：你可以对" + get.translation(target) + "使用其中一张伤害牌", damageCards],
+                            false
+                        )
+                        .set("target", target)
+                        .set("ai", function (button) {
+                            var player = _status.event.player;
+                            var target = _status.event.target;
+                            return get.effect(target, button.link, player, player);
+                        });
+                    if (result.result && result.result.bool && result.result.links && result.result.links.length) {
+                        var chosenCard = result.result.links[0];
+                        cards.remove(chosenCard);
+                        // 选中的那张直接按原牌名结算，剩下的再统一丢弃。
+                        await player.useCard(chosenCard, target, false);
+                    }
+                }
+            }
+            if (cards.length) {
+                // 没被打出去的亮牌全部进入弃牌堆，不回牌堆顶。
+                player.loseToDiscardpile(cards);
+            }
+        },
+        ai: {
+            order: 6.5,
+            expose: 0.12,
+            result: {
+                target: function (player, target) {
+                    return get.attitude(player, target) < 0 ? -0.8 : 0;
                 },
+            },
+        },
+    },
 };
 
 export { shuileizhandui };
