@@ -1754,6 +1754,167 @@ const unfulfilledambition = {
 
         "_priority": 0,
     },
+    jing_shu: {
+        nobracket: true,
+        audio: "ext:舰R牌将/audio/skill:true",
+        enable: "phaseUse",
+        usable: 1,
+        filter: function (event, player) {
+            return player.countCards('h') > 0;
+        },
+        content: function () {
+            'step 0';
+            player.chooseCard('h', [1, Infinity], get.prompt('jing_shu')).set('ai', function (card) {
+                return 6 - get.value(card);
+            });
+            'step 1';
+            if (result.bool) {
+                event.cards = result.cards;
+                player.showCards(event.cards, get.translation(player) + '发动了【惊鼠】');
+                player.chooseTarget('令一名其他角色选择', true, function (card, player, target) {
+                    return target != player;
+                }).set('ai', function (target) {
+                    var player = get.player();
+                    var att = get.attitude(player, target);
+                    return -att;
+                });
+            } else {
+                event.finish();
+            }
+            'step 2';
+            if (result.bool && result.targets && result.targets.length > 0) {
+                event.target = result.targets[0];
+                event.num = event.cards.length;
+                event.target.chooseControl('翻面获得牌', '弃置牌交牌').set('choiceList', [
+                    '翻面并获得' + get.translation(player) + '展示的所有牌',
+                    '弃置' + get.translation(player) + '展示的所有牌，然后交给' + get.translation(player) + '等量张牌'
+                ]).set('ai', function () {
+                    var player = get.player();
+                    var source = _status.event.player;
+                    var handlen = player.countCards('h');
+                    var hp = player.hp;
+                    var sourceAtt = get.attitude(player, source);
+
+                    // 基础得失评估：翻面能补牌+解除姿态；交牌可打击/消耗对手
+                    var scoreFlip = 0;
+                    var scoreGive = 0;
+
+                    // 翻面角度
+                    if (!player.isTurnedOver()) scoreFlip += 2;
+                    if (handlen <= 2) scoreFlip += 3;
+                    if (hp <= 2) scoreFlip += 1;
+                    if (sourceAtt > 0) scoreFlip += 1; // 友方更倾向自保
+
+                    // 交牌角度
+                    if (sourceAtt < 0) scoreGive += 3; // 敌方直接补手非常吃亏
+                    if (handlen >= 4) scoreGive += 2; // 手牌多时丢牌影响小
+                    if (player.isTurnedOver()) scoreGive += 2; // 本身翻面反而可耍反击
+
+                    // 小概率随机，避免千篇一律（0~1），阈值0.2随机翻转选择
+                    var randomBias = Math.random();
+                    if (randomBias < 0.1) return 0;
+                    if (randomBias > 0.9) return 1;
+
+                    return scoreGive > scoreFlip ? 1 : 0;
+                });
+            } else {
+                event.finish();
+            }
+            'step 3';
+            if (result.index == 0) {
+                event.target.turnOver();
+                event.target.gain(event.cards, player, 'giveAuto');
+            } else {
+                player.discard(event.cards);
+                event.target.chooseCard('h', event.num, '交给' + get.translation(player) + event.num + '张牌', true).set('ai', function (card) {
+                    return -get.value(card);
+                });
+                event.goto(4);
+            }
+            'step 4';
+            if (result.bool) {
+                event.target.give(result.cards, player);
+            }
+        },
+        ai: {
+            order: 7,
+            result: {
+                player: 1,
+            },
+        },
+    },
+    ling_mu: {
+        nobracket: true,
+        audio: "ext:舰R牌将/audio/skill:true",
+        trigger: {
+            player: "phaseDrawEnd",
+        },
+        filter: function (event, player) {
+            return true;
+        },
+        check: function (event, player) {
+            var cards = player.getCards('h');
+            return cards.length > 0 && cards.every(function(card) { return get.type(card) != 'trick'; });
+        },
+        content: function () {
+            var cards = player.getCards('h');
+            player.showCards(cards, get.translation(player) + '展示了所有手牌');
+            if (cards.some(function(card) { return get.type(card) == 'trick'; })) {
+                return;
+            }
+            'step 0';
+            player.chooseControl('摸两张牌', '伤害+1').set('choiceList', [
+                '摸两张牌',
+                '本回合你造成的伤害+1'
+            ]).set('ai', function () {
+                var player = get.player();
+                var handlen = player.countCards('h');
+                var hp = player.hp;
+                var enemies = game.filterPlayer(function(current) {
+                    return current != player && get.attitude(player, current) < 0;
+                });
+                var friendlies = game.filterPlayer(function(current) {
+                    return current != player && get.attitude(player, current) > 0;
+                });
+
+                // 优先补充弱势手牌
+                if (handlen <= 2 || hp <= 2) return 0;
+
+                // 自己手牌很多时可以尝试进攻
+                if (handlen >= 5 && enemies.length > 0) return 1;
+
+                // 友方较多时更偏向补牌支援
+                if (friendlies.length > enemies.length) return 0;
+
+                // 同时添加少量随机，避免绝对单一路线
+                if (Math.random() < 0.15) return 0;
+                if (Math.random() > 0.85) return 1;
+
+                return hp >= 3 ? 1 : 0;
+            });
+            'step 1';
+            if (result.index == 0) {
+                player.draw(2);
+            } else {
+                player.addTempSkill('ling_mu_damage', { player: 'phaseEnd' });
+            }
+        },
+        subSkill: {
+            damage: {
+                trigger: {
+                    source: "damageBegin1",
+                },
+                forced: true,
+                content: function () {
+                    trigger.num++;
+                },
+                sub: true,
+            },
+        },
+        ai: {
+            threaten: 1.5,
+        },
+    },
 };
 
 export { unfulfilledambition };

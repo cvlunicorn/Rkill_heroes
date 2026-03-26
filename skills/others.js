@@ -1047,71 +1047,71 @@ const others = {
             },
         },
     },
-     liaowangtai: {
-                nobracket: true,
-                enable: "phaseUse",
-                init: function (player) {
-                    if (!player.storage.liaowangtai) player.storage.liaowangtai = 0;
-                },
-                mod: {
-                    globalFrom: function (from, to, distance) {
-                        var totalLevels = 0;
-                        totalLevels += 2;//from.countMark('jinengup');
-                        if (from.hasSkill("liaowangtai")) {
-                            totalLevels -= from.countMark("liaowangtai");
-                        }
-                        //game.log(from.countMark("liaowangtai"));
-                        return distance - totalLevels;
-                    },
-                },
-                filter: function (event, player) {
-                    return game.hasPlayer(function (current) {
-                        return current.countCards("h") && get.distance(player, current) == 1;
-                    });
-                },
-                selectTarget: 1,
-                filterTarget: function (card, player, target) {
-                    return target.countCards("h") && get.distance(player, target) == 1;
-                },
-                content: function () {
-                    "step 0";
-                    player.draw(player.countMark("liaowangtai") + 1);
-                    player.addMark("liaowangtai", 1);
-                    player.useCard({ name: "huogong", isCard: true }, event.targets, "liaowangtai");
-                },
-                ai: {
-                    order: 3,
-                    expose: 0.2,
-                    threaten: 1.4,
-                    result: {
-                        target: function (player, target) {
-                            return -1;
-                        },
-                    },
-                },
-                "_priority": 0,
-    
+    liaowangtai: {
+        nobracket: true,
+        enable: "phaseUse",
+        init: function (player) {
+            if (!player.storage.liaowangtai) player.storage.liaowangtai = 0;
+        },
+        mod: {
+            globalFrom: function (from, to, distance) {
+                var totalLevels = 0;
+                totalLevels += 2;//from.countMark('jinengup');
+                if (from.hasSkill("liaowangtai")) {
+                    totalLevels -= from.countMark("liaowangtai");
+                }
+                //game.log(from.countMark("liaowangtai"));
+                return distance - totalLevels;
             },
-            huodezhuangbei: {
-                        nobracket: true,
-                        enable: "phaseUse",
-                        content: function () {
-                            var card = get.cardPile2(function (card) {
-                                return get.type(card, "trick") == "equip";
-                            });
-                            if (card) player.gain(card, "gain2", "log");
-                        },
-                    },
-                    huodeyanshi: {
-                        nobracket: true,
-                        enable: "phaseUse",
-                        content: function () {
-                            var card = get.cardPile2(function (card) {
-                                return get.type(card) == "delay";
-                            });
-                            if (card) player.gain(card, "gain2", "log");
-                        },
-                    },
+        },
+        filter: function (event, player) {
+            return game.hasPlayer(function (current) {
+                return current.countCards("h") && get.distance(player, current) == 1;
+            });
+        },
+        selectTarget: 1,
+        filterTarget: function (card, player, target) {
+            return target.countCards("h") && get.distance(player, target) == 1;
+        },
+        content: function () {
+            "step 0";
+            player.draw(player.countMark("liaowangtai") + 1);
+            player.addMark("liaowangtai", 1);
+            player.useCard({ name: "huogong", isCard: true }, event.targets, "liaowangtai");
+        },
+        ai: {
+            order: 3,
+            expose: 0.2,
+            threaten: 1.4,
+            result: {
+                target: function (player, target) {
+                    return -1;
+                },
+            },
+        },
+        "_priority": 0,
+
+    },
+    huodezhuangbei: {
+        nobracket: true,
+        enable: "phaseUse",
+        content: function () {
+            var card = get.cardPile2(function (card) {
+                return get.type(card, "trick") == "equip";
+            });
+            if (card) player.gain(card, "gain2", "log");
+        },
+    },
+    huodeyanshi: {
+        nobracket: true,
+        enable: "phaseUse",
+        content: function () {
+            var card = get.cardPile2(function (card) {
+                return get.type(card) == "delay";
+            });
+            if (card) player.gain(card, "gain2", "log");
+        },
+    },
 };
 
 export { others };

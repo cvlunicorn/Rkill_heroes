@@ -20,7 +20,7 @@ var jianrjinji = {
             lishizhanyi_danmaihaixia: ["hude_R", "shenluopujun_R", "weiershiqinwang_R", "z1_R", "z16_R"],
             lishizhanyi_shanhuhai: ["lafei_R", "shiyu_R", "salemu_R", "dahuangfeng_R", "yuekecheng_R", "qiuyue_R", "weilianDbote_R", "xianghe_R", "ruihe_R", "yuhei_R", "guying_R"],
             lishizhanyi_haixiafujizhan: ["u47_R", "u81_R", "u505_R", "jinqu_R", "kente_R", "u96_R", "lundun_R"],
-            weijingzhizhi: ["jifu_R", "dujiaoshou_R", "sp_lafei_R", "getelan_R", "sp_aisaikesi_R", "sp_ninghai_R", "sp_zhongtudao_R", "xukufu_R", "lingbo_R", "kelaosaiweici_R"],
+            weijingzhizhi: ["jifu_R", "dujiaoshou_R", "sp_lafei_R", "getelan_R", "sp_aisaikesi_R", "sp_ninghai_R", "sp_zhongtudao_R", "xukufu_R", "lingbo_R", "kelaosaiweici_R", "gaobo_R"],
             cangqinghuanying: ["mist_dujiaoshou_R", "mist_xiawu_R", "mist_shanhuhai_R"],
             shixinrumoR_tan: ["bismarck_R", "tirpitz_R", "akagikaga_R"],
             shixinrumoR_chen: ["401_R", "chaoyamato_R", "yamato_R"],
@@ -140,7 +140,9 @@ var jianrjinji = {
         jiagu_R: ["female", "IJN", 4, ["zhongxunca", "xietongzuozhan"], ["des:　加古属古鹰型2番舰,于26年完工。同古鹰号一样,在37年也进行了全面的改装以提升性能。战争爆发时加古号和古鹰号编入相通的部队作战。42年,一同编入三川的第八舰队,在萨沃岛海战中,夜战熟练的日军重创了美军,不过在归途中,加古号被美军潜艇击沉。"]],
         yamato_R: ["female", "IJN", 4, ["zhuangjiafh", "zhanliebb", "yamato_R_tongchou", "yamato_R_dikai", "yamato_R_nizhuanfanji"], ["des:深海化的大和级战列舰。她以自毁般的同仇反噬敌我,于濒死边缘掀起最后的逆转反击。"]],
         kelaosaiweici_R: ["female", "KMS", 4, ["zhuangjiafh", "zhanliebb", "kelaosaiweici_R_jinji", "kelaosaiweici_R_lunzhan"], ["des:以普鲁士军事理论家克劳塞维茨命名的德国战列舰方案。她强调持续压迫与战场调度,既能在炮战中不断寻找突破口,也能在战局开始前通过推演争夺主动。"]],
+        gaobo_R: ["female", "IJN", 3, ["jing_shu", "ling_mu", "dajiaoduguibi", "quzhudd"], ["des: 本舰属于甲型驱逐舰，在同级中排行第六。本级舰基于前代小改而来，主要改动包括防空性能强化与舰桥造型优化，并使用了能将主炮抬升到75度的全新炮塔以追求高平两用能力（然而受限于主炮较低的射速与旋转速度，以及对空火控的缺失，单纯增加主炮仰角并未能使防空性能得到多少强化）。本舰于1942年8月竣工后编入第31驱逐舰队服役，参与了炮击瓜岛与圣克鲁兹群岛海战；1942年11月，在塔萨法隆格海战中，本舰作为舰队的先锋在受到敌军集火时顽强还击，为舰队的反击创造了有利条件，但自身最终被敌军集火击沉。"]],
 
+        //新武将写在这行上面
         skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "huodeyanshi", "paoxiao"], ["forbidai", "des:测试用"]],
     },
     skill: {
@@ -156,6 +158,7 @@ var jianrjinji = {
         //这下面的大括号是整个skill数组的末尾,有且只有一个大括号。
     },
     translate: {
+        //武将名翻译
         skilltest: "测试武将",
         liekexingdun_R: "列克星敦",
         qixichicheng_R: "奇袭赤城",
@@ -232,7 +235,7 @@ var jianrjinji = {
         mist_dujiaoshou_R: "MIST独角兽",
         mist_xiawu_R: "MIST夏雾",
         mist_shanhuhai_R: "MIST珊瑚海",
-        "u96_R": "u96_R",
+        "u96_R": "u96",
         lundun_R: "伦敦",
         aisijimoren_R: "爱斯基摩人",
         sp_zhongtudao_R: "SP中途岛",
@@ -257,7 +260,9 @@ var jianrjinji = {
         jiagu_R: "加古",
         yamato_R: "嗔大和",
         kelaosaiweici_R: "克劳塞维茨",
+        gaobo_R: "高波",
 
+        //舰种技能与全局技能翻译
         quzhudd: "驱逐", "quzhudd_info": "",
         qingxuncl: "轻巡", "qingxuncl_info": "",
         zhongxunca: "重巡", "zhongxunca_info": "",
@@ -267,9 +272,9 @@ var jianrjinji = {
         daodan: "防空导弹",
         zhandouji: "战斗机",
         yaosai: "要塞", "yaosai_info": "(可强化)每局游戏限0/1/2次,出牌阶段,你可以增加一点体力上限,回复一点体力。",
-
         "fangqu_info": "（可强化）游戏开始时/出牌阶段开始时,将至多1/2/3张手牌放到武将牌上.称为防空导弹。锦囊牌被使用时,你可以移去一枚防空导弹,令其无效。",
         "fangqu_wuxie": "发射防空导弹",
+
         hangmucv: "航母", "hangmucv_info": "(可强化)你的出牌阶段开始时,<br>你可以将任意张：零级强化,黑桃或梅花手牌；一级强化,黑桃或梅花或红桃手牌；二级强化,任意手牌。当作万箭齐发对等量个目标使用",
         qianting_xiji: "袭击", "qianting_xiji_info": "每回合限两次,将♦/♥牌当做顺手牵羊,♣/♠牌当做兵粮寸断使用<br>你使用的锦囊牌可以对距离你2以内的角色使用。",
         qianting: "潜艇", "qianting_info": "（可强化）准备阶段或弃牌阶段开始时,若你本回合未造成伤害,你可以弃置一张红桃或黑桃/红桃或黑桃或方片/牌,视为对一个目标使用一张无距离限制的雷杀。",
@@ -317,6 +322,8 @@ var jianrjinji = {
         "huijiahuihe_info": "当你有护甲时,你可以移除所有护甲并进行一个额外的回合；额外回合的摸牌数等于护甲数。此回合结束时,若你没有造成伤害,你摸一张牌。",
         junfu: "军辅船",
         "junfu_info": "（可强化）出牌阶段结束时,你可以把至多1/2/3张手牌存于武将牌上,如手牌般使用。<br>其他角色回合开始时,你可以把存储的牌交给ta,然后你摸一张牌。",
+
+        //个体技能翻译
         manchangzhanyi: "漫长战役", "manchangzhanyi_info": "每轮限一次,你受到锦囊牌的伤害时,你免疫此伤害。你攻击范围内的其他角色的准备阶段,你可以弃置其一张手牌。",
         manchangzhanyi_mianyi: "漫长战役", "manchangzhanyi_mianyi_info": "",
         guzhuyizhi: "孤注一掷", "guzhuyizhi_info": "准备阶段,你可以弃置所有手牌,然后摸弃置的手牌数+2张牌,如此做,你的其他技能失效直到你的下回合开始,你计算与其他角色的距离-1,杀使用次数+1,你的手牌上限等于本回合造成的伤害。",
@@ -567,8 +574,11 @@ var jianrjinji = {
         kelaosaiweici_R_lunzhan_info: "准备阶段,你可以选择一项：1.观看并排列牌堆顶的4张牌,本回合你的手牌上限+X（X为本局G国角色数）；2.本回合你使用【杀】造成的伤害+1。",
         kelaosaiweici_R_lunzhan_hand: "论战：手牌上限",
         kelaosaiweici_R_lunzhan_damage: "论战：伤害加一",
+        jing_shu: "惊鼠", "jing_shu_info": "出牌阶段限一次，你可以展示任意张手牌，然后令一名其他角色选择：1.翻面并获得你展示的所有牌；2.弃置你展示的所有牌，然后交给你等量张牌。",
+        ling_mu: "灵目", "ling_mu_info": "摸牌阶段结束时，你可以展示所有手牌，若其中没有锦囊牌，你选择：1.摸两张牌；2.本回合你造成的伤害+1。",
 
-
+        //新技能翻译写在这上面
+        //包名翻译
         jianrbiaozhun: "舰r标准",
         lishizhanyi: '历史战役',
         lishizhanyi_naerweike: '历史战役-纳尔维克',
