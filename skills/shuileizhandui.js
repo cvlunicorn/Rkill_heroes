@@ -465,6 +465,139 @@ const shuileizhandui = {
             },
         },
     },
+    shuileihun: {
+        // 水雷魂：
+        // 出牌阶段一开始就能抢先补一张虚拟【雷杀】，保留“驱逐先手雷击”的定位。
+        trigger: {
+            player: "phaseUseBegin",
+        },
+        frequent: true,
+        log: false,
+        filter: function (event, player) {
+            // 先确认当前确实存在可合法指定的目标，避免空触发。
+            return player.hasUseTarget({ name: "sha", nature: "thunder", isCard: true }, false);
+        },
+        prompt2: "选择一名角色，视为对其使用一张【雷杀】。",
+        content: function () {
+            "step 0";
+            // 目标选择和真正用牌拆开做，和常规“视为使用一张杀”的流程保持一致。
+            player.chooseTarget(
+                get.prompt("shuileihun"),
+                "选择一名角色，视为对其使用一张【雷杀】",
+                function (card, player, target) {
+                    return player.canUse({ name: "sha", nature: "thunder", isCard: true }, target, false);
+                }
+            ).set("ai", function (target) {
+                var player = _status.event.player;
+                return get.effect(target, { name: "sha", nature: "thunder", isCard: true }, player, player);
+            });
+            "step 1";
+            if (result.bool && result.targets && result.targets.length) {
+                player.logSkill("shuileihun", result.targets);
+                // 直接生成虚拟【雷杀】，不需要额外消耗实体手牌。
+                player.useCard({ name: "sha", nature: "thunder", isCard: true }, result.targets[0], false);
+            }
+        },
+    },
+    shuileiqiangxi: {
+        // 水雷强袭：
+        // 把全部手牌压成一张超规格【雷杀】，伤害更高、需要更多【闪】响应；
+        // 但打完这一轮总攻后，自己的出牌阶段也会立刻结束。
+        enable: "phaseUse",
+        filterCard: true,
+        selectCard: -1,
+        position: "h",
+        prompt: function () {
+            var player = get.player();
+            var num = player ? player.countCards("h") : 0;
+            return "将所有手牌当作一张需要" + num + "张【闪】响应且伤害基数+1的【雷杀】使用";
+        },
+        filter: function (event, player) {
+            var hs = player.getCards("h");
+            if (!hs.length) return false;
+            for (var card of hs) {
+                if (game.checkMod(card, player, "unchanged", "cardEnabled2", player) === false) return false;
+            }
+            return event.filterCard(get.autoViewAs({ name: "sha", nature: "thunder", storage: { shuileiqiangxi: true } }, hs));
+        },
+        viewAs: {
+            name: "sha",
+            nature: "thunder",
+            storage: { shuileiqiangxi: true },
+        },
+        group: ["shuileiqiangxi_damage", "shuileiqiangxi_response", "shuileiqiangxi_end"],
+        ai: {
+            order: 9,
+            result: {
+                player: function (player) {
+                    var handCount = player.countCards("h");
+                        if (!handCount) return 0;
+                        var best = 0;
+                        game.countPlayer(function (current) {
+                            if (current == player) return;
+                            if (!player.canUse({ name: "sha", nature: "thunder", isCard: true }, current, false)) return;
+                            best = Math.max(best, get.effect(current, { name: "sha", nature: "thunder", isCard: true }, player, player));
+                        });
+                        if (best <= 0) return 0;
+                        var cost = get.value(player.getCards("h"), player) / Math.max(1, handCount);
+                        // 这是交光手牌的爆发技，收益至少要明显高于均摊手牌价值。
+                        return best > cost ? Math.min(2.5, best / 1.6) : 0;
+                },
+            },
+        },
+    },
+    shuileiqiangxi_damage: {
+        // 这张总攻【雷杀】的基础伤害固定额外 +1。
+        forced: true,
+        popup: false,
+        trigger: {
+            player: "useCard",
+        },
+        filter: function (event) {
+            return event.card && event.card.name == "sha" && (event.skill == "shuileiqiangxi" || (event.card.storage && event.card.storage.shuileiqiangxi));
+        },
+        content: function () {
+            trigger.baseDamage++;
+        },
+    },
+    shuileiqiangxi_response: {
+        // 响应需求按实体牌数结算：用了几张手牌，就要多交几张【闪】。
+        forced: true,
+        popup: false,
+        trigger: {
+            player: "useCardToPlayered",
+        },
+        filter: function (event) {
+            return event.card && event.card.name == "sha" && (event.skill == "shuileiqiangxi" || (event.card.storage && event.card.storage.shuileiqiangxi)) && !event.getParent().directHit.includes(event.target) && event.cards && event.cards.length > 1;
+        },
+        logTarget: "target",
+        content: function () {
+            var id = trigger.target.playerid;
+            var map = trigger.getParent().customArgs;
+            if (!map[id]) map[id] = {};
+            if (typeof map[id].shanRequired == "number") {
+                map[id].shanRequired += trigger.cards.length - 1;
+            }
+            else {
+                map[id].shanRequired = trigger.cards.length;
+            }
+        },
+    },
+    shuileiqiangxi_end: {
+        // 爆发完毕直接结束出牌阶段，防止再叠普通输出手段。
+        forced: true,
+        popup: false,
+        trigger: {
+            player: "useCardAfter",
+        },
+        filter: function (event) {
+            return event.card && event.card.name == "sha" && (event.skill == "shuileiqiangxi" || (event.card.storage && event.card.storage.shuileiqiangxi));
+        },
+        content: function () {
+            var evt = trigger.getParent("phaseUse");
+            if (evt) evt.skipped = true;
+        },
+    },
 };
 
 export { shuileizhandui };

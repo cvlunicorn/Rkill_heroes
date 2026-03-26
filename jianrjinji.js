@@ -28,7 +28,7 @@ var jianrjinji = {
             shixinrumoR_man: ["sukhbaatar_R", "odin_R", "vestal_R"],
             shixinrumoR_yi: ["savoy_R", "cassone_R", "Xfliegerkorps_R"],
             others: ["boerzhanuo_R", "dafeng_R", "dajingbeishang_R", "jialifuniya_R", "ninghai_R", "nvzaoshen_R", "jiate_R", "rangbaer_R", "wugelini_R", "yaergushuishou_R", "yi25_R", "yiahua_R", "skilltest"],
-            shuileizhandui: ["jiagu_R", "buzhihuo_R", "chuannei_R", "chuxue_R"],
+            shuileizhandui: ["jiagu_R", "buzhihuo_R", "chuannei_R", "chuxue_R", "dian_R", "lei_R", "fubo_R","shenxue_R"],
         },
     },
     character: {
@@ -145,6 +145,9 @@ var jianrjinji = {
         chuannei_R: ["female", "IJN", 3, ["fangkong2", "qingxuncl", "zhanduiqijian"], ["des:川内级是5500吨轻巡的最后一批。这种轻巡被用于水雷战队旗舰。为了节约石油燃料，川内混装了一些燃煤锅炉，烟囱数量也因此达到了四个。在瓜岛战役期间，川内是田中的旗舰，田中赖三是东京快车行动（利用高速军舰向瓜岛补给）的指挥官。尽管在不利的环境下取得了一些战果，但是对局势帮助不大。川内号于43年在奥古斯塔皇后湾海战中被美军击沉。"]],
         chuxue_R: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "lingjupaoji"], ["des:吹雪型驱逐舰3号舰。35年在第四舰队事件中舰首断裂，这次事件暴露了日本军舰重心和强度上的问题，此后日本对有问题的军舰进行了加强。1941年编入第11驱逐舰队参与了南洋作战。42年投入到了瓜岛，参加了萨沃岛海战。1943年加入第八舰队，在库拉湾海战中受创。7月17日在布因被美军空袭击沉。"]],
         dian_R: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "wuyizhuangji"], ["des:日本海军驱逐舰“电”号。她擅长高速逼近与近距离突进，一旦战局失控，往往会以近乎本能的撞击撕开敌阵。"]],
+        fubo_R: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "shuileihun"], ["des:特II型驱逐舰2号舰。特型驱逐舰虽然有着较强的水面作战能力，但是缺乏对空和反潜能力。35年敷波号进行了增加强度的改装，42年随队参加了中途岛海战。此后特型驱逐舰大多都投入到了瓜岛前线，敷波号也不例外。在瓜岛战役结束后她主要执行护航任务，于1944年9月战沉。"]],
+        lei_R: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "shuileihun"], ["des:晓型驱逐舰3番舰，初期主要在南太平洋作战。1942年5月被调到北方舰队在阿留申作战。1942年夏投入到瓜岛前线，在第三次所罗门海战中受创。1943年参与了阿图岛作战，在行动中发生了碰撞事故。1944年在执行护航任务时被美军潜艇击沉。"]],
+        shenxue_R: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "shuileiqiangxi"], ["des:吹雪型驱逐舰4号舰。深雪号是唯一一艘没有参加战争的特型驱逐舰：深雪号在1934年6月29日在一次同电号驱逐舰的冲撞中沉没，是该级24舰中唯一一艘非战斗损失的。"]],
 
 
         //新武将写在这行上面
@@ -271,6 +274,9 @@ var jianrjinji = {
         chuannei_R: "川内",
         chuxue_R: "初雪",
         dian_R: "电",
+        lei_R: "雷",
+        fubo_R: "敷波",
+        shenxue_R: "深雪",
 
         //舰种技能与全局技能翻译
         quzhudd: "驱逐", "quzhudd_info": "",
@@ -595,6 +601,16 @@ var jianrjinji = {
         lingjupaoji_info: "出牌阶段限一次，你可以选择一名距离为1的角色，展示牌堆顶的三张牌，你可以对其使用其中一张伤害类牌，然后将其余牌置入弃牌堆。",
         wuyizhuangji: "无意撞击",
         wuyizhuangji_info: "出牌阶段限一次，你可以失去1点体力，然后对一名其他角色造成其当前体力值一半的伤害（向下取整）。",
+        shuileihun: "水雷魂",
+        shuileihun_info: "出牌阶段开始时，你可以视为使用一张【雷杀】。",
+        shuileiqiangxi: "水雷强袭",
+        shuileiqiangxi_info: "出牌阶段，你可以将所有手牌当作一张【雷杀】使用。此【雷杀】需要使用X张【闪】响应且伤害基数+1（X为此牌对应的实体牌数）。然后你结束出牌阶段。",
+        shuileiqiangxi_damage: "水雷强袭",
+        shuileiqiangxi_damage_info: "",
+        shuileiqiangxi_response: "水雷强袭",
+        shuileiqiangxi_response_info: "",
+        shuileiqiangxi_end: "水雷强袭",
+        shuileiqiangxi_end_info: "",
 
         //新技能翻译写在这上面
         //包名翻译
