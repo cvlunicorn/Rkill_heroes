@@ -1264,12 +1264,9 @@ const shiptypeskills = {
         },
         selectCard: 1,
         content: function () {
-            if (!target.isLinked()) {
-                target.link();
-            }
-            if (lib.card["paohuofugai9"]) {
+            if (lib.card["yuanchengdaodan9"]) {
                 var card = {
-                    name: "paohuofugai9",
+                    name: "yuanchengdaodan9",
                     isCard: true,
 
                 };
@@ -1277,7 +1274,7 @@ const shiptypeskills = {
                     _status.event.directHit.addArray(game.filterPlayer());
                 });
             } else {
-                target.damage("fire");
+                target.damage(1);
             }
             //target.damage("nocard");
         },

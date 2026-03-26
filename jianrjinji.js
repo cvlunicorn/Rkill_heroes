@@ -267,7 +267,7 @@ var jianrjinji = {
         qingxuncl: "轻巡", "qingxuncl_info": "",
         zhongxunca: "重巡", "zhongxunca_info": "",
         zhanliebb: "战列", "zhanliebb_info": "",
-        daoqu: "导驱", "daoqu_info": "（可强化）你的攻击范围增加2+2X(x为技能强化次数),出牌阶段限一次,你可以弃置一张武器/装备牌,令一名角色横置，然后视为对其使用一张不可响应的炮火覆盖。",
+        daoqu: "导驱", "daoqu_info": "（可强化）你的攻击范围增加2+2X(x为技能强化次数),出牌阶段限一次,你可以弃置一张武器/装备牌,对目标使用一张不可响应的远程导弹。",
         fangqu: "防驱",
         daodan: "防空导弹",
         zhandouji: "战斗机",
