@@ -142,6 +142,7 @@ var jianrjinji = {
         kelaosaiweici_R: ["female", "KMS", 4, ["zhuangjiafh", "zhanliebb", "kelaosaiweici_R_jinji", "kelaosaiweici_R_lunzhan"], ["des:以普鲁士军事理论家克劳塞维茨命名的德国战列舰方案。她强调持续压迫与战场调度,既能在炮战中不断寻找突破口,也能在战局开始前通过推演争夺主动。"]],
         gaobo_R: ["female", "IJN", 3, ["jing_shu", "ling_mu", "dajiaoduguibi", "quzhudd"], ["des: 本舰属于甲型驱逐舰，在同级中排行第六。本级舰基于前代小改而来，主要改动包括防空性能强化与舰桥造型优化，并使用了能将主炮抬升到75度的全新炮塔以追求高平两用能力（然而受限于主炮较低的射速与旋转速度，以及对空火控的缺失，单纯增加主炮仰角并未能使防空性能得到多少强化）。本舰于1942年8月竣工后编入第31驱逐舰队服役，参与了炮击瓜岛与圣克鲁兹群岛海战；1942年11月，在塔萨法隆格海战中，本舰作为舰队的先锋在受到敌军集火时顽强还击，为舰队的反击创造了有利条件，但自身最终被敌军集火击沉。"]],
         buzhihuo_R: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "yuleizhantujin"], ["des:阳炎型驱逐舰二号舰。她与姊妹舰同属日本海军主力雷击驱逐舰，在南方和所罗门方面多次投入夜战与护航任务。1944年，不知火号在菲律宾方面作战中因机动受限，最终于奥尔莫克湾附近遭美军围攻沉没。"]],
+        chuannei_R: ["female", "IJN", 3, ["fangkong2", "qingxuncl", "zhanduiqijian"], ["des:川内级是5500吨轻巡的最后一批。这种轻巡被用于水雷战队旗舰。为了节约石油燃料，川内混装了一些燃煤锅炉，烟囱数量也因此达到了四个。在瓜岛战役期间，川内是田中的旗舰，田中赖三是东京快车行动（利用高速军舰向瓜岛补给）的指挥官。尽管在不利的环境下取得了一些战果，但是对局势帮助不大。川内号于43年在奥古斯塔皇后湾海战中被美军击沉。"]],
 
         //新武将写在这行上面
         skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "huodeyanshi", "paoxiao"], ["forbidai", "des:测试用"]],
@@ -264,6 +265,7 @@ var jianrjinji = {
 
         gaobo_R: "高波",
         buzhihuo_R: "不知火",
+        chuannei_R: "川内",
 
         //舰种技能与全局技能翻译
         quzhudd: "驱逐", "quzhudd_info": "",
@@ -581,6 +583,8 @@ var jianrjinji = {
         ling_mu: "灵目", "ling_mu_info": "摸牌阶段结束时，你可以展示所有手牌，若其中没有锦囊牌，你选择：1.摸两张牌；2.本回合你造成的伤害+1。",
         yuleizhantujin: "鱼雷战突进",
         yuleizhantujin_info: "出牌阶段限一次，你可以亮出牌堆顶X张牌（X为你的装备区牌数与场上驱逐舰数量之和），选择一名角色，你依次对其使用其中可以使用的基本牌（无次数限制），然后其对你使用其中可以使用的锦囊牌。",
+        zhanduiqijian: "战队旗舰",
+        zhanduiqijian_info: "每轮限一次。一名角色的出牌阶段开始时，你可以观看牌堆顶的三张牌，并令其获得其中的0-2张牌。",
 
 
         //新技能翻译写在这上面
