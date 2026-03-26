@@ -531,17 +531,17 @@ const shuileizhandui = {
             result: {
                 player: function (player) {
                     var handCount = player.countCards("h");
-                        if (!handCount) return 0;
-                        var best = 0;
-                        game.countPlayer(function (current) {
-                            if (current == player) return;
-                            if (!player.canUse({ name: "sha", nature: "thunder", isCard: true }, current, false)) return;
-                            best = Math.max(best, get.effect(current, { name: "sha", nature: "thunder", isCard: true }, player, player));
-                        });
-                        if (best <= 0) return 0;
-                        var cost = get.value(player.getCards("h"), player) / Math.max(1, handCount);
-                        // 这是交光手牌的爆发技，收益至少要明显高于均摊手牌价值。
-                        return best > cost ? Math.min(2.5, best / 1.6) : 0;
+                    if (!handCount) return 0;
+                    var best = 0;
+                    game.countPlayer(function (current) {
+                        if (current == player) return;
+                        if (!player.canUse({ name: "sha", nature: "thunder", isCard: true }, current, false)) return;
+                        best = Math.max(best, get.effect(current, { name: "sha", nature: "thunder", isCard: true }, player, player));
+                    });
+                    if (best <= 0) return 0;
+                    var cost = get.value(player.getCards("h"), player) / Math.max(1, handCount);
+                    // 这是交光手牌的爆发技，收益至少要明显高于均摊手牌价值。
+                    return best > cost ? Math.min(2.5, best / 1.6) : 0;
                 },
             },
         },
@@ -596,6 +596,52 @@ const shuileizhandui = {
         content: function () {
             var evt = trigger.getParent("phaseUse");
             if (evt) evt.skipped = true;
+        },
+    },
+    kongqianyiti: {
+        // 空潜一体：
+        // 回合内打基本牌后补一张锦囊，回合外打锦囊后补一张基本牌，
+        // 让她在主动输出和被动支援之间形成资源循环。
+        locked: true,
+        forced: true,
+        group: ["kongqianyiti_turn", "kongqianyiti_outturn"],
+        subSkill: {
+            turn: {
+                // 自己回合内偏向先手调度，基本牌会继续牵出后续锦囊资源。
+                trigger: {
+                    player: "useCard",
+                },
+                forced: true,
+                filter: function (event, player) {
+                    return _status.currentPhase == player && get.type2(event.card) == "basic" && !!get.cardPile(function (card) {
+                        return get.type2(card) == "trick";
+                    });
+                },
+                content: function () {
+                    var card = get.cardPile(function (card) {
+                        return get.type2(card) == "trick";
+                    });
+                    if (card) player.gain(card, "gain2");
+                },
+            },
+            outturn: {
+                // 回合外更像防空/反潜支援，打出锦囊后再补一张基础应急牌。
+                trigger: {
+                    player: "useCard",
+                },
+                forced: true,
+                filter: function (event, player) {
+                    return _status.currentPhase != player && get.type2(event.card) == "trick" && !!get.cardPile(function (card) {
+                        return get.type2(card) == "basic";
+                    });
+                },
+                content: function () {
+                    var card = get.cardPile(function (card) {
+                        return get.type2(card) == "basic";
+                    });
+                    if (card) player.gain(card, "gain2");
+                },
+            },
         },
     },
 };

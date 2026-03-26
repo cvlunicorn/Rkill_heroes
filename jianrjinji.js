@@ -28,7 +28,7 @@ var jianrjinji = {
             shixinrumoR_man: ["sukhbaatar_R", "odin_R", "vestal_R"],
             shixinrumoR_yi: ["savoy_R", "cassone_R", "Xfliegerkorps_R"],
             others: ["boerzhanuo_R", "dafeng_R", "dajingbeishang_R", "jialifuniya_R", "ninghai_R", "nvzaoshen_R", "jiate_R", "rangbaer_R", "wugelini_R", "yaergushuishou_R", "yi25_R", "yiahua_R", "skilltest"],
-            shuileizhandui: ["jiagu_R", "buzhihuo_R", "chuannei_R", "chuxue_R", "dian_R", "lei_R", "fubo_R","shenxue_R"],
+            shuileizhandui: ["jiagu_R", "buzhihuo_R", "chuannei_R", "chuxue_R", "dian_R", "lei_R", "fubo_R", "shenxue_R","wushiling_R"],
         },
     },
     character: {
@@ -148,6 +148,7 @@ var jianrjinji = {
         fubo_R: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "shuileihun"], ["des:特II型驱逐舰2号舰。特型驱逐舰虽然有着较强的水面作战能力，但是缺乏对空和反潜能力。35年敷波号进行了增加强度的改装，42年随队参加了中途岛海战。此后特型驱逐舰大多都投入到了瓜岛前线，敷波号也不例外。在瓜岛战役结束后她主要执行护航任务，于1944年9月战沉。"]],
         lei_R: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "shuileihun"], ["des:晓型驱逐舰3番舰，初期主要在南太平洋作战。1942年5月被调到北方舰队在阿留申作战。1942年夏投入到瓜岛前线，在第三次所罗门海战中受创。1943年参与了阿图岛作战，在行动中发生了碰撞事故。1944年在执行护航任务时被美军潜艇击沉。"]],
         shenxue_R: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "shuileiqiangxi"], ["des:吹雪型驱逐舰4号舰。深雪号是唯一一艘没有参加战争的特型驱逐舰：深雪号在1934年6月29日在一次同电号驱逐舰的冲撞中沉没，是该级24舰中唯一一艘非战斗损失的。"]],
+        wushiling_R: ["female", "IJN", 3, ["fangkong2", "qingxuncl", "kongqianyiti"], ["des:长良型轻巡2番舰。设计上属于5500吨级水雷战队旗舰轻巡，二战爆发后五十铃号参加了南方作战和瓜岛战役。44年被美军潜艇重创后，五十铃号在修复中装上了三座89式127毫米高炮和大量机炮，成为了防空巡洋舰。莱特湾海战中编入小泽编队，在护航中表现出色。1945年4月五十铃号被美军潜艇击沉。"]],
 
 
         //新武将写在这行上面
@@ -277,6 +278,7 @@ var jianrjinji = {
         lei_R: "雷",
         fubo_R: "敷波",
         shenxue_R: "深雪",
+        wushiling_R: "五十铃",
 
         //舰种技能与全局技能翻译
         quzhudd: "驱逐", "quzhudd_info": "",
@@ -611,6 +613,8 @@ var jianrjinji = {
         shuileiqiangxi_response_info: "",
         shuileiqiangxi_end: "水雷强袭",
         shuileiqiangxi_end_info: "",
+        kongqianyiti: "空潜一体",
+        kongqianyiti_info: "锁定技。你于回合内使用基本牌后，从牌堆中获得一张锦囊牌；你于回合外使用锦囊牌后，从牌堆中获得一张基本牌。",
 
         //新技能翻译写在这上面
         //包名翻译
