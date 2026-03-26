@@ -356,8 +356,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 // 因此这里把图片路径解析抽出来,和引擎自己的判定逻辑保持一致。
                 // 另外顺手兼容两张不是标准 `.jpg` 命名的角色图,避免只修主分支后还残留个别空白头像。
                 var jianrCharacterImagePathOverrides = {
-                    weineituo_R: 'image/character/weineituo_R.JPG',
-                    yinghuochong_R: 'image/character/yinghuochong_R.png',
                 };
                 var getJianRCharacterImageRelativePath = function (characterName) {
                     // 扩展若是从压缩包导入,`extensionInfo.file` 中会记录真实文件名。
