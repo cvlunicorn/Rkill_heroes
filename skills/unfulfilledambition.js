@@ -1854,12 +1854,12 @@ const unfulfilledambition = {
         },
         check: function (event, player) {
             var cards = player.getCards('h');
-            return cards.length > 0 && cards.every(function(card) { return get.type(card) != 'trick'; });
+            return cards.length > 0 && cards.every(function (card) { return get.type(card) != 'trick'; });
         },
         content: function () {
             var cards = player.getCards('h');
             player.showCards(cards, get.translation(player) + '展示了所有手牌');
-            if (cards.some(function(card) { return get.type(card) == 'trick'; })) {
+            if (cards.some(function (card) { return get.type(card) == 'trick'; })) {
                 return;
             }
             'step 0';
@@ -1870,10 +1870,10 @@ const unfulfilledambition = {
                 var player = get.player();
                 var handlen = player.countCards('h');
                 var hp = player.hp;
-                var enemies = game.filterPlayer(function(current) {
+                var enemies = game.filterPlayer(function (current) {
                     return current != player && get.attitude(player, current) < 0;
                 });
-                var friendlies = game.filterPlayer(function(current) {
+                var friendlies = game.filterPlayer(function (current) {
                     return current != player && get.attitude(player, current) > 0;
                 });
 
@@ -1913,6 +1913,187 @@ const unfulfilledambition = {
         },
         ai: {
             threaten: 1.5,
+        },
+    },
+    yuanzhenghuhang: {
+        // 远征护航：
+        // 把手牌寄存在友军武将牌上，作为其本回合外的可调用资源；
+        // 只要对方真的把这张”护航”牌用出去，你就摸一张牌回补。
+        enable: "phaseUse",
+        usable: 1,
+        position: "h",
+        filterCard: true,
+        filterTarget: function (card, player, target) {
+            return target != player;
+        },
+        check: function (card) {
+            return 6 - get.value(card);
+        },
+        content: function () {
+            var ownerKey = "yuanzhenghuhang_owner";
+            // 先把牌和自己绑定，再送入对方特殊区，避免后续结算时丢失归属信息。
+            for (var i = 0; i < cards.length; i++) {
+                cards[i][ownerKey] = player.playerid;
+            }
+            player.loseToSpecial(cards,"yuanzhenghuhang",target).visible = true;
+        },
+        group: "yuanzhenghuhang_draw",
+        ai: {
+            order: 7,
+            result: {
+                player: 0.6,
+                target: function (player, target) {
+                    if (get.attitude(player, target) <= 0) return 0;
+                    var score = 1.2;
+                    if (target.countCards("h") <= 1) score += 0.4;
+                    if (target.hp <= 2) score += 0.2;
+                    return score;
+                },
+            },
+        },
+    },
+
+    yuanzhenghuhang_draw: {
+        // 友军把你的"护航”牌当手牌使用/打出后，你立刻摸 1 作为后勤回报。
+        frequent:true,
+        silent: true,
+        trigger: {
+            global: ["useCardAfter", "respondAfter"],
+        },
+        filter: function (event, player) {
+            if (!event.player || event.player == player || !player.playerid) return false;
+            // 使用牌和响应牌的实体来源位置不完全一致，因此两种入口都要一起扫。
+            if (event.cards) {var cards = event.cards;}
+            for (var i = 0; i < cards.length; i++) {
+                var card = cards[i];
+                if (!card) continue;
+                game.log("远征护航："+card["yuanzhenghuhang_owner"]);
+                game.log(player.playerid);
+                if (card["yuanzhenghuhang_owner"] != player.playerid) continue;
+                return true;
+            }
+            return false;
+        },
+        content: function () {
+            player.draw();
+        },
+    },
+
+    yuanzhenghuwei: {
+        // 远征护卫：
+        // 回合开始时回收别人那里尚未使用的”护航”牌，
+        // 再让这些角色各拿一次”直击”或”闪避”的预备效果。
+        trigger: {
+            player: "phaseBegin",
+        },
+        forced: true,
+        filter: function (event, player) {
+            return game.hasPlayer(function (current) {
+                if (current == player || !player.playerid) return false;
+                return current.getCards("s", function (card) {
+                    return card.hasGaintag("yuanzhenghuhang") && card["yuanzhenghuhang_owner"] == player.playerid;
+                }).length > 0;
+            });
+        },
+        async content(event, trigger, player) {
+            var targets = game.filterPlayer(function (current) {
+                if (current == player || !player.playerid) return false;
+                return current.getCards("s", function (card) {
+                    return card.hasGaintag("yuanzhenghuhang") && card["yuanzhenghuhang_owner"] == player.playerid;
+                }).length > 0;
+            }).sortBySeat(player);
+            for (var i = 0; i < targets.length; i++) {
+                var target = targets[i];
+                var cards = target.getCards("s", function (card) {
+                    return card.hasGaintag("yuanzhenghuhang") && card["yuanzhenghuhang_owner"] == player.playerid;
+                });
+                if (!cards.length) continue;
+                // 先把没用掉的补给收回来，再给对方新的战术选项。
+                await player.gain(cards, target, "giveAuto");
+                // clearMarks inlined: 护航牌一旦被打出、回收或离开特殊区，就需要彻底去掉归属标记。
+                for (var ci = 0; ci < cards.length; ci++) {
+                    var markedCard = cards[ci];
+                    if (!markedCard) continue;
+                    if (markedCard.hasGaintag && markedCard.hasGaintag("yuanzhenghuhang")) {
+                        markedCard.removeGaintag("yuanzhenghuhang");
+                    }
+                    delete markedCard["yuanzhenghuhang_owner"];
+                }
+                if (!target.isIn()) continue;
+                target.removeSkills(["yuanzhenghuwei_directhit", "yuanzhenghuwei_evade"]);
+                // getChoice inlined: 进攻资源较足时优先拿"不可响应"，否则更偏向拿一次性保命。
+                var choice = (function (t) {
+                    if (!t || !t.isIn()) return 0;
+                    var attackCards = t.countCards("hs", function (card) {
+                        if (card.name == "sha") return true;
+                        return get.type2(card) == "trick" && get.tag(card, "damage");
+                    });
+                    if (attackCards > 0 && t.hp > 2 && t.countCards("h") > 1) return 0;
+                    return 1;
+                })(target);
+                var choiceResult = await target
+                    .chooseControl("选项一", "选项二")
+                    .set("prompt", "远征护卫：请选择一项")
+                    .set("choiceList", [
+                        "下一次使用的牌不可被响应",
+                        "下一次成为牌的目标时取消之",
+                    ])
+                    .set("ai", function () {
+                        return _status.event.choice;
+                    })
+                    .set("choice", choice);
+                if (!choiceResult.result || !choiceResult.result.control) continue;
+                if (choiceResult.result.control == "选项一") {
+                    target.addSkill("yuanzhenghuwei_directhit");
+                } else {
+                    target.addSkill("yuanzhenghuwei_evade");
+                }
+            }
+        },
+    },
+
+    yuanzhenghuwei_directhit: {
+        // 下一次主动出牌变成“不可响应"，打完即失效。
+        charlotte: true,
+        mark: true,
+        marktext: "航",
+        intro: {
+            content: "下一次使用的牌不可被响应",
+        },
+        trigger: {
+            player: "useCard2",
+        },
+        forced: true,
+        content: function () {
+            player.removeSkill("yuanzhenghuwei_directhit");
+            trigger.directHit.addArray(game.players);
+            game.log(trigger.card, "不可被响应");
+        },
+        ai: {
+            directHit_ai: true,
+        },
+    },
+
+    yuanzhenghuwei_evade: {
+        // 下一次成为目标时直接被排除，挡掉后即失效。
+        charlotte: true,
+        mark: true,
+        marktext: "卫",
+        intro: {
+            content: "下一次成为牌的目标时取消之",
+        },
+        trigger: {
+            target: "useCardToTarget",
+        },
+        forced: true,
+        content: function () {
+            player.removeSkill("yuanzhenghuwei_evade");
+            if (trigger.excluded) {
+                trigger.excluded.add(player);
+            } else if (trigger.targets) {
+                trigger.targets.remove(player);
+            }
+            game.log(trigger.card, "对", player, "无效");
         },
     },
 };

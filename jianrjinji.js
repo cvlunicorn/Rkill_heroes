@@ -150,7 +150,7 @@ var jianrjinji = {
         shenxue_R: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "shuileiqiangxi"], ["des:吹雪型驱逐舰4号舰。深雪号是唯一一艘没有参加战争的特型驱逐舰：深雪号在1934年6月29日在一次同电号驱逐舰的冲撞中沉没，是该级24舰中唯一一艘非战斗损失的。"]],
         wushiling_R: ["female", "IJN", 3, ["fangkong2", "qingxuncl", "kongqianyiti"], ["des:长良型轻巡2番舰。设计上属于5500吨级水雷战队旗舰轻巡，二战爆发后五十铃号参加了南方作战和瓜岛战役。44年被美军潜艇重创后，五十铃号在修复中装上了三座89式127毫米高炮和大量机炮，成为了防空巡洋舰。莱特湾海战中编入小泽编队，在护航中表现出色。1945年4月五十铃号被美军潜艇击沉。"]],
         xiang_R: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "xiang_busizhishouhu"], ["des:晓型驱逐舰2番舰，建成后编入第六驱逐舰队，战争初期主要在南太平洋活动。1942年在基斯卡作战中被美军空袭击伤，7月参与了基斯卡撤退作战。1944年在商船护航中受创，修理中错过了莱特湾海战。1945年，在参与大和的特攻作战之前触雷修理。响号有着不死鸟的称号，不过她主要是靠运气避开了恶战。在战后响号被赔偿给苏联，命名为信赖号（Верный）一直使用到1963年。"]],
-
+        tianlonglongtian_R: ["female", "IJN", 3, ["fangkong2", "qingxuncl", "yuanzhenghuhang", "yuanzhenghuwei"], ["des:天龙型轻巡洋舰一号舰“天龙”与二号舰“龙田”。两舰长期承担护航、运输与前线掩护任务，擅长把手中的资源提前分派给友军，并在回收补给后为其预置下一轮的攻防节奏。"],],
 
         //新武将写在这行上面
         skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "huodeyanshi", "paoxiao"], ["forbidai", "des:测试用"]],
@@ -280,7 +280,8 @@ var jianrjinji = {
         fubo_R: "敷波",
         shenxue_R: "深雪",
         wushiling_R: "五十铃",
-        xiang_R:"响",
+        xiang_R: "响",
+        "tianlonglongtian_R": "天龙龙田",
 
         //舰种技能与全局技能翻译
         quzhudd: "驱逐", "quzhudd_info": "",
@@ -623,6 +624,14 @@ var jianrjinji = {
         xiang_busizhishouhu_mark_info: "",
         xiang_shouhu: "守护",
         xiang_shouhu_info: "锁定技，你的体力上限+1。当你获得此技能后，你摸两张牌并回复1点体力。",
+        yuanzhenghuhang: "远征护航",
+        yuanzhenghuhang_info: "出牌阶段限一次，你可以将一张手牌置于一名其他角色的武将牌上，称为“护航”牌。其可以如手牌般使用或打出这些牌。当其如此做后，你摸一张牌。",
+        yuanzhenghuwei: "远征护卫",
+        yuanzhenghuwei_info: "回合开始时，你收回其他角色武将牌上未使用的“护航”牌，然后令这些角色各选择一项：1.下一次使用的牌不可被响应；2.下一次成为牌的目标时取消之。",
+        yuanzhenghuwei_directhit: "远征护卫",
+        yuanzhenghuwei_directhit_info: "",
+        yuanzhenghuwei_evade: "远征护卫",
+        yuanzhenghuwei_evade_info: "",
 
         //新技能翻译写在这上面
         //包名翻译
