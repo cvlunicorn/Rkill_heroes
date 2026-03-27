@@ -1790,11 +1790,10 @@ const unfulfilledambition = {
                     '弃置' + get.translation(player) + '展示的所有牌，然后交给' + get.translation(player) + '等量张牌'
                 ]).set('ai', function () {
                     var player = get.player();
-                    var source = _status.event.player;
+                    var source = _status.event.player1;
                     var handlen = player.countCards('h');
                     var hp = player.hp;
                     var sourceAtt = get.attitude(player, source);
-
                     // 基础得失评估：翻面能补牌+解除姿态；交牌可打击/消耗对手
                     var scoreFlip = 0;
                     var scoreGive = 0;
@@ -1816,7 +1815,7 @@ const unfulfilledambition = {
                     if (randomBias > 0.9) return 1;
 
                     return scoreGive > scoreFlip ? 1 : 0;
-                });
+                }).set("player1", player);
             } else {
                 event.finish();
             }
@@ -1868,7 +1867,7 @@ const unfulfilledambition = {
                 '本回合你造成的伤害+1'
             ]).set('ai', function () {
                 var player = get.player();
-                var handlen = player.countCards('h');
+                var handlength = player.countCards('h');
                 var hp = player.hp;
                 var enemies = game.filterPlayer(function (current) {
                     return current != player && get.attitude(player, current) < 0;
@@ -1878,10 +1877,10 @@ const unfulfilledambition = {
                 });
 
                 // 优先补充弱势手牌
-                if (handlen <= 2 || hp <= 2) return 0;
+                if (handlength <= 2 || hp <= 2) return 0;
 
                 // 自己手牌很多时可以尝试进攻
-                if (handlen >= 5 && enemies.length > 0) return 1;
+                if (player.countCards("h", function (card) { return get.tag(card, "damage"); }) >= 5 && enemies.length > 0) return 1;
 
                 // 友方较多时更偏向补牌支援
                 if (friendlies.length > enemies.length) return 0;
@@ -1935,7 +1934,7 @@ const unfulfilledambition = {
             for (var i = 0; i < cards.length; i++) {
                 cards[i][ownerKey] = player.playerid;
             }
-            player.loseToSpecial(cards,"yuanzhenghuhang",target).visible = true;
+            player.loseToSpecial(cards, "yuanzhenghuhang", target).visible = true;
         },
         group: "yuanzhenghuhang_draw",
         ai: {
@@ -1955,7 +1954,7 @@ const unfulfilledambition = {
 
     yuanzhenghuhang_draw: {
         // 友军把你的"护航”牌当手牌使用/打出后，你立刻摸 1 作为后勤回报。
-        frequent:true,
+        frequent: true,
         silent: true,
         trigger: {
             global: ["useCardAfter", "respondAfter"],
@@ -1963,11 +1962,11 @@ const unfulfilledambition = {
         filter: function (event, player) {
             if (!event.player || event.player == player || !player.playerid) return false;
             // 使用牌和响应牌的实体来源位置不完全一致，因此两种入口都要一起扫。
-            if (event.cards) {var cards = event.cards;}
+            if (event.cards) { var cards = event.cards; }
             for (var i = 0; i < cards.length; i++) {
                 var card = cards[i];
                 if (!card) continue;
-                game.log("远征护航："+card["yuanzhenghuhang_owner"]);
+                game.log("远征护航：" + card["yuanzhenghuhang_owner"]);
                 game.log(player.playerid);
                 if (card["yuanzhenghuhang_owner"] != player.playerid) continue;
                 return true;
