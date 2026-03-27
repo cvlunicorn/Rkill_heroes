@@ -28,7 +28,7 @@ var jianrjinji = {
             shixinrumoR_man: ["sukhbaatar_R", "odin_R", "vestal_R"],
             shixinrumoR_yi: ["savoy_R", "cassone_R", "Xfliegerkorps_R"],
             others: ["boerzhanuo_R", "dafeng_R", "dajingbeishang_R", "jialifuniya_R", "ninghai_R", "nvzaoshen_R", "jiate_R", "rangbaer_R", "wugelini_R", "yaergushuishou_R", "yi25_R", "yiahua_R", "skilltest"],
-            shuileizhandui: ["jiagu_R", "buzhihuo_R", "chuannei_R", "chuxue_R", "dian_R", "lei_R", "fubo_R", "shenxue_R","wushiling_R"],
+            shuileizhandui: ["jiagu_R", "buzhihuo_R", "chuannei_R", "chuxue_R", "dian_R", "lei_R", "fubo_R", "shenxue_R", "wushiling_R"],
         },
     },
     character: {
@@ -149,6 +149,7 @@ var jianrjinji = {
         lei_R: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "shuileihun"], ["des:晓型驱逐舰3番舰，初期主要在南太平洋作战。1942年5月被调到北方舰队在阿留申作战。1942年夏投入到瓜岛前线，在第三次所罗门海战中受创。1943年参与了阿图岛作战，在行动中发生了碰撞事故。1944年在执行护航任务时被美军潜艇击沉。"]],
         shenxue_R: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "shuileiqiangxi"], ["des:吹雪型驱逐舰4号舰。深雪号是唯一一艘没有参加战争的特型驱逐舰：深雪号在1934年6月29日在一次同电号驱逐舰的冲撞中沉没，是该级24舰中唯一一艘非战斗损失的。"]],
         wushiling_R: ["female", "IJN", 3, ["fangkong2", "qingxuncl", "kongqianyiti"], ["des:长良型轻巡2番舰。设计上属于5500吨级水雷战队旗舰轻巡，二战爆发后五十铃号参加了南方作战和瓜岛战役。44年被美军潜艇重创后，五十铃号在修复中装上了三座89式127毫米高炮和大量机炮，成为了防空巡洋舰。莱特湾海战中编入小泽编队，在护航中表现出色。1945年4月五十铃号被美军潜艇击沉。"]],
+        xiang_R: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "xiang_busizhishouhu"], ["des:晓型驱逐舰2番舰，建成后编入第六驱逐舰队，战争初期主要在南太平洋活动。1942年在基斯卡作战中被美军空袭击伤，7月参与了基斯卡撤退作战。1944年在商船护航中受创，修理中错过了莱特湾海战。1945年，在参与大和的特攻作战之前触雷修理。响号有着不死鸟的称号，不过她主要是靠运气避开了恶战。在战后响号被赔偿给苏联，命名为信赖号（Верный）一直使用到1963年。"]],
 
 
         //新武将写在这行上面
@@ -279,6 +280,7 @@ var jianrjinji = {
         fubo_R: "敷波",
         shenxue_R: "深雪",
         wushiling_R: "五十铃",
+        xiang_R:"响",
 
         //舰种技能与全局技能翻译
         quzhudd: "驱逐", "quzhudd_info": "",
@@ -615,6 +617,12 @@ var jianrjinji = {
         shuileiqiangxi_end_info: "",
         kongqianyiti: "空潜一体",
         kongqianyiti_info: "锁定技。你于回合内使用基本牌后，从牌堆中获得一张锦囊牌；你于回合外使用锦囊牌后，从牌堆中获得一张基本牌。",
+        xiang_busizhishouhu: "不死鸟的守护",
+        xiang_busizhishouhu_info: "锁定技，游戏开始时，你获得技能〖守护〗并选择一名其他角色，其获得技能〖守护〗且获得“守护”标记；有守护标记的角色死亡后，你选择一名其他角色，其获得技能〖守护〗且获得“守护”标记。",
+        xiang_busizhishouhu_mark: "守护标记",
+        xiang_busizhishouhu_mark_info: "",
+        xiang_shouhu: "守护",
+        xiang_shouhu_info: "锁定技，你的体力上限+1。当你获得此技能后，你摸两张牌并回复1点体力。",
 
         //新技能翻译写在这上面
         //包名翻译

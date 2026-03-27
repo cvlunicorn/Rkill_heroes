@@ -644,6 +644,144 @@ const shuileizhandui = {
             },
         },
     },
+    xiang_busizhishouhu: {
+        // 不死鸟的守护：
+        // 开局自己先获得【守护】，再指定一名其他角色获得【守护】；
+        // 这名角色死亡后，守护对象继续向其他存活角色传递。
+        locked: true,
+        forced: true,
+        unique: true,
+        mark: true,
+        marktext: "护",
+        intro: {
+            content: function (storage) {
+                if (storage && storage.isIn()) return "当前守护对象：" + get.translation(storage);
+                return "当前没有守护对象";
+            },
+        },
+        group: ["xiang_busizhishouhu_start", "xiang_busizhishouhu_transfer"],
+        subSkill: {
+            start: {
+                trigger: { global: "phaseBefore", player: "enterGame" },
+                forced: true,
+                filter: function (event, player) {
+                    if (player.storage.xiang_busizhishouhu_started) return false;
+                    return event.name != "phase" || game.phaseNumber == 0;
+                },
+                async content(event, trigger, player) {
+                    player.storage.xiang_busizhishouhu_started = true;
+                    await player.addSkills("xiang_shouhu");
+                    if (!game.hasPlayer(function (current) {
+                        return current != player;
+                    })) return;
+                    // chooseGuardTarget inlined
+                    var chooseResult = await player
+                        .chooseTarget(get.prompt("xiang_busizhishouhu"), "选择一名其他角色获得【守护】", true, function (card, player, target) {
+                            return target != player;
+                        })
+                        .set("ai", function (target) {
+                            var player = _status.event.player;
+                            var attitude = get.attitude(player, target);
+                            var score = attitude * 4;
+                            if (attitude > 0) {
+                                if (target.isDamaged()) score += 2;
+                                score += Math.max(0, 3 - target.hp);
+                                if (!target.hasSkill("xiang_shouhu")) score += 1;
+                            }
+                            return score;
+                        });
+                    var target = (chooseResult.result.bool && chooseResult.result.targets && chooseResult.result.targets.length) ? chooseResult.result.targets[0] : null;
+                    if (!target) return;
+                    player.logSkill("xiang_busizhishouhu", target);
+                    // assignGuardTarget inlined (clearGuardTarget first)
+                    var oldTarget = player.storage.xiang_busizhishouhu;
+                    if (oldTarget) oldTarget.removeSkill("xiang_busizhishouhu_mark");
+                    delete player.storage.xiang_busizhishouhu;
+                    player.unmarkSkill("xiang_busizhishouhu");
+                    player.storage.xiang_busizhishouhu = target;
+                    player.markSkill("xiang_busizhishouhu");
+                    await target.addSkills("xiang_shouhu");
+                    target.addSkill("xiang_busizhishouhu_mark");
+                },
+                sub: true,
+            },
+            transfer: {
+                trigger: { global: "dieAfter" },
+                forced: true,
+                filter: function (event, player) {
+                    return player.storage.xiang_busizhishouhu == event.player;
+                },
+                async content(event, trigger, player) {
+                    // clearGuardTarget inlined
+                    var oldTarget = player.storage.xiang_busizhishouhu;
+                    if (oldTarget) oldTarget.removeSkill("xiang_busizhishouhu_mark");
+                    delete player.storage.xiang_busizhishouhu;
+                    player.unmarkSkill("xiang_busizhishouhu");
+                    if (!game.hasPlayer(function (current) {
+                        return current != player;
+                    })) return;
+                    // chooseGuardTarget inlined
+                    var chooseResult = await player
+                        .chooseTarget("不死鸟的守护：选择一名其他角色获得【守护】", "选择一名其他角色获得【守护】", true, function (card, player, target) {
+                            return target != player;
+                        })
+                        .set("ai", function (target) {
+                            var player = _status.event.player;
+                            var attitude = get.attitude(player, target);
+                            var score = attitude * 4;
+                            if (attitude > 0) {
+                                if (target.isDamaged()) score += 2;
+                                score += Math.max(0, 3 - target.hp);
+                                if (!target.hasSkill("xiang_shouhu")) score += 1;
+                            }
+                            return score;
+                        });
+                    var target = (chooseResult.result.bool && chooseResult.result.targets && chooseResult.result.targets.length) ? chooseResult.result.targets[0] : null;
+                    if (!target) return;
+                    player.logSkill("xiang_busizhishouhu", target);
+                    // assignGuardTarget inlined (clearGuardTarget already done above)
+                    player.storage.xiang_busizhishouhu = target;
+                    player.markSkill("xiang_busizhishouhu");
+                    await target.addSkills("xiang_shouhu");
+                    target.addSkill("xiang_busizhishouhu_mark");
+                },
+                sub: true,
+            },
+        },
+    },
+
+    xiang_busizhishouhu_mark: {
+        charlotte: true,
+        mark: true,
+        marktext: "护",
+        intro: {
+            content: "当前拥有“守护”标记",
+        },
+    },
+
+    xiang_shouhu: {
+        // 守护：
+        // 通过技能获得时立刻加上限、补牌并回体，之后常驻提供体力上限+1。
+        mark: true,
+        marktext: "守",
+        intro: {
+            content: "体力上限+1",
+        },
+        onremove: function (player) {
+            player.loseMaxHp();
+        },
+        trigger: { player: "changeSkillsAfter" },
+        forced: true,
+        popup: false,
+        filter: function (event) {
+            return event.addSkill.includes("xiang_shouhu");
+        },
+        async content(event, trigger, player) {
+            await player.gainMaxHp();
+            await player.draw(2);
+            await player.recover();
+        },
+    },
 };
 
 export { shuileizhandui };
