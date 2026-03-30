@@ -28,7 +28,7 @@ var jianrjinji = {
             shixinrumoR_man: ["sukhbaatar_R", "odin_R", "vestal_R"],
             shixinrumoR_yi: ["savoy_R", "cassone_R", "Xfliegerkorps_R"],
             others: ["boerzhanuo_R", "dafeng_R", "dajingbeishang_R", "jialifuniya_R", "ninghai_R", "nvzaoshen_R", "jiate_R", "rangbaer_R", "wugelini_R", "yaergushuishou_R", "yi25_R", "yiahua_R", "skilltest"],
-            shuileizhandui: ["jiagu_R", "buzhihuo_R", "chuannei_R", "chuxue_R", "dian_R", "lei_R", "fubo_R", "shenxue_R", "wushiling_R"],
+            shuileizhandui: ["jiagu_R", "buzhihuo_R", "chuannei_R", "chuxue_R", "dian_R", "lei_R", "fubo_R", "shenxue_R", "wushiling_R", "xiangqu_R"],
         },
     },
     character: {
@@ -151,6 +151,7 @@ var jianrjinji = {
         wushiling_R: ["female", "IJN", 3, ["fangkong2", "qingxuncl", "kongqianyiti"], ["des:长良型轻巡2番舰。设计上属于5500吨级水雷战队旗舰轻巡，二战爆发后五十铃号参加了南方作战和瓜岛战役。44年被美军潜艇重创后，五十铃号在修复中装上了三座89式127毫米高炮和大量机炮，成为了防空巡洋舰。莱特湾海战中编入小泽编队，在护航中表现出色。1945年4月五十铃号被美军潜艇击沉。"]],
         xiang_R: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "xiang_busizhishouhu"], ["des:晓型驱逐舰2番舰，建成后编入第六驱逐舰队，战争初期主要在南太平洋活动。1942年在基斯卡作战中被美军空袭击伤，7月参与了基斯卡撤退作战。1944年在商船护航中受创，修理中错过了莱特湾海战。1945年，在参与大和的特攻作战之前触雷修理。响号有着不死鸟的称号，不过她主要是靠运气避开了恶战。在战后响号被赔偿给苏联，命名为信赖号（Верный）一直使用到1963年。"]],
         tianlonglongtian_R: ["female", "IJN", 3, ["fangkong2", "qingxuncl", "yuanzhenghuhang", "yuanzhenghuwei"], ["des:天龙型轻巡洋舰一号舰“天龙”与二号舰“龙田”。两舰长期承担护航、运输与前线掩护任务，擅长把手中的资源提前分派给友军，并在回收补给后为其预置下一轮的攻防节奏。"],],
+        xiangqu_R: ["female", "IJN", 3, ["fangkong2", "qingxuncl", "duomianxunlianjian"], ["des:由于之前担任训练任务的装甲巡洋舰老化，日本海军特意开发了香取型训练巡洋舰。香取型的居住性和航洋性都好于一般的轻巡洋舰，由于外事访问需要，内部装饰也更为豪华。同时出于教学目的，武器类型也相当齐全，从高炮到鱼雷均有。香取号在战争期间主要担任护卫部队的旗舰，44年香取在特鲁克以北被美军击沉。"]],
 
         //新武将写在这行上面
         skilltest: ["male", "OTHER", 9, ["guanxing", "jujianmengxiang", "huodezhuangbei", "huodeyanshi", "paoxiao"], ["forbidai", "des:测试用"]],
@@ -281,6 +282,7 @@ var jianrjinji = {
         shenxue_R: "深雪",
         wushiling_R: "五十铃",
         xiang_R: "响",
+        xiangqu_R: "香取",
         "tianlonglongtian_R": "天龙龙田",
 
         //舰种技能与全局技能翻译
@@ -632,6 +634,9 @@ var jianrjinji = {
         yuanzhenghuwei_directhit_info: "",
         yuanzhenghuwei_evade: "远征护卫",
         yuanzhenghuwei_evade_info: "",
+        duomianxunlianjian: "多面训练舰",
+        duomianxunlianjian_info: "当你失去牌后，你可以令场上手牌唯一最少的角色摸一张牌。",
+
 
         //新技能翻译写在这上面
         //包名翻译

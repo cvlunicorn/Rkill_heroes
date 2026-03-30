@@ -316,7 +316,7 @@ const shuileizhandui = {
     zhanduiqijian: {
         // 战队旗舰：
         // 其他角色出牌阶段开始时，可以先看牌堆顶三张，
-        // 再按需要把其中 0~2 张“调拨”给该角色，剩余牌按原顺序放回牌堆顶。
+        // 再按需要把其中 0~2 张"调拨"给该角色，剩余牌按原顺序放回牌堆顶。
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
         round: 1,
@@ -360,7 +360,7 @@ const shuileizhandui = {
                 cards.removeArray(gains);
             }
 
-            // 剩余牌逆序插回牌堆顶，从而还原“未被选中的牌保持原先上下顺序”。
+            // 剩余牌逆序插回牌堆顶，从而还原"未被选中的牌保持原先上下顺序"。
             cards.reverse();
             for (var i = 0; i < cards.length; i++) {
                 ui.cardPile.insertBefore(cards[i], ui.cardPile.firstChild);
@@ -467,7 +467,7 @@ const shuileizhandui = {
     },
     shuileihun: {
         // 水雷魂：
-        // 出牌阶段一开始就能抢先补一张虚拟【雷杀】，保留“驱逐先手雷击”的定位。
+        // 出牌阶段一开始就能抢先补一张虚拟【雷杀】，保留"驱逐先手雷击"的定位。
         trigger: {
             player: "phaseUseBegin",
         },
@@ -480,7 +480,7 @@ const shuileizhandui = {
         prompt2: "选择一名角色，视为对其使用一张【雷杀】。",
         content: function () {
             "step 0";
-            // 目标选择和真正用牌拆开做，和常规“视为使用一张杀”的流程保持一致。
+            // 目标选择和真正用牌拆开做，和常规"视为使用一张杀"的流程保持一致。
             player.chooseTarget(
                 get.prompt("shuileihun"),
                 "选择一名角色，视为对其使用一张【雷杀】",
@@ -755,7 +755,7 @@ const shuileizhandui = {
         mark: true,
         marktext: "护",
         intro: {
-            content: "当前拥有“守护”标记",
+            content: "当前拥有“守”标记",
         },
     },
 
@@ -780,6 +780,83 @@ const shuileizhandui = {
             await player.gainMaxHp();
             await player.draw(2);
             await player.recover();
+        },
+    },
+    duomianxunlianjian: {
+        // 多面训练舰：
+        // 自己失去牌后，若场上此时存在"手牌唯一最少"的角色，
+        // 则可以令其摸一张牌，体现她偏向训练与后勤支援的定位。
+        trigger: {
+            player: "loseAfter",
+            global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
+        },
+        log: false,
+        filter: function (event, player) {
+            // 只在自己确实失去过牌后才触发；其他区域变动但未失牌的不算。
+            var evt = event.getl(player);
+            if (!evt || !evt.cards2 || !evt.cards2.length) return false;
+            // 只有"唯一最少手牌"的角色才符合技能要求；若并列最少则直接返回空。
+            var minHandCount = Infinity;
+            var uniqueTargets = [];
+            game.filterPlayer().forEach(function (current) {
+                var handCount = current.countCards("h");
+                if (handCount < minHandCount) { minHandCount = handCount; uniqueTargets = [current]; }
+                else if (handCount == minHandCount) uniqueTargets.push(current);
+            });
+            return uniqueTargets.length == 1;
+        },
+        prompt: function (event, player) {
+            // 只有"唯一最少手牌"的角色才符合技能要求；若并列最少则直接返回空。
+            var minHandCount = Infinity;
+            var uniqueTargets = [];
+            game.filterPlayer().forEach(function (current) {
+                var handCount = current.countCards("h");
+                if (handCount < minHandCount) { minHandCount = handCount; uniqueTargets = [current]; }
+                else if (handCount == minHandCount) uniqueTargets.push(current);
+            });
+            var target = uniqueTargets.length == 1 ? uniqueTargets[0] : null;
+            return target ? get.prompt("duomianxunlianjian", target, player) : get.prompt("duomianxunlianjian");
+        },
+        prompt2: "令场上手牌唯一最少的角色摸一张牌。",
+        check: function (event, player) {
+            // 只有"唯一最少手牌"的角色才符合技能要求；若并列最少则直接返回空。
+            var minHandCount = Infinity;
+            var uniqueTargets = [];
+            game.filterPlayer().forEach(function (current) {
+                var handCount = current.countCards("h");
+                if (handCount < minHandCount) { minHandCount = handCount; uniqueTargets = [current]; }
+                else if (handCount == minHandCount) uniqueTargets.push(current);
+            });
+            var target = uniqueTargets.length == 1 ? uniqueTargets[0] : null;
+            return !!(target && target.isIn() && get.attitude(player, target) > 0);
+        },
+        async content(event, trigger, player) {
+            // 只有"唯一最少手牌"的角色才符合技能要求；若并列最少则直接返回空。
+            var minHandCount = Infinity;
+            var uniqueTargets = [];
+            game.filterPlayer().forEach(function (current) {
+                var handCount = current.countCards("h");
+                if (handCount < minHandCount) { minHandCount = handCount; uniqueTargets = [current]; }
+                else if (handCount == minHandCount) uniqueTargets.push(current);
+            });
+            var target = uniqueTargets.length == 1 ? uniqueTargets[0] : null;
+            if (!target) return;
+            // 结算前再复查一次，防止连锁事件后"唯一最少"已经换人。
+            var minHandCount2 = Infinity;
+            var uniqueTargets2 = [];
+            game.filterPlayer().forEach(function (current) {
+                var handCount = current.countCards("h");
+                if (handCount < minHandCount2) { minHandCount2 = handCount; uniqueTargets2 = [current]; }
+                else if (handCount == minHandCount2) uniqueTargets2.push(current);
+            });
+            if (!target.isIn() || uniqueTargets2.length != 1 || uniqueTargets2[0] != target) return;
+
+            player.logSkill("duomianxunlianjian", target);
+            await target.draw(1);
+        },
+        ai: {
+            expose: 0.1,
+            threaten: 1.05,
         },
     },
 };
