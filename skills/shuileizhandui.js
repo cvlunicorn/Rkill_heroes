@@ -859,6 +859,85 @@ const shuileizhandui = {
             threaten: 1.05,
         },
     },
+    baixue_jiban: {
+        // 羁绊：
+        // 白雪可以替任意驱逐舰“垫牌保人”，
+        // 把一张手牌压回牌堆顶，抵消一次【杀】或【决斗】造成的伤害。
+        trigger: {
+            global: "damageBegin4",
+        },
+        log: false,
+        direct: true,
+        filter: function (event, player) {
+            return player.countCards("h") > 0 &&
+                event.player &&
+                event.player.isIn() &&
+                (event.player.hasSkill("quzhudd") || player.countCards("h", { suit: "heart" })) &&
+                event.card &&
+                (event.card.name == "sha" || event.card.name == "sheji9" || event.card.name == "juedou" || event.card.name == "juedouba9") &&
+                event.notLink();
+        },
+        prompt: function (event, player) {
+            return get.prompt("baixue_jiban", event.player, player);
+        },
+        prompt2: function (event) {
+            return "将一张符合要求的手牌置于牌堆顶，防止" + get.translation(event.player) + "受到的此次伤害。";
+        },
+        check: function (event, player) {
+            if (!event || !player || !event.player) return false;
+            var _checkTarget = event.player;
+            var _checkAttitude = get.attitude(player, _checkTarget);
+            if (_checkAttitude <= 0) return false;
+            var _checkScore = -get.damageEffect(_checkTarget, event.source || player, player, event.nature) * Math.max(1, event.num || 1);
+            if (!(_checkScore > 0)) _checkScore = Math.max(0, event.num || 1);
+            if (_checkTarget.hp <= event.num) _checkScore += 4;
+            else if (_checkTarget.hp - event.num == 1) _checkScore += 1.8;
+            if (_checkTarget.countCards("h") <= 1) _checkScore += 0.4;
+            if (player.countCards("h") <= 1) _checkScore -= 2.2;
+            else if (player.countCards("h") <= 2) _checkScore -= 0.8;
+            return _checkScore > 1.2;
+        },
+        async content(event, trigger, player) {
+            var target = trigger.player;
+            // 伤害足以压进濒死时，AI 会更愿意把低价值牌垫出去救人。
+            var attitude = get.attitude(player, target);
+            // getProtectScore inlined
+            var protectScore = (function (ev, pl) {
+                if (!ev || !pl || !ev.player) return -Infinity;
+                var t = ev.player;
+                var att = get.attitude(pl, t);
+                if (att <= 0) return -Infinity;
+                var s = -get.damageEffect(t, ev.source || pl, pl, ev.nature) * Math.max(1, ev.num || 1);
+                if (!(s > 0)) s = Math.max(0, ev.num || 1);
+                if (t.hp <= ev.num) s += 4;
+                else if (t.hp - ev.num == 1) s += 1.8;
+                if (t.countCards("h") <= 1) s += 0.4;
+                if (pl.countCards("h") <= 1) s -= 2.2;
+                else if (pl.countCards("h") <= 2) s -= 0.8;
+                return s;
+            })(trigger, player);
+            var prompt2 = "将一张手牌置于牌堆顶，防止" + get.translation(target) + "受到的此次伤害。";
+            if (target.hasSkill("quzhudd")) {
+                var result = await player.chooseCard("h", get.prompt("baixue_jiban", target), prompt2).set("ai", function (card) {
+                    if (attitude <= 0) return 0;
+                    return protectScore - get.value(card, player);
+                });
+            } else {
+                var result = await player.chooseCard("h", get.prompt("baixue_jiban", target), prompt2, { suit: "heart" }).set("ai", function (card) {
+                    if (attitude <= 0) return 0;
+                    return protectScore - get.value(card, player);
+                });
+            }
+            if (!result.result.bool || !result.result.cards || !result.result.cards.length) return;
+
+            player.logSkill("baixue_jiban", target);
+            await player.lose(result.result.cards, ui.cardPile, "insert");
+            trigger.cancel();
+        },
+        ai: {
+            expose: 0.15,
+        },
+    },
 };
 
 export { shuileizhandui };
