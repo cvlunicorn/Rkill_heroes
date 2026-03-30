@@ -997,6 +997,54 @@ const shuileizhandui = {
             threaten: 1.1,
         },
     },
+    jiquleiji: {
+        // 甲驱雷击：
+        trigger: {
+            player: ["phaseZhunbeiBegin", "phaseJieshuBegin"],
+        },
+        frequent: true,
+        log: false,
+        filter: function (event, player) {
+            return player.hasUseTarget({ name: "sha", nature: "thunder", isCard: true });
+        },
+        prompt2: "进行判定，若结果为黑色，你可以视为使用一张【雷杀】。",
+        check: function (event, player) {
+            return game.hasPlayer(function (current) {
+                return player.canUse({ name: "sha", nature: "thunder", isCard: true }, current) &&
+                    get.effect(current, { name: "sha", nature: "thunder", isCard: true }, player, player) > 0;
+            });
+        },
+        content: function () {
+            "step 0";
+            player.judge(function (card) {
+                return get.color(card) == "black" ? 1.5 : -0.5;
+            }).judge2 = function (result) {
+                // 明确把黑色视为成功，方便后续只看 result.bool。
+                return result.bool;
+            };
+            "step 1";
+            if (result.judge > 0 && player.isIn()) {
+                player.chooseTarget(
+                    get.prompt("jiquleiji"),
+                    "选择一名角色，视为对其使用一张【雷杀】",
+                    function (card, player, target) {
+                        return player.canUse({ name: "sha", nature: "thunder", isCard: true }, target);
+                    }
+                ).set("ai", function (target) {
+                    var player = _status.event.player;
+                    return get.effect(target, { name: "sha", nature: "thunder", isCard: true }, player, player);
+                });
+            }
+            else {
+                event.finish();
+            }
+            "step 2";
+            if (result.bool && result.targets && result.targets.length && player.isIn()) {
+                player.logSkill("jiquleiji", result.targets);
+                player.useCard({ name: "sha", nature: "thunder", isCard: true }, result.targets[0], false);
+            }
+        },
+    },
 };
 
 export { shuileizhandui };
