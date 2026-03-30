@@ -28,7 +28,7 @@ var jianrjinji = {
             shixinrumoR_man: ["sukhbaatar_R", "odin_R", "vestal_R"],
             shixinrumoR_yi: ["savoy_R", "cassone_R", "Xfliegerkorps_R"],
             others: ["boerzhanuo_R", "dafeng_R", "dajingbeishang_R", "jialifuniya_R", "ninghai_R", "nvzaoshen_R", "jiate_R", "rangbaer_R", "wugelini_R", "yaergushuishou_R", "yi25_R", "yiahua_R", "skilltest"],
-            shuileizhandui: ["jiagu_R", "buzhihuo_R", "chuannei_R", "chuxue_R", "dian_R", "lei_R", "fubo_R", "shenxue_R", "wushiling_R", "xiangqu_R", "baixue_R"],
+            shuileizhandui: ["jiagu_R", "buzhihuo_R", "chuannei_R", "chuxue_R", "dian_R", "lei_R", "fubo_R", "shenxue_R", "wushiling_R", "xiangqu_R", "baixue_R", "xiao_R"],
         },
     },
     character: {
@@ -153,6 +153,7 @@ var jianrjinji = {
         tianlonglongtian_R: ["female", "IJN", 3, ["fangkong2", "qingxuncl", "yuanzhenghuhang", "yuanzhenghuwei"], ["des:天龙型轻巡洋舰一号舰“天龙”与二号舰“龙田”。两舰长期承担护航、运输与前线掩护任务，擅长把手中的资源提前分派给友军，并在回收补给后为其预置下一轮的攻防节奏。"],],
         xiangqu_R: ["female", "IJN", 3, ["fangkong2", "qingxuncl", "duomianxunlianjian"], ["des:由于之前担任训练任务的装甲巡洋舰老化，日本海军特意开发了香取型训练巡洋舰。香取型的居住性和航洋性都好于一般的轻巡洋舰，由于外事访问需要，内部装饰也更为豪华。同时出于教学目的，武器类型也相当齐全，从高炮到鱼雷均有。香取号在战争期间主要担任护卫部队的旗舰，44年香取在特鲁克以北被美军击沉。"]],
         baixue_R: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "baixue_jiban"], ["des:吹雪型驱逐舰2号舰，于1928年服役。战争开始后编入第11驱逐舰队活动，和吹雪号一同参与了1942年1月击沉英国驱逐舰的海战。3月参与巽他海峡作战，期间协同击沉了盟军两艘巡洋舰。1942年白雪号投入到了瓜岛前线，并参与了第二次瓜岛海战。43年白雪号在美军空袭中沉没。"]],
+        xiao_R: ["female", "IJN", 3, ["dajiaoduguibi", "quzhudd", "qiangxingzhencha"], ["des:特III型驱逐舰首舰，也被划分为晓型。相比吹雪型减少了一座锅炉，外观上一号烟囱较细。竣工后，四艘晓型驱逐舰编成第六驱逐舰队一同活动。1942年参与了菲律宾海域的战斗，之后主要作为航母的护卫舰只。1942年参与了瓜岛战役，在第三次所罗门海战中被美军击沉。"]],
 
         //新武将写在这行上面
         skilltest: ["male", "OTHER", 9, ["guanxing", "jujianmengxiang", "huodezhuangbei", "huodeyanshi", "paoxiao"], ["forbidai", "des:测试用"]],
@@ -286,6 +287,7 @@ var jianrjinji = {
         xiangqu_R: "香取",
         "tianlonglongtian_R": "天龙龙田",
         baixue_R: "白雪",
+        xiao_R: "晓",
 
         //舰种技能与全局技能翻译
         quzhudd: "驱逐", "quzhudd_info": "",
@@ -640,6 +642,8 @@ var jianrjinji = {
         duomianxunlianjian_info: "当你失去牌后，你可以令场上手牌唯一最少的角色摸一张牌。",
         baixue_jiban: "羁绊",
         baixue_jiban_info: "当一名角色受到【杀】或【决斗】造成的伤害时，你可以将一张红桃手牌置于牌堆顶，防止此伤害。若其为驱逐舰，改为任意手牌。",
+        qiangxingzhencha: "强行侦查",
+        qiangxingzhencha_info: "其他角色的结束阶段，你可以展示其手牌，然后其可以对你使用一张无距离限制的【杀】。若其如此做，你获得其一张手牌。",
 
 
 

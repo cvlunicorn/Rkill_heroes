@@ -938,6 +938,65 @@ const shuileizhandui = {
             expose: 0.15,
         },
     },
+    qiangxingzhencha: {
+        // 强行侦查：
+        // 其他角色结束阶段可以公开其手牌，但对方随后有机会反手对你出一张无距离限制的【杀】。
+        nobracket: true,
+        trigger: {
+            global: "phaseJieshuBegin",
+        },
+        filter: function (event, player) {
+            return event.player && event.player != player && event.player.isIn() && event.player.countCards("h");
+        },
+        prompt2: function (event) {
+            return "展示" + get.translation(event.player) + "的手牌，然后其可以对你使用一张无距离限制的【杀】。若其如此做，你获得其一张手牌。";
+        },
+        check: function (event, player) {
+            if (!event || !player || !event.player) return false;
+            var _zcTarget = event.player;
+            if (!_zcTarget.isIn() || get.attitude(player, _zcTarget) >= 0 || !_zcTarget.countCards("h")) return false;
+            var _zcInfoGain = Math.min(2.8, _zcTarget.countCards("h") * 0.45);
+            if (_zcTarget.countCards("h", function (card) {
+                return get.value(card, _zcTarget) >= 6;
+            })) {
+                _zcInfoGain += 0.5;
+            }
+            if (_zcTarget.hp <= 2) _zcInfoGain += 0.3;
+            var _zcRetaliation = 0;
+            if (_zcTarget.countCards("h", function (card) {
+                return get.name(card, _zcTarget) == "sha";
+            }) && _zcTarget.canUse({ name: "sha", isCard: true }, player, false)) {
+                _zcRetaliation = Math.max(0, get.effect(player, { name: "sha", isCard: true }, _zcTarget, player));
+                if (player.countCards("hs", { name: "shan" })) _zcRetaliation *= 0.45;
+                else if (player.countCards("hs") <= 1) _zcRetaliation *= 1.2;
+            }
+            return (_zcInfoGain - _zcRetaliation) > 0.2;
+        },
+        content(event, trigger, player) {
+            "step 0";
+            // 先公开情报，再决定对方要不要顺势反打一刀。
+            trigger.player.showHandcards(get.translation(player) + "对" + get.translation(target) + "发动了【强行侦查】");
+            "step 1";
+            trigger.player.chooseToUse(
+                "强行侦查：是否对" + get.translation(player) + "使用一张无距离限制的【杀】？",
+                { name: "sha" },
+                player,
+                -1
+            ).set("nodistance", true);
+            "step 2";
+            if (result.bool && trigger.player.countCards("h")) {
+                player
+                    .gainPlayerCard("h", trigger.player, true)
+                    .set("target", trigger.player)
+                    .set("complexSelect", false)
+                    .set("ai", lib.card.shunshou.ai.button);
+            }
+        },
+        ai: {
+            expose: 0.15,
+            threaten: 1.1,
+        },
+    },
 };
 
 export { shuileizhandui };
