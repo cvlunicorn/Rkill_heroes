@@ -153,7 +153,7 @@ var jianrjinji = {
         tianlonglongtian_R: ["female", "IJN", 3, ["fangkong2", "qingxuncl", "yuanzhenghuhang", "yuanzhenghuwei"], ["des:天龙型轻巡洋舰一号舰“天龙”与二号舰“龙田”。两舰长期承担护航、运输与前线掩护任务，擅长把手中的资源提前分派给友军，并在回收补给后为其预置下一轮的攻防节奏。"],],
 
         //新武将写在这行上面
-        skilltest: ["male", "OTHER", 9, ["jujianmengxiang", "huodezhuangbei", "huodeyanshi", "paoxiao"], ["forbidai", "des:测试用"]],
+        skilltest: ["male", "OTHER", 9, ["guanxing", "jujianmengxiang", "huodezhuangbei", "huodeyanshi", "paoxiao"], ["forbidai", "des:测试用"]],
     },
     skill: {
         ...globalskills,
@@ -599,7 +599,7 @@ var jianrjinji = {
         jing_shu: "惊鼠", "jing_shu_info": "出牌阶段限一次，你可以展示任意张手牌，然后令一名其他角色选择：1.翻面并获得你展示的所有牌；2.弃置你展示的所有牌，然后交给你等量张牌。",
         ling_mu: "灵目", "ling_mu_info": "摸牌阶段结束时，你可以展示所有手牌，若其中没有锦囊牌，你选择：1.摸两张牌；2.本回合你造成的伤害+1。",
         yuleizhantujin: "鱼雷战突进",
-        yuleizhantujin_info: "出牌阶段限一次，你可以亮出牌堆顶X张牌（X为你的装备区牌数与场上驱逐舰数量之和），选择一名角色，你依次对其使用其中可以使用的基本牌（无次数限制），然后其对你使用其中可以使用的锦囊牌。",
+        yuleizhantujin_info: "出牌阶段限一次，你可以亮出牌堆顶X张牌（X为你的装备区牌数与场上驱逐舰数量之和），选择一名角色，你依次对其使用其中可以使用的基本牌（无次数限制），然后其对你使用其中可以使用的普通锦囊牌。",
         zhanduiqijian: "战队旗舰",
         zhanduiqijian_info: "每轮限一次。一名角色的出牌阶段开始时，你可以观看牌堆顶的三张牌，并令其获得其中的0-2张牌。",
         lingjupaoji: "零距炮击",

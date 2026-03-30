@@ -232,7 +232,7 @@ const shuileizhandui = {
                 return current.hasSkill("quzhudd");
             });
             var cards = game.cardsGotoOrdering(get.cards(count)).cards;
-            var showCardsDelay = Math.min(20, 10 + cards.length * 5);
+            var showCardsDelay = Math.min(15, 10 + cards.length * 5);
             await player.showCards(cards, "鱼雷战突进").set("delay_time", showCardsDelay);
 
             var basicTargetResult = { result: { bool: false } };
