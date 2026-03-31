@@ -563,6 +563,7 @@ const fallendemon = {
             },
         },
         ai: {
+            threaten:1.5,
             "directHit_ai": true,
         },
         "_priority": 0,

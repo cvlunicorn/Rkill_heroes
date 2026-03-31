@@ -374,18 +374,17 @@ const shuileizhandui = {
     },
     lingjupaoji: {
         // 零距炮击：
-        // 选择距离 1 的目标，亮出牌堆顶三张牌，
         // 若其中存在能对该目标合法使用的伤害牌，则可选其中一张直接结算。
         nobracket: true,
         enable: "phaseUse",
         usable: 1,
         filter: function (event, player) {
             return game.hasPlayer(function (current) {
-                return current != player && get.distance(player, current) == 1;
+                return current != player;
             });
         },
         filterTarget: function (card, player, target) {
-            return target != player && get.distance(player, target) == 1;
+            return target != player;
         },
         async content(event, trigger, player) {
             var target = event.target;
@@ -418,14 +417,17 @@ const shuileizhandui = {
                         await player.useCard(chosenCard, target, false);
                     }
                 }
+                
             }
             if (cards.length) {
                 // 没被打出去的亮牌全部进入弃牌堆，不回牌堆顶。
                 player.loseToDiscardpile(cards);
             }
+            player.markAuto('lingjupaoji_1', [target]);
+            player.addTempSkill("lingjupaoji_1", { global: "phaseEnd" });
         },
         ai: {
-            order: 6.5,
+            order: 9,
             expose: 0.12,
             result: {
                 target: function (player, target) {
@@ -433,6 +435,24 @@ const shuileizhandui = {
                 },
             },
         },
+    },
+    lingjupaoji_1: {
+        mark: "character",
+        onremove: true,
+        init: function (player, skill) {
+            if (!player.storage.lingjupaoji_1) player.storage.lingjupaoji_1 = [];
+        },
+        intro: {
+            content: "到$的距离视为1",
+        },
+        mod: {
+            globalFrom: function (from, to) {
+                if (from.getStorage('lingjupaoji_1').includes(to)) {
+                    return -Infinity;
+                }
+            },
+        },
+        "_priority": 0,
     },
     wuyizhuangji: {
         enable: "phaseUse",
@@ -527,7 +547,7 @@ const shuileizhandui = {
         },
         group: ["shuileiqiangxi_damage", "shuileiqiangxi_response", "shuileiqiangxi_end"],
         ai: {
-            order: 9,
+            order: 2,
             result: {
                 player: function (player) {
                     var handCount = player.countCards("h");
