@@ -1649,8 +1649,7 @@ const fallendemon = {
                             i == es.length &&
                             (!player.countCards("j", function (card) {
                                 return target.canAddJudge(card);
-                            }) ||
-                                att2 <= 0)
+                            }) ||att <= 0)
                         ) {
                             if (player.countCards("h") > 0) return att;
                             return 0;
