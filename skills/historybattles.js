@@ -148,9 +148,9 @@ const historybattles = {
             }).set('ai', target => {
                 var att = get.attitude(player, target);
                 if (att >= 0) {
-                    return (target.getStorage('u47_xinbiao_hp') - target.hp) * 2 + (target.getStorage('u47_xinbiao_cards') - target.getStorage("h"));
+                    return (target.getStorage('u47_xinbiao_hp') - target.hp) * 2 + (target.getStorage('u47_xinbiao_cards') - target.countCards("h"));
                 } else if (att < 0) {
-                    return (target.hp - target.getStorage('u47_xinbiao_hp')) * 2 + (target.getStorage("h") - target.getStorage('u47_xinbiao_cards'));
+                    return (target.hp - target.getStorage('u47_xinbiao_hp')) * 2 + (target.countCards("h") - target.getStorage('u47_xinbiao_cards'));
                 } else {
                     return 1;
                 }
@@ -216,13 +216,13 @@ const historybattles = {
             return !event.player.hasSkill("u81_zonglie_shanghai") && player != event.player && event.player.countCards("h") > 0 && event.player.countCards("h") != player.countCards("h");
         },
         content: function* (event, map) {
-            "step0"
+            "step 0"
             var player = map.player, trigger = map.trigger;
             //game.log(event.player);
             //game.log(trigger.player);
 
             var result1 = yield trigger.player.chooseCard('h', '是否交给' + get.translation(player) + '一张手牌免疫此次伤害并摸一张牌？').set('ai', function (card) { return 7 - get.value(card) });
-            "step1"
+            "step 1"
             if (result1.bool) {
                 game.log("给牌免伤");
                 trigger.player.give(result1.cards, player);
@@ -408,7 +408,7 @@ const historybattles = {
             if (!flag) {
                 var card = {
                     name: "sha",
-                    nature: "thude_Rr",
+                    nature: "thuder",
                     isCard: true,
                 };
                 if (player.canUse(card, trigger.player, false)) {
@@ -641,7 +641,7 @@ const historybattles = {
         },
         visible: true,
         check: function (event, player) {
-            return event.number > 1 || player.hp <= 1;
+            return event.num > 1 || player.hp <= 1;
         },
         content: function () {
             "step 0"

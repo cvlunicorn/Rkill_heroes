@@ -2279,7 +2279,7 @@ const standard = {
                     //game.log("return'cancel2'");
                     return 'cancel2';
                 }
-                if (trigger.target.Hp + trigger.target.hujia <= 2 || _status.currentPhase.countCards("h") > 2) {
+                if (trigger.target.hp + trigger.target.hujia <= 2 || _status.currentPhase.countCards("h") > 2) {
                     return target.mayHaveShan() ? 1 : 0;
                 }
                 return 2;

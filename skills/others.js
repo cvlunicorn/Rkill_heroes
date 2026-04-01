@@ -178,8 +178,8 @@ const others = {
                 else listm = lib.character[event.players[i].name][3];
                 if (event.players[i].name2 != undefined) listv = lib.character[event.players[i].name2][3];//副将
                 listm = listm.concat(listv);
-                for (var i = 0; i < listm.length; i++) {
-                    if (func(listm[i])) event.skills.push(listm[i]);
+                for (var j = 0; j < listm.length; j++) {
+                    if (func(listm[j])) event.skills.push(listm[j]);
                 }
             }
             //game.log(event.skills);
@@ -419,6 +419,7 @@ const others = {
         },
         viewAsFilter(player) {
             if (!player.countCards('hes')) return false;
+            return true;
         },
         prompt: "将一张红色牌当雷杀使用",
         check(card) { return 4 - get.value(card) },
@@ -999,7 +1000,7 @@ const others = {
             "step 1"
             if (result.bool) {
                 event.targets = result.targets[0];
-                player.chooseToDiscard(get.prompt('xiwangdeshuguang'), "弃置一张手牌,令" + get.translation(event.target) + "恢复一点体力", 1).set(ai, function (card) {
+                player.chooseToDiscard(get.prompt('xiwangdeshuguang'), "弃置一张手牌,令" + get.translation(event.target) + "恢复一点体力", 1).set("ai", function (card) {
                     return 9 - get.value(card);
                 });
             }
