@@ -576,7 +576,7 @@ const others = {
                 nobracket: true,
                 audio: "ext:舰R牌将/audio/skill:true",
                 trigger: { player: "dying", },
-                force: true,
+                forced: true,
                 direct: true,
                 filter: function (event, player) {
                     return event.name == "dying" && player.maxHp > 1;
@@ -589,7 +589,7 @@ const others = {
                 subSkill: {
                     mark: {
                         trigger: { player: "loseMaxHpAfter", },
-                        force: true,
+                        forced: true,
                         direct: true,
                         silent: true,
                         sub: true,
@@ -663,7 +663,7 @@ const others = {
     },
     /* zhengzhansihai: {
         nobracket: true,
-        force: true,
+        forced: true,
         mod: {
             maxHandcard: function (player, num) {
                 return num += player.countMark("jinyangmaozhishi_mark");
@@ -1014,7 +1014,7 @@ const others = {
         }
     },
     qiangxiu: {
-        obracket: true,
+        nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
         enable: "phaseUse",
         usable: 1,

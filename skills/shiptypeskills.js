@@ -983,9 +983,9 @@ const shiptypeskills = {
                 },//以5为标准就行。
                 ai2: function (target) {
                     var att = -get.attitude(_status.event.player, target);
-                    if (target.hasSkill('zhanliebb') | target.hasSkill('zhanliebb')) { att *= 1.5 };
+                    if (target.hasSkill('zhanliebb') || target.hasSkill('zhanliebb')) { att *= 1.5 };
                     if (Math.ceil(target.hp * 2) <= target.maxHp) { att *= 2 };
-                    if (target.hasSkill('bagua_skill') | target.hasSkill('re_bagua_skill')) { att *= 0.5 };
+                    if (target.hasSkill('bagua_skill') || target.hasSkill('re_bagua_skill')) { att *= 0.5 };
                     return att;
                 }, targets: trigger.targets,//这个代码不能照搬到content以外的地方。贯石斧、朱雀羽扇有类似代码。还有recover版的。
             });//技能还没扩起来,括起来。*///移除选择目标这一过程,视为使用牌自带选择目标。2024.2.18

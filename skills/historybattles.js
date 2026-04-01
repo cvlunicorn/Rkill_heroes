@@ -2854,7 +2854,7 @@ const historybattles = {
     saobaxing: {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
-        force: true,
+        forced: true,
         direct: true,
         trigger: {
             global: "judge",
@@ -3163,7 +3163,7 @@ const historybattles = {
         subSkill: {
             effect: {
                 charlotte: true,
-                force: true,
+                forced: true,
                 intro: {
                     marktext: "威慑",
                     content: function () {

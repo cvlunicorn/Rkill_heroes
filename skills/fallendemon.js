@@ -656,7 +656,7 @@ const fallendemon = {
         trigger: {
             player: "phaseZhunbeiBegin",
         },
-        force: true,
+        forced: true,
         direct: true,
         filter: function (event, player) {
             return (player.countCards("h") &&
@@ -680,7 +680,7 @@ const fallendemon = {
         group: ["sukhbaatar_R_rumeng_1"],
         subSkill: {
             1: {
-                force: true,
+                forced: true,
                 trigger: {
                     global: "chooseToCompareBegin",
                 },
@@ -833,7 +833,7 @@ const fallendemon = {
     sukhbaatar_R_zuiqiang: {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
-        force: true,
+        forced: true,
         direct: true,
         trigger: {
             global: "damageBegin4",

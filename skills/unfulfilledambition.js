@@ -1019,7 +1019,7 @@ const unfulfilledambition = {
                 if (get.type(card) == "trick" || get.type(card) == "delay") return false;
             },
         },
-        force: true,
+        forced: true,
         direct: true,
         trigger: {
             player: "useCard",
@@ -1040,7 +1040,7 @@ const unfulfilledambition = {
                 if (get.type(card) == "basic") return false;
             },
         },
-        force: true,
+        forced: true,
         direct: true,
         trigger: {
             player: "useCard",
@@ -1212,7 +1212,7 @@ const unfulfilledambition = {
             return num;
         },
         direct: true,
-        force: true,
+        forced: true,
         filter: function (event, player) {
             return lib.skill.huofu.count() > 0;
 
@@ -1431,7 +1431,7 @@ const unfulfilledambition = {
                 targets[i].removeSkill("guishen_fengyin");
             }
         },
-        force: true,
+        forced: true,
         trigger: {
             player: "phaseUseBegin",
         },
@@ -1455,7 +1455,7 @@ const unfulfilledambition = {
         group: ["guishen_change"],
         subSkill: {
             change: {
-                force: true,
+                forced: true,
                 direct: true,
                 trigger: {
                     global: ["damageEnd", "loseHpEnd", "recoverEnd", "loseMaxHpEnd", "gainMaxHpEnd"],

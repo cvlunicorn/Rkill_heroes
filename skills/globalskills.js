@@ -42,7 +42,7 @@ const globalskills = {
                 sub: true,
             },
             kaishi: {
-                name: "远航回合开始时", fixed: true, silent: true, friquent: true,
+                name: "远航回合开始时", fixed: true, silent: true,  frequent: true,
                 trigger: {
                     player: "phaseBegin",
                 },
@@ -1223,7 +1223,7 @@ const globalskills = {
             //game.log(chusha, danzong);
 
             /* trigger.card.nature = 'fire';
-            if ((player.hasSkill('quzhudd') | player.hasSkill('qianting'))) { trigger.card.nature = 'thunder' }; if ((player.hasSkill('zhanliebb') | player.hasSkill('hangmucv'))) { trigger.card.nature = 'thunder'; };
+            if ((player.hasSkill('quzhudd') || player.hasSkill('qianting'))) { trigger.card.nature = 'thunder' }; if ((player.hasSkill('zhanliebb') || player.hasSkill('hangmucv'))) { trigger.card.nature = 'thunder'; };
             if (get.itemtype(trigger.card) == 'card') {
                 var next = game.createEvent('zhuque_clear');
                 next.card = trigger.card;
@@ -1245,7 +1245,7 @@ const globalskills = {
                 prompt: "增强杀", "prompt2": "下一次造成伤害时,可以改变伤害属性（接近伤害的触发时机,几乎就是个特效）",
                 content: function () {//player.addTempSkill('qinggang_skill','useCard1');
                     trigger.nature = 'fire';
-                    if ((player.hasSkill('quzhudd') | player.hasSkill('qianting'))) { trigger.nature = 'thunder' }; if ((player.hasSkill('zhanliebb') | player.hasSkill('hangmucv'))) { trigger.nature = 'ice'; };
+                    if ((player.hasSkill('quzhudd') || player.hasSkill('qianting'))) { trigger.nature = 'thunder' }; if ((player.hasSkill('zhanliebb') || player.hasSkill('hangmucv'))) { trigger.nature = 'ice'; };
                     player.removeSkill('danzong_damage');
                 },
                 mark: true, intro: { marktext: "增强", content: function (storage, player) { return ('下一次造成伤害时,可以改变伤害属性（接近伤害的触发时机,几乎就是个特效）'); }, },
@@ -1264,7 +1264,7 @@ const globalskills = {
         subSkill: {
             jieshu: {
                 trigger: { player: "phaseJieshuBegin", },
-                priority: 1, fixed: true, silent: true, friquent: true, forced: true, popup: false,
+                priority: 1, fixed: true, silent: true,  frequent: true, forced: true, popup: false,
                 filter: function (event, player) {
                     if (lib.config.extension_舰R牌将__kaishimopai === false) return false;
                     return true;
@@ -1378,7 +1378,7 @@ const globalskills = {
         content: function () {
             'step 0'//你获得技能[]player.addTempSkill('touxichuan','phaseAfter');
             event.num = event.cards.length;
-            var d = game.countPlayer(function (current) { return current != player && (get.attitude(player, current) < 1) && (current.hasSkill('bagua_skill') | current.hasSkill('re_bagua_skill')); });
+            var d = game.countPlayer(function (current) { return current != player && (get.attitude(player, current) < 1) && (current.hasSkill('bagua_skill') || current.hasSkill('re_bagua_skill')); });
             //game.log('有八卦的角色:', d);
             player.chooseTarget(get.prompt2('选择攻击目标'), function (card, player, target) {
                 return target.maxHp > 0 && player.inRange(target);
@@ -1386,7 +1386,7 @@ const globalskills = {
                 var att = -get.attitude(_status.event.player, target) / target.countCards('h');
                 if (target.hasSkill('quzhudd') || target.hasSkill('hangmucv')) { att *= 1.1 };
                 if (Math.ceil(target.hp * 2) <= target.maxHp) { att *= 1.1 }; if (target.countCards('h') < 3) { att *= 1.1 };
-                if (target.hasSkill('bagua_skill') | target.hasSkill('re_bagua_skill')) { att *= 0.5 };
+                if (target.hasSkill('bagua_skill') || target.hasSkill('re_bagua_skill')) { att *= 0.5 };
                 return att
             });
             'step 1'
