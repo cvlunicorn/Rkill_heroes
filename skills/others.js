@@ -546,7 +546,7 @@ const others = {
 
                             evt = evt.getParent("chooseToUse");
                         }
-                        if (!evt?.respondTo || !evt.respondTo[0].hasSkill("fenzhandaodi") || evt.respondTo[1].name != "sha" || evt.respondTo[1].name != "sheji9") {
+                        if (!evt?.respondTo || !evt.respondTo[0].hasSkill("fenzhandaodi") || (evt.respondTo[1].name != "sha" && evt.respondTo[1].name != "sheji9")) {
                             return;
                         }
                         const color1 = get.color(card),

@@ -82,7 +82,7 @@ const historybattles = {
             "step 0"
             player.chooseToDiscard(1, 'he', '是否弃置一张黑色牌并记录' + get.translation(trigger.player) + '状态？', { color: 'black' }).set('ai', function (card, player) {
                 var player = get.player(), target = _status.event.getTrigger().player;
-                if (get.attitude(player, target >= 0)) {
+                if (get.attitude(player, target) >= 0) {
                     if (target.hp < 3 && target.countCards("h") < 3) return 0;
                 } else {
                     if (target.hp > 2 && target.countCards("h") > 2) return 0;

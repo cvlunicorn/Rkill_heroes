@@ -462,7 +462,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     if (typeof event.baseDamage != 'number') event.baseDamage = 1;
                                     if (event.directHit) event._result = { bool: false };
                                     else {
-                                        var next = target.chooseToRespond({ name: 'shan' || 'huibi9' });
+                                        var next = target.chooseToRespond({ name: 'shan'});
                                         next.set('ai', function (card) {
                                             var evt = _status.event.getParent();
                                             if (get.damageEffect(evt.target, evt.player, evt.target) >= 0) return 0;
@@ -477,7 +477,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                     "step 1"
                                     if (result.bool == false) {
-                                        if (target.getEquip(2) != 'tengjia') target.damage(event.baseDamage);
+                                        if (target.getEquip(2).name != 'tengjia') target.damage(event.baseDamage);
                                     }
                                 },
                                 ai: {

@@ -319,14 +319,11 @@ const standard = {
         audio: "ext:舰R牌将/audio/skill:true",
         forced: true,
         filter: function (event, player) {
-            return event.card.name == 'sha' && !event.getParent().directHit.includes(event.target) && player.getHistory('useCard', function (event) {
+            return (event.card.name == 'sha' || event.card.name == 'sheji9') && !event.getParent().directHit.includes(event.target) && player.getHistory('useCard', function (event) {
                 return (event.card.name == 'sha' || event.card.name == 'sheji9') && event.cards && event.cards.length;
-            }).indexOf(event) == 0;
+            }).length == 1;
         },
         trigger: { player: 'useCardToPlayered' },
-        filter(event, player) {
-            return event.card.name == 'sha'
-        },
         logTarget: 'target',
         async content(event, trigger, player) {
             const id = trigger.target.playerid;
@@ -529,10 +526,10 @@ const standard = {
             if (typeof player.storage.gaosusheji === 'undefined') player.storage.gaosusheji = false;
             if (player.storage.gaosusheji) {
                 //game.log("阳");
-                return (_status.currentPhase == player && (get.type(event.card) == 'trick') & event.getParent('phaseUse') == evtx);
+                return (_status.currentPhase == player && (get.type(event.card) == 'trick') && event.getParent('phaseUse') == evtx);
             } else {
                 //game.log("阴");
-                return (_status.currentPhase == player && (get.type(event.card) == 'basic') & event.getParent('phaseUse') == evtx);
+                return (_status.currentPhase == player && (get.type(event.card) == 'basic') && event.getParent('phaseUse') == evtx);
 
             }
 
@@ -1375,7 +1372,7 @@ const standard = {
             return get.attitude(player, event.target) > 1;
         },
         filter: function (event, player) {
-            if (player.countCards == 0) return false;
+            if (player.countCards("hes") == 0) return false;
             if (player == event.target || player == event.player) return false;
             return (event.card.name == 'sha' || event.card.name == 'sheji9') && get.distance(player, event.target, 'pure') <= 1;
         },
@@ -2202,7 +2199,7 @@ const standard = {
                 sub: true,
                 mod: {
                     cardUsable: function (card, player, num) {
-                        if (card.name == 'sha' || card.name == 'sha') return num + player.storage.shizhibuyu1_eff;
+                        if (card.name == 'sha' || card.name == 'sheji9') return num + player.storage.shizhibuyu1_eff;
                     },
                     maxHandcard: function (player, num) { return num + player.storage.shizhibuyu1_eff },
                 },
