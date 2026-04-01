@@ -125,7 +125,7 @@ var jianrjinji = {
         loki_R: ["female", "KMS", 4, ["hangmucv", "loki_R_xiance"], ["des:深海版的装甲航空母舰彼得·施特拉塞尔。"]],
         southdakota_R: ["female", "USN", 4, ["zhanliebb", "zhuangjiafh", "southdakota_R_gumei", "southdakota_R_jianmiemoshi", "southdakota_R_zhaopin"], ["des:原型为美国海军南达科他级战列舰南达科他（BB-57）。"]],
         lingbo_R: ["female", "IJN", 3, ["quzhudd", "dajiaoduguibi", "zhanxian", "guishen"], ["des:吹雪型11号舰,特II型1号舰。相比特I型,绫波号增加了主炮高射功能,35年针对第四舰队事件进行了改装,战争初期隶属南方部队。1942年8月被派到瓜岛,并参加了11月的第三次所罗门海战,战斗中绫波号表现突出,至少击伤四艘美军战舰,其中包括南达科他号战列舰,绫波号自身也在此次海战中沉没。"]],
-        sukhbaatar_R: ["female", "OTHER", 3, ["junfu", "sukhbaatar_R_rumeng", "sukhbaatar_R_sudaren", "sukhbaatar_R_zuiqiang"], ["des:CLASSIFIED*。"]],
+        sukhbaatar_R: ["female", "OTHER", 3, ["junfu", "sukhbaatar_R_rumeng", "sukhbaatar_R_sudaren"], ["des:CLASSIFIED*。"]],
         odin_R: ["female", "OTHER", 3, ["junfu", "odin_R_ganggenier"], ["des:CLASSIFIED*。"]],
         vestal_R: ["female", "USN", 3, ["junfu", "vestal_R_mowang"], ["des:CLASSIFIED*。"]],
         nvzaoshen_R: ["female", "USN", 3, ["junfu", "dajiaoduguibi", "xiwangdeshuguang", "qiangxiu"], ["des:女灶神号（舷号AR-4）是一艘在1913年至1946年期间服役于美国海军的修理船。在改装为修理船之前,女灶神是一条运煤船（从1909年开始）。女灶神号参与了全部两次世界大战,在日本空袭珍珠港期间,该舰在港口内遭到重创。打满整场第二次世界大战的女灶神共获得了两枚战斗之星。"]],
