@@ -113,7 +113,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             style2.innerHTML += "span[data-nature='PLANmm'] {text-shadow: black 0 0 1px,rgba(255, 0, 0,1) 0 0 2px,rgba(255, 0, 0,1) 0 0 2px,rgba(255, 0, 0,1) 0 0 2px,rgba(255, 0, 0,1) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
 
-            var style2 = document.createElement('style');
+            style2 = document.createElement('style');
             style2.innerHTML = ".player.identity[data-color='KMS'],";
             style2.innerHTML += "div[data-nature='KMS'],";
             style2.innerHTML += "span[data-nature='KMS'] {text-shadow: black 0 0 1px,rgba(128, 0, 0,1) 0 0 2px,rgba(128, 0, 0,1) 0 0 5px,rgba(128, 0, 0,1) 0 0 10px,rgba(128, 0, 0,1) 0 0 10px}";
@@ -123,7 +123,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             style2.innerHTML += "span[data-nature='KMSmm'] {text-shadow: black 0 0 1px,rgba(128, 0, 0,1) 0 0 2px,rgba(128, 0, 0,1) 0 0 2px,rgba(128, 0, 0,1) 0 0 2px,rgba(128, 0, 0,1) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
 
-            var style2 = document.createElement('style');
+            style2 = document.createElement('style');
             style2.innerHTML = ".player.identity[data-color='USN'],";
             style2.innerHTML += "div[data-nature='USN'],";
             style2.innerHTML += "span[data-nature='USN'] {text-shadow: black 0 0 1px,rgba(0, 0, 160,1) 0 0 2px,rgba(0, 0, 160,1) 0 0 5px,rgba(0, 0, 160,1) 0 0 10px,rgba(0, 0, 160,1) 0 0 10px}";
@@ -133,7 +133,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             style2.innerHTML += "span[data-nature='USNmm'] {text-shadow: black 0 0 1px,rgba(0, 0, 160,1) 0 0 2px,rgba(0, 0, 160,1) 0 0 2px,rgba(0, 0, 160,1) 0 0 2px,rgba(0, 0, 160,1) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
 
-            var style2 = document.createElement('style');
+            style2 = document.createElement('style');
             style2.innerHTML = ".player.identity[data-color='RN'],";
             style2.innerHTML += "div[data-nature='RN'],";
             style2.innerHTML += "span[data-nature='RN'] {text-shadow: black 0 0 1px,rgba(0, 255, 128,1) 0 0 2px,rgba(0, 255, 128,1) 0 0 5px,rgba(0, 255, 128,1) 0 0 10px,rgba(0, 255, 128,1) 0 0 10px}";
@@ -143,7 +143,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             style2.innerHTML += "span[data-nature='RNmm'] {text-shadow: black 0 0 1px,rgba(0, 255, 128,1) 0 0 2px,rgba(0, 255, 128,1) 0 0 2px,rgba(0, 255, 128,1) 0 0 2px,rgba(0, 255, 128,1) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
 
-            var style2 = document.createElement('style');
+            style2 = document.createElement('style');
             style2.innerHTML = ".player.identity[data-color='IJN'],";
             style2.innerHTML += "div[data-nature='IJN'],";
             style2.innerHTML += "span[data-nature='IJN'] {text-shadow: black 0 0 1px,rgba(255, 255, 128,1) 0 0 2px,rgba(255, 255, 128,1) 0 0 5px,rgba(255, 255, 128,1) 0 0 10px,rgba(255, 255, 128,1) 0 0 10px}";
@@ -153,7 +153,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             style2.innerHTML += "span[data-nature='IJNmm'] {text-shadow: black 0 0 1px,rgba(255, 255, 128,1) 0 0 2px,rgba(255, 255, 128,1) 0 0 2px,rgba(255, 255, 128,1) 0 0 2px,rgba(255, 255, 128,1) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
 
-            var style2 = document.createElement('style');
+            style2 = document.createElement('style');
             style2.innerHTML = ".player.identity[data-color='MN'],";
             style2.innerHTML += "div[data-nature='MN'],";
             style2.innerHTML += "span[data-nature='MN'] {text-shadow: black 0 0 1px,rgba(0, 128, 255,1) 0 0 2px,rgba(0, 128, 255,1) 0 0 5px,rgba(0, 128, 255,1) 0 0 10px,rgba(0, 128, 255,1) 0 0 10px}";
@@ -163,7 +163,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             style2.innerHTML += "span[data-nature='MNmm'] {text-shadow: black 0 0 1px,rgba(0, 128, 255,1) 0 0 2px,rgba(0, 128, 255,1) 0 0 2px,rgba(0, 128, 255,1) 0 0 2px,rgba(0, 128, 255,1) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
 
-            var style2 = document.createElement('style');
+            style2 = document.createElement('style');
             style2.innerHTML = ".player.identity[data-color='RM'],";
             style2.innerHTML += "div[data-nature='RM'],";
             style2.innerHTML += "span[data-nature='RM'] {text-shadow: black 0 0 1px,rgba(128, 0, 128) 0 0 2px,rgba(128, 0, 128) 0 0 5px,rgba(128, 0, 128) 0 0 10px,rgba(128, 0, 128) 0 0 10px}";
@@ -173,7 +173,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             style2.innerHTML += "span[data-nature='RMmm'] {text-shadow: black 0 0 1px,rgba(128, 0, 128) 0 0 2px,rgba(128, 0, 128) 0 0 2px,rgba(128, 0, 128) 0 0 2px,rgba(128, 0, 128) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
 
-            var style2 = document.createElement('style');
+            style2 = document.createElement('style');
             style2.innerHTML = ".player.identity[data-color='ΒΜΦCCCP'],";
             style2.innerHTML += "div[data-nature='ΒΜΦCCCP'],";
             style2.innerHTML += "span[data-nature='ΒΜΦCCCP'] {text-shadow: black 0 0 1px,rgba(255, 128, 0) 0 0 2px,rgba(255, 128, 0) 0 0 5px,rgba(255, 128, 0) 0 0 10px,rgba(255, 128, 0) 0 0 10px}";
@@ -183,7 +183,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             style2.innerHTML += "span[data-nature='ΒΜΦCCCPmm'] {text-shadow: black 0 0 1px,rgba(255, 128, 0) 0 0 2px,rgba(255, 128, 0) 0 0 2px,rgba(255, 128, 0) 0 0 2px,rgba(255, 128, 0) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
 
-            var style2 = document.createElement('style');
+            style2 = document.createElement('style');
             style2.innerHTML = ".player.identity[data-color='ROCN'],";
             style2.innerHTML += "div[data-nature='ROCN'],";
             style2.innerHTML += "span[data-nature='ROCN'] {text-shadow: black 0 0 1px,rgba(255, 128, 128) 0 0 2px,rgba(255, 128, 128) 0 0 5px,rgba(255, 128, 128) 0 0 10px,rgba(255, 128, 128) 0 0 10px}";
@@ -193,7 +193,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             style2.innerHTML += "span[data-nature='ROCNmm'] {text-shadow: black 0 0 1px,rgba(255, 128, 128) 0 0 2px,rgba(255, 128, 128) 0 0 2px,rgba(255, 128, 128) 0 0 2px,rgba(255, 128, 128) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
 
-            var style2 = document.createElement('style');
+            style2 = document.createElement('style');
             style2.innerHTML = ".player.identity[data-color='OTHER'],";
             style2.innerHTML += "div[data-nature='OTHER'],";
             style2.innerHTML += "span[data-nature='OTHER'] {text-shadow: black 0 0 1px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 5px,rgba(0, 0, 0) 0 0 10px,rgba(0, 0, 0) 0 0 10px}";
