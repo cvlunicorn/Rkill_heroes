@@ -60,7 +60,7 @@ const shuileizhandui = {
                 if (type != "basic" && type != "trick" && type != "delay") continue;
                 if (event.usedNames.includes(name)) continue;
                 var typeTrans = type == "basic" ? "基本" : (type == "delay" ? "延时锦囊" : "锦囊");
-                list.push([typeTrans, "", name]);
+                list.push([typeTrans, "", name,""]);
             }
             if (list.length <= 0) {
                 game.log("没有可选的牌了");
@@ -218,8 +218,6 @@ const shuileizhandui = {
     },
     yuleizhantujin: {
         // 鱼雷战突进：
-        // 先按 X 亮出牌堆顶若干牌，再把其中能用的基本牌集中砸向同一名角色；
-        // 剩下能对自己生效的锦囊则尽量立即结算，最后处理未用掉的余牌。
         enable: "phaseUse",
         usable: 1,
         filter: function (event, player) {
@@ -995,7 +993,7 @@ const shuileizhandui = {
         content(event, trigger, player) {
             "step 0";
             // 先公开情报，再决定对方要不要顺势反打一刀。
-            trigger.player.showHandcards(get.translation(player) + "对" + get.translation(target) + "发动了【强行侦查】");
+            trigger.player.showHandcards(get.translation(player) + "对" + get.translation(trigger.player) + "发动了【强行侦查】");
             "step 1";
             trigger.player.chooseToUse(
                 "强行侦查：是否对" + get.translation(player) + "使用一张无距离限制的【杀】？",
