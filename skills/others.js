@@ -425,95 +425,21 @@ const others = {
         check(card) { return 4 - get.value(card) },
         ai: {
             yingbian: function (card, player, targets, viewer) {
-                if (get.attitude(viewer, player) <= 0) return 0;
-                var base = 0, hit = false;
-                if (get.cardtag(card, 'yingbian_hit')) {
-                    hit = true;
-                    if (targets.some(target => {
-                        return target.mayHaveShan(viewer, 'use', target.getCards('h', i => {
-                            return i.hasGaintag('sha_notshan');
-                        })) && get.attitude(viewer, target) < 0 && get.damageEffect(target, player, viewer, get.natureList(card)) > 0;
-                    })) base += 5;
-                }
-                if (get.cardtag(card, 'yingbian_add')) {
-                    if (game.hasPlayer(function (current) {
-                        return !targets.includes(current) && lib.filter.targetEnabled2(card, player, current) && get.effect(current, card, player, player) > 0;
-                    })) base += 5;
-                }
-                if (get.cardtag(card, 'yingbian_damage')) {
-                    if (targets.some(target => {
-                        return get.attitude(player, target) < 0 && (hit || !target.mayHaveShan(viewer, 'use', target.getCards('h', i => {
-                            return i.hasGaintag('sha_notshan');
-                        })) || player.hasSkillTag('directHit_ai', true, {
-                            target: target,
-                            card: card,
-                        }, true)) && !target.hasSkillTag('filterDamage', null, {
-                            player: player,
-                            card: card,
-                            jiu: true,
-                        })
-                    })) base += 5;
-                }
-                return base;
+                return lib.card.sha.ai.yingbian(card, player, targets, viewer);
             },
             canLink: function (player, target, card) {
-                if (!target.isLinked() && !player.hasSkill('wutiesuolian_skill')) return false;
-                if (player.hasSkill('jueqing') || player.hasSkill('gangzhi') || target.hasSkill('gangzhi')) return false;
-                return true;
+                return lib.card.sha.ai.canLink(player, target, card);
             },
             basic: {
                 useful: [5, 3, 1],
                 value: [5, 3, 1],
             },
             order: function (item, player) {
-                if (player.hasSkillTag('presha', true, null, true)) return 10;
-                if (typeof item === 'object' && game.hasNature(item, 'linked')) {
-                    if (game.hasPlayer(function (current) {
-                        return current != player && lib.card.sha.ai.canLink(player, current, item) && player.canUse(item, current, null, true) && get.effect(current, item, player, player) > 0;
-                    }) && game.countPlayer(function (current) {
-                        return current.isLinked() && get.damageEffect(current, player, player, get.nature(item)) > 0;
-                    }) > 1) return 3.1;
-                    return 3;
-                }
-                return 3.05;
+                return lib.card.sha.ai.order(item, player);
             },
             result: {
                 target: function (player, target, card, isLink) {
-                    let eff = -1.5, odds = 1.35, num = 1;
-                    if (isLink) {
-                        let cache = _status.event.getTempCache('sha_result', 'eff');
-                        if (typeof cache !== 'object' || cache.card !== get.translation(card)) return eff;
-                        if (cache.odds < 1.35 && cache.bool) return 1.35 * cache.eff;
-                        return cache.odds * cache.eff;
-                    }
-                    if (player.hasSkill('jiu') || player.hasSkillTag('damageBonus', true, {
-                        target: target,
-                        card: card
-                    })) {
-                        if (target.hasSkillTag('filterDamage', null, {
-                            player: player,
-                            card: card,
-                            jiu: true,
-                        })) eff = -0.5;
-                        else {
-                            num = 2;
-                            if (get.attitude(player, target) > 0) eff = -7;
-                            else eff = -4;
-                        }
-                    }
-                    if (!player.hasSkillTag('directHit_ai', true, {
-                        target: target,
-                        card: card,
-                    }, true)) odds -= 0.7 * target.mayHaveShan(player, 'use', target.getCards('h', i => {
-                        return i.hasGaintag('sha_notshan');
-                    }), 'odds');
-                    _status.event.putTempCache('sha_result', 'eff', {
-                        bool: target.hp > num && get.attitude(player, target) > 0,
-                        card: get.translation(card),
-                        eff: eff,
-                        odds: odds
-                    });
-                    return odds * eff;
+                   return lib.card.sha.ai.result.target.apply(this, arguments);
                 },
             },
             tag: {
@@ -799,96 +725,22 @@ const others = {
         prompt: "将一张装备牌当雷杀使用",
         check(card) { return 4 - get.value(card) },
         ai: {
-            yingbian: function (card, player, targets, viewer) {
-                if (get.attitude(viewer, player) <= 0) return 0;
-                var base = 0, hit = false;
-                if (get.cardtag(card, 'yingbian_hit')) {
-                    hit = true;
-                    if (targets.some(target => {
-                        return target.mayHaveShan(viewer, 'use', target.getCards('h', i => {
-                            return i.hasGaintag('sha_notshan');
-                        })) && get.attitude(viewer, target) < 0 && get.damageEffect(target, player, viewer, get.natureList(card)) > 0;
-                    })) base += 5;
-                }
-                if (get.cardtag(card, 'yingbian_add')) {
-                    if (game.hasPlayer(function (current) {
-                        return !targets.includes(current) && lib.filter.targetEnabled2(card, player, current) && get.effect(current, card, player, player) > 0;
-                    })) base += 5;
-                }
-                if (get.cardtag(card, 'yingbian_damage')) {
-                    if (targets.some(target => {
-                        return get.attitude(player, target) < 0 && (hit || !target.mayHaveShan(viewer, 'use', target.getCards('h', i => {
-                            return i.hasGaintag('sha_notshan');
-                        })) || player.hasSkillTag('directHit_ai', true, {
-                            target: target,
-                            card: card,
-                        }, true)) && !target.hasSkillTag('filterDamage', null, {
-                            player: player,
-                            card: card,
-                            jiu: true,
-                        })
-                    })) base += 5;
-                }
-                return base;
+             yingbian: function (card, player, targets, viewer) {
+                return lib.card.sha.ai.yingbian(card, player, targets, viewer);
             },
             canLink: function (player, target, card) {
-                if (!target.isLinked() && !player.hasSkill('wutiesuolian_skill')) return false;
-                if (player.hasSkill('jueqing') || player.hasSkill('gangzhi') || target.hasSkill('gangzhi')) return false;
-                return true;
+                return lib.card.sha.ai.canLink(player, target, card);
             },
             basic: {
                 useful: [5, 3, 1],
                 value: [5, 3, 1],
             },
             order: function (item, player) {
-                if (player.hasSkillTag('presha', true, null, true)) return 10;
-                if (typeof item === 'object' && game.hasNature(item, 'linked')) {
-                    if (game.hasPlayer(function (current) {
-                        return current != player && lib.card.sha.ai.canLink(player, current, item) && player.canUse(item, current, null, true) && get.effect(current, item, player, player) > 0;
-                    }) && game.countPlayer(function (current) {
-                        return current.isLinked() && get.damageEffect(current, player, player, get.nature(item)) > 0;
-                    }) > 1) return 3.1;
-                    return 3;
-                }
-                return 3.05;
+                return lib.card.sha.ai.order(item, player);
             },
             result: {
                 target: function (player, target, card, isLink) {
-                    let eff = -1.5, odds = 1.35, num = 1;
-                    if (isLink) {
-                        let cache = _status.event.getTempCache('sha_result', 'eff');
-                        if (typeof cache !== 'object' || cache.card !== get.translation(card)) return eff;
-                        if (cache.odds < 1.35 && cache.bool) return 1.35 * cache.eff;
-                        return cache.odds * cache.eff;
-                    }
-                    if (player.hasSkill('jiu') || player.hasSkillTag('damageBonus', true, {
-                        target: target,
-                        card: card
-                    })) {
-                        if (target.hasSkillTag('filterDamage', null, {
-                            player: player,
-                            card: card,
-                            jiu: true,
-                        })) eff = -0.5;
-                        else {
-                            num = 2;
-                            if (get.attitude(player, target) > 0) eff = -7;
-                            else eff = -4;
-                        }
-                    }
-                    if (!player.hasSkillTag('directHit_ai', true, {
-                        target: target,
-                        card: card,
-                    }, true)) odds -= 0.7 * target.mayHaveShan(player, 'use', target.getCards('h', i => {
-                        return i.hasGaintag('sha_notshan');
-                    }), 'odds');
-                    _status.event.putTempCache('sha_result', 'eff', {
-                        bool: target.hp > num && get.attitude(player, target) > 0,
-                        card: get.translation(card),
-                        eff: eff,
-                        odds: odds
-                    });
-                    return odds * eff;
+                   return lib.card.sha.ai.result.target.apply(this, arguments);
                 },
             },
             tag: {
