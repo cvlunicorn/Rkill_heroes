@@ -272,7 +272,7 @@ const shiptypeskills = {
         content: function () {
             'step 0'
             player.chooseControl('<span class=yellowtext>友军摸牌防御' + '</span>', '<span class=yellowtext>友军远射攻击' + '</span>', 'cancel2').set('prompt', get.prompt('huokongld')).set('prompt2', '<br>防御：你让实际距离此角色为' + (1 + player.countMark('songpaiup')) + '的队友：<br>防御距离+1,但用杀攻击的距离-1,令自己的摸牌阶段摸牌数-1。<br>攻击：让距离自己' + (1 + player.countMark('jinengup')) + '的队友及自己的攻击距离+1,但防御杀的距离-1,队友的摸牌阶段摸牌数+1。<br>强化技能可以增加这两个技能的作用距离').set('ai', function (event, player) {
-                var player = get.player(), chusha = lib.filter.cardEnabled({ name: 'sha' }, player), renshu = game.countPlayer(function (current) { return get.attitude(player, current) > 0 && get.distance(from, current, 'pure') <= 1 + current.countMark('jinengup'); });
+                var player = get.player(), chusha = lib.filter.cardEnabled({ name: 'sha' }, player), renshu = game.countPlayer(function (current) { return get.attitude(player, current) > 0 && get.distance(player, current, 'pure') <= 1 + current.countMark('jinengup'); });
                 if (renshu < 2 || chusha) return 1; if (renshu >= 2 && !chusha) return 0;
             });
             'step 1'
