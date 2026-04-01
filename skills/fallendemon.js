@@ -453,7 +453,7 @@ const fallendemon = {
         global: ["southdakota_R_gumei_phaseUse"],
         nobracket: true,
         init: function (player) {
-            player.storage.temp_ban_southdakota_R_gumei = false;
+            player.storage.southdakota_R_gumei = false;
         },
         trigger: {
             source: "damageSource",
@@ -461,11 +461,12 @@ const fallendemon = {
         forced: true,
         filter: function (event, player) {
             var evt = event.getParent("southdakota_R_gumei_phaseUse");
-            return evt && evt == "southdakota_R_gumei_phaseUse" && evt.targets[1] == player;
+            return evt && evt.name == "southdakota_R_gumei_phaseUse" && evt.targets[1] == player;
         },
         content: function () {
-            if (typeof player.storage.temp_ban_southdakota_R_gumei === 'undefined') player.storage.temp_ban_southdakota_R_gumei = false;
-            player.storage.temp_ban_southdakota_R_gumei == true;
+            
+            if (typeof player.storage.southdakota_R_gumei === 'undefined') player.storage.southdakota_R_gumei = false;
+            player.storage.southdakota_R_gumei = true;
         },
         group: ["southdakota_R_gumei_reflash"],
         subSkill: {
@@ -475,10 +476,10 @@ const fallendemon = {
                 },
                 forced: true,
                 filter: function (event, player) {
-                    return player.storage.temp_ban_southdakota_R_gumei == true;
+                    return player.storage.southdakota_R_gumei == true;
                 },
                 content: function () {
-                    player.storage.temp_ban_southdakota_R_gumei = false;
+                    player.storage.southdakota_R_gumei = false;
                 },
                 sub: true,
                 "_priority": 0,
@@ -502,13 +503,13 @@ const fallendemon = {
         multitarget: true,
         filterTarget: function (card, player, target) {
             if (ui.selected.targets.length == 1) {
-                return (target.hasSkill("southdakota_R_gumei") && target.getStorage('temp_ban_southdakota_R_gumei') != true) && target.canUse({ name: "juedou" }, ui.selected.targets[0]);
+                return (target.hasSkill("southdakota_R_gumei") && target.getStorage('southdakota_R_gumei') != true) && target.canUse({ name: "juedou" }, ui.selected.targets[0]);
             }
             return true;
         },
         filter: function (event, player) {
             if (player.hasSkill("southdakota_R_gumei") || (!player.countCards("h"))) { return false; }
-            return game.countPlayer(current => current != player && current.hasSkill("southdakota_R_gumei") && current.getStorage('temp_ban_southdakota_R_gumei') != true) >= 1;
+            return game.countPlayer(current => current != player && current.hasSkill("southdakota_R_gumei") && current.getStorage('southdakota_R_gumei') != true) >= 1;
         },
         content: function () {
             player.give(cards[0], event.targets[1]);
