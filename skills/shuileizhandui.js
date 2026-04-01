@@ -60,7 +60,7 @@ const shuileizhandui = {
                 if (type != "basic" && type != "trick" && type != "delay") continue;
                 if (event.usedNames.includes(name)) continue;
                 var typeTrans = type == "basic" ? "基本" : (type == "delay" ? "延时锦囊" : "锦囊");
-                list.push([typeTrans, "", name,""]);
+                list.push([typeTrans, "", name, ""]);
             }
             if (list.length <= 0) {
                 game.log("没有可选的牌了");
@@ -415,7 +415,7 @@ const shuileizhandui = {
                         await player.useCard(chosenCard, target, false);
                     }
                 }
-                
+
             }
             if (cards.length) {
                 // 没被打出去的亮牌全部进入弃牌堆，不回牌堆顶。
@@ -469,11 +469,13 @@ const shuileizhandui = {
             }
         },
         ai: {
-            order: 8,
+            order: 7,
             result: {
                 player: function (player, target) {
-                    if (player.hp > 2) return -1;
-                    return -2;
+                    if (player.hp < 2) return -2;
+                    var damage = Math.floor(Math.max(target.getHp(), 0) / 2);
+                    if (damage <= 0) return 0;
+                    return get.damageEffect(target, player, player) * damage - get.damageEffect(player, player, player);
                 },
                 target: function (player, target) {
                     var damage = Math.floor(Math.max(target.getHp(), 0) / 2);
