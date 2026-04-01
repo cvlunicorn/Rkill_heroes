@@ -245,8 +245,9 @@ const shiptypeskills = {
             player: "shaMiss",
         },
         silent: true,
-        filter: function (event) {//return event.getParent(2).name=='zhongpaoduijue'
-            ;
+        filter: function (event) {
+            //return event.getParent(2).name=='zhongpaoduijue';
+            return true;
         },
         content: function () {
             player.getStat().card.sha--
@@ -266,7 +267,7 @@ const shiptypeskills = {
         enable: "phaseUse",
         usable: 2,
         init: function (player) {
-            if (!player.hasMark('xianjinld_difend') && !player.hasMark('xianjinld_attack')) player.addMark('xianjinld_difend');
+            if (!player.hasMark('xianjinld_defend') && !player.hasMark('xianjinld_attack')) player.addMark('xianjinld_defend');
         },
         content: function () {
             'step 0'
@@ -275,7 +276,7 @@ const shiptypeskills = {
                 if (renshu < 2 || chusha) return 1; if (renshu >= 2 && !chusha) return 0;
             });
             'step 1'
-            if (result.control != 'cancel2') { var i = result.index; game.log(i, 'xianjinld'); if (i == 0 && !player.hasMark('xianjinld_difend')) { player.addMark('xianjinld_difend'); player.removeMark('xianjinld_attack') }; if (i == 1 && !player.hasMark('xianjinld_attack')) { player.addMark('xianjinld_attack'); player.removeMark('xianjinld_difend') }; };
+            if (result.control != 'cancel2') { var i = result.index; game.log(i, 'xianjinld'); if (i == 0 && !player.hasMark('xianjinld_defend')) { player.addMark('xianjinld_defend'); player.removeMark('xianjinld_attack') }; if (i == 1 && !player.hasMark('xianjinld_attack')) { player.addMark('xianjinld_attack'); player.removeMark('xianjinld_defend') }; };
         },
         ai: {
             order: function (player) { if (lib.filter.cardEnabled({ name: 'sha' }, player)) { return 8; } return 3; },
@@ -287,17 +288,17 @@ const shiptypeskills = {
         },
         intro: {
             mark: function (dialog, content, player) {
-                var tishi = ''; if (player.hasMark('xianjinld_difend')) { var tishi = '实际距离此角色为' + (1 + player.countMark('songpaiup')) + '的队友：防御距离+1,但用杀攻击的距离-1,令自己的摸牌阶段摸牌数-1' }; if (player.hasMark('xianjinld_attack')) { var tishi = '实际距离此角色为' + (1 + player.countMark('songpaiup')) + '的队友及自己：攻击距离+1,但防御杀的距离-1,队友的摸牌阶段摸牌数+1。' };
-                if (get.attitude(game.me, player) <= 0 || player.hasMark('xianjinld_difend')) { return get.translation(player) + '观看牌堆中...' + '<br>增益' + tishi; };
+                var tishi = ''; if (player.hasMark('xianjinld_defend')) { var tishi = '实际距离此角色为' + (1 + player.countMark('songpaiup')) + '的队友：防御距离+1,但用杀攻击的距离-1,令自己的摸牌阶段摸牌数-1' }; if (player.hasMark('xianjinld_attack')) { var tishi = '实际距离此角色为' + (1 + player.countMark('songpaiup')) + '的队友及自己：攻击距离+1,但防御杀的距离-1,队友的摸牌阶段摸牌数+1。' };
+                if (get.attitude(game.me, player) <= 0 || player.hasMark('xianjinld_defend')) { return get.translation(player) + '观看牌堆中...' + '<br>增益' + tishi; };
                 if (get.itemtype(_status.pileTop) != 'card') return '牌堆顶无牌'; var cardPile = Array.from(ui.cardPile.childNodes); var cardPile = cardPile.slice(0, Math.min(3, cardPile.length)); dialog.addAuto(cardPile, tishi);
             },
         },
-        global: ["xianjinld_attack", "xianjinld_difend"],
-        group: ["xianjinld_difend1"],
+        global: ["xianjinld_attack", "xianjinld_defend"],
+        group: ["xianjinld_defend1"],
         subSkill: {
             attack: {
                 mod: {
-                    golbalFrom: function (from, to, num) {
+                    globalFrom: function (from, to, num) {
                         return num - game.hasPlayer(function (current) {
                             return get.attitude(from, current) > 0 && get.distance(from, current, 'pure') <= 1 + current.countMark('jinengup') && current.hasSkill('xianjinld') && current.hasMark('xianjinld_attack');
                         });
@@ -314,7 +315,7 @@ const shiptypeskills = {
                 mod: {
                     globalTo: function (from, to, num) {
                         return num + game.hasPlayer(function (current) {
-                            return current != to && get.attitude(to, current) > 0 && get.distance(to, current, 'pure') <= 1 + current.countMark('jinengup') && current.hasSkill('xianjinld') && current.hasMark('xianjinld_difend');
+                            return current != to && get.attitude(to, current) > 0 && get.distance(to, current, 'pure') <= 1 + current.countMark('jinengup') && current.hasSkill('xianjinld') && current.hasMark('xianjinld_defend');
                         });
                     },
                     attackFrom: function (from, to, num) {
@@ -339,7 +340,7 @@ const shiptypeskills = {
                     var a = get.translation('xianjinld_info');
                     if (player.identity == 'nei') { a += ('<br>控制全场状态有一手；<br>内奸需要辅助弱势方,攻击实力出色的角色,平衡场上局势,保持自己的状态,伺机实现连破。') }; return a;
                 },
-                content: function () { if (trigger.player == player && player.hasMark('xianjinld_difend')) { trigger.num-- }; if (trigger.player != player && player.hasMark('xianjinld_attack')) { trigger.num++; }; },
+                content: function () { if (trigger.player == player && player.hasMark('xianjinld_defend')) { trigger.num-- }; if (trigger.player != player && player.hasMark('xianjinld_attack')) { trigger.num++; }; },
                 sub: true,
             },
         },

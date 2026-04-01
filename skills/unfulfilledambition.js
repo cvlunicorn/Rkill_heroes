@@ -1546,7 +1546,8 @@ const unfulfilledambition = {
             },
 
         },
-        kelaosaiweici_R_jinji: {
+        "_priority": 0,
+    },kelaosaiweici_R_jinji: {
             // 进击：
             // 用【杀】后可先摸一张；若摸到基本牌,则可再弃掉它,
             // 把这张【杀】从本回合使用次数里“退款”,为连续进攻续航。
@@ -1751,9 +1752,6 @@ const unfulfilledambition = {
                 trigger.num++;
             },
         },
-
-        "_priority": 0,
-    },
     jing_shu: {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",

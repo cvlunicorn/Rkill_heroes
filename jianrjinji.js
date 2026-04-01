@@ -14,9 +14,9 @@ var jianrjinji = {
     //全局技能"_yuanhang","_jianzaochuan","_qianghuazhuang",
     characterSort: {
         jianrjinji: {
-            jianrbiaozhun: ["liekexingdun_R", "qixichicheng_R", "wufenzhongchicheng_R", "qiye_R", "bisimai_R", "misuli_R", "weineituo_R", "lisailiu_R", "1913_R", "changmen_R", "kunxi_R", "ougengqi_R", "qingye_R", "beianpudun_R", "jiujinshan_R", "jiujinshan_R", "yixian_R", "tianlangxing_R", "dadianrendian_R", "yatelanda_R", "z31_R", "xuefeng_R", "kangfusi_R", "47project_R", "guzhuyizhichuixue_R", "shuileizhanduichuixue_R", "mingsike_R", "yinghuochong_R", "u1405_R", "baiyanjuren_R", "changchun_R"],
+            jianrbiaozhun: ["liekexingdun_R", "qixichicheng_R", "wufenzhongchicheng_R", "qiye_R", "bisimai_R", "misuli_R", "weineituo_R", "lisailiu_R", "1913_R", "changmen_R", "kunxi_R", "ougengqi_R", "qingye_R", "beianpudun_R", "jiujinshan_R", "yixian_R", "tianlangxing_R", "dadianrendian_R", "yatelanda_R", "z31_R", "xuefeng_R", "kangfusi_R", "47project_R", "guzhuyizhichuixue_R", "shuileizhanduichuixue_R", "mingsike_R", "yinghuochong_R", "u1405_R", "baiyanjuren_R", "changchun_R"],
             lishizhanyi_naerweike: ["shengwang_R", "z17_R", "z18_R", "z21_R", "z22_R", "gesakeren_R", "biaoqiang_R", "aisijimoren_R"],
-            lishizhanyi_matapanjiao: ["kewei_R", "shengqiaozhi_R", "luodeni_R", "boerzanuo", "jialibodi_R"],
+            lishizhanyi_matapanjiao: ["kewei_R", "shengqiaozhi_R", "luodeni_R", "boerzanuo_R", "jialibodi_R"],
             lishizhanyi_danmaihaixia: ["hude_R", "shenluopujun_R", "weiershiqinwang_R", "z1_R", "z16_R"],
             lishizhanyi_shanhuhai: ["lafei_R", "shiyu_R", "salemu_R", "dahuangfeng_R", "yuekecheng_R", "qiuyue_R", "weilianDbote_R", "xianghe_R", "ruihe_R", "yuhei_R", "guying_R"],
             lishizhanyi_haixiafujizhan: ["u47_R", "u81_R", "u505_R", "jinqu_R", "kente_R", "u96_R", "lundun_R"],
@@ -79,7 +79,7 @@ var jianrjinji = {
         shenluopujun_R: ["female", "RN", 4, ["huokongld", "zhongxunca", "hongseqiangwei"], ["des:什罗普郡是伦敦级重巡洋舰四号舰。在战争早期,什罗普郡主要执行护航与武装巡逻任务。在萨沃岛海战中,原澳海军堪培拉号重巡洋舰战沉。皇家海军将什罗普郡转交澳海军顶替堪培拉号巡洋舰的战损。什罗普郡参加了太平洋战场诸多战役,在苏里高海战中与盟军一道截击了来袭战列舰。在战争胜利时,什罗普郡参加了签字仪式。"]],
         lafei_R: ["female", "USN", 4, ["dajiaoduguibi", "quzhudd", "bujushenfeng"], ["des:艾伦·萨姆纳级拉菲号驱逐舰（DD724）的舰名继承自一艘英雄军舰,前代拉菲号曾经在所罗门海战中勇敢地挑战日军的比睿号战列舰。而这一代拉菲也毫不逊色。在冲绳战役期间,她执行雷达哨舰任务时在短时间内遭到了约五十架神风飞机的攻击,被直接撞击六架,命中四弹。但是拉菲坚持战斗,舰长拒绝弃舰并率舰返回了关岛。这是战争史上的一个奇迹,而这艘坚毅的驱逐舰一直服役到了冷战时期。75年退役后成为了博物馆。"]],
         sp_lafei_R: ["female", "USN", 3, ["dajiaoduguibi", "quzhudd", "shenfeng", "buju", "qiangyun", "yuanjun"], ["des:艾伦·萨姆纳级拉菲号驱逐舰（DD724）的舰名继承自一艘英雄军舰,前代拉菲号曾经在所罗门海战中勇敢地挑战日军的比睿号战列舰。而这一代拉菲也毫不逊色。在冲绳战役期间,她执行雷达哨舰任务时在短时间内遭到了约五十架神风飞机的攻击,被直接撞击六架,命中四弹。但是拉菲坚持战斗,舰长拒绝弃舰并率舰返回了关岛。这是战争史上的一个奇迹,而这艘坚毅的驱逐舰一直服役到了冷战时期。75年退役后成为了博物馆。"]],
-        salemu_R: ["female", "USN", 4, ["huokongld", "zhongxunca", "jingruizhuangbei"], ["des:新奥尔良级重巡洋舰6号舰。新奥尔良级是北安普顿级的改良版本,增强了防护。战争爆发后,昆西号先是执行了在大西洋的岛屿巡逻任务,后于42年5月通过巴拿马运河来到太平洋战场。在萨沃岛海战中,昆西号击中了鸟海号的舰桥,但是之后昆西号被日军集火射击,最终不幸被鱼雷击沉。"]],
+        salemu_R: ["female", "USN", 4, ["huokongld", "zhongxunca", "jingruizhuangbei"], ["des:萨勒姆号是德梅因级2号舰。由于完工时战争已经结束，强大的自动主炮没有发挥的机会。她服役之后主要担任舰队旗舰，并且于1959年退役，现在停泊在昆西市作为博物馆。在50年代的电影《河口之战》中，萨勒姆扮演了斯佩伯爵。"]],
         "u505_R": ["female", "KMS", 3, ["qianting", "dananbusi", "houfu"], ["des:该艇属IX-C型潜艇,于42年建成,她在德军服役生涯中一共击沉了8艘总计4万吨的盟军船只。让U-505成名的事件发生在44年6月。当时U-505被美军的反潜编队发现并击伤,鉴于形势,艇员浮出水面并弃艇。这艘潜艇之后被美军俘获并进行了抢修运回本土,上面的一些发报机和密码本被盟军获得。至今这个特别的战利品依然在美国的博物馆中对外展出,这也是唯一存世的IX-C型潜艇。"]],
         jialifuniya_R: ["female", "USN", 4, ["zhanliebb", "zhuangjiafh", "zhanliexianfuchou"], ["des:田纳西级2号舰,在20年代的年度大演习中,她表现优秀。1940年成为美军最早装备CXAM雷达的几艘军舰之一。在日军偷袭珍珠港中加利福尼亚号被重创,一直到1944年才修复完毕重返战场,修复的同时加利福尼亚号也进行了性能上的改装。苏里高海战中,加利福尼亚号同其余在珍珠港受难的姐妹一道,用战舰的方式完成了对日军的复仇。"]],
         jifu_R: ["female", "ΒΜΦCCCP", 2, ["quzhudd", "dajiaoduguibi", "jifu_R_weicheng", "jifu_R_yuanjing", "jifu_R_lingwei", "jifu_R_yuanqin", "jifu_R_yuanqin"], ["des:基辅是苏联海军大舰队计划中的一环,她的设计吸取了塔什干和列宁格勒等驱逐舰的技术,同时航速和火力也保持了非常强的水平。尽管基辅在战前已经开工,但还是因为战况的影响而停工。在战争末期,未完工的基辅被拖回船厂,并修改了设计准备继续建造,但由于相比战后的新驱逐舰设计优势不大,所以并没有最终建造完成。"]],

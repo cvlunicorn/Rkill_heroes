@@ -92,8 +92,7 @@ const globalskills = {
                 },
                 sub: true,
             },
-        },
-        bingsimopai: {
+            bingsimopai: {
             name: "濒死摸牌",
             //usable: 2,
             fixed: true,
@@ -116,6 +115,8 @@ const globalskills = {
             },
             sub: true,
         },
+        },
+        
     },
     _jianzaochuan: {
         name: "建造",
