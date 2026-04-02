@@ -643,7 +643,7 @@ var jianrjinji = {
         yuanzhenghuwei_evade: "远征护卫",
         yuanzhenghuwei_evade_info: "",
         duomianxunlianjian: "多面训练舰",
-        duomianxunlianjian_info: "当你失去牌后，你可以令场上手牌唯一最少的角色摸一张牌。",
+        duomianxunlianjian_info: "当你失去牌后，你可以令场上手牌最少的角色摸一张牌。",
         baixue_jiban: "羁绊",
         baixue_jiban_info: "当一名角色受到【杀】或【决斗】造成的伤害时，你可以将一张红桃手牌置于牌堆顶，防止此伤害。若其为驱逐舰，改为任意手牌。",
         qiangxingzhencha: "强行侦查",

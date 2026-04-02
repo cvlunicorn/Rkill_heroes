@@ -810,73 +810,40 @@ const shuileizhandui = {
             player: "loseAfter",
             global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
         },
+        direct: true,
         log: false,
         filter: function (event, player) {
             // 只在自己确实失去过牌后才触发；其他区域变动但未失牌的不算。
             var evt = event.getl(player);
             if (!evt || !evt.cards2 || !evt.cards2.length) return false;
-            // 只有"唯一最少手牌"的角色才符合技能要求；若并列最少则直接返回空。
-            var minHandCount = Infinity;
-            var uniqueTargets = [];
-            game.filterPlayer().forEach(function (current) {
-                var handCount = current.countCards("h");
-                if (handCount < minHandCount) { minHandCount = handCount; uniqueTargets = [current]; }
-                else if (handCount == minHandCount) uniqueTargets.push(current);
-            });
-            return uniqueTargets.length == 1;
+            return true;
         },
         prompt: function (event, player) {
-            // 只有"唯一最少手牌"的角色才符合技能要求；若并列最少则直接返回空。
-            var minHandCount = Infinity;
-            var uniqueTargets = [];
-            game.filterPlayer().forEach(function (current) {
-                var handCount = current.countCards("h");
-                if (handCount < minHandCount) { minHandCount = handCount; uniqueTargets = [current]; }
-                else if (handCount == minHandCount) uniqueTargets.push(current);
-            });
-            var target = uniqueTargets.length == 1 ? uniqueTargets[0] : null;
-            return target ? get.prompt("duomianxunlianjian", target, player) : get.prompt("duomianxunlianjian");
+            return get.prompt("duomianxunlianjian");
         },
-        prompt2: "令场上手牌唯一最少的角色摸一张牌。",
+        prompt2: "令场上手牌最少的角色摸一张牌。",
         check: function (event, player) {
-            // 只有"唯一最少手牌"的角色才符合技能要求；若并列最少则直接返回空。
-            var minHandCount = Infinity;
-            var uniqueTargets = [];
-            game.filterPlayer().forEach(function (current) {
-                var handCount = current.countCards("h");
-                if (handCount < minHandCount) { minHandCount = handCount; uniqueTargets = [current]; }
-                else if (handCount == minHandCount) uniqueTargets.push(current);
+            game.hasPlayer(function (target) {
+                return player !== target && !game.hasPlayer(function (current) {
+                    return current !== player && current !== target && current.countCards('h') < target.countCards('h');
+                }) && get.attitude(player, target) > 0;
             });
-            var target = uniqueTargets.length == 1 ? uniqueTargets[0] : null;
-            return !!(target && target.isIn() && get.attitude(player, target) > 0);
         },
-        async content(event, trigger, player) {
-            // 只有"唯一最少手牌"的角色才符合技能要求；若并列最少则直接返回空。
-            var minHandCount = Infinity;
-            var uniqueTargets = [];
-            game.filterPlayer().forEach(function (current) {
-                var handCount = current.countCards("h");
-                if (handCount < minHandCount) { minHandCount = handCount; uniqueTargets = [current]; }
-                else if (handCount == minHandCount) uniqueTargets.push(current);
+        content(event, trigger, player) {
+            'step 0';
+            player.chooseTarget("令场上手牌最少的角色摸一张牌。", function (card, player, target) {
+                return target.isMinHandcard();
+            }).set('ai', function (target) {
+                return get.attitude(_status.event.player, target);
             });
-            var target = uniqueTargets.length == 1 ? uniqueTargets[0] : null;
-            if (!target) return;
-            // 结算前再复查一次，防止连锁事件后"唯一最少"已经换人。
-            var minHandCount2 = Infinity;
-            var uniqueTargets2 = [];
-            game.filterPlayer().forEach(function (current) {
-                var handCount = current.countCards("h");
-                if (handCount < minHandCount2) { minHandCount2 = handCount; uniqueTargets2 = [current]; }
-                else if (handCount == minHandCount2) uniqueTargets2.push(current);
-            });
-            if (!target.isIn() || uniqueTargets2.length != 1 || uniqueTargets2[0] != target) return;
-
-            player.logSkill("duomianxunlianjian", target);
-            await target.draw(1);
+            'step 1';
+            if (result.bool) {
+                result.targets[0].draw(1);
+                game.logSkill("duomianxunlianjian");
+            }
         },
         ai: {
             expose: 0.1,
-            threaten: 1.05,
         },
     },
     baixue_jiban: {
