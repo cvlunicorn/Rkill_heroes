@@ -463,7 +463,7 @@ const shuileizhandui = {
             var target = event.target;
             await player.loseHp();
             if (!player.isIn() || !target.isIn()) return;
-            var damage = Math.floor(target.getHp() / 2);
+            var damage = Math.ceil(target.getHp() / 2);
             if (damage > 0) {
                 await target.damage(damage, player);
             }
