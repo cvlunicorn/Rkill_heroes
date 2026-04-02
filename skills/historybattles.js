@@ -3224,7 +3224,7 @@ const historybattles = {
             "step 0"
             player.awakenSkill('yangwangxingkong');
             player.give(cards[0], target);
-            player.addSkill("yangwangxingkong_draw");
+            //player.addSkill("yangwangxingkong_draw");
             "step 1"
             target.chooseControl("yangwangxingkong_card", "yangwangxingkong_hp").ai = function (event, player) {
                 var cards = player.getCards("h");
@@ -3277,7 +3277,7 @@ const historybattles = {
         init: (player, skill) => (player.storage[skill] = false),
         "_priority": 0,
     },
-    yangwangxingkong_draw: {
+    /*yangwangxingkong_draw: {
         trigger: {
             player: "phaseDrawBegin2",
         },
@@ -3294,7 +3294,7 @@ const historybattles = {
         },
         sub: true,
         "_priority": 0,
-    },
+    },*/
     zhengzhansifang: {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
