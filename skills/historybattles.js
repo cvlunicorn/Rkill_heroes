@@ -381,7 +381,7 @@ const historybattles = {
                     dialog.buttons[i].querySelector('.info').innerHTML = getName(targets[i]) + '|' + get.strNumber(cards[i].number);
                 }
             }, targets, cards, videoId, player);
-            await game.asyncDelay(4);
+            await game.asyncDelayx(4);
             game.broadcastAll('closeDialog', videoId);
  
             const type = get.type(cards[0], false);
@@ -1776,7 +1776,7 @@ const historybattles = {
             trigger.player.judging[0] = chooseCardResultCards[0];
             trigger.orderingCards.addArray(chooseCardResultCards);
             game.log(trigger.player, '的判定牌改为', chooseCardResultCards[0]);
-            game.asyncDelay(2);
+            game.asyncDelayx(2);
         },
         ai: {
             rejudge: true,
@@ -2881,7 +2881,7 @@ const historybattles = {
             game.cardsDiscard(trigger.player.judging[0]);
             trigger.player.judging[0] = card;
             game.log(trigger.player, "的判定牌改为", card);
-            game.delay(2);
+            game.delayx(2);
         },
     },
     shaojie: {
@@ -3077,7 +3077,7 @@ const historybattles = {
             }/* 
                                      var time = 1000 - (get.utc() - event.time);
                                      if (time > 0) {
-                                         game.delay(0, time);
+                                         game.delayx(0, time);
                                      } */
             "step 3"
             game.broadcastAll('closeDialog', event.videoId);
@@ -3142,7 +3142,7 @@ const historybattles = {
                 game.asyncDraw(result.targets, 1);
             } else event.finish();
             "step 2";
-            game.delay();
+            game.delayx();
         },
     },
 

@@ -1720,7 +1720,6 @@ const fallendemon = {
                 else event.target1.addJudge(event.card);
             }
             game.log(event.target0, "的", get.position(event.card) == "h" ? "一张手牌" : event.card, "被移动给了", event.target1);
-            game.delay();
             player.changeZhuanhuanji('cassone_R_yibing');
         },
         group: ["cassone_R_yibing_number"],
@@ -2171,7 +2170,7 @@ const fallendemon = {
                 },
                 content: function () {
                     "step 0"
-                    if (trigger.delay == false) game.delay();
+                    if (trigger.delay == false) game.delayx();
                     "step 1"
                     var cards = [], cards2 = trigger.cards.slice(0), evt = trigger.getl(player);
                     if (evt && evt.cards) cards2.removeArray(evt.cards);

@@ -485,7 +485,7 @@ const standard = {
             }
             var time = 1000 - (get.utc() - event.time);
             if (time > 0) {
-                game.delay(0, time);
+                game.delayx(0, time);
             }
             "step 3"
             game.broadcastAll('closeDialog', event.videoId);
@@ -741,10 +741,8 @@ const standard = {
                             // 友方：对方选的选项越优,我方收益越高（避免误伤友方）
                             targetProfit = -lib.skill.qixi_cv.getChoiceCost(target, bestChoice);
                         }
-                        console.log("奇袭target" + get.translation(target) + targetProfit);
                         totalProfit += targetProfit;
                     }
-                    console.log("奇袭total" + totalProfit);
                     // 限定技阈值：收益≥1 才发动（避免浪费）
                     return totalProfit > 2 ? 1 : 0;
                 },
@@ -1029,7 +1027,7 @@ const standard = {
                     }).set('ai', function (card) {
                         return (get.effect(player, trigger.card, trigger.player, player)) - get.value(card);
                     });
-                game.delay();
+                game.delayx();
             }
             else {
                 event.finish();
@@ -1953,7 +1951,7 @@ const standard = {
             }
             "step 1"
             player.give(result.cards, trigger.target);
-            game.delay();
+            game.delayx();
             if (trigger.target.countCards("ej")) {
                 player.gainPlayerCard(trigger.target, 'ej', true, 'visible').set('ai', function (card) {
                     if (get.type(card) == "delay") return 1;
@@ -1987,7 +1985,7 @@ const standard = {
             "step 4"
             if (result.bool) {
                 event.target.give(result.cards, player);
-                //game.delay();
+                //game.delayx();
                 if (trigger.target.countCards("ej")) {
                     event.target.gainPlayerCard(player, 'ej', true, 'visible').set('ai', function (card) {
                         if (get.attitude(event.target, player) >= 0) {
@@ -2510,7 +2508,7 @@ const standard = {
                 player.changeHujia(1, null, true);
             }
             else event.current.draw();
-            game.delay();
+            game.delayx();
             if (targets.length) event.goto(2);
         },
         "_priority": 0,
@@ -3195,7 +3193,7 @@ const standard = {
                     dialog.buttons[i].querySelector('.info').innerHTML = getName(targets[i]) + '|' + get.translation(cardsA[i].suit);
                 }
             }, targets, cardsA, videoId, player);
-            await game.asyncDelay(4);
+            await game.asyncDelayx(4);
             game.broadcastAll('closeDialog', videoId);
             const suit = get.suit(cardsA[0], false);
             let flag = false;

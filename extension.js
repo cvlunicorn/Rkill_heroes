@@ -662,7 +662,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     dialog.content.firstChild.innerHTML = capt;
                                     game.addVideo('dialogCapt', null, [dialog.videoId, dialog.content.firstChild.innerHTML]);
                                     game.log(target, '选择了', button.link);
-                                    game.delay();
+                                    game.delayx();
                                 },
                                 contentAfter: function () {
                                     for (var i = 0; i < ui.dialogs.length; i++) {
