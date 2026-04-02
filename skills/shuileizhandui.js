@@ -810,8 +810,7 @@ const shuileizhandui = {
             player: "loseAfter",
             global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
         },
-        direct: true,
-        log: false,
+        frequent: true,
         filter: function (event, player) {
             // 只在自己确实失去过牌后才触发；其他区域变动但未失牌的不算。
             var evt = event.getl(player);
@@ -839,7 +838,6 @@ const shuileizhandui = {
             'step 1';
             if (result.bool) {
                 result.targets[0].draw(1);
-                game.logSkill("duomianxunlianjian");
             }
         },
         ai: {
