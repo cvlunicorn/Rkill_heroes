@@ -924,22 +924,24 @@ const unfulfilledambition = {
             'step 0';
             player.discardPlayerCard(target, "h", "visible");
             'step 1';
-            event.card = result.cards[0];
-            //game.log(event.card);
-            if (get.type(event.card) == "trick") {
-                game.log("爱知视为未发动过");
-                player.getStat('skill').aizhi -= 1;
+            if (result.bool) {
+                event.card = result.cards[0];
+                //game.log(event.card);
+                if (get.type(event.card) == "trick") {
+                    game.log("爱知视为未发动过");
+                    player.getStat('skill').aizhi -= 1;
+                }
+                if (get.type(event.card) === "delay" || get.type(event.card) === "equip") {
+                    event.finish();
+                    return 0;
+                }
+                var unablelist = ["shan", "huibi9", "ganraodan9", "wuxie", "zhikongquan9"];
+                if (unablelist.includes(get.name(event.card))) {
+                    event.finish();
+                    return 0;
+                }
+                player.chooseToDiscard("你可以弃置一张手牌视为使用" + get.translation(event.card), 1, false);
             }
-            if (get.type(event.card) === "delay" || get.type(event.card) === "equip") {
-                event.finish();
-                return 0;
-            }
-            var unablelist = ["shan", "huibi9", "ganraodan9", "wuxie", "zhikongquan9"];
-            if (unablelist.includes(get.name(event.card))) {
-                event.finish();
-                return 0;
-            }
-            player.chooseToDiscard("你可以弃置一张手牌视为使用" + get.translation(event.card), 1, false);
             'step 2';
             if (result.bool) {
                 player.chooseUseTarget(
@@ -1547,211 +1549,211 @@ const unfulfilledambition = {
 
         },
         "_priority": 0,
-    },kelaosaiweici_R_jinji: {
-            // 进击：
-            // 用【杀】后可先摸一张；若摸到基本牌,则可再弃掉它,
-            // 把这张【杀】从本回合使用次数里“退款”,为连续进攻续航。
-            nobracket: true,
-            usable: 1,
-            trigger: {
-                player: "useCard",
-            },
-            frequent: true,
-            filter: function (event) {
-                return event.card && event.card.name == "sha";
-            },
-            prompt2: "摸一张牌,然后若此牌为基本牌,你可以弃置之令此【杀】不计入本回合的使用次数。",
-            check: function (event, player) {
-                return true;
-            },
-            content: function () {
-                "step 0";
-                player.draw();
-                'step 1'
-                event.card = result[0];
-                if (get.type(event.card) != "basic") {
-                    event.finish();
-                    return;
-                }
-                // 只有摸到的牌仍在手里,才允许把它弃掉来换“不计次数”。
-                if (get.position(event.card) != "h") {
-                    event.finish();
-                    return;
-                }
-                player.chooseBool("进击：是否弃置" + get.translation(event.card) + "令此【杀】不计入本回合的使用次数？").set("ai", function () {
-                    var player = get.player();
-                    var card = _status.event.getParent().card;
-                    if (!card || _status.currentPhase != player) return false;
-                    if (card.name == "sha") {
-                        return game.hasPlayer(function (current) {
-                            return current != player && get.attitude(player, current) < 0 && player.canUse({ name: "sha" }, current);
-                        });
-                    }
-                    if (card.name == "jiu") {
-                        return player.countCards("h", function (current) {
-                            return current != card && current.name == "sha";
-                        }) > 0;
-                    }
-                    return false;
-                });
-                "step 2";
-                if (result.bool && get.position(event.card) == "h") {
-                    player.discard(event.card);
-                    if (trigger.addCount !== false) {
-                        // 回退本次【杀】对次数统计的占用,和 addCount=false 的虚拟出牌保持一致。
-                        trigger.addCount = false;
-                        var stat = player.getStat().card;
-                        if (stat && stat.sha > 0) player.getStat().card.sha--;
-                    }
-                    game.log(trigger.card, "不计入次数限制");
-                }
-            },
-            ai: {
-                expose: 0.15,
-            },
+    }, kelaosaiweici_R_jinji: {
+        // 进击：
+        // 用【杀】后可先摸一张；若摸到基本牌,则可再弃掉它,
+        // 把这张【杀】从本回合使用次数里“退款”,为连续进攻续航。
+        nobracket: true,
+        usable: 1,
+        trigger: {
+            player: "useCard",
         },
-        kelaosaiweici_R_lunzhan: {
-            // 论战：
-            // 准备阶段在“控顶保资源”和“本回合杀伤强化”之间二选一。
-            nobracket: true,
-            trigger: {
-                player: "phaseZhunbeiBegin",
-            },
-            frequent: true,
-            content: function () {
-                "step 0";
-                // KMS 角色数量直接决定控顶分支的手牌上限补正。
-                player.chooseControl().set("choiceList", [
-                    "观看并排列牌堆顶的4张牌,本回合手牌上限+" + game.countPlayer(function (current) {
-                        return current.group == "KMS";
-                    }),
-                    "本回合你使用【杀】造成的伤害+1",
-                ]).set("prompt", get.prompt("kelaosaiweici_R_lunzhan")).set("ai", function () {
-                    var player = get.player();
-                    if (player.countCards("h", function (card) {
-                        return card.name == "sha";
-                    }) > 0 && game.hasPlayer(function (current) {
+        frequent: true,
+        filter: function (event) {
+            return event.card && event.card.name == "sha";
+        },
+        prompt2: "摸一张牌,然后若此牌为基本牌,你可以弃置之令此【杀】不计入本回合的使用次数。",
+        check: function (event, player) {
+            return true;
+        },
+        content: function () {
+            "step 0";
+            player.draw();
+            'step 1'
+            event.card = result[0];
+            if (get.type(event.card) != "basic") {
+                event.finish();
+                return;
+            }
+            // 只有摸到的牌仍在手里,才允许把它弃掉来换“不计次数”。
+            if (get.position(event.card) != "h") {
+                event.finish();
+                return;
+            }
+            player.chooseBool("进击：是否弃置" + get.translation(event.card) + "令此【杀】不计入本回合的使用次数？").set("ai", function () {
+                var player = get.player();
+                var card = _status.event.getParent().card;
+                if (!card || _status.currentPhase != player) return false;
+                if (card.name == "sha") {
+                    return game.hasPlayer(function (current) {
                         return current != player && get.attitude(player, current) < 0 && player.canUse({ name: "sha" }, current);
-                    })) return 1;
-                    return 0;
-                });
-                "step 1";
-                if (result.index == 1) {
-                    player.addTempSkill("kelaosaiweici_R_lunzhan_damage", { player: "phaseAfter" });
-                    event.finish();
-                    return;
-                }
-                else {
-                    event.kelaosaiweici_R_lunzhan_hand = game.countPlayer(function (current) {
-                        return current.group == "KMS";
                     });
-                    var cards = get.cards(event.kelaosaiweici_R_lunzhan_hand);
-                    game.cardsGotoOrdering(cards);
-                    var next = player.chooseToMove();
-                    next.set('list', [
-                        ['牌堆顶', cards],
-                        ['牌堆底'],
-                    ]);
-                    next.set('prompt', '点击将牌移动到牌堆顶或牌堆底');
-                    next.processAI = function (list) {
-                        var cards = list[0][1], player = _status.event.player;
-                        var target = (_status.event.getTrigger().name == 'phaseZhunbei') ? player : player.next;
-                        var att = get.sgn(get.attitude(player, target));
-                        var top = [];
-                        var judges = target.getCards('j');
-                        var stopped = false;
-                        if (player != target || !target.hasWuxie()) {
-                            for (var i = 0; i < judges.length; i++) {
-                                var judge = get.judge(judges[i]);
-                                cards.sort(function (a, b) {
-                                    return (judge(b) - judge(a)) * att;
-                                });
-                                if (judge(cards[0]) * att < 0) {
-                                    stopped = true; break;
-                                }
-                                else {
-                                    top.unshift(cards.shift());
-                                }
-                            }
-                        }
-                        var bottom;
-                        if (!stopped) {
+                }
+                if (card.name == "jiu") {
+                    return player.countCards("h", function (current) {
+                        return current != card && current.name == "sha";
+                    }) > 0;
+                }
+                return false;
+            });
+            "step 2";
+            if (result.bool && get.position(event.card) == "h") {
+                player.discard(event.card);
+                if (trigger.addCount !== false) {
+                    // 回退本次【杀】对次数统计的占用,和 addCount=false 的虚拟出牌保持一致。
+                    trigger.addCount = false;
+                    var stat = player.getStat().card;
+                    if (stat && stat.sha > 0) player.getStat().card.sha--;
+                }
+                game.log(trigger.card, "不计入次数限制");
+            }
+        },
+        ai: {
+            expose: 0.15,
+        },
+    },
+    kelaosaiweici_R_lunzhan: {
+        // 论战：
+        // 准备阶段在“控顶保资源”和“本回合杀伤强化”之间二选一。
+        nobracket: true,
+        trigger: {
+            player: "phaseZhunbeiBegin",
+        },
+        frequent: true,
+        content: function () {
+            "step 0";
+            // KMS 角色数量直接决定控顶分支的手牌上限补正。
+            player.chooseControl().set("choiceList", [
+                "观看并排列牌堆顶的4张牌,本回合手牌上限+" + game.countPlayer(function (current) {
+                    return current.group == "KMS";
+                }),
+                "本回合你使用【杀】造成的伤害+1",
+            ]).set("prompt", get.prompt("kelaosaiweici_R_lunzhan")).set("ai", function () {
+                var player = get.player();
+                if (player.countCards("h", function (card) {
+                    return card.name == "sha";
+                }) > 0 && game.hasPlayer(function (current) {
+                    return current != player && get.attitude(player, current) < 0 && player.canUse({ name: "sha" }, current);
+                })) return 1;
+                return 0;
+            });
+            "step 1";
+            if (result.index == 1) {
+                player.addTempSkill("kelaosaiweici_R_lunzhan_damage", { player: "phaseAfter" });
+                event.finish();
+                return;
+            }
+            else {
+                event.kelaosaiweici_R_lunzhan_hand = game.countPlayer(function (current) {
+                    return current.group == "KMS";
+                });
+                var cards = get.cards(event.kelaosaiweici_R_lunzhan_hand);
+                game.cardsGotoOrdering(cards);
+                var next = player.chooseToMove();
+                next.set('list', [
+                    ['牌堆顶', cards],
+                    ['牌堆底'],
+                ]);
+                next.set('prompt', '点击将牌移动到牌堆顶或牌堆底');
+                next.processAI = function (list) {
+                    var cards = list[0][1], player = _status.event.player;
+                    var target = (_status.event.getTrigger().name == 'phaseZhunbei') ? player : player.next;
+                    var att = get.sgn(get.attitude(player, target));
+                    var top = [];
+                    var judges = target.getCards('j');
+                    var stopped = false;
+                    if (player != target || !target.hasWuxie()) {
+                        for (var i = 0; i < judges.length; i++) {
+                            var judge = get.judge(judges[i]);
                             cards.sort(function (a, b) {
-                                return (get.value(b, player) - get.value(a, player)) * att;
+                                return (judge(b) - judge(a)) * att;
                             });
-                            while (cards.length) {
-                                if ((get.value(cards[0], player) <= 5) == (att > 0)) break;
+                            if (judge(cards[0]) * att < 0) {
+                                stopped = true; break;
+                            }
+                            else {
                                 top.unshift(cards.shift());
                             }
                         }
-                        bottom = cards;
-                        return [top, bottom];
                     }
-                }
-                "step 2"
-                var top = result.moved[0];
-                var bottom = result.moved[1];
-                top.reverse();
-                game.cardsGotoPile(
-                    top.concat(bottom),
-                    ['top_cards', top],
-                    function (event, card) {
-                        if (event.top_cards.includes(card)) return ui.cardPile.firstChild;
-                        return null;
+                    var bottom;
+                    if (!stopped) {
+                        cards.sort(function (a, b) {
+                            return (get.value(b, player) - get.value(a, player)) * att;
+                        });
+                        while (cards.length) {
+                            if ((get.value(cards[0], player) <= 5) == (att > 0)) break;
+                            top.unshift(cards.shift());
+                        }
                     }
-                )
-                if (event.triggername == 'phaseZhunbeiBegin' && top.length == 0) {
-                    player.addTempSkill('reguanxing_on');
-                }
-                player.popup(get.cnNumber(top.length) + '上' + get.cnNumber(bottom.length) + '下');
-                game.log(player, '将' + get.cnNumber(top.length) + '张牌置于牌堆顶');
-                "step 3"
-                game.delayx();
-                if (typeof event.kelaosaiweici_R_lunzhan_hand == "number") {
-                    player.addTempSkill("kelaosaiweici_R_lunzhan_hand", { player: "phaseAfter" });
-                    player.setStorage("kelaosaiweici_R_lunzhan_hand", event.kelaosaiweici_R_lunzhan_hand);
-
+                    bottom = cards;
+                    return [top, bottom];
                 }
             }
+            "step 2"
+            var top = result.moved[0];
+            var bottom = result.moved[1];
+            top.reverse();
+            game.cardsGotoPile(
+                top.concat(bottom),
+                ['top_cards', top],
+                function (event, card) {
+                    if (event.top_cards.includes(card)) return ui.cardPile.firstChild;
+                    return null;
+                }
+            )
+            if (event.triggername == 'phaseZhunbeiBegin' && top.length == 0) {
+                player.addTempSkill('reguanxing_on');
+            }
+            player.popup(get.cnNumber(top.length) + '上' + get.cnNumber(bottom.length) + '下');
+            game.log(player, '将' + get.cnNumber(top.length) + '张牌置于牌堆顶');
+            "step 3"
+            game.delayx();
+            if (typeof event.kelaosaiweici_R_lunzhan_hand == "number") {
+                player.addTempSkill("kelaosaiweici_R_lunzhan_hand", { player: "phaseAfter" });
+                player.setStorage("kelaosaiweici_R_lunzhan_hand", event.kelaosaiweici_R_lunzhan_hand);
+
+            }
+        }
+    },
+    kelaosaiweici_R_lunzhan_hand: {
+        charlotte: true,
+        mark: true,
+        onremove: function (player, skill) {
+            // 临时上限在回合结束后清除,顺手把缓存值一并删掉。
+            delete player.storage[skill];
         },
-        kelaosaiweici_R_lunzhan_hand: {
-            charlotte: true,
-            mark: true,
-            onremove: function (player, skill) {
-                // 临时上限在回合结束后清除,顺手把缓存值一并删掉。
-                delete player.storage[skill];
-            },
-            mod: {
-                maxHandcard: function (player, num) {
-                    return num + (player.storage.kelaosaiweici_R_lunzhan_hand || 0);
-                },
-            },
-            intro: {
-                content: function (storage) {
-                    return "本回合手牌上限+" + (storage || 0);
-                },
+        mod: {
+            maxHandcard: function (player, num) {
+                return num + (player.storage.kelaosaiweici_R_lunzhan_hand || 0);
             },
         },
-        kelaosaiweici_R_lunzhan_damage: {
-            charlotte: true,
-            mark: true,
-            intro: {
-                content: "本回合你使用【杀】造成的伤害+1",
-            },
-            silent: true,
-            popup: false,
-            forced: true,
-            trigger: {
-                source: "damageBegin1",
-            },
-            filter: function (event, player) {
-                return event.card && event.card.name == "sha" && event.player != player;
-            },
-            content: function () {
-                // 直接在 damageBegin1 增伤,兼容绝大多数【杀】的后续结算。
-                trigger.num++;
+        intro: {
+            content: function (storage) {
+                return "本回合手牌上限+" + (storage || 0);
             },
         },
+    },
+    kelaosaiweici_R_lunzhan_damage: {
+        charlotte: true,
+        mark: true,
+        intro: {
+            content: "本回合你使用【杀】造成的伤害+1",
+        },
+        silent: true,
+        popup: false,
+        forced: true,
+        trigger: {
+            source: "damageBegin1",
+        },
+        filter: function (event, player) {
+            return event.card && event.card.name == "sha" && event.player != player;
+        },
+        content: function () {
+            // 直接在 damageBegin1 增伤,兼容绝大多数【杀】的后续结算。
+            trigger.num++;
+        },
+    },
     jing_shu: {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
