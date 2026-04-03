@@ -770,14 +770,14 @@ const standard = {
                     var cardNum = target.countCards('he'); // 手牌+装备区牌数
                     // 牌越多,弃牌成本越高；关键牌（桃/酒/闪）权重更高
                     var keyCardWeight = target.countCards('h', function (card) {
-                        return ['tao', 'jiu', 'shan', 'kuaixiu9', 'Zziqi9', 'huibi9'].includes(get.name(card));
+                        return ['tao', 'jiu', 'shan', 'kuaixiu9', 'zziqi9', 'huibi9'].includes(get.name(card));
                     });
                     return Math.min(cardNum, 2) + keyCardWeight;
 
                 case 2: // 本回合不能使用/打出手牌
                     // 手牌越多/输出型角色,禁手牌成本越高
                     var SaveCardNum = target.countCards('h', function (card) {
-                        return ['tao', 'jiu', 'shan', 'kuaixiu9', 'Zziqi9', 'huibi9'].includes(get.name(card));
+                        return ['tao', 'jiu', 'shan', 'kuaixiu9', 'zziqi9', 'huibi9'].includes(get.name(card));
                     });
                     return SaveCardNum * (target.hp < 2 ? 1.5 : 1);
 

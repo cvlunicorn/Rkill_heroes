@@ -1413,7 +1413,7 @@ const fallendemon = {
         },
         mod: {
             cardUsable(card, player, num) {
-                if (card.name == 'jiu' || card.name == 'Zziqi9') return Infinity;
+                if (card.name == 'jiu' || card.name == 'zziqi9') return Infinity;
                 if (card.name == 'tao' || card.name == 'kuaixiu9') return false;
             },
             cardEnabled(card, player) {
