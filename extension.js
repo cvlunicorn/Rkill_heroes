@@ -46,8 +46,8 @@ try {
 }
 //const { connect } = require("ws");///vscode生成出来的,vscodeAI检测到enable认为没导入自动添加了导入但其实enable只是一个标签。目前使用try-catch包裹起来。
 import { lib, game, ui, get, ai, _status } from '../../noname.js'
-import { checkBegin } from '../../noname/library/assembly/buildin.js';
-import { delay, freezeButExtensible } from '../../noname/util/index.js';
+//import { checkBegin } from '../../noname/library/assembly/buildin.js';
+//import { delay, freezeButExtensible } from '../../noname/util/index.js';
 import {jianrjinji} from "./jianrjinji.js";
 import { weightedRandom } from "./utils.js";
 game.import("extension", function (lib, game, ui, get, ai, _status) {

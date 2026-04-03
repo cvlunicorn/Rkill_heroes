@@ -1,7 +1,7 @@
 import { lib, game, get, ui, _status } from "../../../noname.js";
 const globalskills = {
     _yuanhang: {
-        name: "远航", "prompt2": "当你有摸牌标记时,你失去手牌后能摸1张牌,然后失去1个摸牌标记,自己回合暂时+1标记上限并回满标记,标记上限x个,可在强化中提升X值。", intro: { marktext: "摸牌", content: function (player, mark) { ; var a = game.me.countMark('_yuanhang_mopai'); return '手牌较少时,失去手牌可以摸一张牌,还可以摸' + a + '次,其他角色回合开始时会回复一个标记'; }, },
+        name: "远航", "prompt2": "当你有摸牌标记时,你失去手牌后能摸1张牌,然后失去1个摸牌标记,自己回合暂时+1标记上限并回满标记,标记上限x个,可在强化中提升X值。", intro: { marktext: "摸牌", content: function (player, mark) { ; var a = player.countMark('_yuanhang_mopai'); return '手牌较少时,失去手牌可以摸一张牌,还可以摸' + a + '次,其他角色回合开始时会回复一个标记'; }, },
         group: ["_yuanhang_mopai", "_yuanhang_kaishi", "_yuanhang_bingsimopai", "_yuanhang_dietogain"],
         mod: {
             maxHandcard: function (player, num) {
@@ -24,7 +24,7 @@ const globalskills = {
             let mode = get.mode();
             if (player.identity == 'zhu' && mode === "identity") { player.changeHujia(1); };
         },
-        intro: { content: function () { return get.translation(_yuanhang + '_info'); }, },
+        intro: { content: function () { return get.translation('_yuanhang' + '_info'); }, },
         subSkill: {
             mopai: {
                 name: "远航摸牌", frequent: true,
