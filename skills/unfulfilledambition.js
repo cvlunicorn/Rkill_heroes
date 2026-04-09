@@ -1966,8 +1966,6 @@ const unfulfilledambition = {
             for (var i = 0; i < cards.length; i++) {
                 var card = cards[i];
                 if (!card) continue;
-                game.log("远征护航：" + card["yuanzhenghuhang_owner"]);
-                game.log(player.playerid);
                 if (card["yuanzhenghuhang_owner"] != player.playerid) continue;
                 return true;
             }
@@ -2093,6 +2091,98 @@ const unfulfilledambition = {
                 trigger.targets.remove(player);
             }
             game.log(trigger.card, "对", player, "无效");
+        },
+    },
+    // ============================================
+    // ③ SP深雪 - 彗袭
+    // 触发时机：phaseUseBegin（出牌阶段开始时）
+    // 效果：
+    //   1. 玩家从按钮列表中选择一种基本牌/非延时锦囊类型
+    //   2. 本回合内获得一次机会：可以将任意一张手牌视为所选类型使用（子技能huixi_viewas）
+    //   3. 本回合内锁定类别：只能使用所选类别的牌（子技能huixi_lock，mod.cardEnabled限制）
+    // ============================================
+    huixi: {
+        audio: 2,
+        trigger: { player: "phaseUseBegin" },//出牌阶段开始时触发
+        filter: function (event, player) {
+            return true;
+        },
+        check: function (event, player) {
+            return player.countCards('h', function (card) {
+                return get.type(card, "trick") == "equip";
+            }) < 2;//AI
+        },
+        content: function () {
+            "step 0"
+            //构建可选类型列表（基本牌+非延时锦囊）
+            var vcards = [];
+            //基本牌
+            for (var name of lib.inpile) {
+                if (get.type(name) == "basic") vcards.push(['基本', '', name]);
+                if (get.type(name) == 'trick') {
+                    vcards.push(['锦囊', '', name]);
+                }
+            }
+            player.chooseButton(['彗袭：选择本回合可视为使用的牌', [vcards, 'vcard']])
+                .set('ai', function (button) {
+                    var card = {
+                        name: button.link[2],
+                    };
+                    return (get.value(card) || 1);
+
+                }).set('selectButton', 1);
+            "step 1"
+            if (!result.bool) { event.finish(); return; }//玩家取消则不发动
+            var name = result.links[0][2];//选中的牌名（如'sha'）
+            // //添加视为技能：本回合可将任意手牌视为选中类型使用一次
+            player.addTempSkill('huixi_viewas', { player: 'phaseEnd' });
+            //添加锁定技能：本回合只能使用同类别的牌
+            player.addTempSkill('huixi_lock', { player: 'phaseEnd' });
+            //存储选中的牌名供viewas子技能使用
+            player.setStorage('huixi_viewas_name', name);
+            //存储锁定的类别（'basic'或'trick'）供lock子技能使用
+            player.setStorage('huixi_locked', get.type(name, "trick"));
+
+        },
+        intro: {
+            content: function () {
+                return get.translation('huixi_info');
+            },
+        },
+    },
+    huixi_viewas: {//彗袭子技能：将手牌视为选中类型使用（本回合1次）
+        //此技能由addTempSkill在phaseUseBegin时临时添加，phaseEnd时自动移除
+        charlotte: true,
+        enable: 'chooseToUse',//出牌阶段可主动发动
+        usable: 1,//本回合仅可使用1次（usable按回合重置，与addTempSkill配合实现精确1次限制）
+        filter: function (event, player) {
+            //有存储的目标牌名，且手上有牌可消耗
+            return player.getStorage('huixi_viewas_name') && player.countCards('h') > 0;
+        },
+        filterCard: function (card, player) {
+            return true;//任意手牌均可选为消耗
+        },
+        viewAs: function (cards, player) {
+            //视为使用storage中存储的牌类型
+            return { name: player.getStorage('huixi_viewas_name'), isCard: false };
+        },
+        position: 'h',//从手牌中选择
+        check: function (card) {
+            return 5 - get.value(card);//AI：优先消耗价值低的牌
+        },
+        ai: { result: { player: 1 } },
+    },
+    huixi_lock: {//彗袭子技能：锁定类别，本回合只能使用同类别的牌
+        charlotte: true,
+        mod: {
+            cardEnabled: function (card, player) {
+                var locked = player.getStorage('huixi_locked');
+                if (!locked) return;//没有锁定则不干预
+                var type = get.type(card);
+                //if (type == 'equip' || type == 'delay') return;
+                //只允许使用与锁定类别相同的牌
+                if (type != locked) return false;
+            },
         },
     },
 };
