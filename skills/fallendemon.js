@@ -2300,25 +2300,10 @@ const fallendemon = {
         },
     },
     yamato_R_tongchou: {
-        // 同仇：
-        // 开局绑定一名“仇”角色；其造成伤害时,自己同步吃等量伤害。
-        // 与此同时,自己每次体力变化都会转化成双倍“影”,为后续爆发囤资源。
+        audio: false,
+        locked: true,
         mark: true,
         marktext: "仇",
-        intro: {
-            content: function (storage) {
-                if (storage && storage.isIn()) return "同仇角色：" + get.translation(storage);
-                return "未选择同仇角色";
-            },
-        },
-        mod: {
-            ignoredHandcard: function (card, player) {
-                if (card.name == 'ying') return true;
-            },
-            cardDiscardable: function (card, player, name) {
-                if (name == 'phaseDiscard' && card.name == 'ying') return false;
-            },
-        },
         trigger: { global: "phaseBefore", player: "enterGame" },
         forced: true,
         filter: function (event, player) {
@@ -2327,56 +2312,146 @@ const fallendemon = {
             }) && (event.name != "phase" || game.phaseNumber == 0);
         },
         content: function () {
-            "step 0";
-            // 倾向选择敌方且血线较低的角色,方便使命尽快推进。
-            player
-                .chooseTarget("同仇：选择一名其他角色", "当其造成伤害后,你受到等量的伤害。", true, function (card, player, target) {
-                    return target != player;
-                })
-                .set("ai", function (target) {
-                    var player = _status.event.player;
-                    return -get.attitude(player, target) + Math.max(0, 4 - target.hp);
-                });
-            "step 1";
+            "step 0"
+            player.chooseTarget("同仇：选择一名其他角色", "当其造成伤害后，你受到等量的伤害。", true, function (card, player, target) {
+                return target != player;
+            }).set("ai", function (target) {
+                var player = _status.event.player;
+                //倾向选择敌方且血线较低的角色，方便使命尽快推进
+                return -get.attitude(player, target) + Math.max(0, 4 - target.hp);
+            });
+            "step 1"
             if (result.bool) {
-                player.storage.yamato_R_tongchou = result.targets[0];
+                player.storage.yamato_R_tongchou_targets = [result.targets[0].playerid];
                 player.markSkill("yamato_R_tongchou");
+                player.line(result.targets[0], "green");
+                game.log(player, "选择了", result.targets[0], "作为'同仇'目标");
             }
         },
-        group: ["yamato_R_tongchou_damage", "yamato_R_ying_gain"],
+        intro: {
+            content: function (storage, player) {
+                var ids = player.storage.yamato_R_tongchou_targets || [];
+                var targets = [];
+                for (var i = 0; i < ids.length; i++) {
+                    var t = game.findPlayer2(function (cur) { return cur.playerid == ids[i]; }, true);
+                    if (t && t.isIn()) targets.push(t);
+                }
+                if (targets.length) return "同仇角色：" + targets.map(function (t) { return get.translation(t); }).join("、");
+                return "未选择同仇角色";
+            },
+        },
+        //mod放在主技能中，【影】不计入手牌上限且弃牌阶段不可弃置
+        mod: {
+            ignoredHandcard: function (card, player) {
+                if (card.name == "ying") return true;
+            },
+            cardDiscardable: function (card, player, name) {
+                if (name == "phaseDiscard" && card.name == "ying") return false;
+            },
+        },
+        group: ["yamato_R_tongchou_link"],
+        subSkill: {
+            //同仇目标造成伤害后，你受到等量伤害（用damageSource确保触发时机正确）
+            link: {
+                audio: false,
+                trigger: { global: "damageSource" },
+                forced: true,
+                locked: true,
+                filter: function (event, player) {
+                    var ids = player.storage.yamato_R_tongchou_targets;
+                    return ids && ids.length > 0 && event.source && ids.includes(event.source.playerid) && event.num > 0;
+                },
+                logTarget: function (event) {
+                    return event.source;
+                },
+                content: function () {
+                    //用nosource避免额外牵出新的伤害来源联动
+                    player.damage(trigger.num, "nosource");
+                },
+                sub: true,
+                "_priority": 0,
+            },
+        },
+        ai: {
+            threaten: 1.3,
+        },
+        "_priority": 0,
     },
-    yamato_R_tongchou_damage: {
-        trigger: { global: "damageSource" },
-        forced: true,
-        filter: function (event, player) {
-            return event.source && event.source == player.storage.yamato_R_tongchou && event.num > 0;
-        },
-        logTarget: function (event) {
-            return event.source;
-        },
-        content: function () {
-            // 用 nosource 避免额外牵出新的伤害来源联动。
-            player.damage(trigger.num, "nosource");
-        },
-    },
+    //独立的影获取技能，同仇和同仇·改共享，避免changeSkills切换时丢失
     yamato_R_ying_gain: {
+        audio: false,
         trigger: { player: "changeHp" },
         forced: true,
         popup: false,
+        mod: {
+            ignoredHandcard: function (card, player) {
+                if (card.name == "ying") return true;
+            },
+            cardDiscardable: function (card, player, name) {
+                if (name == "phaseDiscard" && card.name == "ying") return false;
+            },
+        },
         filter: function (event) {
             return event.num != 0;
         },
         content: function () {
-            // 无论掉血还是回血,都按体力变化量的绝对值产出双倍“影”。
             var num = Math.abs(trigger.num) * 2;
             if (num > 0) {
                 player.gain(lib.card.ying.getYing(num), "gain2");
             }
         },
+        "_priority": 0,
     },
+    //同仇·改 - 其他角色受到伤害后可选择受等量伤害，体力变动获得2倍【影】
+    yamato_R_tongchou2: {
+        audio: false,
+        mark: true,
+        marktext: "仇",
+        intro: {
+            content: "其他角色受到伤害后，你可以受到等量的伤害",
+        },
+        group: ["yamato_R_tongchou2_link"],
+        subSkill: {
+            //其他角色受到伤害后，你可以受到等量伤害（用damageEnd确保伤害结算完毕后弹提示）
+            //注意：不能用 frequent:true，否则人类玩家会被引擎自动点"确定"，等同于强制触发
+            link: {
+                audio: false,
+                charlotte: true,
+                trigger: { global: "damageEnd" },
+                log: false,
+                filter: function (event, player) {
+                    return event.player != player && event.num > 0;
+                },
+                prompt: "是否发动【同仇】？",
+                prompt2: function (event) {
+                    return "受到" + get.cnNumber(event.num) + "点伤害。";
+                },
+                check: function (event, player) {
+                    //血量足够才考虑承受，用更细致的评分
+                    if (player.hp <= event.num) return false;
+                    if (player.hp <= event.num + 1 && player.countCards("h", function (card) {
+                        return get.name(card, player) == "tao" || get.name(card, player) == "jiu";
+                    }) == 0) return false;
+                    return player.hp > event.num + 1;
+                },
+                content: function () {
+                    player.logSkill("yamato_R_tongchou2");
+                    player.damage(trigger.num, "nosource");
+                },
+                sub: true,
+                "_priority": 0,
+            },
+        },
+        ai: {
+            threaten: 1.5,
+        },
+        "_priority": 0,
+    },
+    //敌忾 - 两张牌当任意杀使用或打出
     yamato_R_dikai: {
-        getList(player, event) {
-            // 初始版敌忾只能伪装成各种【杀】,这里列出当前事件允许的所有形态。
+        audio: false,
+        enable: ["chooseToUse", "chooseToRespond"],
+        getList: function (player, event) {
             var list = [];
             if (event.filterCard(get.autoViewAs({ name: "sha" }, "unsure"), player, event)) list.push(["基本", "", "sha"]);
             for (var i of lib.inpile_nature) {
@@ -2384,21 +2459,21 @@ const fallendemon = {
             }
             return list;
         },
-        // 敌忾（初始版）：
-        // 任意两张牌都可压成任意属性【杀】,兼顾进攻与响应。
-        enable: ["chooseToUse", "chooseToRespond"],
-        hiddenCard: function (player, name) {
-            return name == "sha" && player.countCards("hes") > 1;
-        },
         filter: function (event, player) {
             return player.countCards("hes") > 1 && lib.skill.yamato_R_dikai.getList(player, event).length > 0;
+        },
+        hiddenCard: function (player, name) {
+            return name == "sha" && player.countCards("hes") > 1;
         },
         chooseButton: {
             dialog: function (event, player) {
                 return ui.create.dialog("敌忾", [lib.skill.yamato_R_dikai.getList(player, event), "vcard"], "hidden");
             },
+            filter: function (button, player) {
+                var event = _status.event.getParent();
+                return event.filterCard({ name: button.link[2], nature: button.link[3] }, player, event);
+            },
             check: function (button) {
-                // 回合外优先保证能响应；回合内则只在确实有正收益目标时才推荐出杀。
                 var player = _status.event.player;
                 var card = { name: "sha", nature: button.link[3] };
                 if (_status.event.getParent().type != "phase") {
@@ -2417,12 +2492,12 @@ const fallendemon = {
             },
             backup: function (links) {
                 return {
+                    audio: false,
                     filterCard: true,
                     complexCard: true,
                     selectCard: 2,
                     position: "hes",
                     check: function (card) {
-                        // 默认优先垫出低价值牌。
                         return 6 - get.value(card);
                     },
                     viewAs: { name: links[0][2], nature: links[0][3] },
@@ -2434,139 +2509,86 @@ const fallendemon = {
             },
         },
         ai: {
-            order: 3.1,
             respondSha: true,
             skillTagFilter: function (player) {
                 return player.countCards("hes") > 1;
             },
-            result: {
-                player: 1,
-            },
+            order: 3.1,
+            result: { player: 1 },
         },
+        "_priority": 0,
     },
-    yamato_R_tongchou2: {
-        // 使命成功后的同仇改为可选发动,不再预先绑定固定对象。
-        mark: true,
-        marktext: "仇",
-        intro: {
-            content: "其他角色受到伤害后,你可以受到等量的伤害",
-        },
-        group: ["yamato_R_tongchou2_damage", "yamato_R_ying_gain"],
-    },
-    yamato_R_tongchou2_damage: {
-        getScore(event, player) {
-            if (!event || !player || event.num <= 0) return -Infinity;
-            var num = event.num;
-            var saveCount = player.countCards("h", function (card) {
-                var name = get.name(card, player);
-                return name == "tao" || name == "jiu";
-            });
-            if (player.hp <= num && saveCount == 0) return -Infinity;
-            var damageScore = get.damageEffect(player, null, player, event.nature);
-            if (typeof damageScore != "number" || isNaN(damageScore)) damageScore = -1.5;
-            var drawScore = get.effect(player, { name: "draw" }, player, player);
-            if (typeof drawScore != "number" || isNaN(drawScore)) drawScore = 1;
-            drawScore = Math.max(0.6, drawScore);
-            var score = drawScore * num * 2 + damageScore * num;
-            if (player.hp <= num + 1) score -= 2.4;
-            if (player.hp <= num) score -= 3.5;
-            if (player.hp <= 2) score -= 0.8;
-            if (player.countCards("h") >= player.hp + 3) score -= 0.8;
-            if (player.countCards("h") <= 2) score += 0.8;
-            if (saveCount > 0) score += 0.5;
-            return score;
-        },
-        charlotte: true,
-        trigger: { global: "damageEnd" },
-        frequent: true,
-        log: false,
-        filter: function (event, player) {
-            return event.player != player && event.num > 0;
-        },
-        prompt: "是否发动【同仇】？",
-        prompt2: function (event) {
-            return "受到" + get.cnNumber(event.num) + "点伤害。";
-        },
-        check: function (event, player) {
-            return lib.skill.yamato_R_tongchou2_damage.getScore(event, player) > 0.75;
-        },
-        content: function () {
-            player.logSkill("yamato_R_tongchou2");
-            player.damage(trigger.num, "nosource");
-        },
-    },
+    //敌忾·改 - 两张牌当任意基本牌使用或打出（每回合最多通过此法使用一张桃）
     yamato_R_dikai2: {
-        getList(player, event) {
-            // 使命完成后开放为任意基本牌,但【桃】每回合只允许通过此法使用一次。
+        audio: false,
+        enable: ["chooseToUse", "chooseToRespond"],
+        //列出本次可选的基本牌；考虑桃每回合限一张
+        getList: function (player, event) {
             var list = [];
-            for (var name of lib.inpile) {
-                if (get.type(name) != "basic") continue;
-                if (name == "tao" && player.hasSkill("yamato_R_dikai2_tao")) continue;
-                if (event.filterCard(get.autoViewAs({ name: name }, "unsure"), player, event)) list.push(["基本", "", name]);
-                if (name == "sha") {
-                    for (var nature of lib.inpile_nature) {
-                        if (event.filterCard(get.autoViewAs({ name: "sha", nature: nature }, "unsure"), player, event)) list.push(["基本", "", "sha", nature]);
-                    }
-                }
+            //杀（含各元素属性）
+            if (event.filterCard(get.autoViewAs({ name: "sha" }, "unsure"), player, event)) list.push(["基本", "", "sha"]);
+            for (var i of lib.inpile_nature) {
+                if (event.filterCard(get.autoViewAs({ name: "sha", nature: i }, "unsure"), player, event)) list.push(["基本", "", "sha", i]);
+            }
+            //闪（由引擎判断何时可用/可响应）
+            if (event.filterCard(get.autoViewAs({ name: "shan" }, "unsure"), player, event)) list.push(["基本", "", "shan"]);
+            //酒
+            if (event.filterCard(get.autoViewAs({ name: "jiu" }, "unsure"), player, event)) list.push(["基本", "", "jiu"]);
+            //桃：每回合最多通过此法使用一张，用 getStat 记录
+            if (!player.getStat("skill").yamato_R_dikai2_tao &&
+                event.filterCard(get.autoViewAs({ name: "tao" }, "unsure"), player, event)) {
+                list.push(["基本", "", "tao"]);
             }
             return list;
         },
-        getButtonValue(button, player, event) {
-            var name = button.link[2];
-            var nature = button.link[3];
-            var card = { name: name, nature: nature, isCard: true };
-            var parent = event.getParent();
-            var isPhase = parent && parent.type == "phase";
-            if (!isPhase) {
-                switch (name) {
-                    case "tao":
-                        if (player.isDying()) return 6;
-                        if (player.hp <= 2 && get.recoverEffect(player, player, player) > 0) return 4.2;
-                        return 0;
-                    case "shan":
-                        return 5;
-                    case "jiu":
-                        return Math.max(3, player.getUseValue(card, null, true) || 0);
-                    case "sha":
-                        return Math.max(0, player.getUseValue(card, null, true) || 0) + 0.2;
-                }
-                return 0;
-            }
-            switch (name) {
-                case "tao":
-                    if (player.isHealthy() || get.recoverEffect(player, player, player) <= 0) return 0;
-                    var recoverScore = get.recoverEffect(player, player, player);
-                    if (player.hp <= 2) recoverScore += 0.8;
-                    if (player.hp <= 1) recoverScore += 1.2;
-                    if (player.countCards("h") <= 1) recoverScore += 0.3;
-                    return Math.max(0, recoverScore);
-                case "shan":
-                    return 0;
-                default:
-                    return Math.max(0, player.getUseValue(card, null, true) || 0);
-            }
-        },
-        // 敌忾（强化版）：
-        // 两张牌可改成任意基本牌,但【桃】加入每回合一次的保险丝。
-        enable: ["chooseToUse", "chooseToRespond"],
-        hiddenCard: function (player, name) {
-            if (get.type(name) != "basic") return false;
-            if (name == "tao" && player.hasSkill("yamato_R_dikai2_tao")) return false;
-            return player.countCards("hes") > 1;
-        },
         filter: function (event, player) {
             return player.countCards("hes") > 1 && lib.skill.yamato_R_dikai2.getList(player, event).length > 0;
+        },
+        hiddenCard: function (player, name) {
+            if (player.countCards("hes") < 2) return false;
+            if (name == "sha" || name == "shan" || name == "jiu") return true;
+            if (name == "tao") return !player.getStat("skill").yamato_R_dikai2_tao;
+            return false;
         },
         chooseButton: {
             dialog: function (event, player) {
                 return ui.create.dialog("敌忾", [lib.skill.yamato_R_dikai2.getList(player, event), "vcard"], "hidden");
             },
+            filter: function (button, player) {
+                var event = _status.event.getParent();
+                return event.filterCard({ name: button.link[2], nature: button.link[3] }, player, event);
+            },
             check: function (button) {
                 var player = _status.event.player;
-                return lib.skill.yamato_R_dikai2.getButtonValue(button, player, _status.event);
+                var name = button.link[2];
+                var nature = button.link[3];
+                //非出牌阶段（响应/濒死救人等）：优先选当前最需要的基本牌
+                if (_status.event.getParent().type != "phase") {
+                    if (name == "tao") return 5;
+                    if (name == "shan") return 4.5;
+                    if (name == "jiu") return 3;
+                    if (nature == "fire") return 2.95;
+                    if (nature == "thunder" || nature == "ice") return 2.92;
+                    return 2.9;
+                }
+                //出牌阶段：桃自救、酒配杀、杀进攻
+                if (name == "tao") return player.isDamaged() ? 3.8 : 0;
+                if (name == "jiu") return player.countCards("h", "sha") > 0 ? 3.2 : 0;
+                if (name == "sha") {
+                    var card = { name: "sha", nature: nature };
+                    if (game.hasPlayer(function (current) {
+                        return player.canUse(card, current) && get.effect(current, card, player, player) > 0;
+                    })) {
+                        if (nature == "fire") return 2.95;
+                        if (nature == "thunder" || nature == "ice") return 2.92;
+                        return 2.9;
+                    }
+                }
+                return 0;
             },
-            backup: function (links, player) {
+            backup: function (links) {
                 return {
+                    audio: false,
                     filterCard: true,
                     complexCard: true,
                     selectCard: 2,
@@ -2576,98 +2598,137 @@ const fallendemon = {
                     },
                     viewAs: { name: links[0][2], nature: links[0][3] },
                     popname: true,
-                    precontent: function () {
-                        // 本回合一旦通过敌忾用出【桃】,立刻挂上限制,避免重复救援。
-                        var card = event.result.card;
-                        if (get.name(card) == "tao") player.addTempSkill("yamato_R_dikai2_tao", { global: "phaseAfter" });
+                    //使用桃后记录，实现"每回合最多通过此法使用一张桃"
+                    onuse: function (result, player) {
+                        if (result.card && result.card.name == "tao") {
+                            var stat = player.getStat("skill");
+                            stat.yamato_R_dikai2_tao = (stat.yamato_R_dikai2_tao || 0) + 1;
+                        }
                     },
                 };
             },
             prompt: function (links) {
-                return "将任意两张牌当做" + get.translation(links[0][3] || "") + get.translation(links[0][2]) + "使用或打出";
+                var name = links[0][2];
+                var nature = links[0][3];
+                if (name == "sha" && nature) return "将任意两张牌当做" + get.translation(nature) + "【杀】使用或打出";
+                return "将任意两张牌当做【" + get.translation(name) + "】使用或打出";
             },
         },
         ai: {
-            order: 3.1,
             respondSha: true,
             respondShan: true,
             save: true,
             skillTagFilter: function (player, tag) {
-                if (tag == "save" && player.hasSkill("yamato_R_dikai2_tao")) return false;
-                return player.countCards("hes") > 1;
+                if (player.countCards("hes") < 2) return false;
+                if (tag == "save") return !player.getStat("skill").yamato_R_dikai2_tao;
+                return true;
             },
-            result: {
-                player: 1,
-            },
+            order: 3.1,
+            result: { player: 1 },
         },
-    },
-    yamato_R_dikai2_tao: {
-        // 纯限制标记,不需要额外描述和表现。
-        charlotte: true,
+        "_priority": 0,
     },
     yamato_R_nizhuanfanji: {
-        // 逆转反击：
-        // 使命成功时把“同仇/敌忾”整体升级；
-        // 使命失败时则在濒死瞬间强行站起,并把所有手牌朝当前回合角色倾泻出去。
+        audio: false,
         dutySkill: true,
         unique: true,
-        group: ["yamato_R_nizhuanfanji_success", "yamato_R_nizhuanfanji_fail"],
+        derivation: ["yamato_R_tongchou2", "yamato_R_dikai2"],
+        group: ["yamato_R_nizhuanfanji_achieve", "yamato_R_nizhuanfanji_fail"],
         subSkill: {
-            success: {
+            //成功：同仇目标死亡（直接读 storage 数组判断）
+            achieve: {
+                audio: false,
                 trigger: { global: "dieAfter" },
                 forced: true,
                 locked: false,
                 dutySkill: true,
+                skillAnimation: true,
+                animationColor: "water",
                 filter: function (event, player) {
-                    return !player.awakenedSkills.includes("yamato_R_nizhuanfanji") && player.storage.yamato_R_tongchou == event.player;
+                    var ids = player.storage.yamato_R_tongchou_targets;
+                    return !player.awakenedSkills.includes("yamato_R_nizhuanfanji") &&
+                        ids && ids.length > 0 && event.player && ids.includes(event.player.playerid);
                 },
                 content: function () {
-                    // 成功后移除旧绑定,并把初始技能直接替换成强化版本。
                     player.awakenSkill("yamato_R_nizhuanfanji");
-                    game.log(player, "成功完成使命");
-                    delete player.storage.yamato_R_tongchou;
-                    player.changeSkills(["yamato_R_tongchou2", "yamato_R_dikai2"], ["yamato_R_tongchou", "yamato_R_dikai"]);
+                    game.log(player, "成功完成使命【逆转反击】");
+                    delete player.storage.yamato_R_tongchou_targets;
+                    player.unmarkSkill("yamato_R_tongchou");
+                    player.changeSkills(
+                        ["yamato_R_tongchou2", "yamato_R_dikai2"],
+                        ["yamato_R_tongchou", "yamato_R_dikai"]
+                    );
                 },
                 sub: true,
+                "_priority": 0,
             },
+            //失败：进入濒死状态时，回复体力至1点，然后依次对当前回合角色使用手牌（无距离次数限制）
             fail: {
+                audio: false,
                 trigger: { player: "dying" },
                 forced: true,
                 locked: false,
+                forceDie: true,
+                dutySkill: true,
                 filter: function (event, player) {
                     return !player.awakenedSkills.includes("yamato_R_nizhuanfanji");
                 },
                 content: function () {
-                    "step 0";
-                    // 先保证至少站到 1 血,再进入“清空手牌反击”流程。
+                    "step 0"
                     player.awakenSkill("yamato_R_nizhuanfanji");
-                    game.log(player, "使命失败");
+                    game.log(player, "使命失败【逆转反击】");
                     if (player.hp < 1) player.recover(1 - player.hp);
-                    "step 1";
-                    // 反击对象锁定为当前回合角色,体现“临死反扑”。
-                    event.target = _status.currentPhase;
-                    if (!event.target || !event.target.isIn() || !player.countCards("h") || event.target == player) {
+                    "step 1"
+                    //记录当前回合角色、快照当前手牌后逐张询问；不走 phaseUse 以免插入结算造成连锁 bug
+                    var current = _status.currentPhase;
+                    if (!current || !current.isIn() || current == player) {
                         event.finish();
                         return;
                     }
-                    event.cards = player.getCards("h").slice(0);
-                    event.num = 0;
-                    "step 2";
-                    if (player.canUse(event.cards[event.num], event.target)) {
-                        player.chooseBool("是否对" + get.translation(event.target) + "使用" + get.translation(event.cards[event.num])).set("ai", function () {
-                            return get.effect(event.target, event.cards[event.num], player, player);
+                    event._target = current;
+                    event._cards = player.getCards("h").slice(0); //快照，避免新获得的牌被纳入流程
+                    event._idx = 0;
+                    "step 2"
+                    //取快照中下一张；不在手牌或不能对目标使用则直接跳过
+                    var target = event._target;
+                    if (!target.isIn() || event._idx >= event._cards.length) {
+                        event.finish();
+                        return;
+                    }
+                    var card = event._cards[event._idx];
+                    event._idx++;
+                    event._curCard = null;
+                    if (!card || !player.getCards("h").includes(card)) {
+                        event.goto(2);
+                        return;
+                    }
+                    if (!player.canUse(card, target, false, false)) {
+                        event.goto(2);
+                        return;
+                    }
+                    event._curCard = card;
+                    player.chooseBool("逆转反击：是否对" + get.translation(target) + "使用" + get.translation(card) + "？")
+                        .set("_target", target)
+                        .set("_card", card)
+                        .set("ai", function () {
+                            var _event = _status.event;
+                            return get.effect(_event._target, _event._card, _event.player, _event.player) > 0;
                         });
+                    "step 3"
+                    //玩家选择"是"且该牌仍可用则使用；"否"或不可用则继续下一张
+                    if (result.bool && event._curCard &&
+                        player.getCards("h").includes(event._curCard) &&
+                        player.canUse(event._curCard, event._target, false, false)) {
+                        //手动 useCard 直接绕过距离和次数限制
+                        player.useCard(event._curCard, event._target, false);
                     }
-                    "step 3";
-                    if (result.bool) {
-                        player.useCard(event.cards[event.num], event.target);
-                    }
-                    event.num++;
-                    if (event.num < event.cards.length) { event.goto(2); }
+                    event.goto(2);
                 },
                 sub: true,
+                "_priority": 0,
             },
         },
+        "_priority": 0,
     },
 };
 export { fallendemon };
