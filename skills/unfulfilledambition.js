@@ -1647,7 +1647,7 @@ const unfulfilledambition = {
                 event.kelaosaiweici_R_lunzhan_hand = game.countPlayer(function (current) {
                     return current.group == "KMS";
                 });
-                var cards = get.cards(event.kelaosaiweici_R_lunzhan_hand);
+                var cards = get.cards(4);
                 game.cardsGotoOrdering(cards);
                 var next = player.chooseToMove();
                 next.set('list', [
