@@ -671,14 +671,6 @@ const shuileizhandui = {
         locked: true,
         forced: true,
         unique: true,
-        mark: true,
-        marktext: "护",
-        intro: {
-            content: function (storage) {
-                if (storage && storage.isIn()) return "当前守护对象：" + get.translation(storage);
-                return "当前没有守护对象";
-            },
-        },
         group: ["xiang_busizhishouhu_start", "xiang_busizhishouhu_transfer"],
         subSkill: {
             start: {
@@ -761,23 +753,13 @@ const shuileizhandui = {
                     player.logSkill("xiang_busizhishouhu", target);
                     // assignGuardTarget inlined (clearGuardTarget already done above)
                     player.storage.xiang_busizhishouhu = target;
-                    player.markSkill("xiang_busizhishouhu");
                     await target.addSkills("xiang_shouhu");
-                    target.addSkill("xiang_busizhishouhu_mark");
                 },
                 sub: true,
             },
         },
     },
 
-    xiang_busizhishouhu_mark: {
-        charlotte: true,
-        mark: true,
-        marktext: "护",
-        intro: {
-            content: "当前拥有“守”标记",
-        },
-    },
 
     xiang_shouhu: {
         // 守护：
