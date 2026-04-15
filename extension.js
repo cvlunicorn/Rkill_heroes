@@ -206,12 +206,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             style2.innerHTML += "span[data-nature='OTHERmm'] {text-shadow: black 0 0 1px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
 
-            // —————— 舰R战斗特效动画（原舰r动画扩展，已合并） ——————
+            // —————— 舰R战斗特效动画 ——————
             // 钩子点：lib.animate.skill[技能id]，由 trySkillAnimate 在 logSkill 时自动调用。
             var JIANR_EXT_DIR = '舰r牌将';
             var JIANR_EXT_DISPLAY = '舰R牌将';
-            var CONFIG_FX_ENABLE = "extension_" + JIANR_EXT_DISPLAY + "_enable_effects";
-            var CONFIG_FX_OPACITY = "extension_" + JIANR_EXT_DISPLAY + "_effect_opacity";
+            var CONFIG_ANIMATION_ENABLE = "extension_" + JIANR_EXT_DISPLAY + "_enable_effects";
+            var CONFIG_ANIMATION_OPACITY = "extension_" + JIANR_EXT_DISPLAY + "_effect_opacity";
             var isImportedMode = !!_status.evaluatingExtension;
 
             function createImageResolver(extDir, extDisplay, isImportedMode) {
@@ -239,17 +239,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             }
             // 图片 URL 解析（共用 createImageResolver）
             var resolveImageUrl = createImageResolver(JIANR_EXT_DIR, JIANR_EXT_DISPLAY, isImportedMode);
-            function resolveFxImageUrl(fileName, callback) {
-                resolveImageUrl("image/fx/" + fileName, callback);
+            function resolveAnimationImageUrl(fileName, callback) {
+                resolveImageUrl("image/animation/" + fileName, callback);
             }
 
 
             // 注入战斗特效 CSS
-            if (!document.getElementById("jianr-battle-fx-style")) {
-                var fxStyleEl = document.createElement("style");
-                fxStyleEl.id = "jianr-battle-fx-style";
-                fxStyleEl.textContent =
-                    ".jianr-battle-fx{" +
+            if (!document.getElementById("jianr-battle-animation-style")) {
+                var animationStyleEl = document.createElement("style");
+                animationStyleEl.id = "jianr-battle-animation-style";
+                animationStyleEl.textContent =
+                    ".jianr-battle-animation{" +
                     "pointer-events:none;" +
                     "z-index:10;" +
                     "background-size:contain;" +
@@ -258,53 +258,53 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     "opacity:0;" +
                     "transition:opacity 0.3s ease-in;" +
                     "}" +
-                    ".jianr-battle-fx.jianr-fx-active{opacity:var(--jianr-fx-opacity,1);}" +
-                    ".jianr-battle-fx.jianr-fx-fadeout{opacity:0 !important;transition:opacity 0.5s ease-out;}" +
-                    ".jianr-battle-fx.jianr-fx-fullscreen{" +
+                    ".jianr-battle-animation.jianr-animation-active{opacity:var(--jianr-animation-opacity,1);}" +
+                    ".jianr-battle-animation.jianr-animation-fadeout{opacity:0 !important;transition:opacity 0.5s ease-out;}" +
+                    ".jianr-battle-animation.jianr-animation-fullscreen{" +
                     "position:fixed;top:0;left:0;width:100%;height:100%;" +
                     "}" +
-                    ".jianr-battle-fx.jianr-fx-local{" +
+                    ".jianr-battle-animation.jianr-animation-local{" +
                     "position:absolute;top:0;left:0;width:100%;height:100%;" +
                     "}";
-                document.head.appendChild(fxStyleEl);
+                document.head.appendChild(animationStyleEl);
             }
 
             // 运行时取配置
-            function getFxOpacity() {
-                var choice = lib.config[CONFIG_FX_OPACITY];
+            function getAnimationOpacity() {
+                var choice = lib.config[CONFIG_ANIMATION_OPACITY];
                 var map = { opacity100: 1, opacity80: 0.8, opacity60: 0.6, opacity40: 0.4 };
                 return map[choice] != null ? map[choice] : 1;
             }
-            function isFxEnabled() {
-                return lib.config[CONFIG_FX_ENABLE] !== false;
+            function isAnimationEnabled() {
+                return lib.config[CONFIG_ANIMATION_ENABLE] !== false;
             }
 
             // 动画显示核心函数
             function showBattleEffect(player, fileName, options) {
-                if (!isFxEnabled()) return;
+                if (!isAnimationEnabled()) return;
                 if (!player) return;
                 if (lib.config && lib.config.low_performance) return;
 
-                var node = ui.create.div(".jianr-battle-fx");
+                var node = ui.create.div(".jianr-battle-animation");
                 if (options.fullscreen) {
-                    node.classList.add("jianr-fx-fullscreen");
+                    node.classList.add("jianr-animation-fullscreen");
                     ui.window.appendChild(node);
                 } else {
-                    node.classList.add("jianr-fx-local");
+                    node.classList.add("jianr-animation-local");
                     player.appendChild(node);
                 }
-                node.style.setProperty("--jianr-fx-opacity", getFxOpacity());
+                node.style.setProperty("--jianr-animation-opacity", getAnimationOpacity());
 
-                resolveFxImageUrl(fileName, function (url) {
+                resolveAnimationImageUrl(fileName, function (url) {
                     if (!node.parentNode) return;
                     node.style.backgroundImage = 'url("' + url + '")';
                 });
 
                 ui.refresh(node);
-                node.classList.add("jianr-fx-active");
+                node.classList.add("jianr-animation-active");
 
                 setTimeout(function () {
-                    node.classList.add("jianr-fx-fadeout");
+                    node.classList.add("jianr-animation-fadeout");
                     setTimeout(function () {
                         if (node.parentNode) node.parentNode.removeChild(node);
                     }, 520);
@@ -2018,7 +2018,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             _kaishimopai: { "name": "更好的摸牌阶段", "intro": "开启后,所有玩家获得摸牌类技能【摸牌】,<br>摸牌阶段摸牌量>1时：<br>可以弃置等同于摸牌数的牌,改为获得1张由你指定类别的牌,<br>在你判定延时锦囊牌前,<br>可令1.下一个摸牌阶段--少摸一张牌;2.本回合结束时--摸一张牌。", "init": false },
             _hanbing_gai: { "name": "寒冰剑-增强", "intro": "开启后,拥有寒冰剑时,寒冰剑的弃牌数改为你造成的伤害*2,<br>弃置到没有手牌时,会将没有计算完的伤害继续打出（以普通伤害的属性）。", "init": true },
             tiaozhanbiaojiang: { "name": "挑战模式全员国战不屈", "intro": "开启后,所有玩家获得技能【挑战技能】：<br>开局流失体力到剩余1血,根据流失的体力数多摸等量的牌；<br>全员获得国战不屈,唤醒界标武将的力量。<br>暂缺一个扶起负数血队友的技能", "init": true },
-            enable_effects: { "name": "启用战斗特效动画", "intro": "触发舰R技能时显示对应战斗动画（GIF）。<br>GIF 素材请放在 extension/舰r牌将/image/fx/ 目录下。", "init": true },
+            enable_effects: { "name": "启用战斗特效动画", "intro": "触发舰R技能时显示对应战斗动画（GIF）。<br>GIF 素材请放在 extension/舰r牌将/image/animation/ 目录下。", "init": true },
             effect_opacity: { "name": "动画不透明度", "intro": "调节战斗特效动画的不透明度。", "init": "opacity100", "item": { "opacity100": "100%", "opacity80": "80%", "opacity60": "60%", "opacity40": "40%" } },
         }, package: {
             character: {

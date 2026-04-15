@@ -1,6 +1,7 @@
+//原本无动画的技能添加动画
 // 技能 → 动画映射（主动/被动触发的技能）
 // 由 trySkillAnimate 在 logSkill 时自动调用。
-// 添加新映射：在 image/fx/ 放同名 GIF，往这张表里加一行即可。
+// 添加新映射：在 image/animation/ 放同名 GIF，往这张表里加一行即可。
 export var skillAnimations = {
     hangmucv:      { image: "hangmucv.gif",      duration: 2500, fullscreen: true  },
     zhuangjiafh:   { image: "zhuangjiafh.gif",   duration: 1500, fullscreen: false },

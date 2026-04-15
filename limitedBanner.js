@@ -1,4 +1,5 @@
-// —————— 舰R限定横幅 ——————
+// —————— 舰R限定技动画效果 ——————
+//用于替换和调整限定技、使命技、觉醒技原有动画效果
 // 两个功能：
 // 1. 限定技触发时在横幅立绘位置播放 GIF（替换 fullscreenavatar 的 backgroundImage）
 // 2. 通过注入 CSS 扩展 data-nature 色表，支持自定义发光颜色
@@ -56,7 +57,7 @@ export function initLimitedBanner(resolveImageUrl) {
     var origTrySkillAnimate = lib.element.Player.prototype.trySkillAnimate;
     lib.element.Player.prototype.trySkillAnimate = function (name, popname, checkShow) {
         if (name && skillGifs[name]) {
-            this._jianrLimitedFxSkill = name;
+            this._jianrLimitedAnimationSkill = name;
         }
         return origTrySkillAnimate.apply(this, arguments);
     };
@@ -64,8 +65,8 @@ export function initLimitedBanner(resolveImageUrl) {
     // Monkey-patch $fullscreenpop：替换立绘背景为 GIF
     var origFullscreenpop = lib.element.Player.prototype.$fullscreenpop;
     lib.element.Player.prototype.$fullscreenpop = function (str, nature, avatar, broadcast) {
-        var skillId = this._jianrLimitedFxSkill;
-        this._jianrLimitedFxSkill = null;
+        var skillId = this._jianrLimitedAnimationSkill;
+        this._jianrLimitedAnimationSkill = null;
         var result = origFullscreenpop.apply(this, arguments);
         if (skillId && skillGifs[skillId] && avatar) {
             try {
@@ -79,7 +80,7 @@ export function initLimitedBanner(resolveImageUrl) {
                     });
                 }
             } catch (e) {
-                console.log("[舰R限定横幅] 替换立绘失败:", e);
+                console.log("[舰R限定技动画] 替换失败:", e);
             }
         }
         return result;
