@@ -409,7 +409,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         game.jianRAlert(
                             // 保留悬挂缩进的文本结构
                             "<p style='margin: 0; padding: 0; margin-bottom: 12px;'><b>开启军争篇卡牌包或舰r美化包战术包时装备栏共有五个,分别是：武器、防具、+1马、-1马、宝物。</b></p>" +
-                            "<p style='margin: 0; padding: 0; margin-bottom: 12px;'>皮肤系统：可以在武将编辑界面左键单击，或对局中左键双击武将立绘呼出武将详情，点击详情立绘切换皮肤</p>" +
+                            "<p style='margin: 0; padding: 0; margin-bottom: 12px;'>皮肤系统：可以在武将编辑界面左键单击，或对局中左键双击武将立绘呼出武将详情，点击详情立绘下滑选择、点击切换皮肤</p>" +
                             "<p style='margin: 0; padding: 0; margin-bottom: 12px;'>所有全局技能均可在扩展详情中查看说明和配置开关,以下是默认开启的全局技能</p>" +
                             "<p style='margin: 0; padding: 0; margin-bottom: 10px; text-indent: -3em; padding-left: 3em;'><b>远航：</b>你受伤时手牌上限+1,挑战模式不屈时手牌上限+1；<br>每轮限1/2/3次,失去手牌后,若手牌数少于一半,你可以摸一张牌。<br>当你进入濒死状态时,若你的体力上限大于2,你可以减少一点体力上限,摸两张牌,否则摸一张牌；<br>你死亡后,若你为忠臣,你可以令主公摸一张牌。</p>" +
                             "<p style='margin: 0; padding: 0; margin-bottom: 10px; text-indent: -3em; padding-left: 3em;'><b>建造：</b>若你进行了至少一次强化：出牌阶段你可以弃置3张不同花色的牌,提升一点血量上限,解锁强化二级效果。</p>" +
@@ -457,67 +457,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             //在Character的数组形式中填写任意个"die:xxx"。
             //*eg.* `guanyu: ["male", "shu", 4, ["wusheng"], ["die:true", "die:ext:无名扩展/audio/die:true"]]`
 
-            // —————— 舰R限定横幅（见 limitedBanner.js） ——————
+            // —————— 舰R限定技动画（见 limitedBanner.js） ——————
             initLimitedBanner(resolveImageUrl);
-
-            // —————— 舰R换图（原舰r换图扩展，已合并） ——————
-            // 把 image/character_alt/ 目录下的同名图片 unshift 到 lib.character[id][4] 开头，
-            // 从而覆盖 precontent 阶段注册的默认立绘。
-            // 添加替换图：把 <武将ID>.jpg/png/webp 放入 image/character_alt/ 即可生效。
-            var replacementImages = {};
-            if (isImportedMode) {
-                var htExtInfo = lib.config && lib.config.extensionInfo && lib.config.extensionInfo[JIANR_EXT_DISPLAY];
-                var htFileList = htExtInfo && Array.isArray(htExtInfo.file) ? htExtInfo.file : [];
-                for (var ri = 0; ri < htFileList.length; ri++) {
-                    var htFilePath = htFileList[ri];
-                    if (typeof htFilePath !== "string") continue;
-                    if (htFilePath.indexOf("image/character_alt/") !== 0) continue;
-                    var htFileName = htFilePath.slice("image/character_alt/".length);
-                    var htDotIndex = htFileName.lastIndexOf(".");
-                    if (htDotIndex <= 0) continue;
-                    var htNameLower = htFileName.slice(0, htDotIndex).toLowerCase();
-                    replacementImages[htNameLower] = htFilePath;
-                }
-            } else {
-                if (typeof lib.node === "object" && lib.node && lib.node.fs && typeof __dirname !== "undefined") {
-                    try {
-                        var altDirPath = __dirname + "/extension/" + JIANR_EXT_DIR + "/image/character_alt";
-                        var altFiles = lib.node.fs.readdirSync(altDirPath);
-                        for (var aj = 0; aj < altFiles.length; aj++) {
-                            var afn = altFiles[aj];
-                            if (afn[0] === ".") continue;
-                            var adot = afn.lastIndexOf(".");
-                            if (adot <= 0) continue;
-                            var aext = afn.slice(adot).toLowerCase();
-                            if (aext !== ".jpg" && aext !== ".png" && aext !== ".webp") continue;
-                            replacementImages[afn.slice(0, adot).toLowerCase()] = "image/character_alt/" + afn;
-                        }
-                    } catch (e) {
-                        // image/character_alt/ 不存在时静默跳过
-                    }
-                }
-            }
-
-            var jianrPack = lib.characterPack && lib.characterPack["jianrjinji"];
-            if (jianrPack) {
-                var replaceCount = 0;
-                for (var rcn in jianrPack) {
-                    var rMatch = replacementImages[rcn.toLowerCase()];
-                    if (!rMatch) continue;
-                    if (!lib.character[rcn]) continue;
-                    if (!Array.isArray(lib.character[rcn][4])) {
-                        lib.character[rcn][4] = [];
-                    }
-                    var rImageTag = isImportedMode
-                        ? "db:extension-" + JIANR_EXT_DISPLAY + ":" + rMatch
-                        : "ext:" + JIANR_EXT_DIR + "/" + rMatch;
-                    lib.character[rcn][4].unshift(rImageTag);
-                    replaceCount++;
-                }
-                if (replaceCount > 0) {
-                    console.log("[舰R换图] 已覆盖 " + replaceCount + " 个武将的立绘");
-                }
-            }
 
             // —————— 使命变装（自动识别 dutySkill: true 标签） ——————
             // 使命技能成功/失败时自动切换武将立绘。
@@ -630,7 +571,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             // 因此这里把图片路径解析抽出来,和引擎自己的判定逻辑保持一致。
             // 另外顺手兼容两张不是标准 `.jpg` 命名的角色图,避免只修主分支后还残留个别空白头像。
             var jianrCharacterImagePathOverrides = {
-                weineituo_R: 'image/character/weineituo_R.JPG',
             };
             var getJianRCharacterImageRelativePath = function (characterName) {
                 // 扩展若是从压缩包导入,`extensionInfo.file` 中会记录真实文件名。

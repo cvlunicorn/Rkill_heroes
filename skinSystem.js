@@ -12,6 +12,15 @@ import { lib, game, ui, get, ai, _status } from '../../noname.js';
 // 皮肤注册表：{ 武将ID: 皮肤数量 }
 export var skinRegistry = {
     shengwang_R: 2,
+    baixue_R: 12,
+    z16_R: 3,
+    z17_R: 4,
+    alasijia_R: 2,
+    qixichichen_R: 3,
+    xiang_R: 5,
+    xiao_R: 1,
+    buzhihuo_R: 2,
+    yangyan_R: 2,
     // yamato_R: 3,  // 表示有 1.jpg, 2.jpg, 3.jpg 三张皮肤
 };
 

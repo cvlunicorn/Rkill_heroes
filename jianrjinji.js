@@ -163,7 +163,7 @@ var jianrjinji = {
         sp_dadian_R: ["female", "IJN", 3, ["qingxuncl", "fangkong2", "modaiqijian", "haitiantongxun"], ["des:SP大淀，日本轻巡洋舰旗舰"]],
         jiahe_R: ["female", "IJN", 4, ["hangmucv", "kaimuhangkong", "jidongjiandui", "jiangongchuji"], ["des:加贺，日本舰队航空母舰"]],
         tierbizi_R: ["female", "KMS", 4, ["zhuangjiafh", "qianzhi", "beizhai"], ["des:提尔比茨，德国战列舰"]],
-        alasijia_R: ["female", "USN", 3 / 4, ["zhuangjiafh", "xianfeng", "kuanhuankaimu"], ["des:阿拉斯加，美国大型巡洋舰"]],
+        alasijia_R: ["female", "USN", '3/4', ["zhuangjiafh", "xianfeng", "kuanhuankaimu"], ["des:阿拉斯加，美国大型巡洋舰"]],
         qibolin_R: ["female", "KMS", 4, ["hangmucv", "kaimuhangkong", "xiaoxiao", "yingfan"], ["des:齐柏林伯爵，德国航空母舰"]],
         chuchun_R: ["female", "IJN", 3, ["quzhudd", "dajiaoduguibi", "butaihegedehuwei", "nituochuanlaila"], ["des:初春，日本驱逐舰，末期的护卫"]],
 
