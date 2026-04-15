@@ -1453,13 +1453,13 @@ const shiptypeskills = {
     },
     huokongld: {
         firstDo: true,
-        frequent: true,
         trigger: { player: ["shaMiss", "eventNeutralized"], }, audio: "ext:舰R牌将/audio/skill:true",
         filter: function (event, player) {
             if (event.type != 'card' || event.card.name != 'sha') return false;
 
             return player.countCards('he', function (card) { return card != player.getEquip('guanshi'); }) >= 1 && event.target.isAlive();
         },
+        direct: true,
         content: function () {
             "step 0"
             //get.prompt2('huokongld')Math.max(0,2-player.countMark('jinengup'))player.chooseToCompare(trigger.player);if(player.countMark('jinengup')>1){player.chooseToCompare(trigger.target);event.goto(2);};else if(player.countMark('jinengup')>1){player.}
@@ -1480,7 +1480,7 @@ const shiptypeskills = {
                     return _status.event.player.getEquip('guanshi') != card;
                 }
             });
-            next.logSkill = 'guanshi_skill';
+            next.logSkill = 'huokongld';
             next.set('ai', function (card) {
                 var evt = _status.event.getTrigger();
                 if (get.attitude(evt.player, evt.target) < 0) {
@@ -1493,17 +1493,12 @@ const shiptypeskills = {
             if (result.bool || result.index == 0) {
                 if (event.triggername == 'shaMiss') {
                     var evt = _status.event.getTrigger();
-                    /*if(!player.hasSkill('guanshi_skill')&&!player.getEquip('huokongld_equip')){if(player.countMark('jinengup')=1){trigger.target.draw((evt.baseDamage+evt.extraDamage));};}else{evt.target.draw((2-player.countMark('jinengup'))*(evt.baseDamage+evt.extraDamage));};*///移除对方摸牌的部分,2023.8.6
-                    trigger.untrigger(); trigger.trigger('shaHit');
+                    trigger.untrigger();
+                    trigger.trigger('shaHit');
                     trigger._result.bool = false; trigger._result.result = null;
                 }
                 else { trigger.unneutralize(); }
             }
-            "step 2"
-            if (result.bool) {
-                trigger.untrigger(); trigger.trigger('shaHit');
-                trigger._result.bool = false; trigger._result.result = null;
-            };
         },
         ai: {
             "directHit_ai": true,
