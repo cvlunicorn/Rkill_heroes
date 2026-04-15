@@ -1873,7 +1873,7 @@ const fallendemon = {
                 },
                 frequent: true,
                 content: function () {
-                    player.addSkill("hangmucv");
+                    player.addSkill("kaimuhangkong");
                 },
             },
             campare: {
@@ -1949,7 +1949,7 @@ const fallendemon = {
             name: "鹰",
             content: function (storage, player) {
                 if (player.hasSkill("Xfliegerkorps_R_piaobodeying")) { return "拥有" + player.countMark("Xfliegerkorps_R_piaobodeying_mark") + "枚鹰标记"; }
-                if (player.hasSkill("hangmucv")) { return "拥有" + player.countMark("Xfliegerkorps_R_piaobodeying_mark") + "枚鹰标记,摸牌阶段摸牌数+1"; }
+                if (player.hasSkill("kaimuhangkong")) { return "拥有" + player.countMark("Xfliegerkorps_R_piaobodeying_mark") + "枚鹰标记,摸牌阶段摸牌数+1"; }
                 return "拥有与" + get.translation(player.storage.Xfliegerkorps_R_piaobodeying_markplayer[0]) + "相同等级的航母";
             },
         },
@@ -1958,7 +1958,7 @@ const fallendemon = {
             hangmucv: {
                 trigger: { player: "phaseUseBegin" },
                 filter: function (event, player) {
-                    return player.getStorage("player.storage.Xfliegerkorps_R_piaobodeying_markplayer").includes(player) && !player.hasSkill("hangmucv") && player.countCards('h') > 0;
+                    return player.getStorage("player.storage.Xfliegerkorps_R_piaobodeying_markplayer").includes(player) && !player.hasSkill("kaimuhangkong") && player.countCards('h') > 0;
                 },
                 frequent: true,
                 content: function () {
@@ -2070,7 +2070,7 @@ const fallendemon = {
                 preHidden: true,
                 frequent: true,
                 filter: function (event, player) {
-                    return player.getStorage("player.storage.Xfliegerkorps_R_piaobodeying_markplayer").includes(player) && player.hasSkill("hangmucv") && !event.numFixed;
+                    return player.getStorage("player.storage.Xfliegerkorps_R_piaobodeying_markplayer").includes(player) && player.hasSkill("kaimuhangkong") && !event.numFixed;
                 },
                 content: function () {
                     trigger.num++;

@@ -2050,7 +2050,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     guzhuyizhichuixue_R: ["female", "shu", 3, ["dajiaoduguibi", "quzhudd", "guzhuyizhi"], ["des:水手服与宽袖的结合,给人以温柔的感觉。"]],
                     shuileizhanduichuixue_R: ["female", "shu", 3, ["dajiaoduguibi", "quzhudd", "shuileizhandui",], ["des:水手服与宽袖的结合,给人以温柔的感觉。"]],
                     mingsike_R: ["female", "qun", 3, ["dajiaoduguibi", "quzhudd", "manchangzhanyi", "manchangzhanyi_1"], ["des:跑得快,看得多。"]],
-                    "u1405_R": ["female", "wu", 2, ["qianting", "baiyin_skill"], ["des:无需隐匿的偷袭大师,马上就让对手的后勤捉襟见肘。"]],
+                    "u1405_R": ["female", "wu", 2, ["qiantingss", "baiyin_skill"], ["des:无需隐匿的偷袭大师,马上就让对手的后勤捉襟见肘。"]],
                     baiyanjuren_R: ["female", "wu", 3, ["junfu"], ["des:需要武器支援,伙计倒下了。"]],
                     changchun_R: ["female", "wu", 3, ["daoqu", "tianyi"], ["des:尚处于正能量之时。"]],*/
                 },

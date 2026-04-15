@@ -154,7 +154,7 @@ const others = {
             //if (player.storage.pangguanzhe.length) return false;
             return true;
         },
-        bannedList: ["pangguanzhe", "zhanliebb", "hangmucv", "zhongxunca", "qingxuncl", "quzhudd", "qianting", "junfu", "daoqu", "fangqu", "zhuangjiafh", "dajiaoduguibi", "huokongld", "fangkong2", "shixiangquanneng", "yaosai", "tiaozhanzhuangbei", "zhongleizhuangjiantuxi", "juejingfengsheng"],
+        bannedList: ["pangguanzhe", "zhanliebb", "hangmucv", "kaimuhangkong", "zhongxunca", "qingxuncl", "quzhudd", "qiantingss", "kaimuleiji", "junfu", "daoqu", "fanjiandaodan", "fangqu", "fangkongdaodan", "zhuangjiafh", "dajiaoduguibi", "huokongld", "fangkong2", "shixiangquanneng", "yaosai", "tiaozhanzhuangbei", "zhongleizhuangjiantuxi", "juejingfengsheng"],
         content: function () {
             "step 0"
             if (player.storage.pangguanzhe.length) {
@@ -283,14 +283,14 @@ const others = {
         limited: true,
         filter: function (event, player) {
             if (player.storage.wuweizhuangji) return false;
-            return player.hasSkill("hangmucv");
+            return player.hasSkill("kaimuhangkong");
         },
         filterTarget: function (card, player, target) {
             return true;
         },
         content: function () {
             player.awakenSkill('hangkongyazhi');
-            player.removeSkill("hangmucv");
+            player.removeSkill("kaimuhangkong");
             target.changeHujia(-player.hujia);
 
             target.addTempSkill("hangkongyazhi_fengyin", "roundStart");

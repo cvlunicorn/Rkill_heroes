@@ -3190,7 +3190,7 @@ const historybattles = {
         },
         frequent: true,
         filter: function (event, player) {
-            return event.player.hasSkill("qianting") && player != event.target && event.card.name == "sha" && event.card.nature == "thunder";
+            return event.player.hasSkill("qiantingss") && player != event.target && event.card.name == "sha" && event.card.nature == "thunder";
         },
         prompt: "你可以摸一张牌",
         content: function () {

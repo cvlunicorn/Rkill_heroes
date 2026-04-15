@@ -64,6 +64,34 @@ const shiptypeskills = {
         },
     },
     hangmucv: {
+        intro: {
+            content: function () {
+                return get.translation(skill + '_info');
+            },
+        },
+    },
+    qiantingss: {
+        intro: {
+            content: function () {
+                return get.translation(skill + '_info');
+            },
+        },
+    },
+    fangqu: {
+        intro: {
+            content: function () {
+                return get.translation(skill + '_info');
+            },
+        },
+    },
+    daoqu: {
+        intro: {
+            content: function () {
+                return get.translation(skill + '_info');
+            },
+        },
+    },
+    kaimuhangkong: {
         audio: "ext:舰R牌将/audio/skill:true",
         trigger: { player: "phaseUseBegin" },
         filter: function (event, player) {
@@ -162,7 +190,7 @@ const shiptypeskills = {
             }*/
             "step 1"
             if (result.targets && result.targets.length > 0) {
-                player.logSkill("hangmucv");
+                player.logSkill("kaimuhangkong");
                 player.useCard({ name: 'wanjian' }, result.cards, result.targets);
             }
         },
@@ -907,7 +935,7 @@ const shiptypeskills = {
             },
         },
     },
-    qianting: {
+    kaimuleiji: {
         audio: "ext:1牌将修改:2",
         trigger: {
             player: ["phaseZhunbeiBegin", "phaseDiscardBegin"],
@@ -1144,7 +1172,7 @@ const shiptypeskills = {
             },
         },
     },
-    fangqu: {
+    fangkongdaodan: {
         trigger: {
             player: "phaseZhunbeiBegin",
             global: "gameStart",
@@ -1175,9 +1203,9 @@ const shiptypeskills = {
 
         },
         ai: {
-            combo: "fangqu_wuxie",
+            combo: "fangkongdaodan_wuxie",
         },
-        group: ["fangqu_wuxie"],
+        group: ["fangkongdaodan_wuxie"],
         onremove: function (player, skill) {
             var cards = player.getExpansions(skill);
             if (cards.length) player.loseToDiscardpile(cards);
@@ -1238,7 +1266,7 @@ const shiptypeskills = {
             }
         }
     },
-    daoqu: {
+    fanjiandaodan: {
         mod: {
             //selectTarget:function(card,player,range){///是卡片作用时可选的目标数量,输出range给牌的发起事件阶段用。
             //if(range[1]==-1) return;var a=game.countPlayer(function(current){return get.attitude(player,current)<=0&&current.inRange(player)})-1;
@@ -1774,7 +1802,7 @@ const shiptypeskills = {
             }
             player.storage.shixiangquanneng = [];
             "step 1"
-            event.skills = ["junfu", "fangkong2", "hangmucv"]
+            event.skills = ["junfu", "fangkong2", "kaimuhangkong"]
             player
                 .chooseControl(event.skills)
                 .set("prompt", "请选择要获得的技能")
