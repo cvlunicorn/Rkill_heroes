@@ -3,11 +3,11 @@
 // 由 trySkillAnimate 在 logSkill 时自动调用。
 // 添加新映射：在 image/animation/ 放同名 GIF，往这张表里加一行即可。
 export var skillAnimations = {
-    kaimuhangkong: { image: "kaimuhangkong.gif", duration: 2500, fullscreen: true },
+    kaimuhangkong: { image: "kaimuhangkong.gif", duration: 2000, fullscreen: true },
     zhuangjiafh: { image: "zhuangjiafh.gif", duration: 1500, fullscreen: false },
     dajiaoduguibi: { image: "dajiaoduguibi.gif", duration: 1500, fullscreen: false },
-    huokongld: { image: "huokongld.gif", duration: 2000, fullscreen: true },
+    huokongld: { image: "huokongld.gif", duration: 1500, fullscreen: true },
     fangkongdaodan: { image: "fangkongdaodan.gif", duration: 2000, fullscreen: true },
-    kaimuleiji: { image: "kaimuleiji.gif", duration: 2000, fullscreen: false },
+    kaimuleiji: { image: "kaimuleiji.gif", duration: 2000, fullscreen: true },
     fanjiandaodan: { image: "fanjiandaodan.gif", duration: 2000, fullscreen: false },
 };
