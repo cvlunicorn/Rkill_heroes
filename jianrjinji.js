@@ -722,7 +722,7 @@ var jianrjinji = {
 
         //新技能翻译写在这上面
         //包名翻译
-        jianrbiaozhun: "舰r标准",
+        jianrbiaozhun: "舰R标准",
         lishizhanyi: '历史战役',
         lishizhanyi_naerweike: '历史战役-纳尔维克',
         lishizhanyi_matapanjiao: '历史战役-马塔潘角',

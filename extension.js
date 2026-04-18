@@ -7,6 +7,7 @@
 //filter函数（条件函数）里的event是触发事件,但content函数（效果函数）里的trigger才是触发事件,event是当前的技能事件。
 //event.getParent()是当前技能事件的上一级父事件,event.getParent(2)是当前技能事件的上二级父事件。
 //"step 0"必须从0开始,引号可以是单引号或双引号,但是整个技能里面不能变。
+//本扩展名称和路径中“舰R牌将”一律大写
 
 //【yield用法】（需要无名杀版本1.10.10或更高版本）
 //yield可以跨步骤储存变量,用于一个技能里需要多次选择目标/牌等造成系统自带result.targets和result.links失效的情况。
@@ -49,21 +50,98 @@ import { lib, game, ui, get, ai, _status } from '../../noname.js'
 //import { checkBegin } from '../../noname/library/assembly/buildin.js';
 //import { delay, freezeButExtensible } from '../../noname/util/index.js';
 import { jianrjinji } from "./jianrjinji.js";
-import { weightedRandom} from "./utils.js";
+import { weightedRandom } from "./utils.js";
 import { skillAnimations } from "./skillAnimations.js";
-import { initSkinSystem } from "./skinSystem.js";
+import { skinRegistry } from "./skinSystem.js";
 import { initLimitedBanner } from "./limitedBanner.js";
+
+// —— 扩展名缓存与探测 ——
+// 目录模式下启动时探测每张立绘真实扩展名：先试 .png，404 再试 .jpg。
+// 结果存入 skinAssetCache，后续调用全部同步查表。
+// 值约定：'.png' / '.jpg' = 已探测存在；null = 已探测但都不存在；undefined = 尚未探测
+// 放在主文件里是因为异步版要用 lib.assetURL（依赖 noname.js 已初始化的 lib），
+// 同步版和异步版共享同一个缓存，所以一起放这里。
+var skinAssetCache = {};
+
+// Electron 下尝试拿到 fs，纯浏览器模式会拿不到，留给 Image 异步探测回退
+var jianrFs = null;
+try {
+    jianrFs = require('fs');
+} catch (e) {
+    jianrFs = null;
+}
+
+// 同步探测：Electron 环境下直接 fs.existsSync 查磁盘，能在 precontent 同步流程里
+// 拿到结果。纯浏览器模式无 fs，返回 undefined，调用方应退回 probeJianRAssetExt 异步方案。
+// 返回值和异步版一致：'.png' / '.jpg' / null / undefined（此处 undefined = 没有 fs，无法同步探测）
+function probeJianRAssetExtSync(relativeBase) {
+    var key = relativeBase;
+    if (skinAssetCache[key] !== undefined) return skinAssetCache[key];
+    if (!jianrFs) return undefined;
+    try {
+        var base = 'extension/舰R牌将/' + relativeBase;
+        if (jianrFs.existsSync(base + '.png')) {
+            skinAssetCache[key] = '.png';
+            return '.png';
+        }
+        if (jianrFs.existsSync(base + '.jpg')) {
+            skinAssetCache[key] = '.jpg';
+            return '.jpg';
+        }
+        // 两个后缀都找不到时不写 null 进缓存 —— 这里的相对路径依赖 process.cwd(),
+        // Windows 打包后 cwd 未必是游戏根目录,existsSync 会全部 false,
+        // 写 null 进缓存会把后续异步 probe 的 Image() 探测也短路掉。
+        return null;
+    } catch (e) {
+        console.warn('[舰R牌将 probeSync] error', key, e);
+        return undefined;
+    }
+}
+
+function probeJianRAssetExt(relativeBase) {
+    var key = relativeBase;
+    if (skinAssetCache[key] !== undefined) {
+        console.log('[舰R牌将 probe] cache hit', key, '=', skinAssetCache[key]);
+        return Promise.resolve(skinAssetCache[key]);
+    }
+    return new Promise(function (resolve) {
+        var base = lib.assetURL + 'extension/' + '舰R牌将' + '/' + relativeBase;
+        console.log('[舰R牌将 probe] start', key, 'base=', base);
+        var pngImg = new Image();
+        pngImg.onload = function () {
+            skinAssetCache[key] = '.png';
+            console.log('[舰R牌将 probe] hit .png', key);
+            resolve('.png');
+        };
+        pngImg.onerror = function () {
+            var jpgImg = new Image();
+            jpgImg.onload = function () {
+                skinAssetCache[key] = '.jpg';
+                console.log('[舰R牌将 probe] hit .jpg', key);
+                resolve('.jpg');
+            };
+            jpgImg.onerror = function () {
+                skinAssetCache[key] = null;
+                console.warn('[舰R牌将 probe] miss both', key);
+                resolve(null);
+            };
+            jpgImg.src = base + '.jpg';
+        };
+        pngImg.src = base + '.png';
+    });
+}
+
 game.import("extension", function (lib, game, ui, get, ai, _status) {
 
     return {
         name: "舰R牌将",
         content: function (config, pack) {
-            /*lib.group.push('RN');
-            lib.translate.RN = '<span style="color:#FFCD7F32">英</span>';
-            lib.group.push('USN');
-            lib.translate.USN = '<span style="color:#FF000000">美</span>';
-            lib.group.push('IJN');
-            lib.translate.IJN = '<span style="color:#FFCCCCCC">日</span>';*///添加势力,但是由于未知原因显示的字体相当模糊,解决问题之前不采用
+            // ╔══════════════════════════════════════════════════════════════╗
+            // ║ 1. 势力注册 + 发光 CSS                                        ║
+            // ╚══════════════════════════════════════════════════════════════╝
+            // 每个势力依次注入 lib.groupnature / lib.group / lib.translate，
+            // 再 append 三条 CSS：data-nature='{势力}'（外发光）/ {势力}m（中）/ {势力}mm（小）。
+            // 新增势力：复制一段，改 rgba 颜色与势力名。
 
             lib.groupnature.PLAN = 'PLAN';
             //将势力添加到势力库中 并指定势力的中文名称
@@ -206,15 +284,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             style2.innerHTML += "span[data-nature='OTHERmm'] {text-shadow: black 0 0 1px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
 
-            // —————— 舰R战斗特效动画 ——————
-            // 钩子点：lib.animate.skill[技能id]，由 trySkillAnimate 在 logSkill 时自动调用。
-            var JIANR_EXT_DIR = '舰r牌将';
-            var JIANR_EXT_DISPLAY = '舰R牌将';
-            var CONFIG_ANIMATION_ENABLE = "extension_" + JIANR_EXT_DISPLAY + "_enable_effects";
-            var CONFIG_ANIMATION_OPACITY = "extension_" + JIANR_EXT_DISPLAY + "_effect_opacity";
+            // ╔══════════════════════════════════════════════════════════════╗
+            // ║ 2. 通用模式判定 + 资源 URL 解析（后续模块共用）                ║
+            // ╚══════════════════════════════════════════════════════════════╝
+            // isImportedMode：true=DB 导入模式（资源走 db:），false=目录直读模式（走 ext:）。
+            // resolveImageUrl(relativePath, cb)：异步拿到一个可直接喂 backgroundImage 的 URL。
+            // 这两位被 战斗特效 / 限定技横幅 / 使命变装 / 皮肤系统 / 默认剪影背景 共用。
             var isImportedMode = !!_status.evaluatingExtension;
 
-            function createImageResolver(extDir, extDisplay, isImportedMode) {
+            function createImageResolver(isImportedMode) {
                 var cache = {};
                 return function resolveImageUrl(relativePath, callback) {
                     if (cache[relativePath]) {
@@ -222,7 +300,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         return;
                     }
                     if (isImportedMode) {
-                        var dbKey = "extension-" + extDisplay + ":" + relativePath;
+                        var dbKey = "extension-" + '舰R牌将' + ":" + relativePath;
                         if (typeof game.getDB === "function") {
                             game.getDB("image", dbKey).then(function (url) {
                                 if (!url) return;
@@ -231,18 +309,24 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             });
                         }
                     } else {
-                        var url = lib.assetURL + "extension/" + extDir + "/" + relativePath;
+                        var url = lib.assetURL + "extension/" + '舰R牌将' + "/" + relativePath;
                         cache[relativePath] = url;
                         callback(url);
                     }
                 };
             }
-            // 图片 URL 解析（共用 createImageResolver）
-            var resolveImageUrl = createImageResolver(JIANR_EXT_DIR, JIANR_EXT_DISPLAY, isImportedMode);
+            var resolveImageUrl = createImageResolver(isImportedMode);
+
+            // ╔══════════════════════════════════════════════════════════════╗
+            // ║ 3. 舰R战斗特效动画                                            ║
+            // ╚══════════════════════════════════════════════════════════════╝
+            // 钩子点：lib.animate.skill[技能id]，由 trySkillAnimate 在 logSkill 时自动调用。
+            // 动画素材映射在 skillAnimations.js，本段把它包装到 lib.animate.skill。
+            var CONFIG_ANIMATION_ENABLE = "extension_" + '舰R牌将' + "_enable_effects";
+            var CONFIG_ANIMATION_OPACITY = "extension_" + '舰R牌将' + "_effect_opacity";
             function resolveAnimationImageUrl(fileName, callback) {
                 resolveImageUrl("image/animation/" + fileName, callback);
             }
-
 
             // 注入战斗特效 CSS
             if (!document.getElementById("jianr-battle-animation-style")) {
@@ -295,20 +379,33 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 }
                 node.style.setProperty("--jianr-animation-opacity", getAnimationOpacity());
 
+                var cleaned = false;
+                function cleanup() {
+                    if (cleaned) return;
+                    cleaned = true;
+                    clearTimeout(safetyTimer);
+                    if (node.parentNode) node.parentNode.removeChild(node);
+                }
+                // 兜底：资源解析失败或解码卡住时也保证节点被清理
+                var safetyTimer = setTimeout(cleanup, (options.duration || 2000) + 5000);
+
                 resolveAnimationImageUrl(fileName, function (url) {
-                    if (!node.parentNode) return;
-                    node.style.backgroundImage = 'url("' + url + '")';
+                    if (cleaned || !node.parentNode) return;
+                    var img = new Image();
+                    img.onload = function () {
+                        if (cleaned || !node.parentNode) return;
+                        node.style.backgroundImage = 'url("' + url + '")';
+                        ui.refresh(node);
+                        node.classList.add("jianr-animation-active");
+                        setTimeout(function () {
+                            if (cleaned) return;
+                            node.classList.add("jianr-animation-fadeout");
+                            setTimeout(cleanup, 520);
+                        }, options.duration);
+                    };
+                    img.onerror = cleanup;
+                    img.src = url;
                 });
-
-                ui.refresh(node);
-                node.classList.add("jianr-animation-active");
-
-                setTimeout(function () {
-                    node.classList.add("jianr-animation-fadeout");
-                    setTimeout(function () {
-                        if (node.parentNode) node.parentNode.removeChild(node);
-                    }, 520);
-                }, options.duration);
             }
 
             // 技能 → 动画映射（7 个主动/被动触发的技能），见 skillAnimations.js
@@ -322,6 +419,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     };
                 })(skillId, skillAnimations[skillId]);
             }
+
+            // ╔══════════════════════════════════════════════════════════════╗
+            // ║ 4. 弹窗工具 + 系统按钮（机制介绍）                             ║
+            // ╚══════════════════════════════════════════════════════════════╝
+            // game.jianRAlert：可自定义样式的 alert 对话框，限本扩展使用。
+            // setInterval 等待 ui.system1/2 出现后，挂一个"舰R杀机制介绍"系统按钮。
 
             // Sueyuki DEV 扩展专用alert对话框（允许自定义样式）
             //2026.2.12豆包修改样式
@@ -405,10 +508,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 if (ui.system1 || ui.system2) {
                     // @ts-ignore
                     clearInterval(getSystem);
-                    ui.jian_R_readme = ui.create.system('舰r杀机制介绍', function () {
+                    ui.jian_R_readme = ui.create.system('舰R杀机制介绍', function () {
                         game.jianRAlert(
                             // 保留悬挂缩进的文本结构
-                            "<p style='margin: 0; padding: 0; margin-bottom: 12px;'><b>开启军争篇卡牌包或舰r美化包战术包时装备栏共有五个,分别是：武器、防具、+1马、-1马、宝物。</b></p>" +
+                            "<p style='margin: 0; padding: 0; margin-bottom: 12px;'><b>开启军争篇卡牌包或舰R美化包战术包时装备栏共有五个,分别是：武器、防具、+1马、-1马、宝物。</b></p>" +
                             "<p style='margin: 0; padding: 0; margin-bottom: 12px;'>皮肤系统：可以在武将编辑界面左键单击，或对局中左键双击武将立绘呼出武将详情，点击详情立绘下滑选择、点击切换皮肤</p>" +
                             "<p style='margin: 0; padding: 0; margin-bottom: 12px;'>所有全局技能均可在扩展详情中查看说明和配置开关,以下是默认开启的全局技能</p>" +
                             "<p style='margin: 0; padding: 0; margin-bottom: 10px; text-indent: -3em; padding-left: 3em;'><b>远航：</b>你受伤时手牌上限+1,挑战模式不屈时手牌上限+1；<br>每轮限1/2/3次,失去手牌后,若手牌数少于一半,你可以摸一张牌。<br>当你进入濒死状态时,若你的体力上限大于2,你可以减少一点体力上限,摸两张牌,否则摸一张牌；<br>你死亡后,若你为忠臣,你可以令主公摸一张牌。</p>" +
@@ -429,6 +532,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     });
                 }
             }, 500);
+
+            // ╔══════════════════════════════════════════════════════════════╗
+            // ║ 5. 全局武将标签 + 死亡台词                                    ║
+            // ╚══════════════════════════════════════════════════════════════╝
+            // 配置开关 jianrjinji=true 时禁用 AI（forbidai）；_DieSound 注册全局阵亡音效。
+            // TODO（保留原作者备注）：阵亡音效后续应迁移到 character 数组里的 die: 标签，
+            //   eg. lib.character.guanyu.dieAudios = [true, "ext:无名扩展/audio/die:true"]
+
             if (config.jianrjinji) {
                 for (var i in lib.characterPack['jianrjinji']) {
                     if (lib.character[i][4].indexOf("forbidai") < 0) lib.character[i][4].push("forbidai");
@@ -448,28 +559,29 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 content: function () {
                     //game.log("死亡台词触发");
                     // 这里必须使用扩展目录的真实文件夹名。
-                    // 扩展内部展示名是“舰R牌将”,但磁盘目录实际是“舰r牌将”。
                     // 浏览器模式下通过静态路径读取资源时,目录名大小写不一致会导致资源 404。
-                    game.playAudio('..', 'extension', '舰r牌将/audio/die', trigger.player.name + ".mp3");
+                    game.playAudio('..', 'extension', '舰R牌将/audio/die', trigger.player.name + ".mp3");
                 },
-            }//即将替换为:为character实例的dieAudio属性赋值,例如
-            //*eg.* `lib.character.guanyu.dieAudios = [true, "ext:无名扩展/audio/die:true"]`
-            //在Character的数组形式中填写任意个"die:xxx"。
-            //*eg.* `guanyu: ["male", "shu", 4, ["wusheng"], ["die:true", "die:ext:无名扩展/audio/die:true"]]`
+            }
 
-            // —————— 舰R限定技动画（见 limitedBanner.js） ——————
+            // ╔══════════════════════════════════════════════════════════════╗
+            // ║ 6. 限定技横幅动画                                             ║
+            // ╚══════════════════════════════════════════════════════════════╝
+            // 立绘位 GIF 替换 + 自定义发光色，具体逻辑在 limitedBanner.js。
             initLimitedBanner(resolveImageUrl);
 
-            // —————— 使命变装（自动识别 dutySkill: true 标签） ——————
+            // ╔══════════════════════════════════════════════════════════════╗
+            // ║ 7. 使命变装（自动识别 dutySkill: true 标签）                   ║
+            // ╚══════════════════════════════════════════════════════════════╝
             // 使命技能成功/失败时自动切换武将立绘。
             // 添加新武将：把 <武将ID>_victory.jpg / <武将ID>_defeat.jpg 放入 image/character/，
             // 技能定义中设置 dutySkill: true 即可自动生效，无需手动配置。
 
             function buildMissionImageTag(relativePath) {
                 if (isImportedMode) {
-                    return "db:extension-" + JIANR_EXT_DISPLAY + ":" + relativePath;
+                    return "db:extension-" + '舰R牌将' + ":" + relativePath;
                 }
-                return "ext:" + JIANR_EXT_DIR + "/" + relativePath;
+                return "ext:" + '舰R牌将' + "/" + relativePath;
             }
 
             // 自动扫描所有武将，找出拥有使命技的武将并注册替代皮肤
@@ -488,14 +600,39 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     }
                 }
             }
-
+            // 查找使命立绘的实际文件扩展名（兼容 .jpg 和 .png）
+            // 必须同步返回：调用方 registerMissionSubstitute 要在启动阶段同步把
+            // lib.character[skinName] 填好，晚于使命技 awakenSkill 就会拿到空条目。
+            function getMissionImageExt(skinName) {
+                if (isImportedMode) {
+                    var extInfo = lib.config && lib.config.extensionInfo && lib.config.extensionInfo['舰R牌将'];
+                    var fileList = extInfo && Array.isArray(extInfo.file) ? extInfo.file : [];
+                    var prefix = 'image/character/' + skinName;
+                    for (var fi = 0; fi < fileList.length; fi++) {
+                        var fp = fileList[fi];
+                        if (typeof fp === 'string' && fp.indexOf(prefix) === 0) {
+                            return fp.slice(prefix.length);
+                        }
+                    }
+                    return '.jpg';
+                }
+                // 目录模式：fs.existsSync 同步探测；纯浏览器无 fs 时 fallback .jpg
+                var syncExt = probeJianRAssetExtSync('image/character/' + skinName);
+                return syncExt || '.jpg';
+            }
             function registerMissionSubstitute(origCharName, skinName) {
                 var list = lib.characterSubstitute[origCharName];
                 for (var si = 0; si < list.length; si++) {
                     if (list[si] && list[si][0] === skinName) return;
                 }
-                var tag = buildMissionImageTag("image/character/" + skinName + ".jpg");
+                var ext = getMissionImageExt(skinName);
+                var tag = buildMissionImageTag("image/character/" + skinName + ext);
                 list.push([skinName, [tag]]);
+                // 预注册使命皮肤的角色数据，保留原武将性别，
+                // 防止 changeSkin 创建临时条目时 sex 为空导致背景从 female 变成 male
+                var origData = lib.character[origCharName];
+                var origSex = origData && origData[0] || 'female';
+                lib.character[skinName] = [origSex, "", 0, [], [tag]];
             }
 
             // Monkey-patch awakenSkill：使命觉醒时切换立绘
@@ -527,11 +664,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 }
                 if (!charName) return;
 
-                // 从事件栈判定当前位于 success 还是 fail 分支
+                // 从事件栈判定当前位于 achieve（成功）还是 fail（失败）分支
+                // 引擎使命技惯例：成功子技能后缀 _achieve，失败子技能后缀 _fail
                 var evt = _status.event;
                 var isSuccess = null;
                 while (evt) {
-                    if (evt.skill === dutySkillName + "_success") { isSuccess = true; break; }
+                    if (evt.skill === dutySkillName + "_achieve") { isSuccess = true; break; }
                     if (evt.skill === dutySkillName + "_fail") { isSuccess = false; break; }
                     evt = evt.parent;
                 }
@@ -541,208 +679,455 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 player.changeSkin({ characterName: charName }, targetSkin);
             }
 
-            // —————— 扩展内皮肤系统（见 skinSystem.js） ——————
-            initSkinSystem(JIANR_EXT_DIR, JIANR_EXT_DISPLAY, isImportedMode);
+            // ╔══════════════════════════════════════════════════════════════╗
+            // ║ 8. 扩展内皮肤系统                                             ║
+            // ╚══════════════════════════════════════════════════════════════╝
+            // 向引擎注册皮肤数量（调试模式下的皮肤菜单会读 lib.skin）
+            if (!lib.skin) lib.skin = {};
+            for (var name in skinRegistry) {
+                lib.skin[name] = skinRegistry[name];
+            }
 
-            // —————— 替换透明立绘的默认剪影背景 ——————
+            // —— 扩展名缓存与异步探测 ——
+            // 目录模式下启动时并发探测每张皮肤真实扩展名：先试 .png，404 再试 .jpg。
+            // 结果存入 skinExtCache，后续调用全部同步查表。
+            // 值约定：'.png' / '.jpg' = 已探测存在；null = 已探测但都不存在；undefined = 尚未探测
+            var skinExtCache = {};
+
+            function probeSkinExt(charName, num) {
+                var key = charName + '/' + num;
+                if (skinExtCache[key] !== undefined) return Promise.resolve(skinExtCache[key]);
+                return new Promise(function (resolve) {
+                    var base = lib.assetURL + 'extension/' + '舰R牌将' + '/image/skin/' + charName + '/' + num;
+                    var pngImg = new Image();
+                    pngImg.onload = function () {
+                        skinExtCache[key] = '.png';
+                        resolve('.png');
+                    };
+                    pngImg.onerror = function () {
+                        var jpgImg = new Image();
+                        jpgImg.onload = function () {
+                            skinExtCache[key] = '.jpg';
+                            resolve('.jpg');
+                        };
+                        jpgImg.onerror = function () {
+                            skinExtCache[key] = null;
+                            resolve(null);
+                        };
+                        jpgImg.src = base + '.jpg';
+                    };
+                    pngImg.src = base + '.png';
+                });
+            }
+
+            // 同步取扩展名。导入模式从 extensionInfo.file 反查；目录模式读缓存
+            function getSkinExt(charName, num) {
+                if (isImportedMode) {
+                    var extInfo = lib.config && lib.config.extensionInfo && lib.config.extensionInfo['舰R牌将'];
+                    var fileList = extInfo && Array.isArray(extInfo.file) ? extInfo.file : [];
+                    var prefix = 'image/skin/' + charName + '/' + num;
+                    for (var fi = 0; fi < fileList.length; fi++) {
+                        var fp = fileList[fi];
+                        if (typeof fp === 'string' && fp.indexOf(prefix) === 0) {
+                            return fp.slice(prefix.length);
+                        }
+                    }
+                    return '.jpg';
+                }
+                // 目录模式：缓存命中返回真实扩展名，未命中临时返回 .jpg（调用方若需精确值应走 probeSkinExt）
+                return skinExtCache[charName + '/' + num] || '.jpg';
+            }
+            function skinFullPath(charName, num) {
+                return 'extension/' + '舰R牌将' + '/image/skin/' + charName + '/' + num + getSkinExt(charName, num);
+            }
+            function skinDbKey(charName, num) {
+                return 'extension-' + '舰R牌将' + ':image/skin/' + charName + '/' + num + getSkinExt(charName, num);
+            }
+
+            // 启动预热：并发探测所有注册皮肤的扩展名，游戏加载期间完成
+            if (!isImportedMode) {
+                for (var regName in skinRegistry) {
+                    for (var ri = 1; ri <= skinRegistry[regName]; ri++) {
+                        probeSkinExt(regName, ri);
+                    }
+                }
+            }
+
+            // ① 补丁 setBackground：扩展武将选中皮肤时从扩展目录加载
+            var _origSetBg = HTMLDivElement.prototype.setBackground;
+            HTMLDivElement.prototype.setBackground = function (name, type, ext, subfolder) {
+                if (type === 'character' && name && skinRegistry[name] &&
+                    lib.config.skin[name] && arguments[2] !== 'noskin') {
+                    var skinNum = lib.config.skin[name];
+                    if (isImportedMode) {
+                        this.setBackgroundDB(skinDbKey(name, skinNum));
+                        return this;
+                    }
+                    var nameinfo = get.character(name);
+                    var sex = (nameinfo && ['male', 'female', 'double'].indexOf(nameinfo[0]) >= 0)
+                        ? nameinfo[0] : 'male';
+                    // 默认剪影背景优先走 fs 探测，兼容用户把 default_bg_{sex} 换成 png。
+                    // 探测不出（无 Node / 文件都缺）才回退到引擎传进来的 ext 或 .jpg。
+                    var defaultBg = lib.characterDefaultPicturePath + sex + '.jpg';
+                    var elem = this;
+                    elem.style.backgroundPositionX = 'center';
+                    elem.style.backgroundSize = 'cover';
+
+                    var cacheKey = name + '/' + skinNum;
+                    if (skinExtCache[cacheKey] !== undefined) {
+                        // 已探测：命中则用真实扩展名，未命中（null）回落默认立绘
+                        var cachedExt = skinExtCache[cacheKey];
+                        if (cachedExt) {
+                            elem.setBackgroundImage([skinFullPath(name, skinNum), defaultBg]);
+                        } else {
+                            elem.setBackgroundImage(defaultBg);
+                        }
+                    } else {
+                        // 未探测：先显示默认立绘占位，异步探测完成后再替换
+                        elem.setBackgroundImage(defaultBg);
+                        probeSkinExt(name, skinNum).then(function (resolvedExt) {
+                            if (!resolvedExt) return;
+                            // 如果期间用户换了皮肤，配置变了就不要覆盖
+                            if (lib.config.skin[name] !== skinNum) return;
+                            elem.setBackgroundImage([skinFullPath(name, skinNum), defaultBg]);
+                        });
+                    }
+                    return this;
+                }
+                return _origSetBg.apply(this, arguments);
+            };
+
+            // ② 补丁 ui.click.skin：点击头像切换扩展武将皮肤
+            var _origClickSkin = ui.click.skin.bind(ui.click);
+            ui.click.skin = function (avatar, name, callback) {
+                var cleanName = name;
+                if (cleanName.startsWith('gz_')) cleanName = cleanName.slice(3);
+                if (!skinRegistry[cleanName]) {
+                    return _origClickSkin(avatar, name, callback);
+                }
+
+                var maxSkin = skinRegistry[cleanName];
+                var num = (lib.config.skin[cleanName] || 0) + 1;
+
+                var fakeavatar = avatar.cloneNode(true);
+                var finish = function (bool) {
+                    var player = avatar.parentNode;
+                    if (bool) {
+                        fakeavatar.style.boxShadow = 'none';
+                        player.insertBefore(fakeavatar, avatar.nextSibling);
+                        setTimeout(function () { fakeavatar.delete(); }, 100);
+                    }
+                    if (bool && lib.config.animation && !lib.config.low_performance) {
+                        player.$rare();
+                    }
+                    if (callback) callback(bool);
+                };
+                var resetSkin = function (hadSkin) {
+                    if (hadSkin) finish(true); else finish(false);
+                    delete lib.config.skin[cleanName];
+                    game.saveConfig('skin', lib.config.skin);
+                    avatar.setBackground(cleanName, 'character');
+                };
+
+                // 超过最大皮肤数 → 回到默认立绘
+                if (num > maxSkin) {
+                    delete lib.config.skin[cleanName];
+                    game.saveConfig('skin', lib.config.skin);
+                    avatar.setBackground(cleanName, 'character');
+                    finish(true);
+                    return;
+                }
+
+                if (!isImportedMode) {
+                    // 目录模式：探测 png / jpg，顺便把扩展名写入缓存
+                    probeSkinExt(cleanName, num).then(function (resolvedExt) {
+                        if (!resolvedExt) {
+                            resetSkin(!!lib.config.skin[cleanName]);
+                            return;
+                        }
+                        lib.config.skin[cleanName] = num;
+                        game.saveConfig('skin', lib.config.skin);
+                        avatar.style.backgroundImage = 'url("' + lib.assetURL + skinFullPath(cleanName, num) + '")';
+                        finish(true);
+                    });
+                } else {
+                    // DB 模式：用 game.getDB 探测
+                    game.getDB('image', skinDbKey(cleanName, num)).then(function (src) {
+                        if (src) {
+                            lib.config.skin[cleanName] = num;
+                            game.saveConfig('skin', lib.config.skin);
+                            avatar.style.backgroundImage = "url('" + src + "')";
+                            finish(true);
+                        } else {
+                            resetSkin(!!lib.config.skin[cleanName]);
+                        }
+                    }).catch(function () {
+                        resetSkin(!!lib.config.skin[cleanName]);
+                    });
+                }
+            };
+
+            // ③ 补丁 charactercard：为扩展武将注入皮肤选择面板
+            // 原版在弹窗内探测 image/skin/{name}/1.jpg 来决定是否显示换肤面板，
+            // 扩展武将的皮肤不在那个路径，所以原版探测必定失败。这里在原版弹窗生成后补挂面板。
+            var _origCharCard = ui.click.charactercard.bind(ui.click);
+            ui.click.charactercard = function (name, sourcenode, noedit, resume, avatar) {
+                _origCharCard(name, sourcenode, noedit, resume, avatar);
+
+                var skinName = name;
+                if (skinName.startsWith('gz_shibing')) skinName = skinName.slice(3, 11);
+                else if (skinName.startsWith('gz_')) skinName = skinName.slice(3);
+                var skinCount = skinRegistry[skinName];
+                if (!skinCount) return;
+
+                // 找到刚创建的弹窗元素
+                var layers = document.querySelectorAll('.popup-container');
+                var layer = layers[layers.length - 1];
+                if (!layer) return;
+                var playerbg = layer.querySelector('.menubutton.large.ava');
+                if (!playerbg) return;
+                // 原版已创建面板（该武将在本体也有皮肤）则跳过
+                if (playerbg.querySelector('.changeskin')) return;
+
+                var bg = playerbg.querySelector('.avatar');
+                if (!bg) return;
+
+                var skinNode = ui.create.div('.changeskin', '可换肤', playerbg);
+                var skinAvatars = ui.create.div('.avatars', playerbg);
+                var panelCreated = false;
+
+                var showSkinPanel = function () {
+                    playerbg.classList.add('scroll');
+                    if (panelCreated) return;
+                    panelCreated = true;
+
+                    if (skinCount >= 4) {
+                        skinAvatars.classList.add('scroll');
+                        if (lib.config.touchscreen) lib.setScroll(skinAvatars);
+                    }
+
+                    for (var i = 0; i <= skinCount; i++) {
+                        (function (idx) {
+                            var btn = ui.create.div(skinAvatars, function () {
+                                playerbg.classList.remove('scroll');
+                                if (idx > 0) {
+                                    lib.config.skin[skinName] = idx;
+                                    bg.style.backgroundImage = this.style.backgroundImage;
+                                    if (sourcenode) sourcenode.style.backgroundImage = this.style.backgroundImage;
+                                    if (avatar) avatar.style.backgroundImage = this.style.backgroundImage;
+                                } else {
+                                    delete lib.config.skin[skinName];
+                                    bg.setBackground(skinName, 'character', 'noskin');
+                                    if (sourcenode) sourcenode.setBackground(skinName, 'character', 'noskin');
+                                    if (avatar) avatar.setBackground(skinName, 'character', 'noskin');
+                                }
+                                game.saveConfig('skin', lib.config.skin);
+                            });
+                            btn._link = idx;
+                            if (idx > 0) {
+                                if (!isImportedMode) {
+                                    // 缓存未命中时异步探测，避免缩略图 URL 用错扩展名
+                                    if (skinExtCache[skinName + '/' + idx] === undefined) {
+                                        probeSkinExt(skinName, idx).then(function (resolvedExt) {
+                                            if (resolvedExt) btn.setBackgroundImage(skinFullPath(skinName, idx));
+                                        });
+                                    } else {
+                                        btn.setBackgroundImage(skinFullPath(skinName, idx));
+                                    }
+                                } else {
+                                    btn.setBackgroundDB(skinDbKey(skinName, idx));
+                                }
+                            } else {
+                                btn.setBackground(skinName, 'character', 'noskin');
+                            }
+                        })(i);
+                    }
+                };
+
+                bg.addEventListener('click', showSkinPanel);
+            };
+
+            // ╔══════════════════════════════════════════════════════════════╗
+            // ║ 9. 替换透明立绘的默认剪影背景                                  ║
+            // ╚══════════════════════════════════════════════════════════════╝
             // 引擎在 setBackground 时拼 lib.characterDefaultPicturePath + sex + ext 作为 fallback，
             // 默认值是 "image/character/default_silhouette_"，这里替换为扩展目录内的自定义背景。
-            // 需要在 extension/舰r牌将/image/ 下放置 default_bg_female.jpg 等文件。
+            // 需要在 extension/舰R牌将/image/ 下放置 default_bg_female.jpg 等文件（png 也可）。
             if (!isImportedMode) {
-                lib.characterDefaultPicturePath = 'extension/' + JIANR_EXT_DIR + '/image/default_bg_';
+                lib.characterDefaultPicturePath = 'extension/' + '舰R牌将' + '/image/default_bg_';
+
+                // 引擎硬编码 default_bg_{sex}.jpg，若用户把默认背景换成 png 需要做后置 URL 改写。
+                // 思路：setBackground 原样调用引擎走完拼装，拿到 backgroundImage 后扫一遍 URL，
+                // 把我们这扩展目录下的 default_bg_*.jpg 替换成实际存在的扩展名。
+                var defaultBgSexList = ['female', 'male', 'double'];
+                var defaultBgExtMap = {};
+                var needsDefaultBgRewrite = false;
+                Promise.all(defaultBgSexList.map(sexKey =>
+                    probeJianRAssetExt('image/default_bg_' + sexKey).then(realExt => {
+                        defaultBgExtMap[sexKey] = realExt;
+                        if (realExt && realExt !== '.jpg') needsDefaultBgRewrite = true;
+                    })
+                )).then(() => {
+                    if (needsDefaultBgRewrite) {
+                        // 路径中的扩展目录名在 CSS URL 里会被 URL 编码，只用不会变的子串做快速过滤。
+                        var defaultBgRewriteRegex = /(\/image\/default_bg_)(female|male|double)\.jpg/g;
+                        var _prevSetBgForDefault = HTMLDivElement.prototype.setBackground;
+                        HTMLDivElement.prototype.setBackground = function (name, type, ext, subfolder) {
+                            var result = _prevSetBgForDefault.apply(this, arguments);
+                            if (type !== 'character') return result;
+                            var cur = this.style.backgroundImage;
+                            if (!cur || cur.indexOf('/image/default_bg_') < 0) return result;
+                            var rewritten = cur.replace(defaultBgRewriteRegex, function (match, head, sx) {
+                                var actual = defaultBgExtMap[sx];
+                                return (actual && actual !== '.jpg') ? (head + sx + actual) : match;
+                            });
+                            if (rewritten !== cur) this.style.backgroundImage = rewritten;
+                            return result;
+                        };
+                    }
+                });
             }
 
             //全局技能写在这上面
         },
         precontent: function () {
-            //挂载工具函数
+            // ╔══════════════════════════════════════════════════════════════╗
+            // ║ A. 工具函数挂载（供技能代码访问）                              ║
+            // ╚══════════════════════════════════════════════════════════════╝
             window.weightedRandom = weightedRandom;
 
-            var jianrExtensionDisplayName = '舰R牌将';
-            var jianrExtensionDirectoryName = '舰r牌将';
-            // 这个扩展之前用 `lib.device || lib.node` 来判断角色图应该走 `ext:` 还是 `db:`。
-            // 这种写法会把“桌面浏览器 + 直接读取 extension 目录”的情况误判成 `db:`,
-            // 于是角色图会去 IndexedDB 里找资源,最终在浏览器模式下出现整包头像不显示的问题。
+            // ╔══════════════════════════════════════════════════════════════╗
+            // ║ B. 角色图路径解析（同步优先，异步兜底）                         ║
+            // ╚══════════════════════════════════════════════════════════════╝
+            // 历史踩坑：之前用 `lib.device || lib.node` 判断 ext: vs db:，
+            // 把"桌面浏览器 + 直接读 extension 目录"的情况误判成 db:，整包头像不显示。
+            // 真正可靠的标志是 `_status.evaluatingExtension`：
+            //   - false → 目录直读模式，走 `ext:舰R牌将/...`
+            //   - true  → 数据库导入模式，走 `db:extension-舰R牌将:...`
             //
-            // 引擎真正区分“目录直读扩展”和“数据库导入扩展”的标志其实是 `_status.evaluatingExtension`：
-            // - `false`：当前扩展来自 `extension/舰R牌将/...` 目录,资源应该走 `ext:`
-            // - `true`：当前扩展来自浏览器本地数据库,资源应该走 `db:`
-            //
-            // 因此这里把图片路径解析抽出来,和引擎自己的判定逻辑保持一致。
-            // 另外顺手兼容两张不是标准 `.jpg` 命名的角色图,避免只修主分支后还残留个别空白头像。
-            var jianrCharacterImagePathOverrides = {
-            };
-            var getJianRCharacterImageRelativePath = function (characterName) {
+            // 三套接口分工：
+            //   getJianRCharacterImageTagSync : 同步版，启动期把 ext: tag 直接 push 进 character[4]
+            //   getJianRCharacterImageTag     : 异步版，纯浏览器无 fs 时兜底
+            //   getJianRCharacterImageRelativePath : 异步版的内部步骤，先反查 fileList 再 fallback
+            var jianrExtensionDirectoryName = '舰R牌将';
+
+            var getJianRCharacterImageRelativePath = async function (characterName) {
                 // 扩展若是从压缩包导入,`extensionInfo.file` 中会记录真实文件名。
-                // 这里优先按“角色名 -> 实际文件路径”反查,可以保留正确的后缀和大小写。
+                // 这里优先按“角色名 -> 实际文件路径”反查,可以保留正确的后缀。
                 var extensionInfo = lib.config && lib.config.extensionInfo && lib.config.extensionInfo['舰R牌将'];
                 var importedFileList = extensionInfo && Array.isArray(extensionInfo.file) ? extensionInfo.file : [];
-                var normalizedCharacterName = String(characterName).toLowerCase();
                 for (var index = 0; index < importedFileList.length; index++) {
                     var filePath = importedFileList[index];
                     if (typeof filePath !== 'string' || filePath.indexOf('image/character/') !== 0) continue;
                     var fileName = filePath.slice('image/character/'.length);
                     var dotIndex = fileName.lastIndexOf('.');
                     if (dotIndex <= 0) continue;
-                    if (fileName.slice(0, dotIndex).toLowerCase() === normalizedCharacterName) {
+                    if (fileName.slice(0, dotIndex) === characterName) {
                         return filePath;
                     }
                 }
-                // 目录模式下不会有这份数据库清单,此时回退到扩展目录里的默认路径。
-                return jianrCharacterImagePathOverrides[characterName] || ('image/character/' + characterName + '.jpg');
+                // 目录模式下同步 fs 探测 png/jpg，兼容用户手动换成 png 的立绘。
+                var probedExt = await probeJianRAssetExt('image/character/' + characterName) || '.jpg';
+                return 'image/character/' + characterName + probedExt;
             };
             var getJianRCharacterImageTag = function (characterName) {
-                var relativePath = getJianRCharacterImageRelativePath(characterName);
-                // 这里直接对齐引擎的资源选择方式,不再通过“是不是浏览器/设备”做环境猜测。
+                return getJianRCharacterImageRelativePath(characterName).then(function (relativePath) {
+                    // 这里直接对齐引擎的资源选择方式,不再通过“是不是浏览器/设备”做环境猜测。
+                    if (_status.evaluatingExtension) {
+                        return 'db:extension-' + jianrExtensionDirectoryName + ':' + relativePath;
+                    }
+                    return 'ext:' + jianrExtensionDirectoryName + '/' + relativePath;
+                });
+            };
+            // 同步版本：Electron 下通过 fs.existsSync 直接拿到后缀，用于 precontent 的同步 tag push
+            // 阶段。这样 `return jianrjinji` 时 character[id][4] 已经带上 ext: tag，
+            // 引擎首次注册/渲染时就能读到正确的扩展路径，不会去本体 image/character 下 404。
+            // 无法同步解析（导入模式没命中 file 列表 + 没有 fs）时返回 null，由调用方回退异步路径。
+            var getJianRCharacterImageTagSync = function (characterName) {
+                // 先按导入模式反查 extensionInfo.file
+                var extensionInfo = lib.config && lib.config.extensionInfo && lib.config.extensionInfo['舰R牌将'];
+                var importedFileList = extensionInfo && Array.isArray(extensionInfo.file) ? extensionInfo.file : [];
+                var matchedRelativePath = null;
+                for (var index = 0; index < importedFileList.length; index++) {
+                    var filePath = importedFileList[index];
+                    if (typeof filePath !== 'string' || filePath.indexOf('image/character/') !== 0) continue;
+                    var fileName = filePath.slice('image/character/'.length);
+                    var dotIndex = fileName.lastIndexOf('.');
+                    if (dotIndex <= 0) continue;
+                    if (fileName.slice(0, dotIndex) === characterName) {
+                        matchedRelativePath = filePath;
+                        break;
+                    }
+                }
+                if (matchedRelativePath === null) {
+                    // 回退到同步 fs 探测（仅 Electron 有效）
+                    var syncExt = probeJianRAssetExtSync('image/character/' + characterName);
+                    // undefined（纯浏览器无 fs）/ null（fs 两个后缀都没找到，可能是 Windows 打包后
+                    // cwd 不是游戏根目录导致 existsSync 全失败）都交给异步路径处理。
+                    // 异步走 Image().src + lib.assetURL URL,不依赖 cwd,是更可靠的兜底。
+                    if (!syncExt) return null;
+                    matchedRelativePath = 'image/character/' + characterName + syncExt;
+                }
                 if (_status.evaluatingExtension) {
-                    return 'db:extension-' + jianrExtensionDisplayName + ':' + relativePath;
+                    return 'db:extension-' + jianrExtensionDirectoryName + ':' + matchedRelativePath;
                 }
-                return 'ext:' + jianrExtensionDirectoryName + '/' + relativePath;
+                return 'ext:' + jianrExtensionDirectoryName + '/' + matchedRelativePath;
             };
-            var normalizeJianRDirectoryAssetReference = function (value) {
-                // 目录直读模式下,所有 `ext:` 资源都必须指向真实文件夹名“舰r牌将”；
-                // 但扩展源码里历史上大量写成了展示名“舰R牌将”。
-                // 这里统一做一次前缀纠正,避免逐条手改数百个音频/贴图字段。
-                if (_status.evaluatingExtension || typeof value !== 'string') return value;
-                return value.split('ext:' + jianrExtensionDisplayName + '/').join('ext:' + jianrExtensionDirectoryName + '/');
-            };
-            var normalizeJianRDirectoryAssetReferenceDeep = function (target, seen) {
-                if (_status.evaluatingExtension) return target;
-                if (!target || typeof target !== 'object') return target;
-                if (!seen) seen = [];
-                if (seen.indexOf(target) !== -1) return target;
-                seen.push(target);
-                if (Array.isArray(target)) {
-                    for (var arrayIndex = 0; arrayIndex < target.length; arrayIndex++) {
-                        if (typeof target[arrayIndex] === 'string') {
-                            target[arrayIndex] = normalizeJianRDirectoryAssetReference(target[arrayIndex]);
-                        } else {
-                            normalizeJianRDirectoryAssetReferenceDeep(target[arrayIndex], seen);
-                        }
-                    }
-                    return target;
-                }
-                for (var key in target) {
-                    if (!Object.prototype.hasOwnProperty.call(target, key)) continue;
-                    if (typeof target[key] === 'string') {
-                        target[key] = normalizeJianRDirectoryAssetReference(target[key]);
-                    } else {
-                        normalizeJianRDirectoryAssetReferenceDeep(target[key], seen);
-                    }
-                }
-                return target;
-            };
-            //武将包,"qigong","qingnang"
+            // ╔══════════════════════════════════════════════════════════════╗
+            // ║ C. 武将包注册（jianrjinji）                                   ║
+            // ╚══════════════════════════════════════════════════════════════╝
+            // 为 jianrjinji.character 每个武将的 character[4] 数组 push 一个 ext:/db: tag，
+            // 同步优先（启动期填好），失败再走异步 fallback 后续 push。
             game.import('character', function () {
 
                 // 这里统一通过上面的解析函数补角色图标签：
                 // 1. 浏览器直接读取扩展目录时返回 `ext:` 路径；
                 // 2. 浏览器读取本地数据库中的导入扩展时返回 `db:` 路径；
-                // 3. 少数特殊后缀/大小写的角色图也会在这里被自动修正。
+                // 3. 少数特殊后缀的角色图也会在这里被自动修正。
+                var __jianrSyncTagCount = 0;
+                var __jianrAsyncTagCount = 0;
                 for (var i in jianrjinji.character) {
                     if (!Array.isArray(jianrjinji.character[i][4])) jianrjinji.character[i][4] = [];
-                    jianrjinji.character[i][4].push(getJianRCharacterImageTag(i));
-                }//由于以此法加入的武将包武将图片是用源文件的,所以要用此法改变路径。
-                normalizeJianRDirectoryAssetReferenceDeep(jianrjinji);
+                    // 用 IIFE 捕获当前迭代的 characterId，避免 var i 闭包陷阱导致
+                    // 所有异步回调里的 i 都是循环结束后的最后一个 key。
+                    (function (characterId) {
+                        // 先尝试同步解析：Electron 下 fs.existsSync 能立刻拿到真实扩展名，
+                        // 保证 return jianrjinji 前 character[4] 已带上 ext: tag。
+                        // 这样引擎注册/首次渲染时就能读到扩展内路径，不会 fallback 去
+                        // 本体 image/character/{id}.jpg 导致 404。
+                        var syncTag = getJianRCharacterImageTagSync(characterId);
+                        if (syncTag) {
+                            __jianrSyncTagCount++;
+                            jianrjinji.character[characterId][4].push(syncTag);
+                            if (__jianrSyncTagCount <= 3) {
+                                console.log('[舰R牌将] sync push', characterId, '->', syncTag);
+                            }
+                            return;
+                        }
+                        // 同步拿不到（纯浏览器环境），退回异步探测
+                        console.log('[舰R牌将] fallback async probe', characterId);
+                        getJianRCharacterImageTag(characterId).then(function (tag) {
+                            __jianrAsyncTagCount++;
+                            console.log('[舰R牌将] async push', characterId, '->', tag, '(#' + __jianrAsyncTagCount + ')');
+                            jianrjinji.character[characterId][4].push(tag);
+                        }).catch(function (err) {
+                            console.warn('[舰R牌将] probe failed', characterId, err);
+                        });
+                    })(i);
+                }
+                console.log('[舰R牌将] sync tag total:', __jianrSyncTagCount);
                 return jianrjinji;
             });
-            //lib.config.all.characters.push('jianrjinji');//无名杀新版本已弃用。如要兼容旧版本可以重新使用
-            //if (!lib.config.characters.includes('jianrjinji')) lib.config.characters.push('jianrjinji');
-            lib.translate['jianrjinji_character_config'] = '舰R武将';// 包名翻译
-            //卡包（手牌）
+            lib.translate['jianrjinji_character_config'] = '舰R武将';
 
+            // ╔══════════════════════════════════════════════════════════════╗
+            // ║ D. 卡牌包注册（jianrjinjibao）                                ║
+            // ╚══════════════════════════════════════════════════════════════╝
             game.import('card', function () {
                 var jianrjinjibao = {
                     name: 'jianrjinjibao',//卡包命名
                     connect: true,//卡包是否可以联机
                     card: {
-                        /* jinjuzhiyuan9: {
-                            audio: "ext:舰R牌将/audio/skill:true",
-                            image: 'ext:舰R牌将/jinjuzhiyuan9.jpg',
-                            type: "trick",
-                            enable: true,
-                            //selectTarget: -1,
-                            selectTarget: [1, Infinity],
-                            reverseOrder: true,
-                            "yingbian_prompt": "当你使用此牌选择目标后,你可为此牌减少一个目标",
-                            "yingbian_tags": ["remove"],
-                            yingbian: function (event) {
-                                event.yingbian_removeTarget = true;
-                            },
-                            filterTarget: function (card, player, target) {
-                                return player != target;
-                            },
-                            content: function () {
-                                "step 0"
-                                if (typeof event.baseDamage != 'number') event.baseDamage = 1;
-                                if (event.directHit) event._result = { bool: false };
-                                else {
-                                    var next = target.chooseToRespond({ name: 'shan'});
-                                    next.set('ai', function (card) {
-                                        var evt = _status.event.getParent();
-                                        if (get.damageEffect(evt.target, evt.player, evt.target) >= 0) return 0;
-                                        if (evt.player.hasSkillTag('notricksource')) return 0;
-                                        if (evt.target.hasSkillTag('notrick')) return 0;
-                                        if (evt.target.hasSkillTag('noShan')) {
-                                            return -1;
-                                        }
-                                        return get.order(card);
-                                    });
-                                    next.autochoose = lib.filter.autoRespondShan;
-                                }
-                                "step 1"
-                                if (result.bool == false) {
-                                    if (target.getEquip(2).name != 'tengjia') target.damage(event.baseDamage);
-                                }
-                            },
-                            ai: {
-             
-                                wuxie: function (target, card, player, viewer) {
-                                    if (get.attitude(viewer, target) > 0 && target.countCards('h', 'shan')) {
-                                        if (!target.countCards('h') || target.hp == 1 || Math.random() < 0.7) return 0;
-                                    }
-                                },
-                                basic: {
-                                    order: 9,
-                                    useful: 1,
-                                    value: 7,
-                                },
-                                result: {
-                                    player(player, target) {
-                                        var att = get.attitude(player, target);
-                                        if (att > 0) return 0;
-                                        return 1;
-                                    },
-                                    "target_use": function (player, target) {
-                                        if (player.hasUnknown(2) && get.mode() != 'guozhan') return 0;
-                                        var nh = target.countCards('h');
-                                        if (get.mode() == 'identity') {
-                                            if (target.isZhu && nh <= 2 && target.hp <= 1) return -100;
-                                        }
-                                        if (nh == 0) return -2;
-                                        if (nh == 1) return -1.7
-                                        return -1.5;
-                                    },
-                                    target: function (player, target) {
-                                        var nh = target.countCards('h');
-                                        if (get.mode() == 'identity') {
-                                            if (target.isZhu && nh <= 2 && target.hp <= 1) return -100;
-                                        }
-                                        if (nh == 0) return -2;
-                                        if (nh == 1) return -1.7
-                                        return -1.5;
-                                    },
-                                },
-                                tag: {
-                                    respond: 1,
-                                    respondShan: 1,
-                                    damage: 1,
-                                    multitarget: 1,
-                                    multineg: 1,
-                                },
-                            },
-                            fullimage: true,
-                        },
                         jiakonglishi9: {
                             image: 'ext:舰R牌将/jiakonglishi9.jpg',
                             audio: "ext:舰R牌将/audio/skill:true",
@@ -1136,7 +1521,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             },
                             toself: true,
                             fullskin: true,
-                        }, */
+                        },
                         xingyun: {
                             image: 'ext:舰R牌将/image/card/xingyun.png',
                             type: "equip",
@@ -1897,20 +2282,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         },
                     },
                     translate: {
-                        /* jinjuzhiyuan9: "近距支援",
-                        "jinjuzhiyuan9_info": "出牌阶段,对所有其他角色使用。每名目标角色需打出一张【闪】,否则受到1点伤害。",
-                        jiakonglishi9: "架空历史",
-                        "jiakonglishi9_info": "群星璀璨,欧陆风云,该武将首次使用会有两轮1.5展示牌量的五谷丰登,再次使用仅有一轮。",
-                        mingzuyueqi9: "民族乐器",
-                        "mingzuyueqi9_info": "北境之地的文化艺术。锁定技,你视为拥有技能国战“制衡”,若你已经有“制衡”,则改为取消可弃置牌数的限制。",
-                        hangkongzhan9: "航空战",
-                        "hangkongzhan9_info": "建树丰厚,参与每轮开始时的三连杀战斗吗,每轮最多弃置三张牌。", 
-                        paohuozhunbei9: "炮火准备",
-                        "paohuozhunbei9_info": "试试就逝世,扣一血得属性杀增强效果,然而现在所有舰船都有这个,可以图加一杀次数。", 
-                        qiangliguibi9: "强力规避",
-                        "qiangliguibi9_info": "可以进行一次判定,为桃、闪则视为打出闪。<br>若判定未生效,会获得判定牌。<br>若武将为驱逐且没有判定成功,可以额外触发一次。",
-                        lianxugongji9: "连续攻击",
-                        "lianxugongji9_info": "其实就是杀,但此杀能连打两次。。",*/
                         "sushepao3": "速射炮",
                         "sushepao3_info": "射速与精度很吓人,当然消耗也很惊人（没有特殊效果）",
                         "quzhupao3": "速射炮",
@@ -1936,16 +2307,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         "fasheqi3": "发射器",
                         "fasheqi3_info": "发射导弹的同时要牺牲一个火控雷达槽位（没有特殊效果）",
                     },
-                    list: [/* ["heart", "1", "hangkongzhan9"], ["diamond", "1", "xingyun"], ["spade", "1", "lianxugongji9"], ["club", "1", "jinjuzhiyuan9"], ["heart", "1", "jiakonglishi9"] */],//牌堆添加
+                    list: [],//牌堆添加
                 }
-                normalizeJianRDirectoryAssetReferenceDeep(jianrjinjibao);
                 return jianrjinjibao
             });
             lib.translate['jianrjinjibao_card_config'] = '舰R卡牌';
             lib.config.all.cards.push('jianrjinjibao');
-
-            //if (!lib.config.cards.includes('jianrjinjibao')) lib.config.cards.push('jianrjinjibao');//包名翻译,失败了：,"jianrjinjibao":{"name":"禁用舰R测试内卡包","intro":"联机卡组在游戏内运行时才添加至游戏内,禁用添加这些卡组的技能,才能真正禁用这些卡组","init":true},
-            //闪避（响应）对面的攻击,通过攻击减少对手手牌数,config.diewulimitaiconfig.hanbing_gaiconfig.tiaozhanbiaojiang
 
         }, help: {}, config: {//config就是配置文件,类似于minecraft的模组设置文本。无名将其可视化了....。当你进行了至少一次强化后<br>1.出牌阶段<br>你可以弃置3张不同花色的牌,提升一点血量上限。<br>2.当你濒死时,<br>你可以弃置4张不同花色的牌,回复一点体力。<br>（未开启强化,则无需强化即可使用建造。未开启建造,则强化上限仅为1级。）火杀：令目标回合结束后,受到一点火焰伤害,摸两张牌。</br>冰杀：护甲加1伤；减少对手1点防御距离。</br>雷杀：自动判断是否流失对手体力；减少对手1点手牌上限；。</br>此角色回合结束后移除所有的进水、减速、燃烧。
             jianrjinji: { "name": "禁用舰R联机武将/可自定义角色技能", "intro": "在游戏运行时,扩展通过运行一个技能,将联机武将添加至游戏内,<br>启用此技能,才能禁用联机武将。<br>禁用后,单机武将不会被联机部分覆盖。<br>进入修改武将的界面：点击上方的编辑扩展-武将。", "init": false },
@@ -1959,7 +2326,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             _kaishimopai: { "name": "更好的摸牌阶段", "intro": "开启后,所有玩家获得摸牌类技能【摸牌】,<br>摸牌阶段摸牌量>1时：<br>可以弃置等同于摸牌数的牌,改为获得1张由你指定类别的牌,<br>在你判定延时锦囊牌前,<br>可令1.下一个摸牌阶段--少摸一张牌;2.本回合结束时--摸一张牌。", "init": false },
             _hanbing_gai: { "name": "寒冰剑-增强", "intro": "开启后,拥有寒冰剑时,寒冰剑的弃牌数改为你造成的伤害*2,<br>弃置到没有手牌时,会将没有计算完的伤害继续打出（以普通伤害的属性）。", "init": true },
             tiaozhanbiaojiang: { "name": "挑战模式全员国战不屈", "intro": "开启后,所有玩家获得技能【挑战技能】：<br>开局流失体力到剩余1血,根据流失的体力数多摸等量的牌；<br>全员获得国战不屈,唤醒界标武将的力量。<br>暂缺一个扶起负数血队友的技能", "init": true },
-            enable_effects: { "name": "启用战斗特效动画", "intro": "触发舰R技能时显示对应战斗动画（GIF）。<br>GIF 素材请放在 extension/舰r牌将/image/animation/ 目录下。", "init": true },
+            enable_effects: { "name": "启用战斗特效动画", "intro": "触发舰R技能时显示对应战斗动画（GIF）。<br>GIF 素材请放在 extension/舰R牌将/image/animation/ 目录下。", "init": true },
             effect_opacity: { "name": "动画不透明度", "intro": "调节战斗特效动画的不透明度。", "init": "opacity100", "item": { "opacity100": "100%", "opacity80": "80%", "opacity60": "60%", "opacity40": "40%" } },
         }, package: {
             character: {

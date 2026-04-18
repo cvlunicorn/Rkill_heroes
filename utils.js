@@ -6,7 +6,7 @@
     { name: "选项二", weight: 3 },
     { name: "选项三", weight: 1 },
   ];
-  
+
   var selectedOption = weightedRandom(options);
   console.log("随机选择的选项是:", selectedOption);*/
 export function weightedRandom(options) {

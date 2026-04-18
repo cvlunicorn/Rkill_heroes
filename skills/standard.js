@@ -2344,7 +2344,7 @@ const standard = {
                         return (button.link[2] == 'ewaibuji9') ? 1 : -1;
                     }
                 } else {
-                    game.log("AI没有可用的牌了！</br>也许您没有正确安装并启用‘舰r美化’卡牌包？");
+                    game.log("AI没有可用的牌了！</br>也许您没有正确安装并启用‘舰R美化’卡牌包？");
                     player.storage.jujianmengxiang_error = true;
                 }
             },
