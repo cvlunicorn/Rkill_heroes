@@ -230,7 +230,7 @@ const shuileizhandui = {
                 return current.hasSkill("quzhudd");
             });
             var cards = game.cardsGotoOrdering(get.cards(count)).cards;
-            var showCardsDelay = Math.min(15, 10 + cards.length * 5);
+            var showCardsDelay = Math.max(2.5, 1.0 + cards.length * 0.5);
             await player.showCards(cards, "鱼雷战突进").set("delay_time", showCardsDelay);
 
             var basicTargetResult = { result: { bool: false } };
@@ -463,7 +463,7 @@ const shuileizhandui = {
             var target = event.target;
             await player.loseHp();
             if (!player.isIn() || !target.isIn()) return;
-            var damage = Math.ceil(target.getHp() / 2);
+            var damage = Math.floor(target.getHp() / 2);
             if (damage > 0) {
                 await target.damage(damage, player);
             }
