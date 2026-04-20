@@ -247,41 +247,41 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             style2 = document.createElement('style');
             style2.innerHTML = ".player.identity[data-color='RM'],";
             style2.innerHTML += "div[data-nature='RM'],";
-            style2.innerHTML += "span[data-nature='RM'] {text-shadow: black 0 0 1px,rgba(128, 0, 128) 0 0 2px,rgba(128, 0, 128) 0 0 5px,rgba(128, 0, 128) 0 0 10px,rgba(128, 0, 128) 0 0 10px}";
+            style2.innerHTML += "span[data-nature='RM'] {text-shadow: black 0 0 1px,rgba(128, 0, 128,1) 0 0 2px,rgba(128, 0, 128,1) 0 0 5px,rgba(128, 0, 128,1) 0 0 10px,rgba(128, 0, 128,1) 0 0 10px}";
             style2.innerHTML += "div[data-nature='RMm'],";
-            style2.innerHTML += "span[data-nature='RMm'] {text-shadow: black 0 0 1px,rgba(128, 0, 128) 0 0 2px,rgba(128, 0, 128) 0 0 5px,rgba(128, 0, 128) 0 0 5px,rgba(128, 0, 128) 0 0 5px,black 0 0 1px;}";
+            style2.innerHTML += "span[data-nature='RMm'] {text-shadow: black 0 0 1px,rgba(128, 0, 128,1) 0 0 2px,rgba(128, 0, 128,1) 0 0 5px,rgba(128, 0, 128,1) 0 0 5px,rgba(128, 0, 128,1) 0 0 5px,black 0 0 1px;}";
             style2.innerHTML += "div[data-nature='RMmm'],";
-            style2.innerHTML += "span[data-nature='RMmm'] {text-shadow: black 0 0 1px,rgba(128, 0, 128) 0 0 2px,rgba(128, 0, 128) 0 0 2px,rgba(128, 0, 128) 0 0 2px,rgba(128, 0, 128) 0 0 2px,black 0 0 1px;}";
+            style2.innerHTML += "span[data-nature='RMmm'] {text-shadow: black 0 0 1px,rgba(128, 0, 128,1) 0 0 2px,rgba(128, 0, 128,1) 0 0 2px,rgba(128, 0, 128,1) 0 0 2px,rgba(128, 0, 128,1) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
 
             style2 = document.createElement('style');
             style2.innerHTML = ".player.identity[data-color='ΒΜΦCCCP'],";
             style2.innerHTML += "div[data-nature='ΒΜΦCCCP'],";
-            style2.innerHTML += "span[data-nature='ΒΜΦCCCP'] {text-shadow: black 0 0 1px,rgba(255, 128, 0) 0 0 2px,rgba(255, 128, 0) 0 0 5px,rgba(255, 128, 0) 0 0 10px,rgba(255, 128, 0) 0 0 10px}";
+            style2.innerHTML += "span[data-nature='ΒΜΦCCCP'] {text-shadow: black 0 0 1px,rgba(255, 128, 0,1) 0 0 2px,rgba(255, 128, 0,1) 0 0 5px,rgba(255, 128, 0,1) 0 0 10px,rgba(255, 128, 0,1) 0 0 10px}";
             style2.innerHTML += "div[data-nature='ΒΜΦCCCPm'],";
-            style2.innerHTML += "span[data-nature='ΒΜΦCCCPm'] {text-shadow: black 0 0 1px,rgba(255, 128, 0) 0 0 2px,rgba(255, 128, 0) 0 0 5px,rgba(255, 128, 0) 0 0 5px,rgba(255, 128, 0) 0 0 5px,black 0 0 1px;}";
+            style2.innerHTML += "span[data-nature='ΒΜΦCCCPm'] {text-shadow: black 0 0 1px,rgba(255, 128, 0,1) 0 0 2px,rgba(255, 128, 0,1) 0 0 5px,rgba(255, 128, 0,1) 0 0 5px,rgba(255, 128, 0,1) 0 0 5px,black 0 0 1px;}";
             style2.innerHTML += "div[data-nature='ΒΜΦCCCPmm'],";
-            style2.innerHTML += "span[data-nature='ΒΜΦCCCPmm'] {text-shadow: black 0 0 1px,rgba(255, 128, 0) 0 0 2px,rgba(255, 128, 0) 0 0 2px,rgba(255, 128, 0) 0 0 2px,rgba(255, 128, 0) 0 0 2px,black 0 0 1px;}";
+            style2.innerHTML += "span[data-nature='ΒΜΦCCCPmm'] {text-shadow: black 0 0 1px,rgba(255, 128, 0,1) 0 0 2px,rgba(255, 128, 0,1) 0 0 2px,rgba(255, 128, 0,1) 0 0 2px,rgba(255, 128, 0,1) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
 
             style2 = document.createElement('style');
             style2.innerHTML = ".player.identity[data-color='ROCN'],";
             style2.innerHTML += "div[data-nature='ROCN'],";
-            style2.innerHTML += "span[data-nature='ROCN'] {text-shadow: black 0 0 1px,rgba(255, 128, 128) 0 0 2px,rgba(255, 128, 128) 0 0 5px,rgba(255, 128, 128) 0 0 10px,rgba(255, 128, 128) 0 0 10px}";
+            style2.innerHTML += "span[data-nature='ROCN'] {text-shadow: black 0 0 1px,rgba(255, 128, 128,1) 0 0 2px,rgba(255, 128, 128,1) 0 0 5px,rgba(255, 128, 128,1) 0 0 10px,rgba(255, 128, 128,1) 0 0 10px}";
             style2.innerHTML += "div[data-nature='ROCNm'],";
-            style2.innerHTML += "span[data-nature='ROCNm'] {text-shadow: black 0 0 1px,rgba(255, 128, 128) 0 0 2px,rgba(255, 128, 128) 0 0 5px,rgba(255, 128, 128) 0 0 5px,rgba(255, 128, 128)8)8) 0 0 5px,black 0 0 1px;}";
+            style2.innerHTML += "span[data-nature='ROCNm'] {text-shadow: black 0 0 1px,rgba(255, 128, 128,1) 0 0 2px,rgba(255, 128, 128,1) 0 0 5px,rgba(255, 128, 128,1) 0 0 5px,rgba(255, 128, 128,1) 0 0 5px,black 0 0 1px;}";
             style2.innerHTML += "div[data-nature='ROCNmm'],";
-            style2.innerHTML += "span[data-nature='ROCNmm'] {text-shadow: black 0 0 1px,rgba(255, 128, 128) 0 0 2px,rgba(255, 128, 128) 0 0 2px,rgba(255, 128, 128) 0 0 2px,rgba(255, 128, 128) 0 0 2px,black 0 0 1px;}";
+            style2.innerHTML += "span[data-nature='ROCNmm'] {text-shadow: black 0 0 1px,rgba(255, 128, 128,1) 0 0 2px,rgba(255, 128, 128,1) 0 0 2px,rgba(255, 128, 128,1) 0 0 2px,rgba(255, 128, 128,1) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
 
             style2 = document.createElement('style');
             style2.innerHTML = ".player.identity[data-color='OTHER'],";
             style2.innerHTML += "div[data-nature='OTHER'],";
-            style2.innerHTML += "span[data-nature='OTHER'] {text-shadow: black 0 0 1px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 5px,rgba(0, 0, 0) 0 0 10px,rgba(0, 0, 0) 0 0 10px}";
+            style2.innerHTML += "span[data-nature='OTHER'] {text-shadow: black 0 0 1px,rgba(0, 0, 0,1) 0 0 2px,rgba(0, 0, 0,1) 0 0 5px,rgba(0, 0, 0,1) 0 0 10px,rgba(0, 0, 0,1) 0 0 10px}";
             style2.innerHTML += "div[data-nature='OTHERm'],";
-            style2.innerHTML += "span[data-nature='OTHERm'] {text-shadow: black 0 0 1px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 5px,rgba(0, 0, 0) 0 0 5px,rgba(0, 0, 0) 0 0 5px,black 0 0 1px;}";
+            style2.innerHTML += "span[data-nature='OTHERm'] {text-shadow: black 0 0 1px,rgba(0, 0, 0,1) 0 0 2px,rgba(0, 0, 0,1) 0 0 5px,rgba(0, 0, 0,1) 0 0 5px,rgba(0, 0, 0,1) 0 0 5px,black 0 0 1px;}";
             style2.innerHTML += "div[data-nature='OTHERmm'],";
-            style2.innerHTML += "span[data-nature='OTHERmm'] {text-shadow: black 0 0 1px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 2px,black 0 0 1px;}";
+            style2.innerHTML += "span[data-nature='OTHERmm'] {text-shadow: black 0 0 1px,rgba(0, 0, 0,1) 0 0 2px,rgba(0, 0, 0,1) 0 0 2px,rgba(0, 0, 0,1) 0 0 2px,rgba(0, 0, 0,1) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
 
             // ╔══════════════════════════════════════════════════════════════╗
