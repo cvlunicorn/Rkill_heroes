@@ -882,8 +882,15 @@ const globalskills = {
                 if (trigger.player.hasSkill('_wulidebuff_jinshui')) { trigger.player.addSkill('_wulidebuff_jinshui'); }
                 trigger.player.addMark('_wulidebuff_jinshui', 1);
                 if ((trigger.player.hujia > 0 || trigger.player.hasSkillTag('maixie_defend')) && (!trigger.player.isLinked() || (trigger.player.isLinked() && link < 2 || trigger.num < 2))) {
-                    trigger.player.loseHp(trigger.num);
-                    game.log('雷杀穿透护甲:', trigger.num);
+                    var loseNum = trigger.num;
+                    trigger.player.loseHp(loseNum);
+                    game.log('雷杀穿透护甲:', loseNum);
+                    // 将体力流失计入伤害来源的统计
+                    if (player) {
+                        var stat = player.getStat();
+                        if (!stat.damage) stat.damage = 0;
+                        stat.damage += loseNum;
+                    }
                     trigger.num -= (trigger.num);
                     //trigger.cancel;
                 };

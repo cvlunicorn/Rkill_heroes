@@ -1616,6 +1616,10 @@ const shiptypeskills = {
             }
             else {
                 trigger.source.loseHp();
+                // 将体力流失计入技能拥有者的统计（刚烈弱化是反击技能）
+                var stat = player.getStat();
+                if (!stat.damage) stat.damage = 0;
+                stat.damage += 1;
             };
             if (event.num > 0) { event.goto(1) };
         },

@@ -168,7 +168,12 @@ const historybattles = {
                 //game.log("hp", hp, "cards", cards);
                 //game.log("hp", Math.abs(hp), "cards", Math.abs(cards));
                 if (hp > 0) {
-                    target.loseHp(Math.abs(hp));
+                    var loseNum = Math.abs(hp);
+                    target.loseHp(loseNum);
+                    // 将体力流失计入U47的统计
+                    var stat = player.getStat();
+                    if (!stat.damage) stat.damage = 0;
+                    stat.damage += loseNum;
 
                 } else if (hp < 0) {
                     target.recover(Math.abs(hp));
@@ -2110,6 +2115,12 @@ const historybattles = {
             "step 1"
             if (!result.bool) {
                 player.loseHp();
+                // 将体力流失计入原始伤害来源的统计
+                if (trigger.source) {
+                    var stat = trigger.source.getStat();
+                    if (!stat.damage) stat.damage = 0;
+                    stat.damage += 1;
+                }
             }
             //game.log("过穿流失体力");
             event.num = trigger.num;
@@ -3247,7 +3258,12 @@ const historybattles = {
             if (result.control == "yangwangxingkong_card") {
                 target.chooseToDiscard(true, target.countCards("h"));
             } else {
-                target.loseHp(target.hp);
+                var loseNum = target.hp;
+                target.loseHp(loseNum);
+                // 将体力流失计入伦敦的统计
+                var stat = player.getStat();
+                if (!stat.damage) stat.damage = 0;
+                stat.damage += loseNum;
                 event.finish();
             }
 

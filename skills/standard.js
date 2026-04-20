@@ -420,6 +420,10 @@ const standard = {
             if (result.bool) {
                 result.targets[0].loseHp(1);
                 result.targets[0].draw(2);
+                // 将体力流失计入雪风的统计
+                var stat = player.getStat();
+                if (!stat.damage) stat.damage = 0;
+                stat.damage += 1;
             } else {
                 event.finish();
                 return;
@@ -2344,7 +2348,7 @@ const standard = {
                         return (button.link[2] == 'ewaibuji9') ? 1 : -1;
                     }
                 } else {
-                    game.log("AI没有可用的牌了！</br>也许您没有正确安装并启用‘舰R美化’卡牌包？");
+                    game.log("AI没有可用的牌了！</br>也许您没有正确安装并启用‘舰r美化’卡牌包？");
                     player.storage.jujianmengxiang_error = true;
                 }
             },
@@ -2613,8 +2617,14 @@ const standard = {
         audio: "ext:舰R牌将/audio/skill:2",
         check: function () { return false; },
         content: function () {
+            var num = trigger.num;
             trigger.cancel();
-            trigger.player.loseHp(trigger.num);
+            trigger.player.loseHp(num);
+
+            // 直接将体力流失计入伤害统计
+            var stat = player.getStat();
+            if (!stat.damage) stat.damage = 0;
+            stat.damage += num;
         },
         ai: {
             jueqing: true,
