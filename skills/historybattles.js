@@ -170,10 +170,16 @@ const historybattles = {
                 if (hp > 0) {
                     var loseNum = Math.abs(hp);
                     target.loseHp(loseNum);
-                    // 将体力流失计入U47的统计
-                    var stat = player.getStat();
-                    if (!stat.damage) stat.damage = 0;
-                    stat.damage += loseNum;
+
+                    // 将体力流失计入U47的造成伤害统计
+                    var sourceStat = player.getStat();
+                    if (!sourceStat.damage) sourceStat.damage = 0;
+                    sourceStat.damage += loseNum;
+
+                    // 将体力流失计入目标的受伤统计
+                    var targetStat = target.getStat();
+                    if (!targetStat.damaged) targetStat.damaged = 0;
+                    targetStat.damaged += loseNum;
 
                 } else if (hp < 0) {
                     target.recover(Math.abs(hp));
@@ -2115,12 +2121,18 @@ const historybattles = {
             "step 1"
             if (!result.bool) {
                 player.loseHp();
-                // 将体力流失计入原始伤害来源的统计
+
+                // 将体力流失计入原始伤害来源的造成伤害统计
                 if (trigger.source) {
-                    var stat = trigger.source.getStat();
-                    if (!stat.damage) stat.damage = 0;
-                    stat.damage += 1;
+                    var sourceStat = trigger.source.getStat();
+                    if (!sourceStat.damage) sourceStat.damage = 0;
+                    sourceStat.damage += 1;
                 }
+
+                // 将体力流失计入肯特自己的受伤统计
+                var targetStat = player.getStat();
+                if (!targetStat.damaged) targetStat.damaged = 0;
+                targetStat.damaged += 1;
             }
             //game.log("过穿流失体力");
             event.num = trigger.num;
@@ -3260,10 +3272,17 @@ const historybattles = {
             } else {
                 var loseNum = target.hp;
                 target.loseHp(loseNum);
-                // 将体力流失计入伦敦的统计
-                var stat = player.getStat();
-                if (!stat.damage) stat.damage = 0;
-                stat.damage += loseNum;
+
+                // 将体力流失计入伦敦的造成伤害统计
+                var sourceStat = player.getStat();
+                if (!sourceStat.damage) sourceStat.damage = 0;
+                sourceStat.damage += loseNum;
+
+                // 将体力流失计入目标的受伤统计
+                var targetStat = target.getStat();
+                if (!targetStat.damaged) targetStat.damaged = 0;
+                targetStat.damaged += loseNum;
+
                 event.finish();
             }
 

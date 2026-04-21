@@ -885,12 +885,19 @@ const globalskills = {
                     var loseNum = trigger.num;
                     trigger.player.loseHp(loseNum);
                     game.log('雷杀穿透护甲:', loseNum);
-                    // 将体力流失计入伤害来源的统计
+
+                    // 将体力流失计入伤害来源的造成伤害统计
                     if (player) {
-                        var stat = player.getStat();
-                        if (!stat.damage) stat.damage = 0;
-                        stat.damage += loseNum;
+                        var sourceStat = player.getStat();
+                        if (!sourceStat.damage) sourceStat.damage = 0;
+                        sourceStat.damage += loseNum;
                     }
+
+                    // 将体力流失计入承受者的受伤统计
+                    var targetStat = trigger.player.getStat();
+                    if (!targetStat.damaged) targetStat.damaged = 0;
+                    targetStat.damaged += loseNum;
+
                     trigger.num -= (trigger.num);
                     //trigger.cancel;
                 };

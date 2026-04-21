@@ -418,12 +418,19 @@ const standard = {
             "step 1"
             //game.log("result.bool" + result.bool);
             if (result.bool) {
-                result.targets[0].loseHp(1);
-                result.targets[0].draw(2);
-                // 将体力流失计入雪风的统计
-                var stat = player.getStat();
-                if (!stat.damage) stat.damage = 0;
-                stat.damage += 1;
+                var target = result.targets[0];
+                target.loseHp(1);
+                target.draw(2);
+
+                // 将体力流失计入雪风的造成伤害统计
+                var sourceStat = player.getStat();
+                if (!sourceStat.damage) sourceStat.damage = 0;
+                sourceStat.damage += 1;
+
+                // 将体力流失计入承受者的受伤统计
+                var targetStat = target.getStat();
+                if (!targetStat.damaged) targetStat.damaged = 0;
+                targetStat.damaged += 1;
             } else {
                 event.finish();
                 return;
@@ -2621,10 +2628,15 @@ const standard = {
             trigger.cancel();
             trigger.player.loseHp(num);
 
-            // 直接将体力流失计入伤害统计
-            var stat = player.getStat();
-            if (!stat.damage) stat.damage = 0;
-            stat.damage += num;
+            // 将体力流失计入萤火虫的造成伤害统计
+            var sourceStat = player.getStat();
+            if (!sourceStat.damage) sourceStat.damage = 0;
+            sourceStat.damage += num;
+
+            // 将体力流失计入承受者的受伤统计
+            var targetStat = trigger.player.getStat();
+            if (!targetStat.damaged) targetStat.damaged = 0;
+            targetStat.damaged += num;
         },
         ai: {
             jueqing: true,

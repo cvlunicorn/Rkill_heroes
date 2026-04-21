@@ -941,7 +941,7 @@ const shiptypeskills = {
             player: ["phaseZhunbeiBegin", "phaseDiscardBegin"],
         },
         lastDo: true,
-        direct: true,
+        frequent: true,
         filter: function (event, player) {//意外发现function应用广泛,然而解决不了自动显示隐藏标记。航母开幕,然后根据舰种判断具体出什么杀game.log();
             return player.countCards('h') > 0 && player.getHistory("sourceDamage").length == 0;
         },
@@ -972,8 +972,7 @@ const shiptypeskills = {
                         isCard: true,
                     };
                     return get.useful(card1) - get.useful(card);
-                });
-            next.logSkill = 'kaimuleiji';
+                }).set('logSkill', '潜艇');
 
             /*var next = player.chooseCardTarget({
                 prompt: ('雷杀'),
@@ -1617,10 +1616,16 @@ const shiptypeskills = {
             }
             else {
                 trigger.source.loseHp();
-                // 将体力流失计入技能拥有者的统计（刚烈弱化是反击技能）
-                var stat = player.getStat();
-                if (!stat.damage) stat.damage = 0;
-                stat.damage += 1;
+
+                // 将体力流失计入技能拥有者的造成伤害统计（刚烈弱化是反击技能）
+                var sourceStat = player.getStat();
+                if (!sourceStat.damage) sourceStat.damage = 0;
+                sourceStat.damage += 1;
+
+                // 将体力流失计入伤害来源的受伤统计
+                var targetStat = trigger.source.getStat();
+                if (!targetStat.damaged) targetStat.damaged = 0;
+                targetStat.damaged += 1;
             };
             if (event.num > 0) { event.goto(1) };
         },
