@@ -247,41 +247,41 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             style2 = document.createElement('style');
             style2.innerHTML = ".player.identity[data-color='RM'],";
             style2.innerHTML += "div[data-nature='RM'],";
-            style2.innerHTML += "span[data-nature='RM'] {text-shadow: black 0 0 1px,rgba(128, 0, 128,1) 0 0 2px,rgba(128, 0, 128,1) 0 0 5px,rgba(128, 0, 128,1) 0 0 10px,rgba(128, 0, 128,1) 0 0 10px}";
+            style2.innerHTML += "span[data-nature='RM'] {text-shadow: black 0 0 1px,rgba(128, 0, 128) 0 0 2px,rgba(128, 0, 128) 0 0 5px,rgba(128, 0, 128) 0 0 10px,rgba(128, 0, 128) 0 0 10px}";
             style2.innerHTML += "div[data-nature='RMm'],";
-            style2.innerHTML += "span[data-nature='RMm'] {text-shadow: black 0 0 1px,rgba(128, 0, 128,1) 0 0 2px,rgba(128, 0, 128,1) 0 0 5px,rgba(128, 0, 128,1) 0 0 5px,rgba(128, 0, 128,1) 0 0 5px,black 0 0 1px;}";
+            style2.innerHTML += "span[data-nature='RMm'] {text-shadow: black 0 0 1px,rgba(128, 0, 128) 0 0 2px,rgba(128, 0, 128) 0 0 5px,rgba(128, 0, 128) 0 0 5px,rgba(128, 0, 128) 0 0 5px,black 0 0 1px;}";
             style2.innerHTML += "div[data-nature='RMmm'],";
-            style2.innerHTML += "span[data-nature='RMmm'] {text-shadow: black 0 0 1px,rgba(128, 0, 128,1) 0 0 2px,rgba(128, 0, 128,1) 0 0 2px,rgba(128, 0, 128,1) 0 0 2px,rgba(128, 0, 128,1) 0 0 2px,black 0 0 1px;}";
+            style2.innerHTML += "span[data-nature='RMmm'] {text-shadow: black 0 0 1px,rgba(128, 0, 128) 0 0 2px,rgba(128, 0, 128) 0 0 2px,rgba(128, 0, 128) 0 0 2px,rgba(128, 0, 128) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
 
             style2 = document.createElement('style');
             style2.innerHTML = ".player.identity[data-color='ΒΜΦCCCP'],";
             style2.innerHTML += "div[data-nature='ΒΜΦCCCP'],";
-            style2.innerHTML += "span[data-nature='ΒΜΦCCCP'] {text-shadow: black 0 0 1px,rgba(255, 128, 0,1) 0 0 2px,rgba(255, 128, 0,1) 0 0 5px,rgba(255, 128, 0,1) 0 0 10px,rgba(255, 128, 0,1) 0 0 10px}";
+            style2.innerHTML += "span[data-nature='ΒΜΦCCCP'] {text-shadow: black 0 0 1px,rgba(255, 128, 0) 0 0 2px,rgba(255, 128, 0) 0 0 5px,rgba(255, 128, 0) 0 0 10px,rgba(255, 128, 0) 0 0 10px}";
             style2.innerHTML += "div[data-nature='ΒΜΦCCCPm'],";
-            style2.innerHTML += "span[data-nature='ΒΜΦCCCPm'] {text-shadow: black 0 0 1px,rgba(255, 128, 0,1) 0 0 2px,rgba(255, 128, 0,1) 0 0 5px,rgba(255, 128, 0,1) 0 0 5px,rgba(255, 128, 0,1) 0 0 5px,black 0 0 1px;}";
+            style2.innerHTML += "span[data-nature='ΒΜΦCCCPm'] {text-shadow: black 0 0 1px,rgba(255, 128, 0) 0 0 2px,rgba(255, 128, 0) 0 0 5px,rgba(255, 128, 0) 0 0 5px,rgba(255, 128, 0) 0 0 5px,black 0 0 1px;}";
             style2.innerHTML += "div[data-nature='ΒΜΦCCCPmm'],";
-            style2.innerHTML += "span[data-nature='ΒΜΦCCCPmm'] {text-shadow: black 0 0 1px,rgba(255, 128, 0,1) 0 0 2px,rgba(255, 128, 0,1) 0 0 2px,rgba(255, 128, 0,1) 0 0 2px,rgba(255, 128, 0,1) 0 0 2px,black 0 0 1px;}";
+            style2.innerHTML += "span[data-nature='ΒΜΦCCCPmm'] {text-shadow: black 0 0 1px,rgba(255, 128, 0) 0 0 2px,rgba(255, 128, 0) 0 0 2px,rgba(255, 128, 0) 0 0 2px,rgba(255, 128, 0) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
 
             style2 = document.createElement('style');
             style2.innerHTML = ".player.identity[data-color='ROCN'],";
             style2.innerHTML += "div[data-nature='ROCN'],";
-            style2.innerHTML += "span[data-nature='ROCN'] {text-shadow: black 0 0 1px,rgba(255, 128, 128,1) 0 0 2px,rgba(255, 128, 128,1) 0 0 5px,rgba(255, 128, 128,1) 0 0 10px,rgba(255, 128, 128,1) 0 0 10px}";
+            style2.innerHTML += "span[data-nature='ROCN'] {text-shadow: black 0 0 1px,rgba(255, 128, 128) 0 0 2px,rgba(255, 128, 128) 0 0 5px,rgba(255, 128, 128) 0 0 10px,rgba(255, 128, 128) 0 0 10px}";
             style2.innerHTML += "div[data-nature='ROCNm'],";
-            style2.innerHTML += "span[data-nature='ROCNm'] {text-shadow: black 0 0 1px,rgba(255, 128, 128,1) 0 0 2px,rgba(255, 128, 128,1) 0 0 5px,rgba(255, 128, 128,1) 0 0 5px,rgba(255, 128, 128,1) 0 0 5px,black 0 0 1px;}";
+            style2.innerHTML += "span[data-nature='ROCNm'] {text-shadow: black 0 0 1px,rgba(255, 128, 128) 0 0 2px,rgba(255, 128, 128) 0 0 5px,rgba(255, 128, 128) 0 0 5px,rgba(255, 128, 128)8)8) 0 0 5px,black 0 0 1px;}";
             style2.innerHTML += "div[data-nature='ROCNmm'],";
-            style2.innerHTML += "span[data-nature='ROCNmm'] {text-shadow: black 0 0 1px,rgba(255, 128, 128,1) 0 0 2px,rgba(255, 128, 128,1) 0 0 2px,rgba(255, 128, 128,1) 0 0 2px,rgba(255, 128, 128,1) 0 0 2px,black 0 0 1px;}";
+            style2.innerHTML += "span[data-nature='ROCNmm'] {text-shadow: black 0 0 1px,rgba(255, 128, 128) 0 0 2px,rgba(255, 128, 128) 0 0 2px,rgba(255, 128, 128) 0 0 2px,rgba(255, 128, 128) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
 
             style2 = document.createElement('style');
             style2.innerHTML = ".player.identity[data-color='OTHER'],";
             style2.innerHTML += "div[data-nature='OTHER'],";
-            style2.innerHTML += "span[data-nature='OTHER'] {text-shadow: black 0 0 1px,rgba(0, 0, 0,1) 0 0 2px,rgba(0, 0, 0,1) 0 0 5px,rgba(0, 0, 0,1) 0 0 10px,rgba(0, 0, 0,1) 0 0 10px}";
+            style2.innerHTML += "span[data-nature='OTHER'] {text-shadow: black 0 0 1px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 5px,rgba(0, 0, 0) 0 0 10px,rgba(0, 0, 0) 0 0 10px}";
             style2.innerHTML += "div[data-nature='OTHERm'],";
-            style2.innerHTML += "span[data-nature='OTHERm'] {text-shadow: black 0 0 1px,rgba(0, 0, 0,1) 0 0 2px,rgba(0, 0, 0,1) 0 0 5px,rgba(0, 0, 0,1) 0 0 5px,rgba(0, 0, 0,1) 0 0 5px,black 0 0 1px;}";
+            style2.innerHTML += "span[data-nature='OTHERm'] {text-shadow: black 0 0 1px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 5px,rgba(0, 0, 0) 0 0 5px,rgba(0, 0, 0) 0 0 5px,black 0 0 1px;}";
             style2.innerHTML += "div[data-nature='OTHERmm'],";
-            style2.innerHTML += "span[data-nature='OTHERmm'] {text-shadow: black 0 0 1px,rgba(0, 0, 0,1) 0 0 2px,rgba(0, 0, 0,1) 0 0 2px,rgba(0, 0, 0,1) 0 0 2px,rgba(0, 0, 0,1) 0 0 2px,black 0 0 1px;}";
+            style2.innerHTML += "span[data-nature='OTHERmm'] {text-shadow: black 0 0 1px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
 
             // ╔══════════════════════════════════════════════════════════════╗
@@ -363,6 +363,69 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 return lib.config[CONFIG_ANIMATION_ENABLE] !== false;
             }
 
+            // 解析 GIF89a 各帧 Graphic Control Extension 的延时之和（毫秒）
+            // 找不到或非 GIF 时返回 0，让调用方走兜底时长
+            function parseGifDuration(buffer) {
+                var bytes = new Uint8Array(buffer);
+                if (bytes.length < 6 || bytes[0] !== 0x47 || bytes[1] !== 0x49 || bytes[2] !== 0x46) return 0;
+                var totalCs = 0;
+                for (var i = 0; i < bytes.length - 8; i++) {
+                    // GCE 块头：0x21 0xF9 0x04 [packed] [delay_lo] [delay_hi] [trans_idx] 0x00
+                    if (bytes[i] === 0x21 && bytes[i + 1] === 0xF9 && bytes[i + 2] === 0x04 && bytes[i + 7] === 0x00) {
+                        totalCs += bytes[i + 4] | (bytes[i + 5] << 8);
+                        i += 7;
+                    }
+                }
+                return totalCs * 10;
+            }
+
+            // 缓存每个 URL 的解析结果，避免每次触发都重新 fetch
+            var gifDurationCache = {};
+            function getGifDuration(url, fallback, callback) {
+                if (gifDurationCache[url] != null) { callback(gifDurationCache[url]); return; }
+                try {
+                    fetch(url).then(function (r) { return r.arrayBuffer(); }).then(function (buf) {
+                        var ms = parseGifDuration(buf);
+                        if (!ms || ms < 100) ms = fallback;
+                        gifDurationCache[url] = ms;
+                        callback(ms);
+                    }).catch(function () { callback(fallback); });
+                } catch (e) { callback(fallback); }
+            }
+
+            // 用 <video preload="metadata"> 探测视频时长
+            var videoDurationCache = {};
+            function getVideoDuration(url, fallback, callback) {
+                if (videoDurationCache[url] != null) { callback(videoDurationCache[url]); return; }
+                try {
+                    var probe = document.createElement("video");
+                    probe.preload = "metadata";
+                    probe.muted = true;
+                    probe.onloadedmetadata = function () {
+                        var ms = (probe.duration && isFinite(probe.duration)) ? Math.round(probe.duration * 1000) : 0;
+                        if (!ms || ms < 100) ms = fallback;
+                        videoDurationCache[url] = ms;
+                        callback(ms);
+                    };
+                    probe.onerror = function () { callback(fallback); };
+                    probe.src = url;
+                } catch (e) { callback(fallback); }
+            }
+
+            // 按文件后缀分类。视频/GIF 走自适应时长，普通图片用 options.duration
+            function getMediaType(fileName) {
+                var lower = (fileName || "").toLowerCase();
+                if (/\.(mp4|webm|mov|m4v|ogv)$/.test(lower)) return "video";
+                if (/\.gif$/.test(lower)) return "gif";
+                return "image";
+            }
+
+            function getMediaDuration(url, mediaType, fallback, callback) {
+                if (mediaType === "gif") { getGifDuration(url, fallback, callback); return; }
+                if (mediaType === "video") { getVideoDuration(url, fallback, callback); return; }
+                callback(fallback); // 普通图片维持配置时长
+            }
+
             // 动画显示核心函数
             function showBattleEffect(player, fileName, options) {
                 if (!isAnimationEnabled()) return;
@@ -372,6 +435,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 var node = ui.create.div(".jianr-battle-animation");
                 if (options.fullscreen) {
                     node.classList.add("jianr-animation-fullscreen");
+                    // size: 0~1 之间时，按窗口比例缩放并居中（默认占满）
+                    if (options.size && options.size > 0 && options.size < 1) {
+                        var pct = (options.size * 100) + "%";
+                        node.style.width = pct;
+                        node.style.height = pct;
+                        node.style.top = "50%";
+                        node.style.left = "50%";
+                        node.style.transform = "translate(-50%, -50%)";
+                    }
                     ui.window.appendChild(node);
                 } else {
                     node.classList.add("jianr-animation-local");
@@ -380,31 +452,67 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 node.style.setProperty("--jianr-animation-opacity", getAnimationOpacity());
 
                 var cleaned = false;
+                var safetyTimer = null;
                 function cleanup() {
                     if (cleaned) return;
                     cleaned = true;
-                    clearTimeout(safetyTimer);
+                    if (safetyTimer) clearTimeout(safetyTimer);
                     if (node.parentNode) node.parentNode.removeChild(node);
                 }
-                // 兜底：资源解析失败或解码卡住时也保证节点被清理
-                var safetyTimer = setTimeout(cleanup, (options.duration || 2000) + 5000);
+                // 兜底：在拿到真实时长前，先按 fallback+宽裕量挂一个清理定时器
+                var fallbackDuration = options.duration || 2000;
+                safetyTimer = setTimeout(cleanup, fallbackDuration + 5000);
+
+                var mediaType = getMediaType(fileName);
+
+                // 视频用 <video> 元素呈现，图片/GIF 走 background-image
+                function presentMedia(url, onReady) {
+                    if (mediaType === "video") {
+                        var video = document.createElement("video");
+                        video.muted = true;
+                        video.playsInline = true;
+                        video.autoplay = true;
+                        video.loop = false;
+                        video.style.position = "absolute";
+                        video.style.top = "0";
+                        video.style.left = "0";
+                        video.style.width = "100%";
+                        video.style.height = "100%";
+                        video.style.objectFit = "contain";
+                        video.onloadeddata = function () { onReady(true); };
+                        video.onerror = function () { onReady(false); };
+                        video.src = url;
+                        node.appendChild(video);
+                    } else {
+                        var img = new Image();
+                        img.onload = function () {
+                            node.style.backgroundImage = 'url("' + url + '")';
+                            ui.refresh(node);
+                            onReady(true);
+                        };
+                        img.onerror = function () { onReady(false); };
+                        img.src = url;
+                    }
+                }
 
                 resolveAnimationImageUrl(fileName, function (url) {
                     if (cleaned || !node.parentNode) return;
-                    var img = new Image();
-                    img.onload = function () {
+                    getMediaDuration(url, mediaType, fallbackDuration, function (duration) {
                         if (cleaned || !node.parentNode) return;
-                        node.style.backgroundImage = 'url("' + url + '")';
-                        ui.refresh(node);
-                        node.classList.add("jianr-animation-active");
-                        setTimeout(function () {
-                            if (cleaned) return;
-                            node.classList.add("jianr-animation-fadeout");
-                            setTimeout(cleanup, 520);
-                        }, options.duration);
-                    };
-                    img.onerror = cleanup;
-                    img.src = url;
+                        // 真实时长拿到后，刷新兜底定时器
+                        if (safetyTimer) clearTimeout(safetyTimer);
+                        safetyTimer = setTimeout(cleanup, duration + 5000);
+                        presentMedia(url, function (ok) {
+                            if (cleaned || !node.parentNode) return;
+                            if (!ok) { cleanup(); return; }
+                            node.classList.add("jianr-animation-active");
+                            setTimeout(function () {
+                                if (cleaned) return;
+                                node.classList.add("jianr-animation-fadeout");
+                                setTimeout(cleanup, 520);
+                            }, duration);
+                        });
+                    });
                 });
             }
 
@@ -632,7 +740,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 // 防止 changeSkin 创建临时条目时 sex 为空导致背景从 female 变成 male
                 var origData = lib.character[origCharName];
                 var origSex = origData && origData[0] || 'female';
-                lib.character[skinName] = [origSex, "", 0, [], [tag]];
+                // minskin + forbidai 双保险：
+                //   createCharacterDialog 走 characterDisabled2 —— 看 isMinskin
+                //   random_pick / 联机头像 等走 characterDisabled —— 只看 isAiForbidden / isUnseen
+                // 只标 minskin 过不了后一条，皮肤条目会在随机选将等处以"新武将"身份露出
+                var skinEntry = [origSex, "", 0, [], [tag, "minskin", "forbidai"]];
+                lib.character[skinName] = skinEntry;
             }
 
             // Monkey-patch awakenSkill：使命觉醒时切换立绘

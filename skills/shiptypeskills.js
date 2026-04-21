@@ -941,7 +941,7 @@ const shiptypeskills = {
             player: ["phaseZhunbeiBegin", "phaseDiscardBegin"],
         },
         lastDo: true,
-        frequent: true,
+        direct: true,
         filter: function (event, player) {//意外发现function应用广泛,然而解决不了自动显示隐藏标记。航母开幕,然后根据舰种判断具体出什么杀game.log();
             return player.countCards('h') > 0 && player.getHistory("sourceDamage").length == 0;
         },
@@ -972,7 +972,8 @@ const shiptypeskills = {
                         isCard: true,
                     };
                     return get.useful(card1) - get.useful(card);
-                }).set('logSkill', '潜艇');
+                });
+            next.logSkill = 'kaimuleiji';
 
             /*var next = player.chooseCardTarget({
                 prompt: ('雷杀'),
