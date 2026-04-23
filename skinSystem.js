@@ -20,6 +20,7 @@ export var skinRegistry = {
     xiao_R: 1,
     buzhihuo_R: 2,
     yangyan_R: 2,
+    dadianrendian_R: 1,
     // yamato_R: 3,  // 表示有 1.jpg, 2.jpg, 3.jpg 三张皮肤
 };
 

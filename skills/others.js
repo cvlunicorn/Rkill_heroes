@@ -1400,9 +1400,10 @@ const others = {
                 if (_status.event.targetlist.includes(target)) return true;
             }, [1, Infinity])
                 .set("ai", function (target) {
-                    var player = get.player;
+                    var player = _status.event.player;
                     var card = _status.event.card;
-                    return get.attitude2(player, target) * get.effect(target, card, player, player) - get.effect(target, "tiesuo", player, player);
+                    //对目标的态度 × 此牌对其的效果 - 横置带来的负收益
+                    return get.attitude(player, target) * get.effect(target, card, player, player) - get.effect(target, { name: "tiesuo" }, player, player);
                 })
                 .set("card", trigger.card)
                 .set("targetlist", targetlist);
@@ -2213,7 +2214,1597 @@ const others = {
             },
         },
     },
+    zhiyuanhangmu: {
+        audio: false,
+        trigger: { player: "useCardAfter" },
+        forced: true,
+        filter: function (event, player) {
+            var type = get.type(event.card);
+            if (!type) return false;
+            var storage = player.storage.zhiyuanhangmu || [];
+            return !storage.includes(type);
+        },
+        content: function () {
+            "step 0"
+            var type = get.type(trigger.card);
+            if (!player.storage.zhiyuanhangmu) player.storage.zhiyuanhangmu = [];
+            player.storage.zhiyuanhangmu.push(type);
+            player.markSkill("zhiyuanhangmu");
+            //检查是否集齐三种类型
+            if (player.storage.zhiyuanhangmu.length >= 3) {
+                var gainType = type;
+                delete player.storage.zhiyuanhangmu;
+                player.unmarkSkill("zhiyuanhangmu");
+                var cardToGain = get.cardPile2(function (card) {
+                    return get.type(card) == gainType;
+                });
+                if (cardToGain) {
+                    player.gain(cardToGain, "gain2");
+                    game.log(player, "集齐三种类型，获得了", cardToGain);
+                }
+            }
+        },
+        intro: {
+            content: function (storage, player) {
+                if (storage && storage.length > 0) {
+                    var typeNames = {
+                        "basic": "基本牌",
+                        "trick": "锦囊牌",
+                        "delay": "延时锦囊牌",
+                        "equip": "装备牌",
+                    };
+                    var names = [];
+                    for (var i = 0; i < storage.length; i++) {
+                        names.push(typeNames[storage[i]] || storage[i]);
+                    }
+                    return "已记录：" + names.join("、");
+                }
+                return "未记录任何类型";
+            },
+        },
+        ai: {
+            threaten: 1.2,
+        },
+        "_priority": 0,
+    },
+    //待机 - 锁定技，你不是其他角色使用牌的合法目标；你的第一个回合开始时，失去此技能
+    daiji: {
+        audio: false,
+        locked: true,
+        mark: true,
+        marktext: "待",
+        intro: {
+            content: "你不是其他角色使用牌的合法目标",
+        },
+        //你不是其他角色使用牌的合法目标
+        mod: {
+            targetEnabled: function (card, player, target) {
+                if (player != target) return false;
+            },
+        },
+        //你的第一个回合开始时，失去此技能
+        trigger: { player: "phaseBegin" },
+        forced: true,
+        content: function () {
+            player.removeSkill("daiji");
+        },
+        ai: {
+            threaten: 0.3,
+        },
+        "_priority": 0,
+    },
+    //运输 - 出牌阶段，你可以将X+1张牌当作【补给】使用（X为本阶段内此技能的使用次数）
+    yunshu: {
+        audio: false,
+        enable: "phaseUse",
+        viewAs: { name: "ewaibuji9" },
+        filterCard: true,
+        position: "hes",
+        selectCard: function () {
+            var player = _status.event.player;
+            var num = player.getStat("skill").yunshu || 0;
+            return num + 1;
+        },
+        filter: function (event, player) {
+            if (!lib.card.ewaibuji9) return false;
+            var num = player.getStat("skill").yunshu || 0;
+            return player.countCards("hes") >= num + 1;
+        },
+        check: function (card) {
+            var player = _status.event.player;
+            var num = player.getStat("skill").yunshu || 0;
+            //第一次使用（1换2）收益高，后续递减
+            if (num == 0) return 7 - get.value(card);
+            if (num == 1) return 5 - get.value(card);
+            return 2 - get.value(card);
+        },
+        ai: {
+            order: 9,
+            result: { player: 1 },
+        },
+        "_priority": 0,
+    },
+    //夜战引导 - 出牌阶段结束时，置全部手牌于武将牌上并翻面，获得锦囊免疫，武将牌上的牌可当无懈可击使用或打出
+    yezhanyindao: {
+        audio: false,
+        nobracket: true,
+        trigger: { player: "phaseUseAfter" },
+        filter: function (event, player) {
+            return player.countCards("h") > 0;
+        },
+        check: function (event, player) {
+            return player.countCards("h") >= 2;
+        },
+        content: function () {
+            "step 0"
+            var cards = player.getCards("h");
+            player.loseToSpecial(cards, 'yezhanyindao', player).visible = true;
+            player.markSkill("yezhanyindao");
+            "step 1"
+            player.turnOver();
+            player.addSkill('yezhanyindao_immune');
+        },
+        onremove: function (player, skill) {
+            var cards = player.getCards('s', function (card) { return card.hasGaintag('yezhanyindao'); });
+            if (cards.length) player.loseToDiscardpile(cards);
+        },
+        intro: {
+            content: function (storage, player) {
+                var cards = player.getCards('s', function (card) { return card.hasGaintag('yezhanyindao'); });
+                if (cards.length > 0) {
+                    return '武将牌上的牌：' + get.translation(cards);
+                }
+                return '武将牌上没有牌';
+            },
+        },
+        group: "yezhanyindao_wuxie",
+        subSkill: {
+            //视为无懈可击使用或打出
+            wuxie: {
+                enable: "chooseToUse",
+                filterCard: function (card) {
+                    return true;
+                },
+                position: "s",
+                viewAs: {
+                    name: "wuxie",
+                },
+                filter: function (event, player) {
+                    return player.getCards('s').length > 0;
+                },
+                viewAsFilter: function (player) {
+                    return player.getCards('s').length > 0;
+                },
+                prompt: "将一张武将牌上的牌当无懈可击使用或打出",
+                sub: true,
+                ai: {
+                    basic: {
+                        useful: [6, 4, 3],
+                        value: [6, 4, 3],
+                    },
+                    result: {
+                        player: 1,
+                    },
+                    expose: 0.2,
+                },
+            },
+            //锦囊牌免疫（临时技能，直到下一回合开始时移除）
+            immune: {
+                charlotte: true,
+                mod: {
+                    targetEnabled: function (card, player, target) {
+                        if (get.type(card) == "trick" || get.type(card) == "delay") return false;
+                    },
+                },
+                trigger: { player: "phaseBegin" },
+                forced: true,
+                direct: true,
+                content: function () {
+                    player.removeSkill('yezhanyindao_immune');
+                },
+                sub: true,
+            },
+        },
+        "_priority": 0,
+    },
+    //英雄之家 - 限定技，出牌阶段，横置至多4名同血量角色和自己，弃全部手牌，对自己造成1点雷击伤害，濒死时其他人不能用桃和酒救
+    yingxiongzhijia: {
+        global: "yingxiongzhijia_nosave",
+        audio: false,
+        limited: true,
+        enable: "phaseUse",
+        skillAnimation: true,
+        animationColor: "thunder",
+        nobracket: true,
+        multitarget: true,
+        multiline: true,
+        filter: function (event, player) {
+            return !player.storage.yingxiongzhijia;
+        },
+        filterTarget: function (card, player, target) {
+            return target != player && target.hp == player.hp;
+        },
+        selectTarget: [0, 4],
+        content: function () {
+            "step 0"
+            player.awakenSkill("yingxiongzhijia");
+            player.storage.yingxiongzhijia = true;
+            //横置目标
+            for (var i = 0; i < targets.length; i++) {
+                if (!targets[i].isLinked()) targets[i].link();
+            }
+            //横置自己
+            if (!player.isLinked()) player.link();
+            "step 1"
+            //弃置全部手牌
+            var hs = player.getCards("h");
+            if (hs.length > 0) player.discard(hs);
+            "step 2"
+            //对自己造成一点雷击伤害，标记nosave
+            player.storage.yingxiongzhijia_nosave = true;
+            player.damage(1, 'thunder');
+            "step 3"
+            delete player.storage.yingxiongzhijia_nosave;
+        },
+        ai: {
+            order: 1,
+            result: {
+                player: -10,
+            },
+        },
+        "_priority": 0,
+    },
+    yingxiongzhijia_nosave: {
+        mod: {
+            cardSavable: function (card, player, target) {
+                if (!target || player == target) return;
+                if (!target.getStorage("yingxiongzhijia_nosave")) return;
+                if (card.name == 'tao' || card.name == 'kuaixiu9') return false;
+            },
+        },
+    },
+    //集火攻击 - 使用伤害类牌指定装备栏有牌的目标时，伤害+X并令X张装备失效（X=装备数/2向下取整，最低1）
+    jihuogongji: {
+        audio: false,
+        trigger: { player: "useCardToPlayered" },
+        filter: function (event, player) {
+            if (!event.card || !get.tag(event.card, 'damage')) return false;
+            return event.target && event.target.countCards("e") > 0;
+        },
+        check: function (event, player) {
+            return get.attitude(player, event.target) <= 0;
+        },
+        logTarget: "target",
+        prompt2: function (event, player) {
+            var target = event.target;
+            var equipNum = target.countCards("e");
+            var x = Math.max(1, Math.floor(equipNum / 2));
+            return "令此牌对" + get.translation(target) + "的伤害+" + x + "，并令其" + x + "张装备牌本回合失效";
+        },
+        content: function () {
+            "step 0"
+            var target = trigger.target;
+            var equipNum = target.countCards("e");
+            var x = Math.max(1, Math.floor(equipNum / 2));
+            event.jihuoX = x;
+            event.jihuoTarget = target;
+            //记录伤害加成，存 cardid 防止跨牌结算（不在 storage 中持有 card 引用）
+            if (!player.storage.jihuogongji_pending) player.storage.jihuogongji_pending = {};
+            player.storage.jihuogongji_pending[target.playerid] = { num: x, cardid: trigger.card.cardid };
+            //选择要失效的装备
+            if (target.countCards("e") <= x) {
+                event.selectedCards = target.getCards("e");
+            } else {
+                player.choosePlayerCard(target, "e", x, true, "集火攻击：选择" + x + "张装备牌令其本回合失效").set("ai", function (button) {
+                    var subtype = get.subtype(button);
+                    if (subtype == "equip2") return 5;
+                    if (subtype == "equip1") return 4;
+                    if (subtype == "equip3") return 3;
+                    if (subtype == "equip4") return 2;
+                    return 1;
+                });
+            }
+            "step 1"
+            var cards = event.selectedCards || (result.bool ? result.cards : null);
+            if (!cards || cards.length == 0) return;
+            var target = event.jihuoTarget;
+            //收集被选装备的技能并禁用
+            var equipSkills = [];
+            for (var i = 0; i < cards.length; i++) {
+                var cardInfo = get.info(cards[i], false);
+                if (cardInfo && cardInfo.skills) {
+                    equipSkills = equipSkills.concat(cardInfo.skills);
+                }
+            }
+            if (equipSkills.length > 0) {
+                if (!target.storage.jihuogongji_keys) target.storage.jihuogongji_keys = [];
+                var disableKey = "R_jihuo_" + Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+                target.disableSkill(disableKey, equipSkills);
+                target.storage.jihuogongji_keys.push(disableKey);
+                target.addTempSkill("jihuogongji_restore", { global: "phaseEnd" });
+                var cardNames = [];
+                for (var i = 0; i < cards.length; i++) {
+                    cardNames.push(get.translation(cards[i]));
+                }
+                game.log(target, "的", "#g" + cardNames.join("、"), "本回合失效");
+            }
+        },
+        group: ["jihuogongji_damage", "jihuogongji_clean"],
+        subSkill: {
+            //伤害加成子技能 - 来源造成伤害时检查是否有加成
+            damage: {
+                trigger: { source: "damageBegin1" },
+                forced: true,
+                silent: true,
+                popup: false,
+                filter: function (event, player) {
+                    var pending = player.storage.jihuogongji_pending;
+                    if (!pending || !pending[event.player.playerid]) return false;
+                    return event.card && event.card.cardid == pending[event.player.playerid].cardid;
+                },
+                content: function () {
+                    var bonus = player.storage.jihuogongji_pending[trigger.player.playerid].num;
+                    trigger.num += bonus;
+                    game.log(player, "的【集火攻击】令伤害+" + bonus);
+                    delete player.storage.jihuogongji_pending[trigger.player.playerid];
+                    if (Object.keys(player.storage.jihuogongji_pending).length == 0) {
+                        delete player.storage.jihuogongji_pending;
+                    }
+                },
+                sub: true,
+                "_priority": 0,
+            },
+            //用牌结束后清理残留的加成标记（目标闪避等情况）
+            clean: {
+                trigger: { player: "useCardAfter" },
+                forced: true,
+                silent: true,
+                popup: false,
+                filter: function (event, player) {
+                    return !!player.storage.jihuogongji_pending;
+                },
+                content: function () {
+                    delete player.storage.jihuogongji_pending;
+                },
+                sub: true,
+                "_priority": 0,
+            },
+            //装备恢复子技能 - 回合结束时恢复被禁用的装备技能
+            restore: {
+                charlotte: true,
+                onremove: function (player) {
+                    if (player.storage.jihuogongji_keys) {
+                        for (var i = 0; i < player.storage.jihuogongji_keys.length; i++) {
+                            player.enableSkill(player.storage.jihuogongji_keys[i]);
+                        }
+                        delete player.storage.jihuogongji_keys;
+                    }
+                },
+                sub: true,
+            },
+        },
+        ai: {
+            threaten: 1.5,
+        },
+        "_priority": 0,
+    },
+    //改造 - 火控雷达，准备阶段废弃装备栏获取装备牌
+    gaizao: {
+        audio: false,
+        trigger: { player: "phaseZhunbei" },
+        filter: function (event, player) {
+            for (var i = 2; i <= 5; i++) {
+                if (!player.isDisabled("equip" + i)) return true;
+            }
+            return false;
+        },
+        check: function (event, player) {
+            //有空栏位时直接用
+            for (var i = 2; i <= 5; i++) {
+                if (!player.isDisabled("equip" + i) && !player.getEquip("equip" + i)) return true;
+            }
+            //只剩最后一个非武器栏位时不用
+            var available = 0;
+            for (var i = 2; i <= 5; i++) {
+                if (!player.isDisabled("equip" + i)) available++;
+            }
+            return available >= 2;
+        },
+        content: function () {
+            "step 0"
+            var controls = [];
+            event.controlMap = {};
+            var slotLabels = { equip2: "防具栏", equip3: "防御坐骑栏", equip4: "攻击坐骑栏", equip5: "宝物栏" };
+            for (var i = 2; i <= 5; i++) {
+                var slot = "equip" + i;
+                if (!player.isDisabled(slot)) {
+                    var label = slotLabels[slot];
+                    var equip = player.getEquip(slot);
+                    if (equip) label += "（" + get.translation(equip) + "）";
+                    controls.push(label);
+                    event.controlMap[label] = slot;
+                }
+            }
+            event.controlList = controls.slice();
+            player.chooseControl(controls, "cancel2")
+                .set("prompt", "改造：选择废弃一个装备栏")
+                .set("ai", function () {
+                    var evt = _status.event.getParent();
+                    var map = evt.controlMap;
+                    var list = evt.controlList;
+                    var player = evt.player;
+                    //优先选空栏位
+                    for (var i = 0; i < list.length; i++) {
+                        var slot = map[list[i]];
+                        if (!player.getEquip(slot)) return list[i];
+                    }
+                    //否则选最低价值装备的栏位
+                    var minVal = Infinity, minLabel = list[0];
+                    for (var i = 0; i < list.length; i++) {
+                        var equip = player.getEquip(map[list[i]]);
+                        if (equip) {
+                            var val = get.value(equip);
+                            if (val < minVal) { minVal = val; minLabel = list[i]; }
+                        }
+                    }
+                    return minLabel;
+                });
+            "step 1"
+            if (result.control == "cancel2") {
+                event.finish();
+                return;
+            }
+            event.chosenSlot = event.controlMap[result.control];
+            if (!event.chosenSlot) {
+                event.finish();
+                return;
+            }
+            //若栏位内有装备，置入手牌
+            var equip = player.getEquip(event.chosenSlot);
+            if (equip) {
+                player.gain(equip, player, "gain2");
+            }
+            "step 2"
+            //废弃该装备栏
+            player.disableEquip(event.chosenSlot);
+            "step 3"
+            //从牌堆和弃牌堆中获得一张装备牌
+            var card = get.cardPile2(function (c) {
+                return get.type(c) == "equip";
+            });
+            if (card) {
+                event.gainedCard = card;
+                player.gain(card, "gain2", "log");
+            } else {
+                event.finish();
+            }
+            "step 4"
+            //使用获得的装备牌，若不能使用则留在手牌
+            if (event.gainedCard && player.getCards("h").includes(event.gainedCard) && player.canUse(event.gainedCard, player)) {
+                player.useCard(event.gainedCard, player);
+            }
+        },
+        ai: {
+            threaten: 1.3,
+        },
+        "_priority": 0,
+    },
+    //试验 - 装备牌视为速射炮置入目标装备栏，摸牌；离开时恢复原名，摸牌
+    shiyan: {
+        audio: false,
+        enable: "phaseUse",
+        usable: 1,
+        filterCard: function (card) {
+            return get.type(card) == "equip";
+        },
+        position: "h",
+        filterTarget: function (card, player, target) {
+            return !target.isDisabled("equip1");
+        },
+        discard: false,
+        delay: false,
+        check: function (card) {
+            return 8 - get.value(card);
+        },
+        content: function () {
+            "step 0"
+            var card = cards[0];
+            var target = targets[0];
+            //保存原始牌名，用于后续恢复（只存 playerid，避免在 card.storage 中持有 player 引用）
+            card.storage = card.storage || {};
+            card.storage.shiyan_original = card.name;
+            card.storage.shiyan_owner = player.playerid;
+            //变更为速射炮
+            card.name = "sushepao9";
+            player.line(target, "green");
+            player.addSkill("shiyan_track");
+            target.equip(card);
+            "step 1"
+            player.draw();
+        },
+        ai: {
+            order: 8,
+            result: {
+                target: function (player, target) {
+                    if (get.attitude(player, target) > 0) {
+                        if (target.hasSha && target.hasSha()) return 3;
+                        return 1.5;
+                    }
+                    return 0;
+                },
+            },
+        },
+        "_priority": 0,
+    },
+    //试验 子技能 - 牌离开武器栏后恢复原名并摸牌
+    shiyan_track: {
+        trigger: {
+            global: ["loseAfter", "loseAsyncAfter"],
+        },
+        forced: true,
+        silent: true,
+        popup: false,
+        filter: function (event, player) {
+            if (!event.getl) return false;
+            var players = game.players.concat(game.dead);
+            for (var i = 0; i < players.length; i++) {
+                var lost = event.getl(players[i]);
+                if (!lost || !lost.es || !lost.es.length) continue;
+                for (var j = 0; j < lost.es.length; j++) {
+                    var card = lost.es[j];
+                    if (card.storage && card.storage.shiyan_original && card.storage.shiyan_owner == player.playerid) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        },
+        content: function () {
+            var count = 0;
+            var players = game.players.concat(game.dead);
+            for (var i = 0; i < players.length; i++) {
+                var lost = trigger.getl(players[i]);
+                if (!lost || !lost.es || !lost.es.length) continue;
+                for (var j = 0; j < lost.es.length; j++) {
+                    var card = lost.es[j];
+                    if (card.storage && card.storage.shiyan_original && card.storage.shiyan_owner == player.playerid) {
+                        game.log(card, "恢复为", "#g【" + get.translation(card.storage.shiyan_original) + "】");
+                        card.name = card.storage.shiyan_original;
+                        delete card.storage.shiyan_original;
+                        delete card.storage.shiyan_owner;
+                        count++;
+                    }
+                }
+            }
+            if (count > 0) player.draw(count);
+        },
+        sub: true,
+        "_priority": 0,
+    },
+    //6英寸高平 - 杀视为制空权（无懈可击）使用或打出
+    liucungaoping: {
+        audio: false,
+        nobracket: true,
+        enable: ["chooseToUse", "chooseToRespond"],
+        filterCard: function (card) {
+            return card.name == "sha" || card.name == "sheji9";
+        },
+        position: "hs",
+        viewAs: { name: "wuxie" },
+        prompt: "将一张杀当制空权使用",
+        check: function (card) {
+            return 6 - get.value(card);
+        },
+        hiddenCard: function (player, name) {
+            if (name == "wuxie") return player.countCards("hs", "sha") > 0;
+        },
+        ai: {
+            order: 1,
+            respondWuxie: true,
+            skillTagFilter: function (player, tag) {
+                if (tag == "respondWuxie") return player.countCards("hs", "sha") > 0;
+            },
+            result: { player: 1 },
+        },
+        "_priority": 0,
+    },
+    //赫尔戈兰湾的初阵 - 锁定技，回合结束展示本回合进入弃牌堆的牌，选目标置换后使用杀和决斗
+    heergelandechuzhen: {
+        audio: false,
+        nobracket: true,
+        locked: true,
+        forced: true,
+        trigger: { player: "phaseEnd" },
+        filter: function (event, player) {
+            //检查本回合是否有牌进入弃牌堆且仍在弃牌堆中
+            var history = game.getGlobalHistory('cardMove');
+            for (var i = 0; i < history.length; i++) {
+                if (history[i].name == 'cardsDiscard' && history[i].cards) {
+                    for (var j = 0; j < history[i].cards.length; j++) {
+                        if (get.position(history[i].cards[j]) == 'd') return true;
+                    }
+                }
+            }
+            return false;
+        },
+        content: function () {
+            "step 0"
+            //收集本回合进入弃牌堆且仍在弃牌堆中的牌
+            var history = game.getGlobalHistory('cardMove');
+            var cards = [];
+            for (var i = 0; i < history.length; i++) {
+                if (history[i].name == 'cardsDiscard' && history[i].cards) {
+                    for (var j = 0; j < history[i].cards.length; j++) {
+                        if (get.position(history[i].cards[j]) == 'd') {
+                            cards.add(history[i].cards[j]);
+                        }
+                    }
+                }
+            }
+            if (cards.length == 0) {
+                event.finish();
+                return;
+            }
+            event.discardCards = cards;
+            player.showCards(cards, get.translation(player) + "发动了【赫尔戈兰湾的初阵】");
+            game.delayx(2);
+            "step 1"
+            //选择一名角色
+            player.chooseTarget("赫尔戈兰湾的初阵：选择一名角色", true).set("ai", function (target) {
+                var player = _status.event.player;
+                var att = get.attitude(player, target);
+                for (var i of event.discardCards) {
+                    if (i.name == "sha" || i.name == "juedou" || i.name == "sheji9" || i.name == "juedouba9") { return -att + 5; }
+                }
+                return att + 5;
+            }).set("event.discardCards", event.discardCards);
+            "step 2"
+            if (!result.bool || !result.targets || !result.targets.length) {
+                event.finish();
+                return;
+            }
+            event.target = result.targets[0];
+            player.line(event.target, "green");
+            var target = event.target;
+            var handCount = target.countCards("h");
+            var swapNum = Math.min(handCount, event.discardCards.length);
+            event.swapNum = swapNum;
+            if (swapNum > 0) {
+                //目标选择等量手牌用于置换
+                target.chooseCard("赫尔戈兰湾的初阵：选择" + swapNum + "张手牌进行置换", swapNum, true).set("ai", function (card) {
+                    return 5 - get.value(card);
+                });
+            }
+            "step 3"
+            if (event.swapNum == 0) {
+                event.goto(6);
+                return;
+            }
+            if (!result.bool || !result.cards || !result.cards.length) {
+                event.goto(6);
+                return;
+            }
+            event.handCardsToGive = result.cards;
+            //目标选择等量弃牌堆中的牌作为新手牌
+            if (event.discardCards.length > event.swapNum) {
+                event.target.chooseCardButton("赫尔戈兰湾的初阵：选择" + event.swapNum + "张牌", event.swapNum, true, event.discardCards).set("ai", function (button) {
+                    var card = button.link;
+                    //AI倾向于拿走杀和决斗，阻止对方使用
+                    if (card.name == 'sha' || card.name == 'juedou') return 10;
+                    return get.value(card);
+                });
+            } else {
+                event.directTake = event.discardCards.slice();
+            }
+            "step 4"
+            var takenCards = event.directTake || (result.bool && result.links) || [];
+            if (!takenCards.length) {
+                event.goto(6);
+                return;
+            }
+            event.takenCards = takenCards;
+            //更新剩余牌列表：移除被拿走的牌，加入目标给出的手牌
+            for (var i = 0; i < takenCards.length; i++) {
+                event.discardCards.remove(takenCards[i]);
+            }
+            event.discardCards.addArray(event.handCardsToGive);
+            //目标弃置手牌
+            event.target.discard(event.handCardsToGive);
+            "step 5"
+            //目标获得选择的牌
+            event.target.gain(event.takenCards, "gain2");
+            "step 6"
+            //从剩余牌中找出仍在弃牌堆的杀和决斗
+            var target = event.target;
+            if (!target || !target.isIn() || !player.isIn()) {
+                event.finish();
+                return;
+            }
+            var useCards = event.discardCards.filter(function (card) {
+                return get.position(card) == 'd' && (card.name == 'sha' || card.name == 'juedou');
+            });
+            event.useCards = useCards;
+            event.useIndex = 0;
+            "step 7"
+            //依次对目标使用剩余的杀和决斗
+            if (event.useIndex >= event.useCards.length || !event.target.isIn() || !player.isIn()) {
+                event.finish();
+                return;
+            }
+            var card = event.useCards[event.useIndex];
+            event.useIndex++;
+            if (get.position(card) == 'd' && event.target.isIn()) {
+                player.useCard({ name: card.name, nature: card.nature, cards: [card], isCard: true }, event.target);
+            }
+            if (event.useIndex < event.useCards.length) {
+                event.redo();
+            }
+        },
+        ai: {
+            threaten: 1.5,
+        },
+        "_priority": 0,
+    },
+    //危险的炮击游戏 - 转换技
+    weixiandepaojiyouxi: {
+        audio: false,
+        nobracket: true,
+        zhuanhuanji: true,
+        mark: true,
+        marktext: "☯",
+        init: function (player) {
+            if (typeof player.storage.weixiandepaojiyouxi === 'undefined') player.storage.weixiandepaojiyouxi = false;
+        },
+        intro: {
+            content: function (storage, player) {
+                if (player.storage.weixiandepaojiyouxi) return '阴：你成为【杀】或【决斗】的唯一目标时，你将手牌弃至一张，令此牌无效，然后其本回合内不能对你使用【杀】或【决斗】。';
+                return '阳：你使用【杀】或【决斗】指定唯一目标时，你将你和目标的手牌调整至上限，然后此牌伤害+1。';
+            },
+        },
+        group: ["weixiandepaojiyouxi_yang", "weixiandepaojiyouxi_yin"],
+        subSkill: {
+            //阳：使用杀/决斗指定唯一目标时，调整双方手牌至上限，伤害+1
+            yang: {
+                audio: false,
+                trigger: { player: "useCardToPlayered" },
+                filter: function (event, player) {
+                    if (player.storage.weixiandepaojiyouxi) return false;
+                    return (event.card.name == 'sha' || event.card.name == 'juedou') && event.targets.length == 1;
+                },
+                check: function (event, player) {
+                    return true;
+                },
+                logTarget: "target",
+                prompt2: function (event, player) {
+                    return "将你和" + get.translation(event.target) + "的手牌调整至手牌上限，然后此牌伤害+1";
+                },
+                content: function () {
+                    "step 0"
+                    player.storage.weixiandepaojiyouxi = true;
+                    player.markSkill("weixiandepaojiyouxi");
+                    var target = trigger.target;
+                    event.target = target;
+                    //双方手牌不足上限时摸牌
+                    var playerLimit = player.getHandcardLimit();
+                    if (player.countCards("h") < playerLimit) {
+                        player.drawTo(playerLimit);
+                    }
+                    var targetLimit = target.getHandcardLimit();
+                    if (target.countCards("h") < targetLimit) {
+                        target.drawTo(targetLimit);
+                    }
+                    "step 1"
+                    //玩家手牌超过上限时弃牌
+                    var playerLimit = player.getHandcardLimit();
+                    var excess = player.countCards("h") - playerLimit;
+                    if (excess > 0) {
+                        player.chooseToDiscard("危险的炮击游戏：弃置" + excess + "张手牌至手牌上限", excess, true).set("ai", function (card) {
+                            return 5 - get.value(card);
+                        });
+                    }
+                    "step 2"
+                    //目标手牌超过上限时弃牌
+                    var target = event.target;
+                    var targetLimit = target.getHandcardLimit();
+                    var excess = target.countCards("h") - targetLimit;
+                    if (excess > 0) {
+                        target.chooseToDiscard("危险的炮击游戏：弃置" + excess + "张手牌至手牌上限", excess, true).set("ai", function (card) {
+                            return 5 - get.value(card);
+                        });
+                    }
+                    "step 3"
+                    //添加伤害+1的临时技能
+                    player.addTempSkill("weixiandepaojiyouxi_bonus", "useCardAfter");
+                },
+                sub: true,
+                "_priority": 0,
+            },
+            //阴：成为杀/决斗的唯一目标时，弃至一张手牌，令牌无效，禁止对方使用杀/决斗
+            yin: {
+                audio: false,
+                trigger: { target: "useCardToTarget" },
+                filter: function (event, player) {
+                    if (!player.storage.weixiandepaojiyouxi) return false;
+                    return (event.card.name == 'sha' || event.card.name == 'juedou') && event.targets.length == 1;
+                },
+                check: function (event, player) {
+                    var handCount = player.countCards("h");
+                    if (handCount <= 2) return true;
+                    if (player.hp <= 1) return true;
+                    if (player.hp <= 2 && handCount <= 3) return true;
+                    return false;
+                },
+                logTarget: "player",
+                prompt2: function (event, player) {
+                    return "弃置手牌至一张，令" + get.translation(event.card) + "无效，且" + get.translation(event.player) + "本回合不能对你使用杀和决斗";
+                },
+                content: function () {
+                    "step 0"
+                    player.storage.weixiandepaojiyouxi = false;
+                    player.markSkill("weixiandepaojiyouxi");
+                    //弃置手牌至一张
+                    var handCount = player.countCards("h");
+                    if (handCount > 1) {
+                        player.chooseToDiscard("危险的炮击游戏：弃置手牌至一张", handCount - 1, true).set("ai", function (card) {
+                            return 7 - get.value(card);
+                        });
+                    }
+                    "step 1"
+                    //令此牌无效
+                    if (trigger.excluded) {
+                        trigger.excluded.add(player);
+                    } else if (trigger.targets) {
+                        trigger.targets.remove(player);
+                    }
+                    game.log(trigger.card, "对", player, "无效");
+                    //禁止来源本回合对你使用杀和决斗
+                    //注：targetEnabled 的 mod 从 target 的技能查询，故把 ban 加在 player 自己身上，记录被禁用的 source 列表
+                    var source = trigger.player;
+                    if (!player.storage.weixiandepaojiyouxi_ban) player.storage.weixiandepaojiyouxi_ban = [];
+                    player.storage.weixiandepaojiyouxi_ban.add(source.playerid);
+                    player.addTempSkill("weixiandepaojiyouxi_ban", "phaseEnd");
+                },
+                sub: true,
+                "_priority": 0,
+            },
+            //伤害+1临时技能
+            bonus: {
+                charlotte: true,
+                trigger: { source: "damageBegin3" },
+                forced: true,
+                silent: true,
+                popup: false,
+                content: function () {
+                    trigger.num++;
+                },
+                sub: true,
+                "_priority": 0,
+            },
+            //禁止对特定角色使用杀/决斗的临时技能
+            ban: {
+                charlotte: true,
+                onremove: function (player) {
+                    delete player.storage.weixiandepaojiyouxi_ban;
+                },
+                mod: {
+                    targetEnabled: function (card, player, target) {
+                        if ((card.name == 'sha' || card.name == 'juedou') &&
+                            target.storage.weixiandepaojiyouxi_ban &&
+                            target.storage.weixiandepaojiyouxi_ban.includes(player.playerid)) {
+                            return false;
+                        }
+                    },
+                },
+                sub: true,
+            },
+        },
+        ai: {
+            threaten: 1.3,
+        },
+        "_priority": 0,
+    },
+    //先辈 - 出牌阶段，牌堆顶的牌对你可见，你可以使用此牌，若造成伤害则技能失效至本回合结束
+    xianbei: {
+        audio: false,
+        enable: "phaseUse",
+        filter: function (event, player) {
+            return !player.hasSkill("xianbei_off") && ui.cardPile && ui.cardPile.childNodes.length > 0;
+        },
+        content: function () {
+            "step 0"
+            //取出牌堆顶的牌并展示
+            var cards = get.cards(1);
+            event.topCard = cards[0];
+            game.cardsGotoOrdering(cards);
+            player.showCards([event.topCard], get.translation(player) + "发动了【先辈】");
+            "step 1"
+            var card = event.topCard;
+            if (player.hasUseTarget(card)) {
+                event.damageBefore = player.getHistory("sourceDamage").length;
+                player.chooseUseTarget(card);
+            } else {
+                //无法使用，放回牌堆顶
+                card.fix();
+                ui.cardPile.insertBefore(card, ui.cardPile.firstChild);
+                game.updateRoundNumber();
+                event.finish();
+                return;
+            }
+            "step 2"
+            if (result && result.bool) {
+                //使用了此牌，检查是否造成了伤害
+                var damageAfter = player.getHistory("sourceDamage").length;
+                if (damageAfter > event.damageBefore) {
+                    player.addTempSkill("xianbei_off", "phaseEnd");
+                }
+            } else {
+                //未使用，放回牌堆顶
+                var card = event.topCard;
+                card.fix();
+                ui.cardPile.insertBefore(card, ui.cardPile.firstChild);
+                game.updateRoundNumber();
+            }
+        },
+        subSkill: {
+            //技能失效标记
+            off: {
+                charlotte: true,
+                sub: true,
+            },
+        },
+        ai: {
+            order: 10,
+            result: { player: 1 },
+        },
+        "_priority": 0,
+    },
+    //突击 - 结束阶段，未造成伤害则选择：翻面使用漫长一役，或弃牌使用紧急修理
+    tuji: {
+        audio: false,
+        trigger: { player: "phaseJieshuBegin" },
+        filter: function (event, player) {
+            if (player.getHistory("sourceDamage").length > 0) return false;
+            return game.hasPlayer(function (current) { return current != player; }) || player.countCards("he") > 0;
+        },
+        content: function () {
+            "step 0"
+            player.chooseControl("选项一", "选项二", "cancel2")
+                .set("prompt", "突击：请选择一项")
+                .set("choiceList", [
+                    "翻面，视为使用一张【漫长一役】",
+                    "弃置一张牌，视为使用一张【紧急修理】",
+                ])
+                .set("ai", function () {
+                    var player = _status.event.player;
+                    var healValue = 0;
+                    var damageValue = 0;
+                    game.countPlayer(function (current) {
+                        if (current.isDamaged() && get.attitude(player, current) > 0) healValue += 2;
+                        if (current != player && get.attitude(player, current) < 0) damageValue += 1;
+                    });
+                    if (healValue > damageValue && player.countCards("he") > 0) return "选项二";
+                    return "选项一";
+                });
+            "step 1"
+            if (result.control == "选项一") {
+                player.turnOver();
+                player.chooseUseTarget({ name: "manchangyiyi9", isCard: true }, true);
+            } else if (result.control == "选项二") {
+                event.isOption2 = true;
+                player.chooseToDiscard("he", true, "突击：弃置一张牌").set("ai", function (card) {
+                    return 6 - get.value(card);
+                });
+            }
+            "step 2"
+            if (event.isOption2 && result && result.bool) {
+                player.chooseUseTarget({ name: "jingjixiuli9", isCard: true }, true);
+            }
+        },
+        ai: {
+            threaten: 1.5,
+        },
+        "_priority": 0,
+    },
 
+    //========== 祥凤&瑞凤 ==========
+    //直卫1级 - 锁定技，出牌阶段内使用的第二张牌指定目标后，弃置所有目标角色各一张牌
+    zhiwei: {
+        audio: false,
+        locked: true,
+        forced: true,
+        trigger: { player: "useCardToPlayered" },
+        filter: function (event, player) {
+            if (!event.target || !event.target.countDiscardableCards(player, "he")) return false;
+            var history = player.getHistory("useCard", function (evt) {
+                return evt.isPhaseUsing();
+            });
+            if (history.length < 2) return false;
+            return history[1] == event.getParent();
+        },
+        logTarget: "target",
+        content: function () {
+            "step 0"
+            player.addTempSkill("zhiwei_active", "phaseEnd");
+            player.discardPlayerCard(trigger.target, "he", true);
+        },
+        ai: { threaten: 1.5 },
+        "_priority": 0,
+    },
+    //直卫 已发动标记（供剑气觉醒判定用）
+    zhiwei_active: {
+        charlotte: true,
+    },
+    //直卫2级 - 出牌阶段限一次，使用牌指定目标后，可弃置其中一些目标各一张牌
+    zhiwei2: {
+        audio: false,
+        trigger: { player: "useCardToPlayered" },
+        filter: function (event, player) {
+            if (player.hasSkill("zhiwei2_used")) return false;
+            //只在第一个目标时触发，避免多次弹窗
+            if (event.targets.indexOf(event.target) != 0) return false;
+            return event.targets.some(function (t) {
+                return t.countDiscardableCards(player, "he") > 0;
+            });
+        },
+        check: function (event, player) {
+            return event.targets.some(function (t) {
+                return get.attitude(player, t) <= 0 && t.countDiscardableCards(player, "he") > 0;
+            });
+        },
+        content: function () {
+            "step 0"
+            player.addTempSkill("zhiwei2_used", "phaseUseAfter");
+            var targets = trigger.targets.filter(function (t) {
+                return t.countDiscardableCards(player, "he") > 0;
+            });
+            if (targets.length == 0) {
+                event.finish();
+                return;
+            }
+            player.chooseTarget(
+                "直卫：选择要弃置牌的目标角色",
+                [1, targets.length],
+                function (card, player, target) {
+                    return _status.event.zhiweiTargets.includes(target);
+                }
+            ).set("zhiweiTargets", targets).set("ai", function (target) {
+                return -get.attitude(_status.event.player, target);
+            });
+            "step 1"
+            if (!result.bool || !result.targets || result.targets.length == 0) {
+                event.finish();
+                return;
+            }
+            event.discardTargets = result.targets.slice();
+            event.discardIndex = 0;
+            "step 2"
+            if (event.discardIndex >= event.discardTargets.length) {
+                event.finish();
+                return;
+            }
+            var target = event.discardTargets[event.discardIndex];
+            if (target.countDiscardableCards(player, "he") > 0) {
+                player.line(target, "green");
+                player.discardPlayerCard(target, "he", true);
+            }
+            event.discardIndex++;
+            if (event.discardIndex < event.discardTargets.length) {
+                event.goto(2);
+            }
+        },
+        ai: { threaten: 1.8 },
+        "_priority": 0,
+    },
+    //直卫2级 已使用标记
+    zhiwei2_used: {
+        charlotte: true,
+    },
+    //剑气 - 觉醒技，回合结束时若发动过直卫且手牌唯一最低，升级直卫
+    jianqi: {
+        audio: false,
+        trigger: { player: "phaseJieshuBegin" },
+        forced: true,
+        unique: true,
+        skillAnimation: true,
+        animationColor: "water",
+        derivation: ["zhiwei2"],
+        filter: function (event, player) {
+            if (player.storage.jianqi_done) return false;
+            if (!player.hasSkill("zhiwei_active")) return false;
+            //手牌数为全场唯一最低
+            var handCount = player.countCards("h");
+            return !game.hasPlayer(function (current) {
+                return current != player && current.countCards("h") <= handCount;
+            });
+        },
+        content: function () {
+            "step 0"
+            player.storage.jianqi_done = true;
+            player.awakenSkill("jianqi");
+            game.log(player, "觉醒了技能", "#g【剑气】");
+            player.changeSkills(["zhiwei2"], ["zhiwei"]);
+        },
+        ai: { threaten: 1.2 },
+        "_priority": 0,
+    },
+    //===================================
+    //     SP圣乔治 技能
+    //===================================
+    //战线齐射 - 使用杀指定目标后判定，♠伤害+1闪+1，♣防具和非锁定技失效
+    zhanxianqishe: {
+        audio: false,
+        trigger: {
+            player: "useCardToPlayered",
+        },
+        filter: function (event, player) {
+            return event.card && event.card.name == "sha";
+        },
+        logTarget: "target",
+        check: function (event, player) {
+            return get.attitude(player, event.target) <= 0;
+        },
+        content: function () {
+            "step 0"
+            player.judge(function (card) {
+                return 1;
+            });
+            "step 1"
+            var suit = get.suit(result.card);
+            //计算①②有效花色（受巨炮火力扩展）
+            //①基础花色：♠；扩展顺序：♥♦♣
+            //②基础花色：♣；扩展顺序：♦♥♠
+            var suits1 = ["spade"];
+            var suits2 = ["club"];
+            if (player.hasSkill("jupaohuoli")) {
+                var expand1 = ["heart", "diamond", "club"];
+                var expand2 = ["diamond", "heart", "spade"];
+                //战巡和战列在本游戏中均为zhanliebb
+                var bbCount = game.countPlayer(function (current) {
+                    return current.hasSkill("zhanliebb");
+                });
+                for (var i = 0; i < bbCount && i < expand1.length; i++) {
+                    if (!suits1.includes(expand1[i])) suits1.push(expand1[i]);
+                }
+                for (var i = 0; i < bbCount && i < expand2.length; i++) {
+                    if (!suits2.includes(expand2[i])) suits2.push(expand2[i]);
+                }
+            }
+            var eff1 = suits1.includes(suit);
+            var eff2 = suits2.includes(suit);
+            if (!eff1 && !eff2) {
+                event.finish();
+                return;
+            }
+            if (eff1) {
+                //①伤害基数+1，抵消所需闪+1
+                //存 cardid 而非 card 引用，避免在 storage 中持有 card
+                if (!player.storage.zhanxianqishe_cards) player.storage.zhanxianqishe_cards = [];
+                player.storage.zhanxianqishe_cards.push(trigger.card.cardid);
+                player.addTempSkill("zhanxianqishe_dmg");
+                var id = trigger.target.playerid;
+                var map = trigger.getParent().customArgs;
+                if (!map[id]) map[id] = {};
+                if (typeof map[id].shanRequired == "number") {
+                    map[id].shanRequired++;
+                } else {
+                    map[id].shanRequired = 2;
+                }
+                game.log(player, "的【战线齐射】触发①效果");
+            }
+            if (eff2) {
+                //②防具和非锁定技失效直到回合结束
+                trigger.target.addTempSkill("zhanxianqishe_seal", "phaseEnd");
+                game.log(player, "的【战线齐射】触发②效果，", trigger.target, "的防具和非锁定技失效");
+            }
+        },
+        ai: {
+            threaten: 1.5,
+        },
+        "_priority": 0,
+    },
+    //战线齐射 子技能 - ①伤害基数+1
+    zhanxianqishe_dmg: {
+        trigger: { source: "damageBegin4" },
+        forced: true,
+        silent: true,
+        popup: false,
+        charlotte: true,
+        filter: function (event, player) {
+            return event.card && player.storage.zhanxianqishe_cards &&
+                player.storage.zhanxianqishe_cards.includes(event.card.cardid) && event.notLink();
+        },
+        content: function () {
+            trigger.num++;
+            player.storage.zhanxianqishe_cards.remove(trigger.card.cardid);
+            if (!player.storage.zhanxianqishe_cards.length) {
+                delete player.storage.zhanxianqishe_cards;
+                player.removeSkill("zhanxianqishe_dmg");
+            }
+        },
+        onremove: function (player) {
+            delete player.storage.zhanxianqishe_cards;
+        },
+        sub: true,
+        "_priority": 0,
+    },
+    //战线齐射 子技能 - ②防具和非锁定技失效（加给目标角色的临时技能）
+    zhanxianqishe_seal: {
+        charlotte: true,
+        ai: { unequip2: true },
+        init: function (player, skill) {
+            player.addSkillBlocker(skill);
+        },
+        onremove: function (player, skill) {
+            player.removeSkillBlocker(skill);
+        },
+        skillBlocker: function (skill, player) {
+            return !lib.skill[skill].charlotte && !get.is.locked(skill, player);
+        },
+        mark: true,
+        marktext: "齐",
+        intro: { content: "防具和非锁定技失效" },
+        sub: true,
+        "_priority": 0,
+    },
+    //巨炮火力 - 锁定技，被动扩展战线齐射的判定花色范围
+    sp_jupaohuoli: {
+        audio: false,
+        locked: true,
+        //被动技能，实际效果在战线齐射的content中计算
+        "_priority": 0,
+    },
+    //========== SP基阿特 ==========
+    //捣蛋 - 锁定技，你使用闪响应杀后，杀的使用者本回合不能再使用基本牌
+    daodan: {
+        audio: false,
+        locked: true,
+        forced: true,
+        trigger: { player: ["useCard", "respond"] },
+        filter: function (event, player) {
+            return event.card && event.card.name == "shan" &&
+                Array.isArray(event.respondTo) &&
+                event.respondTo[0] && event.respondTo[0].isIn() &&
+                event.respondTo[1] && event.respondTo[1].name == "sha";
+        },
+        logTarget: function (event, player) {
+            return event.respondTo[0];
+        },
+        content: function () {
+            var shaUser = trigger.respondTo[0];
+            shaUser.addTempSkill("daodan_ban");
+            game.log(shaUser, "本回合不能再使用基本牌");
+        },
+        subSkill: {
+            //禁止使用基本牌的临时技能
+            ban: {
+                charlotte: true,
+                mark: true,
+                marktext: "捣",
+                intro: {
+                    content: "本回合不能使用基本牌",
+                },
+                mod: {
+                    cardEnabled: function (card) {
+                        if (get.type(card) == "basic") return false;
+                    },
+                    cardSavable: function (card) {
+                        if (get.type(card) == "basic") return false;
+                    },
+                },
+                sub: true,
+            },
+        },
+        ai: {
+            effect: {
+                target: function (card, player, target) {
+                    if (card.name == "sha" && target.countCards("h", "shan") > 0) return [1, -1];
+                },
+            },
+        },
+        "_priority": 0,
+    },
+    //架束 - 结束阶段，若本回合没有使用杀，令一名角色摸两张牌，其须对你选择的另一名角色使用杀，否则翻面
+    jiashu: {
+        audio: false,
+        trigger: { player: "phaseJieshuBegin" },
+        filter: function (event, player) {
+            //本回合没有使用过杀
+            return !player.getHistory("useCard", function (evt) {
+                return evt.card && evt.card.name == "sha";
+            }).length && game.hasPlayer(function (current) {
+                return current != player;
+            });
+        },
+        direct: true,
+        content: function () {
+            "step 0"
+            //选择一名其他角色
+            player.chooseTarget(get.prompt("jiashu"), "令一名其他角色摸两张牌，然后其须对其攻击范围内你选择的另一名角色使用一张【杀】，否则其翻面", function (card, player, target) {
+                return target != player;
+            }).set("ai", function (target) {
+                var player = _status.event.player;
+                var att = get.attitude(player, target);
+                if (att < 0) {
+                    //敌方：检查其攻击范围内有没有不愿意杀的目标，优先让敌人翻面
+                    var hasGoodShaTarget = game.hasPlayer(function (t) {
+                        return t != target && target.inRange(t) && get.attitude(target, t) < 0;
+                    });
+                    if (!hasGoodShaTarget) return 4; //敌方无好的杀目标，大概率翻面
+                    return 1.5; //敌方有敌人可杀，效果一般
+                }
+                if (att > 0) {
+                    //友方：检查其攻击范围内有没有敌人可杀
+                    var hasEnemyTarget = game.hasPlayer(function (t) {
+                        return t != target && target.inRange(t) && get.attitude(player, t) < 0;
+                    });
+                    if (hasEnemyTarget) return 3; //友方摸牌+杀敌
+                    return 0; //友方攻击范围内没有敌人，不选
+                }
+                return 0;
+            });
+            "step 1"
+            if (!result.bool || !result.targets || !result.targets.length) {
+                event.finish();
+                return;
+            }
+            var target = result.targets[0];
+            event.target1 = target;
+            player.logSkill("jiashu", target);
+            target.draw(2);
+            "step 2"
+            //选择target1攻击范围内的另一名角色作为杀的目标
+            var target1 = event.target1;
+            if (!target1.isIn()) {
+                event.finish();
+                return;
+            }
+            if (!game.hasPlayer(function (current) {
+                return current != target1 && target1.inRange(current);
+            })) {
+                //攻击范围内没有可选目标，跳过
+                event.finish();
+                return;
+            }
+            player.chooseTarget("架束：选择" + get.translation(target1) + "攻击范围内的一名角色作为【杀】的目标", true, function (card, player, target) {
+                var target1 = _status.event.target1;
+                return target != target1 && target1.inRange(target);
+            }).set("target1", target1).set("ai", function (target) {
+                var player = _status.event.player;
+                var target1 = _status.event.target1;
+                var att = get.attitude(player, target);
+                //优先选敌方作为被杀目标
+                if (att < 0) return 5 - att;
+                //如果target1是敌方，选target1的友方让其不愿意杀从而翻面
+                var att1 = get.attitude(player, target1);
+                if (att1 < 0) {
+                    var att12 = get.attitude(target1, target);
+                    if (att12 > 0) return 4 + att12;
+                }
+                return 1;
+            });
+            "step 3"
+            if (!result.bool || !result.targets || !result.targets.length) {
+                event.finish();
+                return;
+            }
+            var target1 = event.target1;
+            var target2 = result.targets[0];
+            event.target2 = target2;
+            player.line2([target1, target2], "green");
+            //target1须对target2使用杀，否则翻面
+            target1.chooseToUse("架束：对" + get.translation(target2) + "使用一张【杀】，否则翻面", { name: "sha" }, target2, -1);
+            "step 4"
+            if (!result.bool) {
+                event.target1.turnOver();
+            }
+        },
+        ai: {
+            threaten: 1.3,
+        },
+        "_priority": 0,
+    },
+
+    //武装输送 - 锁定技，成为其他角色目标时判定，字母牌则受到伤害+1
+    wuzhuangshusong: {
+        audio: false,
+        trigger: { target: "useCardToTargeted" },
+        forced: true,
+        filter: function (event, player) {
+            return event.player != player;
+        },
+        content: function () {
+            "step 0"
+            trigger.player.judge(function (card) {
+                var n = get.number(card);
+                //字母牌：A=1, J=11, Q=12, K=13
+                return (n == 1 || n >= 11) ? -1 : 0;
+            });
+            "step 1"
+            if (result.judge < 0) {
+                //存 cardid 而非 card 引用
+                if (!player.storage.wuzhuangshusong_boost) {
+                    player.storage.wuzhuangshusong_boost = [];
+                }
+                player.storage.wuzhuangshusong_boost.push(trigger.card.cardid);
+            }
+        },
+        group: ["wuzhuangshusong_boost"],
+        subSkill: {
+            //伤害增加子技能
+            boost: {
+                audio: false,
+                trigger: { player: "damageBegin3" },
+                forced: true,
+                filter: function (event, player) {
+                    var list = player.storage.wuzhuangshusong_boost;
+                    return list && list.length > 0 && event.card && list.indexOf(event.card.cardid) >= 0;
+                },
+                content: function () {
+                    trigger.num++;
+                    var list = player.storage.wuzhuangshusong_boost;
+                    var idx = list.indexOf(trigger.card.cardid);
+                    if (idx >= 0) list.splice(idx, 1);
+                    game.log(player, "因【武装输送】受到的伤害+1");
+                },
+                sub: true,
+            },
+        },
+        ai: { threaten: 0.8 },
+        "_priority": 0,
+    },
+    //幸运岗哨 - 限定技，受到伤害时若体力值<体力上限，手牌调整至上限并免疫伤害
+    xingyungangshao: {
+        audio: false,
+        trigger: { player: "damageBefore" },
+        limited: true,
+        skillAnimation: true,
+        animationColor: "water",
+        filter: function (event, player) {
+            return player.hp < player.maxHp;
+        },
+        content: function () {
+            "step 0"
+            player.awakenSkill("xingyungangshao");
+            player.storage.xingyungangshao = true;
+            //将手牌数调整为手牌上限
+            var handLimit = player.getHandcardLimit();
+            var currentHand = player.countCards("h");
+            if (currentHand < handLimit) {
+                player.draw(handLimit - currentHand);
+            } else if (currentHand > handLimit) {
+                player.chooseToDiscard("h", currentHand - handLimit, true);
+            }
+            "step 1"
+            //免疫此伤害
+            trigger.cancel();
+        },
+        ai: {
+            effect: {
+                target: function (card, player, target) {
+                    if (!target.storage.xingyungangshao && target.hp < target.maxHp && get.tag(card, "damage")) {
+                        return "zerotarget";
+                    }
+                },
+            },
+        },
+        "_priority": 0,
+    },
+    //塔萨法隆格的幽灵 - 每局限三次，回合结束时选X名角色封印至下回合开始
+    tasafalongge: {
+        audio: false,
+        nobracket: true,
+        trigger: { player: "phaseEnd" },
+        filter: function (event, player) {
+            var count = player.storage.tasafalongge || 0;
+            if (count >= 3) return false;
+            var discardedCount = 0;
+            player.getHistory("lose", function (evt) {
+                if (evt.type == "discard" && evt.hs && evt.hs.length > 0) {
+                    discardedCount += evt.hs.length;
+                }
+            });
+            return discardedCount > 0;
+        },
+        direct: true,
+        content: function () {
+            "step 0"
+            var discardedCount = 0;
+            player.getHistory("lose", function (evt) {
+                if (evt.type == "discard" && evt.hs && evt.hs.length > 0) {
+                    discardedCount += evt.hs.length;
+                }
+            });
+            event.discardedCount = discardedCount;
+            var remaining = 3 - (player.storage.tasafalongge || 0);
+            player.chooseTarget(
+                get.prompt("tasafalongge"),
+                "选择至多" + discardedCount + "名其他角色，令其无法使用或打出牌直到你的下回合开始（剩余" + remaining + "次）",
+                function (card, player, target) {
+                    return target != player;
+                }
+            ).set("selectTarget", [1, discardedCount]).set("ai", function (target) {
+                var player = get.player();
+                return -get.attitude(player, target);
+            });
+            "step 1"
+            if (result.bool && result.targets && result.targets.length > 0) {
+                player.logSkill("tasafalongge", result.targets);
+                if (!player.storage.tasafalongge) player.storage.tasafalongge = 0;
+                player.storage.tasafalongge++;
+                player.markSkill("tasafalongge");
+                //记录被封印的目标（存 playerid 避免在 storage 中持有 player 引用）
+                player.storage.tasafalongge_sealed = result.targets.map(function (t) { return t.playerid; });
+                for (var i = 0; i < result.targets.length; i++) {
+                    result.targets[i].addSkill("tasafalongge_seal");
+                }
+                //若已使用3次，灰掉技能
+                if (player.storage.tasafalongge >= 3) {
+                    player.awakenSkill("tasafalongge");
+                }
+            }
+        },
+        onremove: function (player) {
+            //角色死亡时解除封印
+            var ids = player.storage.tasafalongge_sealed || [];
+            for (var i = 0; i < ids.length; i++) {
+                var t = game.findPlayer2(function (cur) { return cur.playerid == ids[i]; }, true);
+                if (t && t.isIn()) t.removeSkill("tasafalongge_seal");
+            }
+            delete player.storage.tasafalongge_sealed;
+        },
+        group: ["tasafalongge_unseal"],
+        subSkill: {
+            //下回合开始时解除封印
+            unseal: {
+                trigger: { player: "phaseBegin" },
+                forced: true,
+                silent: true,
+                charlotte: true,
+                filter: function (event, player) {
+                    var sealed = player.storage.tasafalongge_sealed;
+                    return sealed && sealed.length > 0;
+                },
+                content: function () {
+                    var ids = player.storage.tasafalongge_sealed || [];
+                    for (var i = 0; i < ids.length; i++) {
+                        var t = game.findPlayer2(function (cur) { return cur.playerid == ids[i]; }, true);
+                        if (t && t.isIn()) t.removeSkill("tasafalongge_seal");
+                    }
+                    delete player.storage.tasafalongge_sealed;
+                },
+                sub: true,
+            },
+            //封印效果 - 无法使用或打出牌
+            seal: {
+                charlotte: true,
+                mark: true,
+                marktext: "封",
+                intro: {
+                    content: "无法使用或打出牌",
+                },
+                mod: {
+                    cardEnabled: function (card, player) {
+                        return false;
+                    },
+                    cardSavable: function (card, player) {
+                        return false;
+                    },
+                    cardRespondable: function (card, player) {
+                        return false;
+                    },
+                },
+                sub: true,
+            },
+        },
+        intro: {
+            content: function (storage, player) {
+                var count = storage || 0;
+                return "已使用" + count + "/3次";
+            },
+        },
+        ai: { threaten: 1.5 },
+        "_priority": 0,
+    },
 
 };
 
