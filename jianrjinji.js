@@ -188,7 +188,7 @@ var jianrjinji = {
 
 
         //新武将写在这行上面
-        skilltest: ["male", "OTHER", 9, ["guanxing", "jujianmengxiang", "huodezhuangbei", "huodeyanshi", "paoxiao", "guankanpaidui"], ["forbidai", "des:测试用"]],
+        skilltest: ["male", "OTHER", 9, ["guanxing", "jujianmengxiang", "huodezhuangbei", "huodeyanshi", "paoxiao", "guankanpaidui","rezhijian","rerende"], ["forbidai", "des:测试用"]],
     },
     skill: {
         ...globalskills,
@@ -781,7 +781,7 @@ var jianrjinji = {
         weixiandepaojiyouxi_yin: "危险的炮击游戏",
         weixiandepaojiyouxi_info: "转换技，阳：你使用【杀】或【决斗】指定唯一目标时，你将你和目标的手牌调整至上限，然后此牌伤害+1；阴：你成为【杀】或【决斗】的唯一目标时，你将手牌弃至一张，令此牌无效，然后其本回合内不能对你使用【杀】或【决斗】。",
         xianbei: "先辈",
-        xianbei_info: "出牌阶段，牌堆顶的牌对你可见，你可以使用或打出此牌，然后若此牌造成了伤害，则此技能失效至本回合结束。",
+        xianbei_info: "出牌阶段限三次，你可以观看牌堆顶的一张牌然后可以使用此牌，然后若此牌造成了伤害，则此技能失效至本回合结束。",
         tuji: "突击",
         tuji_info: "结束阶段，若你未于本回合内造成过伤害，则你可以选择：1.翻面，视为使用一张【漫长一役】；2.弃置一张牌，视为使用一张【紧急修理】。",
         bujiiqianting: "补给潜艇",

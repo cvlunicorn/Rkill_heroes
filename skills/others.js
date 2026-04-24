@@ -3105,6 +3105,7 @@ const others = {
     },
     //先辈 - 出牌阶段，牌堆顶的牌对你可见，你可以使用此牌，若造成伤害则技能失效至本回合结束
     xianbei: {
+        usable: 3,
         audio: false,
         enable: "phaseUse",
         filter: function (event, player) {
