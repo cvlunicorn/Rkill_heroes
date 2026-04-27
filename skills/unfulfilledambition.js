@@ -77,7 +77,7 @@ const unfulfilledambition = {
                         //game.log("return'cancel2'");
                         return 'cancel2';
                     }
-                    if (trigger.target.hp + trigger.target.hujia <= 2 && _status.currentPhase.countCards("h") > 1) {
+                    if (trigger.target.hp + trigger.target.hujia <= 2 &&_status.currentPhase&& _status.currentPhase.countCards("h") > 1) {
                         return target.mayHaveShan() ? 1 : 0;
                     }
                     return 1;
@@ -103,7 +103,7 @@ const unfulfilledambition = {
             }
             'step 3'
             //game.log(_status.currentPhase.group);
-            if (_status.currentPhase.hasSkill("quzhudd") || _status.currentPhase.group == 'ΒΜΦCCCP') {
+            if (_status.currentPhase&&(_status.currentPhase.hasSkill("quzhudd") || _status.currentPhase.group == 'ΒΜΦCCCP')) {
 
                 if (_status.currentPhase != player) { _status.currentPhase.draw(1); }
                 player.draw(1);
@@ -1583,7 +1583,7 @@ const unfulfilledambition = {
             player.chooseBool("进击：是否弃置" + get.translation(event.card) + "令此【杀】不计入本回合的使用次数？").set("ai", function () {
                 var player = get.player();
                 var card = _status.event.getParent().card;
-                if (!card || _status.currentPhase != player) return false;
+                if (!card ||!_status.currentPhase|| _status.currentPhase != player) return false;
                 if (card.name == "sha") {
                     return game.hasPlayer(function (current) {
                         return current != player && get.attitude(player, current) < 0 && player.canUse({ name: "sha" }, current);
@@ -2321,7 +2321,7 @@ const unfulfilledambition = {
         mod: {
             cardEnabled: function (card, player) {
                 if (player.storage.waijiao && card.name == 'sha') {
-                    if (_status.currentPhase == player) return false;
+                    if (_status.currentPhase&&_status.currentPhase == player) return false;
                 }
             },
         },

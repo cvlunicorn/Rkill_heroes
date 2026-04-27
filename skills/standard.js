@@ -1239,16 +1239,57 @@ const standard = {
             result: {
                 target(player, target) {
                     var hs = player.getCards("h");
-                    if (hs.length < 3) return 0;
-                    var bool = false;
+                    if (hs.length < 2) return 0;
+
+                    var att = get.attitude(player, target);
+                    if (att >= 0) return 0;
+
+                    // 找最大点数牌（价值<8的）
+                    var maxNum = 0;
+                    var bestCard = null;
                     for (var i = 0; i < hs.length; i++) {
-                        if (hs[i].number >= 9 && get.value(hs[i]) < 7) {
-                            bool = true;
-                            break;
+                        if (hs[i].number > maxNum && get.value(hs[i]) < 8) {
+                            maxNum = hs[i].number;
+                            bestCard = hs[i];
                         }
                     }
-                    if (!bool) return 0;
-                    return -1;
+
+                    // 至少要8点以上才考虑（拼点失败惩罚太重）
+                    if (!bestCard || maxNum < 8) return 0;
+
+                    var targetHs = target.countCards('h');
+                    if (targetHs == 0) return 0;
+
+                    // 估算胜率（简化：假设对方平均7点）
+                    var winRate = Math.min(0.9, (maxNum - 7) / 6);
+                    if (winRate < 0.4) return 0; // 胜率太低不冒险
+
+                    // 评估拼赢后的收益
+                    var shaCount = player.countCards('h', 'sha');
+                    if (shaCount == 0) return 0; // 没杀就没意义
+
+                    // 能否打死目标
+                    var targetHp = target.hp;
+                    var canKill = (targetHp <= shaCount + 1); // +1是拼点伤害加成
+
+                    // 收益计算：能击杀>高威胁>普通敌人
+                    var benefit = -1;
+                    if (canKill) {
+                        benefit = -4; // 能击杀，高收益
+                    } else if (targetHp <= 2) {
+                        benefit = -3; // 残血目标，中高收益
+                    } else if (att < -3) {
+                        benefit = -2.5; // 高威胁目标
+                    } else {
+                        benefit = -2; // 普通敌人
+                    }
+
+                    // 考虑失败风险（失败=跳过出牌+弃牌阶段）
+                    var failPenalty = 2; // 失败惩罚权重
+                    var expectedValue = benefit * winRate - failPenalty * (1 - winRate);
+
+                    // 只在期望收益为正时才使用
+                    return expectedValue > 0 ? expectedValue : 0;
                 },
             },
         },
