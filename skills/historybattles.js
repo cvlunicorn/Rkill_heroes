@@ -1573,7 +1573,7 @@ const historybattles = {
         },
         "_priority": 0,
     },
-    matapanjiaozhijian: {
+    matapanjiao: {
         audio: "ext:舰R牌将/audio/skill:true",
 
         frequent: true,
@@ -1601,7 +1601,7 @@ const historybattles = {
         },
         content: function () {
             'step 0'
-            player.chooseToDiscard(get.prompt('matapanjiaozhijian', trigger.target), "弃置任意张牌,然后指定至多等量名角色为目标", [1, Infinity], 'hes').set('ai', card => {
+            player.chooseToDiscard(get.prompt('matapanjiao', trigger.target), "弃置任意张牌,然后指定至多等量名角色为目标", [1, Infinity], 'hes').set('ai', card => {
                 if (ui.selected.cards.length >= _status.event.max) return 0;
                 if (_status.event.goon) return 4.5 - get.value(card);
                 return 0;
@@ -1609,7 +1609,7 @@ const historybattles = {
             'step 1'
             if (result.bool) {
                 var num = result.cards.length;
-                player.chooseTarget(get.prompt('matapanjiaozhijian'),
+                player.chooseTarget(get.prompt('matapanjiao'),
                     [1, num], function (card, player, target) {
                         return _status.event.targets.includes(target);
                     }).set('ai', function (target) {
@@ -1934,7 +1934,7 @@ const historybattles = {
             },
         },
     },
-    yongbuchenmodezhanjian: {
+    yongbuchenmo: {
         nobracket: true,
         unique: true,
         zhuSkill: true,
@@ -3009,7 +3009,7 @@ const historybattles = {
         },
         "_priority": 0,
     },
-    xingyundeyunyuqu: {
+    xingyunyunyuqu: {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
         mod: {
@@ -3031,7 +3031,7 @@ const historybattles = {
         content: function () {
             "step 0";
             player
-                .chooseCard("he", get.prompt("xingyundeyunyuqu", player), "将一张牌当做乐不思蜀对自己使用", function (card, player) {
+                .chooseCard("he", get.prompt("xingyunyunyuqu", player), "将一张牌当做乐不思蜀对自己使用", function (card, player) {
                     return true;
                 })
                 .set("target", player)
@@ -3042,7 +3042,7 @@ const historybattles = {
                 });
             "step 1";
             if (result.bool) {
-                player.useCard(get.autoViewAs({ name: "lebu" }, result.cards), result.cards, false, trigger.player, "xingyundeyunyuqu");
+                player.useCard(get.autoViewAs({ name: "lebu" }, result.cards), result.cards, false, trigger.player, "xingyunyunyuqu");
 
             } else {
                 event.finish();
@@ -3050,7 +3050,7 @@ const historybattles = {
             }
             "step 2";
             player.drawTo(Math.min(5, player.maxHp));
-            //player.addTempSkill("xingyundeyunyuqu_bazhen",{player:"phaseBegin"});
+            //player.addTempSkill("xingyunyunyuqu_bazhen",{player:"phaseBegin"});
         },
         ai: {
             threaten: 1.2,
@@ -3061,7 +3061,7 @@ const historybattles = {
 
         },
     },
-    xingyundeyunyuqu_bazhen: {
+    xingyunyunyuqu_bazhen: {
         group: "bazhen_bagua",
         locked: true,
         "_priority": 0,

@@ -833,7 +833,7 @@ const unfulfilledambition = {
             },
         },
     },
-    maliyanaliehuoji: {
+    liehuoji: {
         audio: "ext:舰R牌将/audio/skill:true",
         nobracket: true,
         trigger: {
@@ -863,7 +863,7 @@ const unfulfilledambition = {
                 var suits = event.cards2.map(card => get.suit(card));
                 var uniqueSuits = [...new Set(suits)];
                 event.suitNum = uniqueSuits.length;
-                player.chooseTarget(1, get.prompt("maliyanaliehuoji"), "令一名其他角色使用区域内任意张花色数为" + event.suitNum + "的牌交换", function (card, player, target) {
+                player.chooseTarget(1, get.prompt("liehuoji"), "令一名其他角色使用区域内任意张花色数为" + event.suitNum + "的牌交换", function (card, player, target) {
                     if (player == target) { return false; }
                     var cards1 = target.getCards('hej');
                     var suits3 = cards1.map(card => get.suit(card));
@@ -2798,7 +2798,7 @@ const unfulfilledambition = {
         unique: true,
         juexingji: true,
         nobracket: true,
-        derivation: ["yaoyuandexiwang2", "heshiyanqijian"],
+        derivation: ["yaoyuandexiwang2", "heshiyan"],
         trigger: { player: "changeHp" },
         forced: true,
         direct: true,
@@ -2822,7 +2822,7 @@ const unfulfilledambition = {
                 //升级遥远的希望
                 player.changeSkills(["yaoyuandexiwang2"], ["yaoyuandexiwang"]);
                 //获得核试验旗舰
-                player.addSkill("heshiyanqijian");
+                player.addSkill("heshiyan");
             }
         },
         mark: true,
@@ -2836,7 +2836,7 @@ const unfulfilledambition = {
         "_priority": 0,
     },
     //核试验旗舰 - 主公技，限定技，F势力技，弃5牌对全场造成伤害
-    heshiyanqijian: {
+    heshiyan: {
         audio: false,
         nobracket: true,
         enable: "phaseUse",
@@ -2847,7 +2847,7 @@ const unfulfilledambition = {
         skillAnimation: true,
         animationColor: "fire",
         filter: function (event, player) {
-            if (!player.hasZhuSkill("heshiyanqijian")) return false;
+            if (!player.hasZhuSkill("heshiyan")) return false;
             if (player.group != 'MN') return false;
             if (get.mode() != 'identity' || player.identity != 'zhu') return false;
             return player.countCards("he") >= 5;
@@ -2862,7 +2862,7 @@ const unfulfilledambition = {
                 event.finish();
                 return;
             }
-            player.awakenSkill("heshiyanqijian");
+            player.awakenSkill("heshiyan");
             event.baseDamage = 2;
             event.immunePlayers = [];
             //询问其他F(MN)势力角色是否响应

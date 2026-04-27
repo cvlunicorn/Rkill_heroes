@@ -2809,7 +2809,7 @@ const others = {
         "_priority": 0,
     },
     //赫尔戈兰湾的初阵 - 锁定技，回合结束展示本回合进入弃牌堆的牌，选目标置换后使用杀和决斗
-    heergelandechuzhen: {
+    hewanchuzhen: {
         audio: false,
         nobracket: true,
         locked: true,
@@ -2945,30 +2945,30 @@ const others = {
         },
         "_priority": 0,
     },
-    //危险的炮击游戏 - 转换技
-    weixiandepaojiyouxi: {
+    //你在玩火 - 转换技
+    nizaiwanhuo: {
         audio: false,
         nobracket: true,
         zhuanhuanji: true,
         mark: true,
         marktext: "☯",
         init: function (player) {
-            if (typeof player.storage.weixiandepaojiyouxi === 'undefined') player.storage.weixiandepaojiyouxi = false;
+            if (typeof player.storage.nizaiwanhuo === 'undefined') player.storage.nizaiwanhuo = false;
         },
         intro: {
             content: function (storage, player) {
-                if (player.storage.weixiandepaojiyouxi) return '阴：你成为【杀】或【决斗】的唯一目标时，你将手牌弃至一张，令此牌无效，然后其本回合内不能对你使用【杀】或【决斗】。';
+                if (player.storage.nizaiwanhuo) return '阴：你成为【杀】或【决斗】的唯一目标时，你将手牌弃至一张，令此牌无效，然后其本回合内不能对你使用【杀】或【决斗】。';
                 return '阳：你使用【杀】或【决斗】指定唯一目标时，你将你和目标的手牌调整至上限，然后此牌伤害+1。';
             },
         },
-        group: ["weixiandepaojiyouxi_yang", "weixiandepaojiyouxi_yin"],
+        group: ["nizaiwanhuo_yang", "nizaiwanhuo_yin"],
         subSkill: {
             //阳：使用杀/决斗指定唯一目标时，调整双方手牌至上限，伤害+1
             yang: {
                 audio: false,
                 trigger: { player: "useCardToPlayered" },
                 filter: function (event, player) {
-                    if (player.storage.weixiandepaojiyouxi) return false;
+                    if (player.storage.nizaiwanhuo) return false;
                     return (event.card.name == 'sha' || event.card.name == 'juedou') && event.targets.length == 1;
                 },
                 check: function (event, player) {
@@ -2980,8 +2980,8 @@ const others = {
                 },
                 content: function () {
                     "step 0"
-                    player.storage.weixiandepaojiyouxi = true;
-                    player.markSkill("weixiandepaojiyouxi");
+                    player.storage.nizaiwanhuo = true;
+                    player.markSkill("nizaiwanhuo");
                     var target = trigger.target;
                     event.target = target;
                     //双方手牌不足上限时摸牌
@@ -2998,7 +2998,7 @@ const others = {
                     var playerLimit = player.getHandcardLimit();
                     var excess = player.countCards("h") - playerLimit;
                     if (excess > 0) {
-                        player.chooseToDiscard("危险的炮击游戏：弃置" + excess + "张手牌至手牌上限", excess, true).set("ai", function (card) {
+                        player.chooseToDiscard("你在玩火：弃置" + excess + "张手牌至手牌上限", excess, true).set("ai", function (card) {
                             return 5 - get.value(card);
                         });
                     }
@@ -3008,13 +3008,13 @@ const others = {
                     var targetLimit = target.getHandcardLimit();
                     var excess = target.countCards("h") - targetLimit;
                     if (excess > 0) {
-                        target.chooseToDiscard("危险的炮击游戏：弃置" + excess + "张手牌至手牌上限", excess, true).set("ai", function (card) {
+                        target.chooseToDiscard("你在玩火：弃置" + excess + "张手牌至手牌上限", excess, true).set("ai", function (card) {
                             return 5 - get.value(card);
                         });
                     }
                     "step 3"
                     //添加伤害+1的临时技能
-                    player.addTempSkill("weixiandepaojiyouxi_bonus", "useCardAfter");
+                    player.addTempSkill("nizaiwanhuo_bonus", "useCardAfter");
                 },
                 sub: true,
                 "_priority": 0,
@@ -3024,7 +3024,7 @@ const others = {
                 audio: false,
                 trigger: { target: "useCardToTarget" },
                 filter: function (event, player) {
-                    if (!player.storage.weixiandepaojiyouxi) return false;
+                    if (!player.storage.nizaiwanhuo) return false;
                     return (event.card.name == 'sha' || event.card.name == 'juedou') && event.targets.length == 1;
                 },
                 check: function (event, player) {
@@ -3040,12 +3040,12 @@ const others = {
                 },
                 content: function () {
                     "step 0"
-                    player.storage.weixiandepaojiyouxi = false;
-                    player.markSkill("weixiandepaojiyouxi");
+                    player.storage.nizaiwanhuo = false;
+                    player.markSkill("nizaiwanhuo");
                     //弃置手牌至一张
                     var handCount = player.countCards("h");
                     if (handCount > 1) {
-                        player.chooseToDiscard("危险的炮击游戏：弃置手牌至一张", handCount - 1, true).set("ai", function (card) {
+                        player.chooseToDiscard("你在玩火：弃置手牌至一张", handCount - 1, true).set("ai", function (card) {
                             return 7 - get.value(card);
                         });
                     }
@@ -3060,9 +3060,9 @@ const others = {
                     //禁止来源本回合对你使用杀和决斗
                     //注：targetEnabled 的 mod 从 target 的技能查询，故把 ban 加在 player 自己身上，记录被禁用的 source 列表
                     var source = trigger.player;
-                    if (!player.storage.weixiandepaojiyouxi_ban) player.storage.weixiandepaojiyouxi_ban = [];
-                    player.storage.weixiandepaojiyouxi_ban.add(source.playerid);
-                    player.addTempSkill("weixiandepaojiyouxi_ban", "phaseEnd");
+                    if (!player.storage.nizaiwanhuo_ban) player.storage.nizaiwanhuo_ban = [];
+                    player.storage.nizaiwanhuo_ban.add(source.playerid);
+                    player.addTempSkill("nizaiwanhuo_ban", "phaseEnd");
                 },
                 sub: true,
                 "_priority": 0,
@@ -3084,13 +3084,13 @@ const others = {
             ban: {
                 charlotte: true,
                 onremove: function (player) {
-                    delete player.storage.weixiandepaojiyouxi_ban;
+                    delete player.storage.nizaiwanhuo_ban;
                 },
                 mod: {
                     targetEnabled: function (card, player, target) {
                         if ((card.name == 'sha' || card.name == 'juedou') &&
-                            target.storage.weixiandepaojiyouxi_ban &&
-                            target.storage.weixiandepaojiyouxi_ban.includes(player.playerid)) {
+                            target.storage.nizaiwanhuo_ban &&
+                            target.storage.nizaiwanhuo_ban.includes(player.playerid)) {
                             return false;
                         }
                     },

@@ -441,7 +441,7 @@ const standard = {
             threaten: 1.3,
         },
     },
-    hangkongzhanshuxianqu: {
+    hangkongxianqu: {
         audio: "ext:舰R牌将/audio/skill:true",
         nobracket: true,
         //audio: "ext:舰R牌将/audio/skill:true",

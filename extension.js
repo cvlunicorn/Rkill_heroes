@@ -33,6 +33,7 @@
 //mod尽量放在主技能中。放在子技能中时会由于未知原因结算两遍。
 //联机时客机出牌阶段所在的_status.event.name是game,不是phaseUse。
 //.set("key",val)传递参数后使用数值时应当取后一个参数（val）。
+//尺寸过大的png图片可能加载超时，如果有PNG加载不出来但文件名正确，检查是否像素尺寸过大
 
 //【目录】
 //武将列表、武将技能、武将和技能翻译、卡牌包与卡牌技能、卡牌翻译、配置（config）、扩展简介
@@ -284,16 +285,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             style2.innerHTML += "span[data-nature='OTHERmm'] {text-shadow: black 0 0 1px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 2px,rgba(0, 0, 0) 0 0 2px,black 0 0 1px;}";
             document.head.appendChild(style2);
 
-            // ╔══════════════════════════════════════════════════════════════╗
-            // ║ 修复技能名超过四个字时与描述重叠的问题                          ║
-            // ╚══════════════════════════════════════════════════════════════╝
-            var skillnStyle = document.createElement('style');
-            skillnStyle.innerHTML = ".skilln {" +
-                "display: block !important;" +
-                "width: 100% !important;" +
-                "margin-bottom: 5px !important;" +
-                "}";
-            document.head.appendChild(skillnStyle);
 
             // ╔══════════════════════════════════════════════════════════════╗
             // ║ 2. 通用模式判定 + 资源 URL 解析（后续模块共用）                ║
@@ -1345,7 +1336,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                     if (!card) card = event.dialog.buttons[0].link;
                                 }
-
+             
                                 var button;
                                 for (var i = 0; i < dialog.buttons.length; i++) {
                                     if (dialog.buttons[i].link == card) {
@@ -2455,7 +2446,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
         }, package: {
             character: {
                 character: {//单机部分,在联机框架开启时,联机武将会覆盖同名武将应该不生效。
-                    /*liekexingdun_R: ["female", "wu", 4, ["hangmucv", "hangkongzhanshuxianqu"], ["zhu", "des:血量中等的航母,温柔,体贴,过渡期追着大船打的航母。"]],
+                    /*liekexingdun_R: ["female", "wu", 4, ["hangmucv", "hangkongxianqu"], ["zhu", "des:血量中等的航母,温柔,体贴,过渡期追着大船打的航母。"]],
                     qixichicheng_R: ["female", "shu", 4, ["hangmucv", "qixi_cv"], ["des:大佬友情放出精美壁纸,坚定与自信的姿态"]],
                     wufenzhongchicheng_R: ["female", "shu", 4, ["hangmucv", "mingyundewufenzhong"], ["des:大佬友情放出精美壁纸,坚定与自信的姿态"]],
          
