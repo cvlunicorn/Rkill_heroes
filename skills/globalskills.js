@@ -556,16 +556,175 @@ const globalskills = {
             }).set('ai', function (button) {
                 var choice = button.link;
                 var player = _status.event.player;
-                var priority = {
-                    'mopaiup': 4.0,
-                    'jinengup': 3.5,
-                    'wuqiup': 3.0,
-                    'useshaup': 2.5,
-                    'jidongup': 2.5,
-                    'shoupaiup': 2.0,
-                    'store_only': 0.1
-                };
-                return priority[choice] || 1.0;
+
+                // 仅存储选项默认最低优先级
+                if (choice === 'store_only') return 0.1;
+
+                // === 第一步：评估当前风险分（生存威胁） ===
+                var riskScore = 0;
+                var hp = player.hp;
+                var maxHp = player.maxHp;
+                var handCards = player.countCards('h');
+                var shanCount = player.countCards('h', 'shan');
+
+                // 血量风险
+                if (hp <= 1) riskScore += 0.6;
+                else if (hp <= 2) riskScore += 0.3;
+                else if (hp <= maxHp / 2) riskScore += 0.15;
+
+                // 敌方集火压力
+                var enemiesInRange = game.countPlayer(function (current) {
+                    return current != player && get.attitude(player, current) < 0 && current.inRange(player);
+                });
+                riskScore += Math.min(0.3, enemiesInRange * 0.1);
+
+                // 缺少防御牌
+                if (shanCount === 0 && hp <= 2) riskScore += 0.2;
+
+                // === 第二步：评估各选项的基础收益 ===
+                var baseScore = 0;
+                var currentLv = player.countMark(choice);
+
+                switch (choice) {
+                    case 'mopaiup':
+                        // 后勤保障：手牌紧缺时价值高
+                        baseScore = 3.5;
+                        if (handCards <= player.getHandcardLimit() / 2) baseScore += 1.5;
+                        if (handCards <= 2) baseScore += 1.0;
+                        break;
+
+                    case 'jinengup':
+                        // 技能升级：质变收益极高
+                        baseScore = 4.0;
+
+                        // 重巡：0→1级质变（黑牌必中）
+                        if (player.hasSkill('zhongxunca') && currentLv === 0) {
+                            var blackCards = player.countCards('h', function (card) {
+                                return get.color(card) === 'black' && get.type(card) !== 'basic';
+                            });
+                            if (blackCards > 0) baseScore += 2.5; // 有黑锦囊，质变收益拉满
+                        }
+
+                        // 驱逐：1→2级质变（0.33→0.50闪避）
+                        if (player.hasSkill('quzhudd') && currentLv === 1) {
+                            baseScore += 2.0; // 闪避提升显著
+                        }
+
+                        // 战列：对抗火属性伤害
+                        if (player.hasSkill('zhanliebb')) {
+                            var fireEnemies = game.countPlayer(function (current) {
+                                return get.attitude(player, current) < 0 &&
+                                       (current.hasSkill('huogong') || current.countCards('h', {nature: 'fire'}) > 0);
+                            });
+                            if (fireEnemies > 0 && currentLv === 1) baseScore += 1.5;
+                        }
+
+                        // 轻巡：对抗AOE
+                        if (player.hasSkill('qingxuncl')) {
+                            var aoeEnemies = game.countPlayer(function (current) {
+                                return get.attitude(player, current) < 0 &&
+                                       current.countCards('h', function (card) {
+                                           return ['nanman', 'wanjian', 'taoyuan'].includes(card.name);
+                                       }) > 0;
+                            });
+                            if (aoeEnemies > 0) baseScore += 1.5;
+                        }
+
+                        // 要塞：升级即回血+加血量上限
+                        if (player.hasSkill('yaosai') && hp < maxHp) {
+                            baseScore += 3.0; // 即时回血价值极高
+                        }
+                        break;
+
+                    case 'wuqiup':
+                        // 射程升级：打不到人时价值高
+                        baseScore = 2.5;
+                        var unreachableEnemies = game.countPlayer(function (current) {
+                            return current != player && get.attitude(player, current) < 0 && !player.inRange(current);
+                        });
+                        if (unreachableEnemies > 0) baseScore += unreachableEnemies * 0.8;
+                        break;
+
+                    case 'useshaup':
+                        // 速射炮管：有多张杀时价值高
+                        baseScore = 2.0;
+                        var shaCount = player.countCards('h', 'sha');
+                        if (shaCount > 1) baseScore += shaCount * 0.5;
+
+                        // 输出型武将优先级更高
+                        if (player.hasSkill('zhongxunca') || player.hasSkill('hangmucv')) {
+                            baseScore += 1.0;
+                        }
+                        break;
+
+                    case 'jidongup':
+                        // 改良推进器：被贴脸时价值高
+                        baseScore = 2.0;
+                        if (enemiesInRange > 0) baseScore += enemiesInRange * 0.6;
+
+                        // 脆皮输出更需要防御距离
+                        if ((player.hasSkill('zhongxunca') || player.hasSkill('hangmucv')) && hp <= 2) {
+                            baseScore += 1.5;
+                        }
+                        break;
+
+                    case 'shoupaiup':
+                        // 物流运输：手牌溢出时价值高
+                        baseScore = 1.5;
+                        var handcardLimit = player.getHandcardLimit();
+                        if (handCards >= handcardLimit) baseScore += 2.0; // 溢出，急需
+                        else if (handCards >= handcardLimit - 1) baseScore += 1.0;
+                        break;
+                }
+
+                // === 第三步：根据风险分调整优先级 ===
+                var finalScore = baseScore;
+
+                if (riskScore > 0.5) {
+                    // 高风险：优先防御选项
+                    if (['jidongup', 'shoupaiup'].includes(choice)) {
+                        finalScore += 2.0;
+                    }
+                    // 要塞技能在残血时优先级拉满
+                    if (choice === 'jinengup' && player.hasSkill('yaosai') && hp <= 2) {
+                        finalScore += 3.0;
+                    }
+                    // 降低纯输出选项优先级
+                    if (['wuqiup', 'useshaup'].includes(choice)) {
+                        finalScore -= 1.5;
+                    }
+                } else {
+                    // 低风险：突出特长
+                    // 质变技能优先级拉满
+                    if (choice === 'jinengup' && currentLv === 0) {
+                        finalScore += 2.0;
+                    }
+                    // 输出选项适当提升
+                    if (['wuqiup', 'useshaup'].includes(choice)) {
+                        finalScore += 0.5;
+                    }
+                }
+
+                // === 第四步：团队需求调整 ===
+                var teamHasDamage = game.hasPlayer(function (current) {
+                    return current != player && get.attitude(player, current) > 0 &&
+                           (current.hasSkill('zhongxunca') || current.hasSkill('hangmucv'));
+                });
+
+                // 防御型武将，但团队缺输出
+                if ((player.hasSkill('zhanliebb') || player.hasSkill('yaosai')) && !teamHasDamage) {
+                    if (['wuqiup', 'useshaup'].includes(choice)) {
+                        finalScore += 1.5; // 弥补短板
+                    }
+                }
+
+                // === 第五步：避免重复升级已满级的选项 ===
+                var buildLevel = player.countMark('_jianzaochuan') + 1;
+                if (currentLv >= buildLevel || currentLv >= 2) {
+                    return 0; // 已满级，不可选
+                }
+
+                return finalScore;
             }).set('selectButton', [0, maxSelectable]);
 
             'step 1'
