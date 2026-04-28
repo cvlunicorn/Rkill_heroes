@@ -338,7 +338,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     ".jianr-battle-animation{" +
                     "pointer-events:none;" +
                     "z-index:10;" +
-                    "background-size:contain;" +
+                    "background-size:cover;" +
                     "background-repeat:no-repeat;" +
                     "background-position:center;" +
                     "opacity:0;" +
@@ -348,19 +348,34 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     ".jianr-battle-animation.jianr-animation-fadeout{opacity:0 !important;transition:opacity 0.5s ease-out;}" +
                     ".jianr-battle-animation.jianr-animation-fullscreen{" +
                     "position:fixed;top:0;left:0;width:100%;height:100%;" +
+                    "mask:linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)," +
+                    "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);" +
+                    "mask-composite:intersect;" +
+                    "-webkit-mask:linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)," +
+                    "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);" +
+                    "-webkit-mask-composite:source-in;" +
                     "}" +
                     ".jianr-battle-animation.jianr-animation-fullscreen::before{" +
                     "content:'';" +
                     "position:absolute;" +
                     "top:0;left:0;right:0;bottom:0;" +
                     "pointer-events:none;" +
-                    "background:radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.8) 100%);" +
+                    "background:radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.3) 75%, rgba(0,0,0,0.8) 100%);" +
                     "}" +
                     ".jianr-battle-animation.jianr-animation-local{" +
                     "position:absolute;" +
                     "top:50%;left:50%;" +
-                    "width:120%;height:120%;" +
+                    "width:200%;height:200%;" +
                     "transform:translate(-50%,-50%);" +
+                    "}" +
+                    ".jianr-battle-animation.jianr-animation-local::before{" +
+                    "content:'';" +
+                    "position:absolute;" +
+                    "top:0;left:0;right:0;bottom:0;" +
+                    "pointer-events:none;" +
+                    "background:radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0) 70%, transparent 100%);" +
+                    "mask:radial-gradient(ellipse at center, black 50%, transparent 85%);" +
+                    "-webkit-mask:radial-gradient(ellipse at center, black 50%, transparent 85%);" +
                     "}";
                 document.head.appendChild(animationStyleEl);
             }

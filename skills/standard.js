@@ -164,6 +164,7 @@ const standard = {
                 }
             }, result: {
                 target: function (player, target) {
+                    if (!player || !target) return 0;
                     if (!ui.selected.cards || ui.selected.cards.length == 0) return 0;
                     if (get.value(ui.selected.cards[0], false, 'raw') < 0) return -1;
                     return 1;
@@ -236,6 +237,7 @@ const standard = {
             },
             result: {
                 target: function (player, target) {
+                    if (!player || !target) return 0;
                     if (target.hasSkillTag('nogain')) return 0;
                     if (ui.selected.cards.length && ui.selected.cards[0].name == 'du') {
                         if (target.hasSkillTag('nodu')) return 0;
@@ -1238,6 +1240,8 @@ const standard = {
             order: 8,
             result: {
                 target(player, target) {
+                    if (!player || !target) return 0;
+
                     var hs = player.getCards("h");
                     if (hs.length < 2) return 0;
 
@@ -1550,6 +1554,7 @@ const standard = {
             order: 10,
             result: {
                 target: function (player, target) {
+                    if (!player || !target) return 0;
                     var card = ui.selected.cards[ui.selected.targets.length];
                     if (!card) return 0;
                     if (get.value(card) < 0) return -1;
@@ -1778,19 +1783,274 @@ const standard = {
                 return true;
             }).set('ai', function (button) {
                 var choice = button.link;
+                var player = _status.event.player;
 
-                // 定义不同选项的优先级
-                var priority = {
-                    'mopaiup': 4.0,    // 后勤保障优先级最高（摸牌）
-                    'jinengup': 3.5,   // 技能升级次之
-                    'wuqiup': 3.0,     // 出杀距离
-                    'useshaup': player.countCards('h', { name: 'sha' }) > 1 ? 3.5 : 2.5,
-                    'jidongup': 2.5,   // 防御距离
-                    'shoupaiup': player.countCards('h') > player.maxHandcard * 0.8 ? 3.0 : 2.0,
-                    'draw_cards': 1.0   // 摸牌优先级中等
-                };
+                // 摸牌选项默认最低优先级
+                if (choice === 'draw_cards') return 0.1;
 
-                return priority[choice] || 1.0;
+                // === 第一步：评估当前风险分（生存威胁） ===
+                var riskScore = 0;
+                var hp = player.hp;
+                var maxHp = player.maxHp;
+                var handCards = player.countCards('h');
+                var shanCount = player.countCards('h', 'shan');
+
+                // 血量风险
+                if (hp <= 1) riskScore += 0.6;
+                else if (hp <= 2) riskScore += 0.3;
+                else if (hp <= maxHp / 2) riskScore += 0.15;
+
+                // 敌方集火压力
+                var enemiesInRange = game.countPlayer(function (current) {
+                    return current != player && get.attitude(player, current) < 0 && current.inRange(player);
+                });
+                riskScore += Math.min(0.3, enemiesInRange * 0.1);
+
+                // 缺少防御牌
+                if (shanCount === 0 && hp <= 2) riskScore += 0.2;
+
+                // === 第二步：评估各选项的基础收益 ===
+                var baseScore = 0;
+                var currentLv = player.countMark(choice);
+
+                switch (choice) {
+                    case 'mopaiup':
+                        // 后勤保障：手牌紧缺时价值高
+                        baseScore = 3.5;
+                        if (handCards <= player.getHandcardLimit() / 2) baseScore += 1.5;
+                        if (handCards <= 2) baseScore += 1.0;
+                        break;
+
+                    case 'jinengup':
+                        // 技能升级：质变收益极高
+                        baseScore = 4.0;
+
+                        // 航母：判断是否拥有开幕航空技能
+                        if (player.hasSkill('kaimuhangkong')) {
+                            // 计算升级前后可用牌数量
+                            var beforeUpgrade = player.countCards('h', function (card) {
+                                return card.name === 'wanjian' || (currentLv >= 1 && get.suit(card) === 'spade') ||
+                                       (currentLv >= 2 && get.color(card) === 'black');
+                            });
+                            var afterUpgrade = player.countCards('h', function (card) {
+                                return card.name === 'wanjian' || (currentLv + 1 >= 1 && get.suit(card) === 'spade') ||
+                                       (currentLv + 1 >= 2 && get.color(card) === 'black');
+                            });
+                            var newCards = afterUpgrade - beforeUpgrade;
+                            if (newCards > 0) baseScore += newCards * 1.5; // 每新增一张可用牌+1.5分
+
+                            // 判断是否能立即造成伤害（AOE解场）
+                            var canDamageNow = afterUpgrade > 0 && game.countPlayer(function (current) {
+                                return current != player && get.attitude(player, current) < 0;
+                            }) >= 2;
+                            if (canDamageNow) baseScore += 2.0; // 能立即AOE解场
+                        }
+
+                        // 导驱：判断是否拥有反舰导弹技能
+                        if (player.hasSkill('fanjiandaodan')) {
+                            var beforeUpgrade = player.countCards('he', function (card) {
+                                return (currentLv >= 0 && get.type(card) === 'equip') ||
+                                       (currentLv >= 1 && get.subtype(card)) ||
+                                       (currentLv >= 2);
+                            });
+                            var afterUpgrade = player.countCards('he', function (card) {
+                                return (currentLv + 1 >= 0 && get.type(card) === 'equip') ||
+                                       (currentLv + 1 >= 1 && get.subtype(card)) ||
+                                       (currentLv + 1 >= 2);
+                            });
+                            var newCards = afterUpgrade - beforeUpgrade;
+                            if (newCards > 0) baseScore += newCards * 1.5;
+
+                            // 判断射程提升后能否打到新目标
+                            var currentRange = 2 + currentLv;
+                            var newRange = 2 + currentLv + 1;
+                            var newTargets = game.countPlayer(function (current) {
+                                if (current == player || get.attitude(player, current) >= 0) return false;
+                                var dist = get.distance(player, current);
+                                return dist <= newRange && dist > currentRange;
+                            });
+                            if (newTargets > 0 && afterUpgrade > 0) baseScore += newTargets * 1.5; // 能打到新敌人
+                        }
+
+                        // 潜艇：判断是否拥有开幕雷击技能
+                        if (player.hasSkill('kaimuleiji')) {
+                            var beforeUpgrade = player.countCards('h', function (card) {
+                                return (currentLv >= 0 && get.suit(card) === 'heart') ||
+                                       (currentLv >= 1 && get.suit(card) === 'spade') ||
+                                       (currentLv >= 2 && get.suit(card) === 'diamond');
+                            });
+                            var afterUpgrade = player.countCards('h', function (card) {
+                                return (currentLv + 1 >= 0 && get.suit(card) === 'heart') ||
+                                       (currentLv + 1 >= 1 && get.suit(card) === 'spade') ||
+                                       (currentLv + 1 >= 2 && get.suit(card) === 'diamond');
+                            });
+                            var newCards = afterUpgrade - beforeUpgrade;
+                            if (newCards > 0) baseScore += newCards * 1.5;
+
+                            // 判断是否能立即造成雷击伤害
+                            var canDamageNow = afterUpgrade > 0 && game.countPlayer(function (current) {
+                                return current != player && get.attitude(player, current) < 0;
+                            }) > 0;
+                            if (canDamageNow) baseScore += 1.5;
+                        }
+
+                        // 防驱：判断是否拥有防空导弹技能
+                        if (player.hasSkill('fangkongdaodan')) {
+                            var storedMissiles = player.getExpansions('daodan').length +
+                                               player.getCards('s', function (card) { return card.hasGaintag('daodan') }).length;
+                            var maxMissiles = 1 + currentLv;
+                            var newMaxMissiles = 1 + currentLv + 1;
+                            if (storedMissiles >= maxMissiles && newMaxMissiles > maxMissiles) {
+                                baseScore += 1.5; // 存牌上限提升，能存更多导弹
+                            }
+                        }
+
+                        // 重巡：0→1级质变（黑牌必中）
+                        if (player.hasSkill('zhongxunca')) {
+                            var beforeUpgrade = player.countCards('h', function (card) {
+                                return (currentLv >= 0 && card.name === 'sha') ||
+                                       (currentLv >= 1 && get.color(card) === 'black' && get.type(card) !== 'basic');
+                            });
+                            var afterUpgrade = player.countCards('h', function (card) {
+                                return (currentLv + 1 >= 0 && card.name === 'sha') ||
+                                       (currentLv + 1 >= 1 && get.color(card) === 'black' && get.type(card) !== 'basic');
+                            });
+                            var newCards = afterUpgrade - beforeUpgrade;
+                            if (newCards > 0) baseScore += newCards * 2.0; // 黑锦囊必中价值极高
+
+                            // 判断是否能立即造成伤害或解场
+                            if (afterUpgrade > 0) {
+                                var hasEnemy = game.hasPlayer(function (current) {
+                                    return current != player && get.attitude(player, current) < 0;
+                                });
+                                if (hasEnemy) baseScore += 2.0;
+                            }
+                        }
+
+                        // 驱逐：1→2级质变（0.33→0.50闪避）
+                        if (player.hasSkill('quzhudd') && currentLv === 1) {
+                            baseScore += 2.0; // 闪避提升显著，生存能力提升
+                        }
+
+                        // 战列：对抗火属性伤害
+                        if (player.hasSkill('zhanliebb')) {
+                            var fireEnemies = game.countPlayer(function (current) {
+                                return get.attitude(player, current) < 0 &&
+                                       (current.hasSkill('huogong') || current.countCards('h', {nature: 'fire'}) > 0);
+                            });
+                            if (fireEnemies > 0 && currentLv === 1) baseScore += 1.5;
+                        }
+
+                        // 轻巡：对抗AOE
+                        if (player.hasSkill('qingxuncl')) {
+                            var aoeEnemies = game.countPlayer(function (current) {
+                                return get.attitude(player, current) < 0 &&
+                                       current.countCards('h', function (card) {
+                                           return ['nanman', 'wanjian', 'taoyuan'].includes(card.name);
+                                       }) > 0;
+                            });
+                            if (aoeEnemies > 0) baseScore += 1.5;
+                        }
+
+                        // 要塞：升级即回血+加血量上限
+                        if (player.hasSkill('yaosai')) {
+                            if (hp < maxHp) baseScore += 3.0; // 即时回血价值极高（救人）
+                            baseScore += 1.0; // 血量上限提升
+                        }
+                        break;
+
+                    case 'wuqiup':
+                        // 射程升级：打不到人时价值高
+                        baseScore = 2.5;
+                        var unreachableEnemies = game.countPlayer(function (current) {
+                            return current != player && get.attitude(player, current) < 0 && !player.inRange(current);
+                        });
+                        if (unreachableEnemies > 0) baseScore += unreachableEnemies * 0.8;
+                        break;
+
+                    case 'useshaup':
+                        // 速射炮管：有多张杀时价值高
+                        baseScore = 2.0;
+                        var shaCount = player.countCards('h', 'sha');
+                        if (shaCount > 1) baseScore += shaCount * 0.5;
+
+                        // 输出型武将优先级更高
+                        if (player.hasSkill('kaimuhangkong') || player.hasSkill('zhongxunca') ||
+                            player.hasSkill('fanjiandaodan') || player.hasSkill('kaimuleiji')) {
+                            baseScore += 1.0;
+                        }
+                        break;
+
+                    case 'jidongup':
+                        // 改良推进器：被贴脸时价值高
+                        baseScore = 2.0;
+                        if (enemiesInRange > 0) baseScore += enemiesInRange * 0.6;
+
+                        // 脆皮输出更需要防御距离
+                        if ((player.hasSkill('kaimuhangkong') || player.hasSkill('zhongxunca') ||
+                             player.hasSkill('fanjiandaodan') || player.hasSkill('kaimuleiji')) && hp <= 2) {
+                            baseScore += 1.5;
+                        }
+                        break;
+
+                    case 'shoupaiup':
+                        // 物流运输：手牌溢出时价值高
+                        baseScore = 1.5;
+                        var handcardLimit = player.getHandcardLimit();
+                        if (handCards >= handcardLimit) baseScore += 2.0; // 溢出，急需
+                        else if (handCards >= handcardLimit - 1) baseScore += 1.0;
+                        break;
+                }
+
+                // === 第三步：根据风险分调整优先级 ===
+                var finalScore = baseScore;
+
+                if (riskScore > 0.5) {
+                    // 高风险：优先防御选项
+                    if (['jidongup', 'shoupaiup'].includes(choice)) {
+                        finalScore += 2.0;
+                    }
+                    // 要塞技能在残血时优先级拉满
+                    if (choice === 'jinengup' && player.hasSkill('yaosai') && hp <= 2) {
+                        finalScore += 3.0;
+                    }
+                    // 降低纯输出选项优先级
+                    if (['wuqiup', 'useshaup'].includes(choice)) {
+                        finalScore -= 1.5;
+                    }
+                } else {
+                    // 低风险：突出特长
+                    // 质变技能优先级拉满
+                    if (choice === 'jinengup' && currentLv === 0) {
+                        finalScore += 2.0;
+                    }
+                    // 输出选项适当提升
+                    if (['wuqiup', 'useshaup'].includes(choice)) {
+                        finalScore += 0.5;
+                    }
+                }
+
+                // === 第四步：团队需求调整 ===
+                var teamHasDamage = game.hasPlayer(function (current) {
+                    return current != player && get.attitude(player, current) > 0 &&
+                           (current.hasSkill('kaimuhangkong') || current.hasSkill('zhongxunca') ||
+                            current.hasSkill('fanjiandaodan') || current.hasSkill('kaimuleiji'));
+                });
+
+                // 防御型武将，但团队缺输出
+                if ((player.hasSkill('zhanliebb') || player.hasSkill('yaosai')) && !teamHasDamage) {
+                    if (['wuqiup', 'useshaup'].includes(choice)) {
+                        finalScore += 1.5; // 弥补短板
+                    }
+                }
+
+                // === 第五步：避免重复升级已满级的选项 ===
+                var buildLevel = player.countMark('_jianzaochuan') + 1;
+                if (currentLv >= buildLevel || currentLv >= 2) {
+                    return 0; // 已满级，不可选
+                }
+
+                return finalScore;
             }).set('selectButton', [0, maxSelectable]);
 
             'step 3'
@@ -2876,7 +3136,7 @@ const standard = {
             return target.countCards('h') == 0 || !target.hasSkillTag('noh');
         },
         filter: function (event, player) {
-            if (event.target.hasSkill('quzhudd') || event.target.hasSkill('qingxuncl') || event.target.hasSkill('qianting') || event.target.hasSkill('zhongxunca'))
+            if (event.target.hasSkill('quzhudd') || event.target.hasSkill('qingxuncl') || event.target.hasSkill('qiantingss') || event.target.hasSkill('zhongxunca'))
                 return event.target != player;
         },
         content: function () {
@@ -3421,6 +3681,7 @@ const standard = {
             order: 7.2,
             result: {
                 target(player, target) {
+                    if (!player || !target) return 0;
                     if (get.attitude(player, target) >= 0) return 1;
                     return 0;
                 },

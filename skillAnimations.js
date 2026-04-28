@@ -5,12 +5,12 @@
 // duration: 普通图片按这里写的毫秒数播放；
 //           GIF 优先用各帧延时之和、视频用 metadata 时长，解析失败时才回退到这里。
 export var skillAnimations = {
-    kaimuhangkong: { image: "kaimuhangkong.gif", duration: 1500, fullscreen: true, size: 0.5 },
-    zhuangjiafh: { image: "zhuangjiafh.gif", duration: 1500, fullscreen: false },
+    kaimuhangkong: { image: "kaimuhangkong.gif", duration: 1500, fullscreen: true, size: 0.85 },
+    zhuangjiafh: { image: "zhuangjiafh.png", duration: 1500, fullscreen: false },
     dajiaoduguibi: { image: "dajiaoduguibi.gif", duration: 1500, fullscreen: false },
-    huokongld: { image: "huokongld.gif", duration: 2000, fullscreen: true, size: 0.5 },
-    fangkongdaodan: { image: "fangkongdaodan.gif", duration: 2000, fullscreen: true, size: 0.5 },
-    kaimuleiji: { image: "kaimuleiji.gif", duration: 2000, fullscreen: true, size: 0.5 },
-    fanjiandaodan: { image: "yuanchengdaji.gif", duration: 1200, fullscreen: true, size: 0.5 },
-    yuanchengdaji: { image: "yuanchengdaji.gif", duration: 1200, fullscreen: true, size: 0.5 },
+    huokongld: { image: "huokongld.gif", duration: 2000, fullscreen: true, size: 0.85 },
+    fangkongdaodan: { image: "fangkongdaodan.gif", duration: 2000, fullscreen: true, size: 0.85 },
+    kaimuleiji: { image: "kaimuleiji.gif", duration: 2000, fullscreen: true, size: 0.85 },
+    fanjiandaodan: { image: "yuanchengdaji.gif", duration: 1200, fullscreen: true, size: 0.85 },
+    yuanchengdaji: { image: "yuanchengdaji.gif", duration: 1200, fullscreen: true, size: 0.85 },
 };
