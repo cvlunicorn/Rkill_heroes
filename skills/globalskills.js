@@ -7,7 +7,6 @@ const globalskills = {
             maxHandcard: function (player, num) {
                 if (lib.config.extension_舰R牌将__yuanhang === false) return num;
                 var a = 0;
-                //if (player.hasSkill('qianting')) { var a = a + 1 };
                 if (player.hp < player.maxHp) { a += (1) };
                 if (get.mode() == 'boss' && player.hp <= 0) { a += (1) };
                 return (num + a);
@@ -1318,7 +1317,7 @@ const globalskills = {
             return (event.name != 'phase' || game.phaseNumber == 0) && get.mode() == 'boss';
         },
         content: function () {
-            if (player.hasSkill('qianting')) { player.equip(game.createCard2('yuleiqianting3', 'club', 1)); player.equip(game.createCard2('xingyun', 'club', 1)); }
+            if (player.hasSkill('qiantingss')) { player.equip(game.createCard2('yuleiqianting3', 'club', 1)); player.equip(game.createCard2('xingyun', 'club', 1)); }
             if (player.hasSkill('quzhudd')) { player.equip(game.createCard2('quzhupao3', 'club', 1)); player.equip(game.createCard2('xingyun', 'club', 1)); }
             if (player.hasSkill('qingxuncl')) { player.equip(game.createCard2('qingxunpao3', 'club', 1)); player.equip(game.createCard2('xingyun', 'club', 1)); }
             if (player.hasSkill('zhongxunca')) { player.equip(game.createCard2('zhongxunpao3', 'club', 1)); player.equip(game.createCard2('huokongld_equip', 'club', 1)); }
@@ -1362,7 +1361,7 @@ const globalskills = {
                 var target = event.targets[i];
                 var eff1 = get.damageEffect(target, player, player);
                 var eff2 = get.damageEffect(target, player, player, 'fire');
-                if (player.hasSkill('quzhudd') || player.hasSkill('qianting')) var eff2 = get.damageEffect(target, player, player, 'thunder');
+                if (player.hasSkill('quzhudd') || player.hasSkill('qiantingss')) var eff2 = get.damageEffect(target, player, player, 'thunder');
                 if (player.hasSkill('zhanliebb') || player.hasSkill('hangmucv')) var eff2 = get.damageEffect(target, player, player, 'thunder');
                 eff += eff2;
                 eff -= eff1;
@@ -1371,7 +1370,7 @@ const globalskills = {
         },
         prompt: function (event, player) {
             {
-                if (player.hasSkill('quzhudd') || player.hasSkill('qianting')) { return '穿甲鱼雷' };
+                if (player.hasSkill('quzhudd') || player.hasSkill('qiantingss')) { return '穿甲鱼雷' };
                 if (player.hasSkill('zhanliebb') || player.hasSkill('hangmucv')) { return '弃牌穿甲弹' };
                 return '点燃'
             };
@@ -1381,7 +1380,7 @@ const globalskills = {
             var chusha = player.getAllHistory('useCard', function (evt) {
                 return get.name(evt.card, 'sha');
             }).length, danzong = player.getAllHistory('useSkill', function (evt) { return evt.skill == "danzong"; }).length;
-            var tishi = '总计可用' + Math.floor(chusha / 4 - danzong) + '次,每回合限2次,令非属性' + get.translation(event.card) + '在计算伤害前：<br>', xiaochuan = player.hasSkill('quzhudd') || player.hasSkill('qianting'), dachuan = player.hasSkill('zhanliebb') || player.hasSkill('hangmucv');
+            var tishi = '总计可用' + Math.floor(chusha / 4 - danzong) + '次,每回合限2次,令非属性' + get.translation(event.card) + '在计算伤害前：<br>', xiaochuan = player.hasSkill('quzhudd') || player.hasSkill('qiantingss'), dachuan = player.hasSkill('zhanliebb') || player.hasSkill('hangmucv');
             {
                 if (xiaochuan) { tishi += ('获得雷属性（命中后：目标有护甲时,伤害穿透护甲；减少对手1点防御距离)。<br>被集火了,快跑') };
                 if (dachuan) { tishi += ('获得雷属性（命中后：目标有护甲时,加1伤；减少对手1点手牌上限；放弃伤害,改为弃置对手的卡牌）<br>一般般啦,绝境求生。') };
@@ -1396,7 +1395,7 @@ const globalskills = {
             //game.log(chusha, danzong);
 
             /* trigger.card.nature = 'fire';
-            if ((player.hasSkill('quzhudd') || player.hasSkill('qianting'))) { trigger.card.nature = 'thunder' }; if ((player.hasSkill('zhanliebb') || player.hasSkill('hangmucv'))) { trigger.card.nature = 'thunder'; };
+            if ((player.hasSkill('quzhudd') || player.hasSkill('qiantingss'))) { trigger.card.nature = 'thunder' }; if ((player.hasSkill('zhanliebb') || player.hasSkill('hangmucv'))) { trigger.card.nature = 'thunder'; };
             if (get.itemtype(trigger.card) == 'card') {
                 var next = game.createEvent('zhuque_clear');
                 next.card = trigger.card;
@@ -1418,7 +1417,7 @@ const globalskills = {
                 prompt: "增强杀", "prompt2": "下一次造成伤害时,可以改变伤害属性（接近伤害的触发时机,几乎就是个特效）",
                 content: function () {//player.addTempSkill('qinggang_skill','useCard1');
                     trigger.nature = 'fire';
-                    if ((player.hasSkill('quzhudd') || player.hasSkill('qianting'))) { trigger.nature = 'thunder' }; if ((player.hasSkill('zhanliebb') || player.hasSkill('hangmucv'))) { trigger.nature = 'ice'; };
+                    if ((player.hasSkill('quzhudd') || player.hasSkill('qiantingss'))) { trigger.nature = 'thunder' }; if ((player.hasSkill('zhanliebb') || player.hasSkill('hangmucv'))) { trigger.nature = 'ice'; };
                     player.removeSkill('danzong_damage');
                 },
                 mark: true, intro: { marktext: "增强", content: function (storage, player) { return ('下一次造成伤害时,可以改变伤害属性（接近伤害的触发时机,几乎就是个特效）'); }, },

@@ -816,11 +816,11 @@ const shiptypeskills = {
             },
         },
     },
-    qianting_xiji: {
+    qiantingss_xiji: {
         audio: "ext:舰R牌将/audio/skill:2",
         audioname: ["re_ganning", "re_heqi"],
         mod: {
-            attackFrom: function (from, to, distance) { var a = 0; if (from.hasSkill('quzhudd') && to.hasSkill('qianting')) { var a = a - 1 }; return distance = (distance + a) },
+            attackFrom: function (from, to, distance) { var a = 0; if (from.hasSkill('quzhudd') && to.hasSkill('qiantingss')) { var a = a - 1 }; return distance = (distance + a) },
             selectTarget: function (card, player, range) { if ((card.name == 'huogong' || card.name == 'guohe' || card.name == 'zhaomingdan9' || card.name == 'xiji9') && player.countMark('jinengup') && range[1] != -1) range[1] += (Math.min(player.countMark('jinengup'), game.players.length - 1)); },
             targetInRange: function (card, player, target) {
                 var type = get.type(card);
@@ -907,7 +907,7 @@ const shiptypeskills = {
             },
         },
     },
-    qianting_jiezi: {
+    qiantingss_jiezi: {
         trigger: {
             global: ["phaseJieshuBegin"],
         },
@@ -1156,7 +1156,7 @@ const shiptypeskills = {
         },
     },
     quzhudd: {
-        mod: { globalFrom: function (from, to, distance) { return distance - (to.hasSkill('qianting')); }, },
+        mod: { globalFrom: function (from, to, distance) { return distance - (to.hasSkill('qiantingss')); }, },
         group: [],
         ai: {
             expose: 0,
