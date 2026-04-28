@@ -349,8 +349,18 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     ".jianr-battle-animation.jianr-animation-fullscreen{" +
                     "position:fixed;top:0;left:0;width:100%;height:100%;" +
                     "}" +
+                    ".jianr-battle-animation.jianr-animation-fullscreen::before{" +
+                    "content:'';" +
+                    "position:absolute;" +
+                    "top:0;left:0;right:0;bottom:0;" +
+                    "pointer-events:none;" +
+                    "background:radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.8) 100%);" +
+                    "}" +
                     ".jianr-battle-animation.jianr-animation-local{" +
-                    "position:absolute;top:0;left:0;width:100%;height:100%;" +
+                    "position:absolute;" +
+                    "top:50%;left:50%;" +
+                    "width:120%;height:120%;" +
+                    "transform:translate(-50%,-50%);" +
                     "}";
                 document.head.appendChild(animationStyleEl);
             }
@@ -481,6 +491,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         video.style.width = "100%";
                         video.style.height = "100%";
                         video.style.objectFit = "contain";
+                        video.style.zIndex = "-1";
                         video.onloadeddata = function () { onReady(true); };
                         video.onerror = function () { onReady(false); };
                         video.src = url;
