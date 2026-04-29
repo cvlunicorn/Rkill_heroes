@@ -7,6 +7,7 @@ const globalskills = {
             maxHandcard: function (player, num) {
                 if (lib.config.extension_舰R牌将__yuanhang === false) return num;
                 var a = 0;
+                //if (player.hasSkill('qiantingss')) { var a = a + 1 };
                 if (player.hp < player.maxHp) { a += (1) };
                 if (get.mode() == 'boss' && player.hp <= 0) { a += (1) };
                 return (num + a);
@@ -596,17 +597,135 @@ const globalskills = {
                         // 技能升级：质变收益极高
                         baseScore = 4.0;
 
-                        // 重巡：0→1级质变（黑牌必中）
-                        if (player.hasSkill('zhongxunca') && currentLv === 0) {
-                            var blackCards = player.countCards('h', function (card) {
-                                return get.color(card) === 'black' && get.type(card) !== 'basic';
+                        // 航母：按实际拥有的“开幕航空”判断，不按 hangmucv 舰种标识判断
+                        if (player.hasSkill('kaimuhangkong')) {
+                            var canUseAviationCard = function (card, lv) {
+                                if (lv <= 0) return get.color(card) === 'black';
+                                if (lv === 1) return ['spade', 'club', 'heart'].includes(get.suit(card));
+                                return true;
+                            };
+                            var beforeUpgrade = player.countCards('h', function (card) {
+                                return canUseAviationCard(card, currentLv);
                             });
-                            if (blackCards > 0) baseScore += 2.5; // 有黑锦囊，质变收益拉满
+                            var afterUpgrade = player.countCards('h', function (card) {
+                                return canUseAviationCard(card, currentLv + 1);
+                            });
+                            var newCards = afterUpgrade - beforeUpgrade;
+                            if (newCards > 0) baseScore += newCards * 1.5;
+
+                            var aviationTargets = game.countPlayer(function (current) {
+                                return current != player && player.canUse({ name: 'wanjian' }, current) &&
+                                       get.effect(current, { name: 'wanjian' }, player, player) > 0;
+                            });
+                            if (afterUpgrade > 0 && aviationTargets > 0) {
+                                baseScore += Math.min(3, aviationTargets * 0.8);
+                            }
+                        }
+
+                        // 导驱：按实际拥有的“反舰导弹”判断，不按 daoqu 舰种标识判断
+                        if (player.hasSkill('fanjiandaodan')) {
+                            var canUseMissileCard = function (card, lv) {
+                                if (lv <= 0) return get.subtype(card) === 'equip1';
+                                if (lv === 1) return get.type(card) === 'equip';
+                                return get.type(card) !== 'basic';
+                            };
+                            var beforeUpgrade = player.countCards('he', function (card) {
+                                return canUseMissileCard(card, currentLv);
+                            });
+                            var afterUpgrade = player.countCards('he', function (card) {
+                                return canUseMissileCard(card, currentLv + 1);
+                            });
+                            var newCards = afterUpgrade - beforeUpgrade;
+                            if (newCards > 0) baseScore += newCards * 1.5;
+
+                            var currentRange = 2 + 2 * currentLv;
+                            var newRange = 2 + 2 * (currentLv + 1);
+                            var newTargets = game.countPlayer(function (current) {
+                                if (current == player || get.attitude(player, current) >= 0) return false;
+                                var dist = get.distance(player, current);
+                                return dist <= newRange && dist > currentRange &&
+                                       get.damageEffect(current, player, player) > 0;
+                            });
+                            if (newTargets > 0 && afterUpgrade > 0) baseScore += newTargets * 1.5;
+                        }
+
+                        // 潜艇：按实际拥有的“开幕雷击”判断，不按 qiantingss 舰种标识判断
+                        if (player.hasSkill('kaimuleiji')) {
+                            var canUseOpeningTorpedoCard = function (card, lv) {
+                                if (lv <= 0) return get.suit(card) === 'heart' || get.suit(card) === 'spade';
+                                if (lv === 1) return get.suit(card) === 'heart' || get.suit(card) === 'spade' || get.suit(card) === 'diamond';
+                                return true;
+                            };
+                            var beforeUpgrade = player.countCards('h', function (card) {
+                                return canUseOpeningTorpedoCard(card, currentLv);
+                            });
+                            var afterUpgrade = player.countCards('h', function (card) {
+                                return canUseOpeningTorpedoCard(card, currentLv + 1);
+                            });
+                            var newCards = afterUpgrade - beforeUpgrade;
+                            if (newCards > 0) baseScore += newCards * 1.5;
+
+                            var torpedoTargets = game.countPlayer(function (current) {
+                                return current != player && get.attitude(player, current) < 0 &&
+                                       get.damageEffect(current, player, player, 'thunder') > 0;
+                            });
+                            if (afterUpgrade > 0 && torpedoTargets > 0) {
+                                baseScore += Math.min(2.5, torpedoTargets * 0.9);
+                            }
+                        }
+
+                        // 防驱：按实际拥有的“防空导弹”判断，不按 fangqu 舰种标识判断
+                        if (player.hasSkill('fangkongdaodan')) {
+                            var storedMissiles = player.getExpansions('daodan').length +
+                                               player.getCards('s', function (card) { return card.hasGaintag('daodan') }).length;
+                            var maxMissiles = 1 + currentLv;
+                            var newMaxMissiles = 1 + currentLv + 1;
+                            var currentStoreGap = Math.max(0, maxMissiles - storedMissiles);
+                            var newStoreGap = Math.max(0, newMaxMissiles - storedMissiles);
+                            var extraMissiles = Math.max(0, Math.min(handCards, newStoreGap) - Math.min(handCards, currentStoreGap));
+                            if (extraMissiles > 0) {
+                                baseScore += extraMissiles * 1.4;
+                            }
+                            if (storedMissiles >= maxMissiles && newMaxMissiles > maxMissiles) {
+                                baseScore += 1.2;
+                            }
+
+                            var trickThreats = game.countPlayer(function (current) {
+                                return current != player && get.attitude(player, current) < 0 &&
+                                       current.countCards('h', function (card) {
+                                           return get.type(card) === 'trick' && card.name !== 'wuxie';
+                                       }) > 0;
+                            });
+                            if (trickThreats > 0 && (storedMissiles > 0 || newStoreGap > 0)) {
+                                baseScore += Math.min(2.4, trickThreats * 0.8);
+                            }
+                        }
+
+                        // 重巡：0→1级质变（黑牌必中）
+                        if (player.hasSkill('zhongxunca')) {
+                            var beforeUpgrade = player.countCards('h', function (card) {
+                                return (currentLv >= 0 && card.name === 'sha') ||
+                                       (currentLv >= 1 && get.color(card) === 'black' && get.type(card) !== 'basic');
+                            });
+                            var afterUpgrade = player.countCards('h', function (card) {
+                                return (currentLv + 1 >= 0 && card.name === 'sha') ||
+                                       (currentLv + 1 >= 1 && get.color(card) === 'black' && get.type(card) !== 'basic');
+                            });
+                            var newCards = afterUpgrade - beforeUpgrade;
+                            if (newCards > 0) baseScore += newCards * 2.0; // 黑锦囊必中价值极高
+
+                            // 判断是否能立即造成伤害或解场
+                            if (afterUpgrade > 0) {
+                                var hasEnemy = game.hasPlayer(function (current) {
+                                    return current != player && get.attitude(player, current) < 0;
+                                });
+                                if (hasEnemy) baseScore += 2.0;
+                            }
                         }
 
                         // 驱逐：1→2级质变（0.33→0.50闪避）
                         if (player.hasSkill('quzhudd') && currentLv === 1) {
-                            baseScore += 2.0; // 闪避提升显著
+                            baseScore += 2.0; // 闪避提升显著，生存能力提升
                         }
 
                         // 战列：对抗火属性伤害
@@ -630,8 +749,9 @@ const globalskills = {
                         }
 
                         // 要塞：升级即回血+加血量上限
-                        if (player.hasSkill('yaosai') && hp < maxHp) {
-                            baseScore += 3.0; // 即时回血价值极高
+                        if (player.hasSkill('yaosai')) {
+                            if (hp < maxHp) baseScore += 3.0; // 即时回血价值极高（救人）
+                            baseScore += 1.0; // 血量上限提升
                         }
                         break;
 
@@ -651,7 +771,8 @@ const globalskills = {
                         if (shaCount > 1) baseScore += shaCount * 0.5;
 
                         // 输出型武将优先级更高
-                        if (player.hasSkill('zhongxunca') || player.hasSkill('hangmucv')) {
+                        if (player.hasSkill('kaimuhangkong') || player.hasSkill('zhongxunca') ||
+                            player.hasSkill('fanjiandaodan') || player.hasSkill('kaimuleiji')) {
                             baseScore += 1.0;
                         }
                         break;
@@ -662,7 +783,8 @@ const globalskills = {
                         if (enemiesInRange > 0) baseScore += enemiesInRange * 0.6;
 
                         // 脆皮输出更需要防御距离
-                        if ((player.hasSkill('zhongxunca') || player.hasSkill('hangmucv')) && hp <= 2) {
+                        if ((player.hasSkill('kaimuhangkong') || player.hasSkill('zhongxunca') ||
+                             player.hasSkill('fanjiandaodan') || player.hasSkill('kaimuleiji')) && hp <= 2) {
                             baseScore += 1.5;
                         }
                         break;
@@ -707,7 +829,8 @@ const globalskills = {
                 // === 第四步：团队需求调整 ===
                 var teamHasDamage = game.hasPlayer(function (current) {
                     return current != player && get.attitude(player, current) > 0 &&
-                           (current.hasSkill('zhongxunca') || current.hasSkill('hangmucv'));
+                           (current.hasSkill('kaimuhangkong') || current.hasSkill('zhongxunca') ||
+                            current.hasSkill('fanjiandaodan') || current.hasSkill('kaimuleiji'));
                 });
 
                 // 防御型武将，但团队缺输出
@@ -1317,7 +1440,7 @@ const globalskills = {
             return (event.name != 'phase' || game.phaseNumber == 0) && get.mode() == 'boss';
         },
         content: function () {
-            if (player.hasSkill('qiantingss')) { player.equip(game.createCard2('yuleiqianting3', 'club', 1)); player.equip(game.createCard2('xingyun', 'club', 1)); }
+            if (player.hasSkill('qiantingss')) { player.equip(game.createCard2('yuleiqiantingss3', 'club', 1)); player.equip(game.createCard2('xingyun', 'club', 1)); }
             if (player.hasSkill('quzhudd')) { player.equip(game.createCard2('quzhupao3', 'club', 1)); player.equip(game.createCard2('xingyun', 'club', 1)); }
             if (player.hasSkill('qingxuncl')) { player.equip(game.createCard2('qingxunpao3', 'club', 1)); player.equip(game.createCard2('xingyun', 'club', 1)); }
             if (player.hasSkill('zhongxunca')) { player.equip(game.createCard2('zhongxunpao3', 'club', 1)); player.equip(game.createCard2('huokongld_equip', 'club', 1)); }
