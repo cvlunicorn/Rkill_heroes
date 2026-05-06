@@ -2969,6 +2969,69 @@ const standard = {
             }
 
         },
+        ai: {
+            order: 1,
+            result: {
+                target: function (player, target) {
+                    // 无畏装击：失去所有体力对目标造成等同于体力上限的伤害
+                    // 这是一个自杀式攻击技能，需要谨慎评估
+
+                    var damage = player.maxHp;
+                    var myHp = player.hp;
+
+                    // 如果自己濒死且无法被救，优先考虑使用
+                    if (myHp <= 1 && player.hp <= player.getDamagedHp()) {
+                        // 对敌人使用
+                        if (get.attitude(player, target) < 0) {
+                            // 如果能击杀关键敌人，收益极高
+                            if (target.hp <= damage) {
+                                return -20;
+                            }
+                            // 能造成大量伤害也值得
+                            return -10;
+                        }
+                        return 0;
+                    }
+
+                    // 正常情况下评估收益
+                    if (get.attitude(player, target) < 0) {
+                        // 对敌人：评估是否值得用命换伤害
+                        var targetValue = get.threaten(target);
+
+                        // 能击杀高威胁目标
+                        if (target.hp <= damage && targetValue > 2) {
+                            // 如果自己体力很低且局势不利，值得拼命
+                            if (myHp <= 2) {
+                                return -15;
+                            }
+                            return -8;
+                        }
+
+                        // 能造成致命伤害但无法击杀
+                        if (target.hp <= damage + 1 && targetValue > 2) {
+                            if (myHp <= 1) {
+                                return -12;
+                            }
+                            return -5;
+                        }
+
+                        // 一般情况：伤害高但代价太大
+                        return -3;
+                    }
+
+                    // 不对友方使用
+                    return 0;
+                },
+            },
+            tag: {
+                damage: function (card, player, target) {
+                    if (target && get.attitude(player, target) < 0) {
+                        return player.maxHp;
+                    }
+                    return 0;
+                },
+            },
+        },
     },
     zhongzhuangcike: {
         nobracket: true,

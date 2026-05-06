@@ -1507,6 +1507,124 @@ const fallendemon = {
         ai: {
             order: 9,
             threaten: 1.1,
+            result: {
+                target: function (player, target) {
+                    // 修筑：拼点赢了封锁对方颜色，输了封锁自己颜色，点数和>13双方回血
+
+                    if (get.attitude(player, target) > 0) {
+                        // 对友方：主要考虑回血收益
+                        if (player.isDamaged() || target.isDamaged()) {
+                            // 评估能否凑出点数和>13
+                            var myCards = player.getCards('h');
+                            var avgMyPoint = 0;
+                            for (var i = 0; i < myCards.length; i++) {
+                                avgMyPoint += get.number(myCards[i]);
+                            }
+                            if (myCards.length > 0) avgMyPoint = avgMyPoint / myCards.length;
+
+                            // 如果自己平均点数较高（>7），有机会凑出>13
+                            if (avgMyPoint > 7) {
+                                return 2;
+                            }
+                            return 1;
+                        }
+                        return 0;
+                    }
+
+                    // 对敌人：评估拼点胜率和封锁收益
+                    var myCards = player.getCards('h');
+                    var targetCards = target.getCards('h');
+
+                    if (myCards.length == 0) return 0;
+
+                    // 计算自己的平均点数
+                    var myAvg = 0;
+                    var myMax = 0;
+                    for (var i = 0; i < myCards.length; i++) {
+                        var num = get.number(myCards[i]);
+                        myAvg += num;
+                        if (num > myMax) myMax = num;
+                    }
+                    myAvg = myAvg / myCards.length;
+
+                    // 估算对方平均点数（假设7）
+                    var targetAvg = 7;
+                    if (targetCards.length > 0) {
+                        // 如果能看到对方手牌，精确计算
+                        var sum = 0;
+                        for (var i = 0; i < targetCards.length; i++) {
+                            sum += get.number(targetCards[i]);
+                        }
+                        targetAvg = sum / targetCards.length;
+                    }
+
+                    // 评估胜率
+                    var winChance = 0;
+                    if (myMax > targetAvg + 2) {
+                        winChance = 0.7; // 有大牌，胜率高
+                    } else if (myAvg > targetAvg + 1) {
+                        winChance = 0.6;
+                    } else if (myAvg > targetAvg) {
+                        winChance = 0.55;
+                    } else if (myAvg > targetAvg - 1) {
+                        winChance = 0.45;
+                    } else {
+                        winChance = 0.3; // 牌点数低，胜率低
+                    }
+
+                    // 评估封锁价值
+                    var blockValue = 0;
+                    if (targetCards.length > 0) {
+                        // 统计对方手牌颜色分布
+                        var redCount = 0, blackCount = 0;
+                        for (var i = 0; i < targetCards.length; i++) {
+                            if (get.color(targetCards[i]) == 'red') redCount++;
+                            else if (get.color(targetCards[i]) == 'black') blackCount++;
+                        }
+                        // 封锁对方主要颜色价值更高
+                        blockValue = Math.max(redCount, blackCount) / targetCards.length;
+                    } else {
+                        blockValue = 0.5; // 默认封锁价值
+                    }
+
+                    // 评估自己被封锁的风险
+                    var selfBlockRisk = 0;
+                    var myRedCount = 0, myBlackCount = 0;
+                    for (var i = 0; i < myCards.length; i++) {
+                        if (get.color(myCards[i]) == 'red') myRedCount++;
+                        else if (get.color(myCards[i]) == 'black') myBlackCount++;
+                    }
+                    // 如果自己手牌颜色单一，被封锁风险高
+                    if (myRedCount > myCards.length * 0.7 || myBlackCount > myCards.length * 0.7) {
+                        selfBlockRisk = 2;
+                    } else {
+                        selfBlockRisk = 1;
+                    }
+
+                    // 综合评估
+                    var expectedValue = winChance * (-3 * blockValue) + (1 - winChance) * (1.5 * selfBlockRisk);
+
+                    // 如果胜率高且对方手牌多，收益好
+                    if (winChance > 0.6 && targetCards.length >= 3) {
+                        return -3;
+                    }
+
+                    // 胜率一般但对方威胁高
+                    if (winChance > 0.5 && get.threaten(target) > 2) {
+                        return -2;
+                    }
+
+                    // 胜率低或自己手牌颜色单一，不建议使用
+                    if (winChance < 0.4 || selfBlockRisk > 1.5) {
+                        return 0;
+                    }
+
+                    return expectedValue;
+                },
+            },
+            tag: {
+                recover: 0.5, // 有回血可能
+            },
         },
         subSkill: {
             block: {
@@ -1918,6 +2036,106 @@ const fallendemon = {
                         target.storage.Xfliegerkorps_R_piaobodeying_markplayer.push(player);
                         target.addMark("Xfliegerkorps_R_piaobodeying_mark", 1);
                     }
+                },
+                ai: {
+                    order: 8,
+                    result: {
+                        target: function (player, target) {
+                            // 飘泊的鹰-拼点：赢了累积鹰标记并摸牌，输了清空所有鹰标记给对方
+
+                            var myCards = player.getCards('h');
+                            var targetCards = target.getCards('h');
+
+                            if (myCards.length == 0) return 0;
+
+                            // 计算当前鹰标记总数
+                            var currentMarks = 0;
+                            for (var i of game.filterPlayer()) {
+                                if (i.countMark("Xfliegerkorps_R_piaobodeying_mark") > 0) {
+                                    currentMarks += i.countMark("Xfliegerkorps_R_piaobodeying_mark");
+                                }
+                            }
+
+                            // 计算自己的平均点数和最大点数
+                            var myAvg = 0;
+                            var myMax = 0;
+                            for (var i = 0; i < myCards.length; i++) {
+                                var num = get.number(myCards[i]);
+                                myAvg += num;
+                                if (num > myMax) myMax = num;
+                            }
+                            myAvg = myAvg / myCards.length;
+
+                            // 估算对方平均点数
+                            var targetAvg = 7;
+                            if (targetCards.length > 0) {
+                                var sum = 0;
+                                for (var i = 0; i < targetCards.length; i++) {
+                                    sum += get.number(targetCards[i]);
+                                }
+                                targetAvg = sum / targetCards.length;
+                            }
+
+                            // 评估胜率
+                            var winChance = 0;
+                            if (myMax > targetAvg + 3) {
+                                winChance = 0.75;
+                            } else if (myMax > targetAvg + 2) {
+                                winChance = 0.65;
+                            } else if (myAvg > targetAvg + 1) {
+                                winChance = 0.6;
+                            } else if (myAvg > targetAvg) {
+                                winChance = 0.55;
+                            } else if (myAvg > targetAvg - 1) {
+                                winChance = 0.45;
+                            } else {
+                                winChance = 0.35;
+                            }
+
+                            // 评估收益和风险
+                            // 赢了的收益：+1鹰标记，摸牌数=min(3, 总标记数+1)
+                            var winReward = Math.min(3, currentMarks + 1);
+
+                            // 输了的损失：失去所有已有标记，对方获得1标记
+                            var loseRisk = currentMarks;
+
+                            // 如果没有标记，输了损失小，可以尝试
+                            if (currentMarks == 0) {
+                                if (winChance > 0.5) {
+                                    return -1; // 对敌人使用，收益中等
+                                } else if (winChance > 0.4) {
+                                    return -0.5;
+                                } else {
+                                    return 0; // 胜率太低不用
+                                }
+                            }
+
+                            // 如果已有标记，需要更谨慎
+                            if (currentMarks >= 2) {
+                                // 标记多，输了损失大
+                                if (winChance > 0.65) {
+                                    // 胜率高才值得冒险
+                                    return -2;
+                                } else if (winChance > 0.55) {
+                                    return -1;
+                                } else {
+                                    // 胜率不够，不建议使用
+                                    return 0;
+                                }
+                            }
+
+                            // 标记数为1的情况
+                            if (winChance > 0.6) {
+                                return -1.5;
+                            } else if (winChance > 0.5) {
+                                return -1;
+                            } else if (winChance > 0.45) {
+                                return -0.5;
+                            } else {
+                                return 0;
+                            }
+                        },
+                    },
                 },
 
             },
