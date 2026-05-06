@@ -804,7 +804,7 @@ const shuileizhandui = {
         },
         prompt2: "令场上手牌最少的角色摸一张牌。",
         check: function (event, player) {
-            game.hasPlayer(function (target) {
+            return game.hasPlayer(function (target) {
                 return player !== target && !game.hasPlayer(function (current) {
                     return current !== player && current !== target && current.countCards('h') < target.countCards('h');
                 }) && get.attitude(player, target) > 0;

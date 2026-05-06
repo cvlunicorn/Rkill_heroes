@@ -2270,7 +2270,7 @@ const historybattles = {
             'step 0'
             player.chooseCard(get.prompt('hongseqiangwei', event.target), 1, 'h').set('ai', card => {
                 if (!game.players[(get.number(card) - 1) % game.countPlayer()].isAlive()) { return 0; }
-                if (get.attitude(game.players[(get.number(card) - 1) % game.countPlayer()] < 0)) { return 0; }
+                if (get.attitude(player, game.players[(get.number(card) - 1) % game.countPlayer()]) < 0) { return 0; }
                 return 9 - get.value(card);
             });
             'step 1'

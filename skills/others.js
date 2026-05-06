@@ -890,7 +890,7 @@ const others = {
                     var att = get.attitude(player, target);
                     if (att >= 0 && target.hp >= 1) {
                         if (target.hasSkillTag("maixue")) return 2;
-                        if (target.isDamaged) return 0.5;
+                        if (target.isDamaged()) return 0.5;
                     } else if (target.hp <= 1) {
                         return get.damageEffect(target, player) - 0.5;
                     } else {

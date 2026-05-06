@@ -1420,7 +1420,7 @@ const standard = {
                         if (get.equipValue(card) <= 8) return 0;
                     }
                     if (!player.hasEmptySlot(2)) return;
-                    if (player.getStat('skill').zhanxianfangyu1 == 0 && card.name == "sha" && get.color(card) == "black") return "zerotarget";
+                    if ((!player.getStat('skill').zhanxianfangyu1||player.getStat('skill').zhanxianfangyu1 == 0) && card.name == "sha" && get.color(card) == "black") return "zerotarget";
                 },
             },
         },
