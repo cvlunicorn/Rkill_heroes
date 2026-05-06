@@ -360,7 +360,7 @@ var jianrjinji = {
         qiantingss: "潜艇", "qiantingss_info": "",
         daoqu: "导驱", "daoqu_info": "",
         fangqu: "防驱", "fangqu_info": "",
-        fanjiandaodan: "导驱", "反舰导弹_info": "（可强化）你的攻击范围增加2+2X(x为技能强化次数),出牌阶段限一次,你可以弃置一张武器/装备牌,对目标使用一张不可响应的远程导弹。",
+        fanjiandaodan: "导驱", "反舰导弹_info": "（可强化）你的攻击范围增加2+2X(x为技能强化次数),出牌阶段限一次,你可以弃置一张武器/装备牌/非基本牌,对目标使用一张不可响应的远程导弹。",
 
         daodan: "防空导弹",
         zhandouji: "战斗机",
