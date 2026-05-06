@@ -1983,7 +1983,29 @@ const fallendemon = {
                                 return player.canUse({ name: 'wanjian' }, target);
                             },
                             ai1: function (card) {
-                                return 9 - get.value(card);
+                                var player = get.player();
+                                // 先评估是否有值得攻击的目标
+                                var hasWorthyTarget = game.hasPlayer(function(current) {
+                                    return player.canUse({ name: 'wanjian' }, current) &&
+                                           get.effect(current, { name: 'wanjian' }, player, player) > 0;
+                                });
+
+                                if (!hasWorthyTarget) return -1; // 没有值得攻击的目标，不弃牌
+
+                                // 计算总攻击效果
+                                var totalEffect = 0;
+                                game.countPlayer(function(current) {
+                                    if (player.canUse({ name: 'wanjian' }, current)) {
+                                        totalEffect += get.effect(current, { name: 'wanjian' }, player, player);
+                                    }
+                                });
+
+                                // 只有当攻击效果大于弃牌价值时才弃牌
+                                var cardValue = get.value(card);
+                                if (totalEffect > cardValue * 1.5) {
+                                    return 9 - cardValue;
+                                }
+                                return -1;
                             },
                             ai2: function (target) {
                                 return get.effect(target, { name: 'wanjian' }, player, player);
@@ -2004,7 +2026,29 @@ const fallendemon = {
                                 return player.canUse({ name: 'wanjian' }, target);
                             },
                             ai1: function (card) {
-                                return 9 - get.value(card);
+                                var player = get.player();
+                                // 先评估是否有值得攻击的目标
+                                var hasWorthyTarget = game.hasPlayer(function(current) {
+                                    return player.canUse({ name: 'wanjian' }, current) &&
+                                           get.effect(current, { name: 'wanjian' }, player, player) > 0;
+                                });
+
+                                if (!hasWorthyTarget) return -1; // 没有值得攻击的目标，不弃牌
+
+                                // 计算总攻击效果
+                                var totalEffect = 0;
+                                game.countPlayer(function(current) {
+                                    if (player.canUse({ name: 'wanjian' }, current)) {
+                                        totalEffect += get.effect(current, { name: 'wanjian' }, player, player);
+                                    }
+                                });
+
+                                // 只有当攻击效果大于弃牌价值时才弃牌
+                                var cardValue = get.value(card);
+                                if (totalEffect > cardValue * 1.5) {
+                                    return 9 - cardValue;
+                                }
+                                return -1;
                             },
                             ai2: function (target) {
                                 return get.effect(target, { name: 'wanjian' }, player, player);
@@ -2024,7 +2068,29 @@ const fallendemon = {
                                 return player.canUse({ name: 'wanjian' }, target);
                             },
                             ai1: function (card) {
-                                return 9 - get.value(card);
+                                var player = get.player();
+                                // 先评估是否有值得攻击的目标
+                                var hasWorthyTarget = game.hasPlayer(function(current) {
+                                    return player.canUse({ name: 'wanjian' }, current) &&
+                                           get.effect(current, { name: 'wanjian' }, player, player) > 0;
+                                });
+
+                                if (!hasWorthyTarget) return -1; // 没有值得攻击的目标，不弃牌
+
+                                // 计算总攻击效果
+                                var totalEffect = 0;
+                                game.countPlayer(function(current) {
+                                    if (player.canUse({ name: 'wanjian' }, current)) {
+                                        totalEffect += get.effect(current, { name: 'wanjian' }, player, player);
+                                    }
+                                });
+
+                                // 只有当攻击效果大于弃牌价值时才弃牌
+                                var cardValue = get.value(card);
+                                if (totalEffect > cardValue * 1.5) {
+                                    return 9 - cardValue;
+                                }
+                                return -1;
                             },
                             ai2: function (target) {
                                 return get.effect(target, { name: 'wanjian' }, player, player);

@@ -117,7 +117,29 @@ const shiptypeskills = {
                         return player.canUse({ name: 'wanjian' }, target);
                     },
                     ai1: function (card) {
-                        return 9 - get.value(card);
+                        var player = get.player();
+                        // 先评估是否有值得攻击的目标
+                        var hasWorthyTarget = game.hasPlayer(function(current) {
+                            return player.canUse({ name: 'wanjian' }, current) &&
+                                   get.effect(current, { name: 'wanjian' }, player, player) > 0;
+                        });
+
+                        if (!hasWorthyTarget) return -1; // 没有值得攻击的目标，不弃牌
+
+                        // 计算总攻击效果
+                        var totalEffect = 0;
+                        game.countPlayer(function(current) {
+                            if (player.canUse({ name: 'wanjian' }, current)) {
+                                totalEffect += get.effect(current, { name: 'wanjian' }, player, player);
+                            }
+                        });
+
+                        // 只有当攻击效果大于弃牌价值时才弃牌
+                        var cardValue = get.value(card);
+                        if (totalEffect > cardValue * 1.5) {
+                            return 9 - cardValue;
+                        }
+                        return -1;
                     },
                     ai2: function (target) {
                         return get.effect(target, { name: 'wanjian' }, player, player);
@@ -143,7 +165,29 @@ const shiptypeskills = {
                         return player.canUse({ name: 'wanjian' }, target);
                     },
                     ai1: function (card) {
-                        return 9 - get.value(card);
+                        var player = get.player();
+                        // 先评估是否有值得攻击的目标
+                        var hasWorthyTarget = game.hasPlayer(function(current) {
+                            return player.canUse({ name: 'wanjian' }, current) &&
+                                   get.effect(current, { name: 'wanjian' }, player, player) > 0;
+                        });
+
+                        if (!hasWorthyTarget) return -1; // 没有值得攻击的目标，不弃牌
+
+                        // 计算总攻击效果
+                        var totalEffect = 0;
+                        game.countPlayer(function(current) {
+                            if (player.canUse({ name: 'wanjian' }, current)) {
+                                totalEffect += get.effect(current, { name: 'wanjian' }, player, player);
+                            }
+                        });
+
+                        // 只有当攻击效果大于弃牌价值时才弃牌
+                        var cardValue = get.value(card);
+                        if (totalEffect > cardValue * 1.5) {
+                            return 9 - cardValue;
+                        }
+                        return -1;
                     },
                     ai2: function (target) {
                         return get.effect(target, { name: 'wanjian' }, player, player);
@@ -168,7 +212,29 @@ const shiptypeskills = {
                         return player.canUse({ name: 'wanjian' }, target);
                     },
                     ai1: function (card) {
-                        return 9 - get.value(card);
+                        var player = get.player();
+                        // 先评估是否有值得攻击的目标
+                        var hasWorthyTarget = game.hasPlayer(function(current) {
+                            return player.canUse({ name: 'wanjian' }, current) &&
+                                   get.effect(current, { name: 'wanjian' }, player, player) > 0;
+                        });
+
+                        if (!hasWorthyTarget) return -1; // 没有值得攻击的目标，不弃牌
+
+                        // 计算总攻击效果
+                        var totalEffect = 0;
+                        game.countPlayer(function(current) {
+                            if (player.canUse({ name: 'wanjian' }, current)) {
+                                totalEffect += get.effect(current, { name: 'wanjian' }, player, player);
+                            }
+                        });
+
+                        // 只有当攻击效果大于弃牌价值时才弃牌
+                        var cardValue = get.value(card);
+                        if (totalEffect > cardValue * 1.5) {
+                            return 9 - cardValue;
+                        }
+                        return -1;
                     },
                     ai2: function (target) {
                         return get.effect(target, { name: 'wanjian' }, player, player);
@@ -816,7 +882,7 @@ const shiptypeskills = {
             },
         },
     },
-    qiantingss_xiji: {
+    qianting_xiji: {
         audio: "ext:舰R牌将/audio/skill:2",
         audioname: ["re_ganning", "re_heqi"],
         mod: {
@@ -907,7 +973,7 @@ const shiptypeskills = {
             },
         },
     },
-    qiantingss_jiezi: {
+    qianting_jiezi: {
         trigger: {
             global: ["phaseJieshuBegin"],
         },
@@ -966,12 +1032,36 @@ const shiptypeskills = {
                 .set('prompt', '开幕雷击')
                 .set('prompt2', '弃置一张符合要求的牌视为使用一张雷杀')
                 .set('ai', card => {
-                    card1 = {
+                    var player = get.player();
+                    var card1 = {
                         name: 'sha',
                         nature: 'thunder',
                         isCard: true,
                     };
-                    return get.useful(card1) - get.useful(card);
+
+                    // 先评估是否有值得攻击的目标
+                    var hasWorthyTarget = game.hasPlayer(function(current) {
+                        return player.canUse(card1, current) &&
+                               get.effect(current, card1, player, player) > 0;
+                    });
+
+                    if (!hasWorthyTarget) return -1; // 没有值得攻击的目标，不弃牌
+
+                    // 计算最佳目标的攻击效果
+                    var maxEffect = 0;
+                    game.countPlayer(function(current) {
+                        if (player.canUse(card1, current)) {
+                            var effect = get.effect(current, card1, player, player);
+                            if (effect > maxEffect) maxEffect = effect;
+                        }
+                    });
+
+                    // 只有当攻击效果大于弃牌价值时才弃牌
+                    var cardValue = get.value(card);
+                    if (maxEffect > cardValue * 1.2) {
+                        return get.useful(card1) - cardValue;
+                    }
+                    return -1;
                 }).set('logSkill', '潜艇');
 
             /*var next = player.chooseCardTarget({
