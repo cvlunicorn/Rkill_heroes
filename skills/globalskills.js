@@ -1609,7 +1609,42 @@ const globalskills = {
                     });
                     'step 1'
                     if (result.bool) {
-                        player.chooseControl('<span class=yellowtext>基本', '<span class=yellowtext>装备', '<span class=yellowtext>锦囊', 'cancel2').set('prompt', get.prompt('_kaishimopai')).set('prompt2', '选择一张牌并发现之').set('ai', function (event, player) { var player = get.player(); return 1; });
+                        player.chooseControl('<span class=yellowtext>基本', '<span class=yellowtext>装备', '<span class=yellowtext>锦囊', 'cancel2').set('prompt', get.prompt('_kaishimopai')).set('prompt2', '选择一张牌并发现之').set('ai', function (event, player) {
+                            var player = get.player();
+
+                            // 低血缺回复：基本牌优先
+                            var needHeal = player.hp < player.maxHp && player.hp <= 2;
+                            var hasTao = player.countCards('h', 'tao') > 0;
+                            var hasJiu = player.countCards('h', 'jiu') > 0;
+                            if (needHeal && !hasTao && !hasJiu) return 0; // 基本牌
+
+                            // 有多刀/重巡/潜艇但缺杀：基本牌优先
+                            var hasDuodao = player.hasSkill('duodao') || player.countMark('shachishu') > 0;
+                            var isZhongxun = player.hasSkill('zhongxuncv');
+                            var isQianting = player.hasSkill('qiantingss');
+                            var lackSha = player.countCards('h', 'sha') < 1;
+                            if ((hasDuodao || isZhongxun || isQianting) && lackSha) return 0; // 基本牌
+
+                            // 打不到人或需要发动导驱：装备优先
+                            var unreachableEnemies = game.countPlayer(function (current) {
+                                return current != player && get.attitude(player, current) < 0 && !player.inRange(current);
+                            });
+                            var isDaoqu = player.hasSkill('daoququcv');
+                            var lackWeapon = !player.getEquip(1);
+                            if ((unreachableEnemies > 0 || isDaoqu) && lackWeapon) return 1; // 装备
+
+                            // 需要解场/控场：锦囊优先
+                            var enemyCount = game.countPlayer(function (current) {
+                                return current != player && get.attitude(player, current) < 0;
+                            });
+                            var hasControlTrick = player.countCards('h', function(card) {
+                                return get.type(card) == 'trick' && (card.name == 'wuxie' || card.name == 'wuzhong' || card.name == 'guohe' || card.name == 'shunshou');
+                            }) > 0;
+                            if (enemyCount >= 2 && !hasControlTrick) return 2; // 锦囊
+
+                            // 默认：基本牌
+                            return 0;
+                        });
                     };
                     'step 2'
                     if (result.control != 'cancel2') {
@@ -1648,7 +1683,46 @@ const globalskills = {
                 },
                 content: function () {
                     'step 0'
-                    player.chooseControl('<span class=yellowtext>少摸一张牌' + '</span>', 'cancel2').set('prompt', get.prompt('判定藏牌')).set('prompt2', '准备阶段,若你的判定区有牌时,<br>你可以令自己的摸牌阶段少摸一张牌,<br>然后在自己的回合结束时摸一张牌。').set('ai', function (event, player) { var player = get.player(); return 0; });
+                    player.chooseControl('<span class=yellowtext>少摸一张牌' + '</span>', 'cancel2').set('prompt', get.prompt('判定藏牌')).set('prompt2', '准备阶段,若你的判定区有牌时,<br>你可以令自己的摸牌阶段少摸一张牌,<br>然后在自己的回合结束时摸一张牌。').set('ai', function (event, player) {
+                        var player = get.player();
+
+                        // 比较"下回合少摸一张"与"本回合结束摸一张"的时序价值
+
+                        // 本回合结束摸牌的价值：
+                        // 1. 延时锦囊压制严重（判定区牌数>=2）：结束时摸牌价值高，可以在下回合判定前补充手牌
+                        var delayCardCount = player.countCards('j');
+                        if (delayCardCount >= 2) return 0; // 发动
+
+                        // 2. 当前手牌充足（>=手牌上限）：不急需立即摸牌，结束时摸更好
+                        var handLimit = player.getHandcardLimit();
+                        if (player.countCards('h') >= handLimit) return 0; // 发动
+
+                        // 3. 本回合有大量出牌机会（出牌阶段能打出多张牌）：结束时摸牌可以避免超手牌上限弃牌
+                        var canUseMultipleCards = player.countCards('h', function(card) {
+                            return player.hasUseTarget(card);
+                        }) >= 3;
+                        if (canUseMultipleCards) return 0; // 发动
+
+                        // 下回合摸牌阶段摸牌的价值：
+                        // 1. 当前手牌不足（<3张）：急需补充手牌，摸牌阶段摸更好
+                        if (player.countCards('h') < 3) return 1; // 不发动
+
+                        // 2. 面临生存压力（低血且敌人多）：需要立即补充防御牌
+                        var lowHp = player.hp <= 2;
+                        var enemiesInRange = game.countPlayer(function (current) {
+                            return current != player && get.attitude(player, current) < 0 && current.inRange(player);
+                        });
+                        if (lowHp && enemiesInRange >= 2) return 1; // 不发动
+
+                        // 3. 判定区只有1张牌且不是乐不思蜀：摸牌阶段摸更稳定
+                        if (delayCardCount == 1) {
+                            var hasLebusishu = player.countCards('j', 'lebusishu') > 0;
+                            if (!hasLebusishu) return 1; // 不发动
+                        }
+
+                        // 默认：不发动（摸牌阶段摸更稳定）
+                        return 1;
+                    });
                     'step 1'
                     if (result.control != 'cancel2') { player.addMark('_kaishimopai_jieshudraw'); player.addMark('_kaishimopai_draw'); };
                 }, sub: true, mark: false, intro: { marktext: "闭月", content: function (storage, player) { return ('结束时摸一张牌'); }, },
