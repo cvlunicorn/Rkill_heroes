@@ -1568,26 +1568,11 @@ const standard = {
     Z_qianghua: {
         nobracket: true,
         name: "Z强化",
-        prompt: "出牌阶段,你可以移去一张Z,强化一项或摸两张牌。<br>强化规则与'强化装备'技能相同。",
-        mark: true,
+        prompt: "出牌阶段,你可以移去任意张Z,每张Z获得2点强化点数,可强化多项或摸牌(每2点摸2张)。<br>强化规则与'强化装备'技能相同。<br>未使用的点数可存储为经验供下次使用。",
         enable: "phaseUse",
         filter: function (event, player) {
             // 检查是否有Z卡牌
             if (!player.getExpansions('Z').length) return false;
-
-            // 检查是否达到强化上限
-            var buildLevel = player.countMark('_jianzaochuan') + 1;
-            var maxLevels = buildLevel * 6; // 最多6项,每项最多buildLevel级
-
-            // 计算当前总等级
-            var keys = ['mopaiup', 'jinengup', 'wuqiup', 'useshaup', 'jidongup', 'shoupaiup'];
-            var totalLevels = 0;
-            for (var i = 0; i < keys.length; i++) {
-                totalLevels += player.countMark(keys[i]);
-            }
-
-            // 如果已经达到上限,只能摸牌
-            if (totalLevels >= maxLevels) return true; // 仍然可以发动,但只能摸牌
 
             return true;
         },
@@ -1611,7 +1596,7 @@ const standard = {
         },
         content: function () {
             'step 0'
-            // 获取当前玩家（补充缺失的player定义）
+            // 获取当前玩家
             var player = get.player();
             // 获取所有Z卡牌
             var zCards = player.getExpansions('Z');
@@ -1620,16 +1605,46 @@ const standard = {
                 return;
             }
 
-            // 让玩家选择一张Z卡牌
-            player.chooseCardButton('请选择要移去的一张Z卡牌', true, zCards)
+            // 让玩家选择要移去的Z卡牌（可选多张）
+            var maxZ = Math.min(zCards.length, 4); // 最多选4张
+            player.chooseCardButton('请选择要移去的Z卡牌（可选多张）', [1, maxZ], zCards)
                 .set('ai', function (button) {
-                    return 1;
+                    var player = _status.event.player;
+                    var currentExp = player.countMark('Expup') || 0;
+                    var zCount = player.getExpansions('Z').length;
+
+                    // 如果已有经验，优先少选
+                    if (currentExp >= 2) return 0.5;
+
+                    // 根据Z数量决定选择策略
+                    if (zCount >= 3) return 1; // Z多时可以多选
+                    return 0.8; // Z少时谨慎
                 });
 
             'step 1'
             // 移去选择的Z卡牌
-            event.zCard = result.links[0];
-            player.loseToDiscardpile(event.zCard);
+            if (!result || !result.bool || !result.links || result.links.length === 0) {
+                event.finish();
+                return;
+            }
+
+            event.zCards = result.links;
+            player.loseToDiscardpile(event.zCards);
+
+            // 计算获得的点数：移去的Z数量 * 2 + 已存储的经验
+            var currentExp = player.countMark('Expup') || 0;
+            var gainedPoints = event.zCards.length * 2;
+            var totalPoints = currentExp + gainedPoints;
+
+            // 先将新获得的点数加到经验标记上
+            if (gainedPoints > 0) {
+                player.addMark('Expup', gainedPoints);
+            }
+
+            event.gainedPoints = gainedPoints;
+            event.totalPoints = totalPoints;
+
+            game.log(player, '移去了', event.zCards.length, '张Z，获得', gainedPoints, '点，总计', totalPoints, '点');
 
             // 检查是否可以强化
             var buildLevel = player.countMark('_jianzaochuan') + 1;
@@ -1675,7 +1690,7 @@ const standard = {
 
             // 生成可选列表
             var choiceList = [];
-            var availableUpgrades = [];
+            event.upgradeConfigMap = {};
 
             for (var i = 0; i < upgradeConfig.length; i++) {
                 var item = upgradeConfig[i];
@@ -1684,16 +1699,10 @@ const standard = {
                 var currentLv = player.countMark(item.mark);
                 var cost = item.cost(currentLv);
 
-                // 检查是否可升级（消耗2点,因为一张Z=2点）
-                if (currentLv < 2 && currentLv < buildLevel && 2 >= cost) {
-                    availableUpgrades.push({
-                        mark: item.mark,
-                        name: item.name,
-                        cost: cost,
-                        currentLv: currentLv,
-                        desc: item.desc
-                    });
+                event.upgradeConfigMap[item.mark] = item;
 
+                // 检查是否可升级
+                if (currentLv < 2 && currentLv < buildLevel && totalPoints >= cost) {
                     choiceList.push([
                         item.mark,
                         item.name + ' (消耗' + cost + '点)<br>当前:' + currentLv + '→' + (currentLv + 1) + '级<br>' + item.desc
@@ -1701,92 +1710,103 @@ const standard = {
                 }
             }
 
-            // 添加摸牌选项
-            choiceList.push(['draw_cards', '<b>摸两张牌</b><br>不进行强化,改为摸两张牌。']);
+            // 添加摸牌选项（每2点摸2张）
+            var maxDrawTimes = Math.floor(totalPoints / 2);
+            if (maxDrawTimes > 0) {
+                choiceList.push(['draw_cards', '<b>摸牌</b> (消耗2点)<br>每选择一次消耗2点摸2张牌，可多次选择。']);
+            }
 
-            event.availableUpgrades = availableUpgrades;
+            // 添加存储选项
+            choiceList.push(['store_only', '<b>仅存储经验</b><br>不进行任何升级或摸牌，将所有' + totalPoints + '点存储为经验。']);
+
             event.choiceList = choiceList;
 
-            // 如果没有可升级选项,直接摸牌
-            if (availableUpgrades.length === 0) {
-                player.draw(2);
-                game.log(player, '没有可升级的技能,摸两张牌');
+            if (choiceList.length <= 1) { // 只有存储选项
+                game.log(player, '没有可用选项，存储了', totalPoints, '点经验');
                 return;
             }
 
             'step 2'
-            // 计算最多可以选择多少个选项（一张Z=2点,最多只能升级一个项目）
-            var maxSelectable = 1;
+            // 计算最多可选数量
+            var maxSelectable = Math.floor(event.totalPoints / 2);
+            maxSelectable = Math.max(1, maxSelectable);
 
             // 使用与通用强化一致的界面
             player.chooseButton([
-                '移去一张Z获得2点强化点数,选择要强化的项目；取消将摸两张牌。<br>强化上限默认为1,发动建造技能后提高。<br>一级强化需要2点,二级强化需要3点强化点数。',
+                '移去' + event.zCards.length + '张Z获得' + event.gainedPoints + '点，加上已存储' + (event.totalPoints - event.gainedPoints) + '点，共' + event.totalPoints + '点。<br>选择要强化的项目或摸牌（每2点摸2张），未使用的点数将保留。<br>强化上限默认为1，发动建造技能后提高。一级强化需要2点，二级强化需要3点。',
                 [event.choiceList, 'textbutton'],
             ]).set('filterButton', function (button) {
-                // 检查点数是否足够
+                // --- 客户端安全代码区域 ---
+                var player = _status.event.player;
+                // 直接读取已同步的标记，获取真实总点数
+                var totalPoints = player.countMark('Expup');
                 var selectedButtons = ui.selected.buttons || [];
                 var totalCost = 0;
+                var drawCount = 0;
 
-                // 计算已选按钮的总消耗
+                // 简易版 Cost 计算函数
+                var getCost = function (mk) {
+                    if (mk === 'draw_cards') return 2;
+                    if (mk === 'store_only') return 0;
+                    var lv = player.countMark(mk);
+                    return lv + 2;
+                };
+
+                // 计算已选消耗和摸牌次数
                 for (var i = 0; i < selectedButtons.length; i++) {
                     var mark = selectedButtons[i].link || selectedButtons[i];
-                    if (mark === 'draw_cards') continue;
-
-                    for (var j = 0; j < event.availableUpgrades.length; j++) {
-                        if (event.availableUpgrades[j].mark === mark) {
-                            totalCost += event.availableUpgrades[j].cost;
-                            break;
-                        }
-                    }
+                    if (mark === 'store_only') continue;
+                    if (mark === 'draw_cards') drawCount++;
+                    totalCost += getCost(mark);
                 }
 
-                // 如果当前按钮是摸牌,总是可选（但与其他选项互斥）
-                if (button.link === 'draw_cards') {
-                    // 如果已经选择了其他升级选项,则摸牌不可选
+                var currentLink = button.link;
+
+                // 互斥逻辑：存储选项与其他选项互斥
+                if (currentLink === 'store_only') {
                     for (var i = 0; i < selectedButtons.length; i++) {
-                        var mark = selectedButtons[i].link || selectedButtons[i];
-                        if (mark !== 'draw_cards') return false;
+                        if ((selectedButtons[i].link || selectedButtons[i]) !== 'store_only') return false;
                     }
                     return true;
                 }
-
-                // 如果已经选择了摸牌,则其他选项不可选
                 for (var i = 0; i < selectedButtons.length; i++) {
-                    var mark = selectedButtons[i].link || selectedButtons[i];
-                    if (mark === 'draw_cards') return false;
+                    if ((selectedButtons[i].link || selectedButtons[i]) === 'store_only') return false;
                 }
 
-                // 检查这个按钮是否已经被选中（允许取消）
-                var isSelected = false;
+                // 允许取消勾选
                 for (var i = 0; i < selectedButtons.length; i++) {
-                    if ((selectedButtons[i].link || selectedButtons[i]) === button.link) {
-                        isSelected = true;
-                        break;
-                    }
+                    if ((selectedButtons[i].link || selectedButtons[i]) === currentLink) return true;
                 }
 
-                if (isSelected) {
-                    return true; // 允许取消已选项目
+                // 摸牌选项可以多次选择
+                if (currentLink === 'draw_cards') {
+                    if (totalCost + 2 <= totalPoints) return true;
+                    return false;
                 }
 
-                // 检查点数是否足够选择这个新项目（一张Z固定2点）
-                for (var j = 0; j < event.availableUpgrades.length; j++) {
-                    if (event.availableUpgrades[j].mark === button.link) {
-                        if (totalCost + event.availableUpgrades[j].cost <= 2) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }
+                // 检查余额（升级选项）
+                if (totalCost + getCost(currentLink) <= totalPoints) {
+                    return true;
                 }
-
-                return true;
+                return false;
             }).set('ai', function (button) {
                 var choice = button.link;
                 var player = _status.event.player;
 
-                // 摸牌选项默认最低优先级
-                if (choice === 'draw_cards') return 0.1;
+                // 存储选项默认最低优先级
+                if (choice === 'store_only') return 0.1;
+
+                // 摸牌选项：根据手牌情况动态评分
+                if (choice === 'draw_cards') {
+                    var handCards = player.countCards('h');
+                    var handcardLimit = player.getHandcardLimit();
+
+                    // 手牌紧缺时摸牌价值高
+                    if (handCards <= 2) return 2.5;
+                    if (handCards <= handcardLimit / 2) return 1.5;
+                    if (handCards >= handcardLimit) return 0.2; // 手牌溢出时不摸
+                    return 0.8;
+                }
 
                 // === 第一步：评估当前风险分（生存威胁） ===
                 var riskScore = 0;
@@ -2092,32 +2112,64 @@ const standard = {
             if (result && result.bool && result.links) {
                 selected = result.links;
             } else {
-                // 取消选择,摸两张牌
-                player.draw(2);
-                game.log(player, '取消了强化,摸两张牌');
+                // 取消选择，保留所有点数
+                game.log(player, '取消了选择，保留', event.totalPoints, '点经验');
                 return;
             }
 
-            if (selected.includes('draw_cards')) {
-                player.draw(2);
-                game.log(player, '选择了摸两张牌');
-            } else {
-                for (var i = 0; i < selected.length; i++) {
-                    var mark = selected[i];
-                    var upgrade = null;
+            // 处理选择的选项
+            var usedPoints = 0;
+            var drawCount = 0;
+            var upgradedItems = [];
 
-                    for (var j = 0; j < event.availableUpgrades.length; j++) {
-                        if (event.availableUpgrades[j].mark === mark) {
-                            upgrade = event.availableUpgrades[j];
-                            break;
-                        }
-                    }
+            // 统计摸牌次数和升级项目
+            for (var i = 0; i < selected.length; i++) {
+                var mark = selected[i];
 
-                    if (upgrade) {
-                        // 执行升级
-                        player.addMark(mark, 1);
-                        game.log(player, '使用Z强化了', upgrade.name);
+                if (mark === 'store_only') {
+                    // 仅存储，不消耗点数
+                    game.log(player, '选择了仅存储经验，保留', event.totalPoints, '点');
+                    return;
+                } else if (mark === 'draw_cards') {
+                    drawCount++;
+                } else {
+                    // 升级项目
+                    var item = event.upgradeConfigMap[mark];
+                    if (item) {
+                        var currentLv = player.countMark(mark);
+                        var cost = item.cost(currentLv);
+                        upgradedItems.push({
+                            mark: mark,
+                            name: item.name,
+                            cost: cost
+                        });
                     }
+                }
+            }
+
+            // 执行摸牌
+            if (drawCount > 0) {
+                var drawAmount = drawCount * 2;
+                var drawCost = drawCount * 2;
+                player.draw(drawAmount);
+                usedPoints += drawCost;
+                game.log(player, '消耗', drawCost, '点摸了', drawAmount, '张牌');
+            }
+
+            // 执行升级
+            for (var i = 0; i < upgradedItems.length; i++) {
+                var item = upgradedItems[i];
+                player.addMark(item.mark, 1);
+                usedPoints += item.cost;
+                game.log(player, '消耗', item.cost, '点强化了', item.name);
+            }
+
+            // 扣除使用的点数
+            if (usedPoints > 0) {
+                player.removeMark('Expup', usedPoints);
+                var remainingPoints = player.countMark('Expup');
+                if (remainingPoints > 0) {
+                    game.log(player, '剩余', remainingPoints, '点经验');
                 }
             }
         },
