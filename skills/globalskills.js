@@ -1284,12 +1284,11 @@ const globalskills = {
                     effect: {
                         player: function (card, player) {
                             var a = game.countPlayer(function (current) {
-                                return current != player && (!get.attitude(player, current) < 0 && (player.hasSkill('zhongxunca') || player.hasSkill('qingxun')));
+                                return current != player && (get.attitude(player, current) < 0 && (current.hasSkill('zhongxunca') || current.hasSkill('qingxun')));
 
                             });
                             if (card.name == 'tengjia') {
-                                var equip1 = player.getEquip(1); if (a > 0 || player.hasSkill('_wulidebuff_ranshao')) { return -10; };
-                                if (a > 0) return -1;
+                                if (a > 0 || player.hasSkill('_wulidebuff_ranshao')) { return -10; };
                             }
                         },
                     },
