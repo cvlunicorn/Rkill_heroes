@@ -1878,6 +1878,16 @@ const others = {
             }
             var xun = result.links[0];
             player.logSkill('haitiantongxun', trigger.player);
+            player.respond(xun, 'haitiantongxun', 'highlight', 'noOrdering');
+            if (trigger.player.judging[0].clone) {
+                trigger.player.judging[0].clone.classList.remove('thrownhighlight');
+                game.broadcast(function (card) {
+                    if (card.clone) {
+                        card.clone.classList.remove('thrownhighlight');
+                    }
+                }, trigger.player.judging[0]);
+                game.addVideo('deletenode', player, get.cardsInfo([trigger.player.judging[0].clone]));
+            }
             //旧判定牌弃置
             game.cardsDiscard(trigger.player.judging[0]);
             //讯牌替换为新判定牌
