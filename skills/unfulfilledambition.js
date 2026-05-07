@@ -3236,6 +3236,19 @@ const unfulfilledambition = {
         trigger: {//触发时机,
             player: "phaseBegin"//准备阶段
         },
+        check: function (event, player) {
+            if (player.hasSkill('shuiji1_used')) {
+                if (player.hp < 2) return true;
+                if (player.countCards("j", { name: "lebu" }).length > 0 && player.countCards("h", { name: wuxie }).length <= 0) return true;
+            }
+            if (game.roundNumber > 1) {
+                var enemiesCount = game.countPlayer(function (current) {
+                    return get.attitude(player, current) < 0 && (!player.inRange(current) || current.hasSkillTag("fireAttack", null, null, true) || current.hasSkillTag("thunderAttack", null, null, true))
+                });
+                return enemiesCount > 1;
+            }
+            return false;
+        },
         //要加判定一下有没有要删的技能
         filter: function (event, player) {//对技能能不能生效的检查。
             if (player.hasSkill('benzhi1') && player.hasSkill('benzhi2')) //如果有本职就不能发动
@@ -3243,11 +3256,13 @@ const unfulfilledambition = {
             return player.hasSkill('zhiqiu') && player.hasSkill('shuiji1');//有掷球和水机才能发动
         },
         ai: {//ai部分
-            order: 1,//优先级1
+            order: 1,
             result: {
-                player: 3,//对自己的评价是3
+                player: function (event, player) {
+                    return 2;
+                },
             },
-            threaten: 1.5,//威胁值1.5
+            threaten: 1.2,
         },//ai写的
         content: function () {//技能效果在这里
             player.awakenSkill('huidang');//记录下回档是个觉醒技能，这样后面就不会再发动了
@@ -3256,7 +3271,8 @@ const unfulfilledambition = {
             player.removeSkill('shuiji1');//失去水机
             player.addSkills('benzhi1');//获得本职1
             player.addSkills('benzhi2');//获得本职2
-            trigger.cancel();//跳过了自己的回合
+            player.skip('phaseUse');
+            player.skip('phaseDiscard');
             player.recover(1);//回复一点体力
 
             var card = get.cardPile(function (card) {//从牌堆和弃牌堆中获得一张杀
