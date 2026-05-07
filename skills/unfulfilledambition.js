@@ -855,7 +855,7 @@ const unfulfilledambition = {
             },
         },
     },
-    maliyanaliehuoji: {
+    liehuoji: {
         audio: "ext:舰R牌将/audio/skill:true",
         nobracket: true,
         trigger: {
@@ -885,7 +885,7 @@ const unfulfilledambition = {
                 var suits = event.cards2.map(card => get.suit(card));
                 var uniqueSuits = [...new Set(suits)];
                 event.suitNum = uniqueSuits.length;
-                player.chooseTarget(1, get.prompt("maliyanaliehuoji"), "令一名其他角色使用区域内任意张花色数为" + event.suitNum + "的牌交换", function (card, player, target) {
+                player.chooseTarget(1, get.prompt("liehuoji"), "令一名其他角色使用区域内任意张花色数为" + event.suitNum + "的牌交换", function (card, player, target) {
                     if (player == target) { return false; }
                     var cards1 = target.getCards('hej');
                     var suits3 = cards1.map(card => get.suit(card));
