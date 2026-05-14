@@ -91,6 +91,20 @@ const shiptypeskills = {
             },
         },
     },
+    daoxun: {
+        intro: {
+            content: function () {
+                return get.translation(skill + '_info');
+            },
+        },
+    },
+    zhongpao: {
+        intro: {
+            content: function () {
+                return get.translation(skill + '_info');
+            },
+        },
+    },
     kaimuhangkong: {
         audio: "ext:舰R牌将/audio/skill:true",
         trigger: { player: "phaseUseBegin" },
@@ -119,16 +133,16 @@ const shiptypeskills = {
                     ai1: function (card) {
                         var player = get.player();
                         // 先评估是否有值得攻击的目标
-                        var hasWorthyTarget = game.hasPlayer(function(current) {
+                        var hasWorthyTarget = game.hasPlayer(function (current) {
                             return player.canUse({ name: 'wanjian' }, current) &&
-                                   get.effect(current, { name: 'wanjian' }, player, player) > 0;
+                                get.effect(current, { name: 'wanjian' }, player, player) > 0;
                         });
 
                         if (!hasWorthyTarget) return -1; // 没有值得攻击的目标，不弃牌
 
                         // 计算总攻击效果
                         var totalEffect = 0;
-                        game.countPlayer(function(current) {
+                        game.countPlayer(function (current) {
                             if (player.canUse({ name: 'wanjian' }, current)) {
                                 totalEffect += get.effect(current, { name: 'wanjian' }, player, player);
                             }
@@ -167,16 +181,16 @@ const shiptypeskills = {
                     ai1: function (card) {
                         var player = get.player();
                         // 先评估是否有值得攻击的目标
-                        var hasWorthyTarget = game.hasPlayer(function(current) {
+                        var hasWorthyTarget = game.hasPlayer(function (current) {
                             return player.canUse({ name: 'wanjian' }, current) &&
-                                   get.effect(current, { name: 'wanjian' }, player, player) > 0;
+                                get.effect(current, { name: 'wanjian' }, player, player) > 0;
                         });
 
                         if (!hasWorthyTarget) return -1; // 没有值得攻击的目标，不弃牌
 
                         // 计算总攻击效果
                         var totalEffect = 0;
-                        game.countPlayer(function(current) {
+                        game.countPlayer(function (current) {
                             if (player.canUse({ name: 'wanjian' }, current)) {
                                 totalEffect += get.effect(current, { name: 'wanjian' }, player, player);
                             }
@@ -214,16 +228,16 @@ const shiptypeskills = {
                     ai1: function (card) {
                         var player = get.player();
                         // 先评估是否有值得攻击的目标
-                        var hasWorthyTarget = game.hasPlayer(function(current) {
+                        var hasWorthyTarget = game.hasPlayer(function (current) {
                             return player.canUse({ name: 'wanjian' }, current) &&
-                                   get.effect(current, { name: 'wanjian' }, player, player) > 0;
+                                get.effect(current, { name: 'wanjian' }, player, player) > 0;
                         });
 
                         if (!hasWorthyTarget) return -1; // 没有值得攻击的目标，不弃牌
 
                         // 计算总攻击效果
                         var totalEffect = 0;
-                        game.countPlayer(function(current) {
+                        game.countPlayer(function (current) {
                             if (player.canUse({ name: 'wanjian' }, current)) {
                                 totalEffect += get.effect(current, { name: 'wanjian' }, player, player);
                             }
@@ -1040,16 +1054,16 @@ const shiptypeskills = {
                     };
 
                     // 先评估是否有值得攻击的目标
-                    var hasWorthyTarget = game.hasPlayer(function(current) {
+                    var hasWorthyTarget = game.hasPlayer(function (current) {
                         return player.canUse(card1, current) &&
-                               get.effect(current, card1, player, player) > 0;
+                            get.effect(current, card1, player, player) > 0;
                     });
 
                     if (!hasWorthyTarget) return -1; // 没有值得攻击的目标，不弃牌
 
                     // 计算最佳目标的攻击效果
                     var maxEffect = 0;
-                    game.countPlayer(function(current) {
+                    game.countPlayer(function (current) {
                         if (player.canUse(card1, current)) {
                             var effect = get.effect(current, card1, player, player);
                             if (effect > maxEffect) maxEffect = effect;
@@ -1990,6 +2004,88 @@ const shiptypeskills = {
                     player.markAuto("zhongleizhuangjiantuxi_count", [trigger.player]);
                 },
             },
+        },
+    },
+    //远程打击
+    yuanchengdaji: {
+        audio: false,
+        trigger: { global: "phaseBefore", player: "enterGame" },
+        direct: true,
+        filter: function (event, player) {
+            return (event.name != 'phase' || game.phaseNumber == 0) && player.countCards("he") >= 4;
+        },
+        log: false,
+        content: function () {
+            "step 0"
+            player.chooseToDiscard("he", 4, "远程打击：是否弃置四张牌对一至两名其他角色造成共计两点伤害？").set("ai", function (card) {
+                return 8 - get.value(card);
+            });
+            "step 1"
+            if (result.bool) {
+                player.chooseTarget([1, 2], "远程打击：对一至两名其他角色造成共计两点伤害", function (card, player, target) {
+                    return target != player;
+                }, true).set("ai", function (target) {
+                    var player = _status.event.player;
+                    return get.damageEffect(target, player, player);
+                });
+            } else {
+                event.finish();
+            }
+            "step 2"
+            if (result.bool && result.targets && result.targets.length > 0) {
+                player.logSkill("yuanchnegdaji");
+                event.targets = result.targets;
+                if (event.targets.length == 1) {
+                    event.targets[0].damage(2, player);
+                } else {
+                    event.targets[0].damage(player);
+                    event.targets[1].damage(player);
+                }
+            }
+        },
+    },
+    //缓行
+    bm_huanxing: {
+        audio: false,
+        trigger: { global: "phaseBefore", player: "enterGame" },
+        forced: true,
+        filter: function (event, player) {
+            if (player.getSeatNum() == 1) return false;
+            var num = game.players.length;
+            if (player.getSeatNum() == num) return false;
+            return (event.name != 'phase' || game.phaseNumber == 0);
+        },
+        content: function () {
+            "step 0"
+            event.before = player.getSeatNum();
+            var max = game.players.length;
+            var canMove = max - event.before;
+            var list = [];
+            for (var i = 1; i <= canMove; i++) {
+                list.push(i.toString());
+            }
+            list.push("cancel2");
+            player.chooseControl(list).set("prompt", "缓行：将座次向后移动任意位").set("ai", function () {
+                return canMove.toString();
+            });
+            "step 1"
+            if (result.control != "cancel2") {
+                event.num = parseInt(result.control);
+                let totalPopulation = game.players.length + game.dead.length + 1;
+                for (let iwhile = 0; iwhile < totalPopulation; iwhile++) {
+                    if (player.getSeatNum() != event.before + event.num) {
+                        game.swapSeat(player, player.next, false, false);
+                    } else break;
+                }
+            } else {
+                event.finish();
+                return;
+            }
+            "step 2"
+            event.after = player.getSeatNum();
+            if (event.after - event.before > 0) {
+                player.draw(event.after - event.before);
+            }
         },
     },
 };

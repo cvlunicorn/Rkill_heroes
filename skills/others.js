@@ -154,7 +154,7 @@ const others = {
             //if (player.storage.pangguanzhe.length) return false;
             return true;
         },
-        bannedList: ["pangguanzhe", "zhanliebb", "hangmucv", "kaimuhangkong", "zhongxunca", "qingxuncl", "quzhudd", "qiantingss", "kaimuleiji", "junfu", "daoqu", "fanjiandaodan", "fangqu", "fangkongdaodan", "zhuangjiafh", "dajiaoduguibi", "huokongld", "fangkong2", "shixiangquanneng", "yaosai", "tiaozhanzhuangbei", "zhongleizhuangjiantuxi", "juejingfengsheng"],
+        bannedList: ["pangguanzhe", "zhanliebb", "hangmucv", "kaimuhangkong", "zhongxunca", "qingxuncl", "quzhudd", "qiantingss", "kaimuleiji", "junfu", "daoqu", "fanjiandaodan", "fangqu", "fangkongdaodan", "zhuangjiafh", "dajiaoduguibi", "huokongld", "fangkong2", "shixiangquanneng", "yaosai", "tiaozhanzhuangbei", "zhongleizhuangjiantuxi", "juejingfengsheng","bm_huanxing","zhongpao","daoxun","yuanchengdaji"],
         content: function () {
             "step 0"
             if (player.storage.pangguanzhe.length) {
@@ -3816,7 +3816,247 @@ const others = {
         ai: { threaten: 1.5 },
         "_priority": 0,
     },
-
+    /*
+    //烟雾掩护
+    yanwuyanhu: {
+        audio: false,
+        trigger: { global: "loseAfter" },
+        direct: true,
+        filter: function (event, player) {
+            if (event.type == "use") return false;
+            if (!event.cards || event.cards.length == 0) return false;
+            for (var card of event.cards) {
+                if (get.position(card) == "d") return true;
+            }
+            return false;
+        },
+        content: function () {
+            "step 0"
+            var cards = trigger.cards.filter(function (card) {
+                return get.position(card) == "d";
+            });
+            if (cards.length == 0) {
+                event.finish();
+                return;
+            }
+            event.cards = cards;
+            player.chooseButton(["烟雾掩护：是否将一张牌置于牌堆顶或角色武将牌上？", cards]).set("ai", function (button) {
+                return 1;
+            });
+            "step 1"
+            if (!result.bool) {
+                event.finish();
+                return;
+            }
+            event.card = result.links[0];
+            player.chooseControl("牌堆顶", "角色武将牌上").set("prompt", "烟雾掩护：将" + get.translation(event.card) + "置于牌堆顶还是角色武将牌上？").set("ai", function () {
+                return "角色武将牌上";
+            });
+            "step 2"
+            if (result.control == "牌堆顶") {
+                event.card.fix();
+                ui.cardPile.insertBefore(event.card, ui.cardPile.firstChild);
+                game.log(player, "将", event.card, "置于牌堆顶");
+            } else {
+                player.chooseTarget("烟雾掩护：将" + get.translation(event.card) + "置于一名角色武将牌上", true).set("ai", function (target) {
+                    var player = _status.event.player;
+                    var att = get.attitude(player, target);
+                    if (att > 0) return att;
+                    return 0;
+                });
+            }
+            "step 3"
+            if (result.bool && result.targets && result.targets[0]) {
+                var target = result.targets[0];
+                var max = target.maxHp * 2;
+                if (!target.storage.yanwuyanhu_yan) target.storage.yanwuyanhu_yan = [];
+                if (target.storage.yanwuyanhu_yan.length < max) {
+                    target.storage.yanwuyanhu_yan.push(event.card);
+                    target.addSkill("yanwuyanhu_yan");
+                    target.syncStorage("yanwuyanhu_yan");
+                    target.markSkill("yanwuyanhu_yan");
+                    game.log(player, "将", event.card, "置于", target, "的武将牌上");
+                }
+            }
+        },
+        subSkill: {
+            yan: {
+                audio: false,
+                trigger: { player: "damageBegin3" },
+                forced: false,
+                filter: function (event, player) {
+                    if (!player.storage.yanwuyanhu_yan || player.storage.yanwuyanhu_yan.length == 0) return false;
+                    if (!event.card) return false;
+                    var suit = get.suit(event.card);
+                    for (var card of player.storage.yanwuyanhu_yan) {
+                        if (get.suit(card) == suit) return true;
+                    }
+                    return false;
+                },
+                content: function () {
+                    "step 0"
+                    var suit = get.suit(trigger.card);
+                    var cards = player.storage.yanwuyanhu_yan.filter(function (card) {
+                        return get.suit(card) == suit;
+                    });
+                    player.chooseButton(["烟雾掩护：是否弃置一张[烟]防止此伤害？", cards]).set("ai", function (button) {
+                        return 10;
+                    });
+                    "step 1"
+                    if (result.bool && result.links && result.links[0]) {
+                        var card = result.links[0];
+                        player.storage.yanwuyanhu_yan.remove(card);
+                        player.syncStorage("yanwuyanhu_yan");
+                        if (player.storage.yanwuyanhu_yan.length == 0) {
+                            player.removeSkill("yanwuyanhu_yan");
+                        } else {
+                            player.markSkill("yanwuyanhu_yan");
+                        }
+                        player.$throw(card);
+                        game.cardsDiscard(card);
+                        trigger.cancel();
+                    }
+                },
+                marktext: "烟",
+                intro: {
+                    content: "cards",
+                    onunmark: function (storage, player) {
+                        if (storage && storage.length) {
+                            player.$throw(storage, 1000);
+                            game.cardsDiscard(storage);
+                            game.log(storage, "被置入了弃牌堆");
+                            storage.length = 0;
+                        }
+                    },
+                },
+                mod: {
+                    cardEnabled2: function (card, player) {
+                        if (player.storage.yanwuyanhu_yan && player.storage.yanwuyanhu_yan.includes(card)) {
+                            return true;
+                        }
+                    },
+                    cardUsable: function (card, player) {
+                        if (player.storage.yanwuyanhu_yan && player.storage.yanwuyanhu_yan.includes(card)) {
+                            return true;
+                        }
+                    },
+                    cardRespondable: function (card, player) {
+                        if (player.storage.yanwuyanhu_yan && player.storage.yanwuyanhu_yan.includes(card)) {
+                            return true;
+                        }
+                    },
+                },
+            },
+        },
+    },
+    //投石机
+    toushiji: {
+        audio: false,
+        mod: {
+            cardEnabled2: function (card, player) {
+                if (card.name != "sha") return;
+                var lostHp = player.maxHp - player.hp;
+                if (lostHp <= 0) return;
+                var color = get.color(card);
+                if (!player.storage.toushiji_count) player.storage.toushiji_count = {};
+                var count = player.storage.toushiji_count[color] || 0;
+                if (count < lostHp) {
+                    if (get.type(card) != "basic") return true;
+                }
+            },
+        },
+        trigger: { player: "useCard1" },
+        forced: true,
+        silent: true,
+        popup: false,
+        filter: function (event, player) {
+            return event.card && event.card.name == "sha";
+        },
+        content: function () {
+            if (!player.storage.toushiji_count) player.storage.toushiji_count = {};
+            var color = get.color(trigger.card);
+            if (!player.storage.toushiji_count[color]) player.storage.toushiji_count[color] = 0;
+            player.storage.toushiji_count[color]++;
+        },
+        group: "toushiji_clear",
+        subSkill: {
+            clear: {
+                trigger: { player: "phaseUseEnd" },
+                forced: true,
+                silent: true,
+                popup: false,
+                content: function () {
+                    delete player.storage.toushiji_count;
+                },
+            },
+        },
+    },
+    //近援
+    jianyuan: {
+        audio: false,
+        mod: {
+            cardname: function (card, player) {
+                if (get.subtype(card) == "equip1") {
+                    var range = get.info(card).distance;
+                    if (range && range.attackRange && range.attackRange > 1) {
+                        return "zhiyuangongji";
+                    }
+                }
+                if (get.subtype(card) == "equip3" || get.subtype(card) == "equip4") {
+                    return "sha";
+                }
+            },
+        },
+    },
+    //岸轰
+    anghong: {
+        audio: false,
+        trigger: { player: "phaseUseBegin" },
+        direct: true,
+        content: function () {
+            "step 0"
+            var str = "阴：随机获得牌堆中一张装备牌";
+            if (player.storage.anghong_yin) {
+                str = "阳：你的攻击范围改为3，然后回复一点体力";
+            }
+            player.chooseControl("阴", "阳", "cancel2").set("prompt", "岸轰：" + str).set("ai", function () {
+                var player = _status.event.player;
+                if (player.storage.anghong_yin) {
+                    if (player.hp < player.maxHp) return "阳";
+                }
+                return "阴";
+            });
+            "step 1"
+            if (result.control == "阴") {
+                player.logSkill("anghong");
+                player.storage.anghong_yin = true;
+                var list = [];
+                for (var i = 0; i < lib.card.list.length; i++) {
+                    if (get.type(lib.card.list[i][2]) == "equip") {
+                        list.push(lib.card.list[i]);
+                    }
+                }
+                if (list.length > 0) {
+                    var card = game.createCard(list.randomGet());
+                    player.gain(card, "gain2");
+                }
+            } else if (result.control == "阳") {
+                player.logSkill("anghong");
+                delete player.storage.anghong_yin;
+                player.addTempSkill("anghong_range");
+                player.recover();
+            }
+        },
+        subSkill: {
+            range: {
+                mod: {
+                    attackRange: function (player, distance) {
+                        return 3;
+                    },
+                },
+            },
+        },
+    },*/
 };
 
 export { others };
