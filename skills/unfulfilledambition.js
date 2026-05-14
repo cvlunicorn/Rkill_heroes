@@ -4069,7 +4069,7 @@ const unfulfilledambition = {
         },
     },
     //岛勋
-    daoxun: {
+    t23_daoxun: {
         audio: false,
         trigger: { player: "gainAfter" },
         direct: true,
@@ -4083,7 +4083,7 @@ const unfulfilledambition = {
             });
             "step 1"
             if (result.control == "展示") {
-                player.logSkill("daoxun");
+                player.logSkill("t23_daoxun");
                 player.showCards(trigger.cards);
                 var colors = [];
                 for (var card of trigger.cards) {

@@ -1,18 +1,28 @@
 import { lib, game, ui, get, ai, _status } from '../../../noname.js';
 const tebiechuanwu = {
-/*
+
     //光荣舰队SP
     guangrongjianduisp: {
         audio: false,
-        trigger: { player: "turnOverAfter" },
+        trigger: { global: "phaseEnd" },
         forced: false,
+        frequent: true,
         filter: function (event, player) {
+            var evt = _status.event.getParent("phase");
+            if (!evt || !evt.player) return false;
+            var list = [];
+            evt.player.getHistory("lose", function (evt) {
+                if (evt.type == "discard" && evt.cards) {
+                    list.addArray(evt.cards.filter(function (card) {
+                        return get.position(card) == "d";
+                    }));
+                }
+            });
+            if (list.length <= 0) return false;
             return player.isTurnedOver();
         },
         content: function () {
             "step 0"
-            event.cards = [];
-            "step 1"
             var evt = _status.event.getParent("phase");
             if (evt && evt.player) {
                 var list = [];
@@ -35,7 +45,7 @@ const tebiechuanwu = {
             } else {
                 event.finish();
             }
-            "step 2"
+            "step 1"
             if (result.bool && result.links && result.links[0]) {
                 player.chooseUseTarget(result.links[0], true);
             }
@@ -92,6 +102,9 @@ const tebiechuanwu = {
                 intro: {
                     content: "当你被指定目标时，你可以取消并失去'威'",
                 },
+                ai: {
+                    threaten: 0.8,
+                },
             },
             mark: {},
         },
@@ -110,8 +123,10 @@ const tebiechuanwu = {
                 var player = _status.event.player;
                 var evt = _status.event.getTrigger();
                 if (get.attitude(player, evt.player) > 0) {
+                    if (get.color(card) == "black") return 8.5 - get.value(card);
                     return 7 - get.value(card);
                 }
+                if (get.color(card) == "black") return 7 - get.value(card);
                 return 0;
             });
             "step 1"
@@ -129,6 +144,7 @@ const tebiechuanwu = {
             }
         },
     },
+    /*
     //南沙功臣
     nanshagonchen: {
         audio: false,
@@ -455,43 +471,114 @@ const tebiechuanwu = {
                 target: -1,
             },
         },
-    },
+    },*/
     //威严召唤
     weiyanzhaohuan: {
-        audio: false,
-        trigger: { player: ["chooseToUseBegin", "chooseToRespondBegin"] },
-        direct: true,
-        filter: function (event, player) {
-            if (player.storage.weiyanzhaohuan_used) return false;
-            return event.filterCard({ name: "sha" }, player, event);
-        },
-        content: function () {
-            "step 0"
-            player.chooseControl("发动", "cancel2").set("prompt", "威严召唤：是否进行一次判定？").set("ai", function () {
-                return "发动";
-            });
-            "step 1"
-            if (result.control == "发动") {
-                player.logSkill("weiyanzhaohuan");
-                player.storage.weiyanzhaohuan_used = true;
-                player.addTempSkill("weiyanzhaohuan_clear");
-                player.judge();
-            } else {
-                event.finish();
-            }
-            "step 2"
-            if (result.color == "black") {
-                trigger.result = { bool: true, card: { name: "sha" } };
-            }
-        },
+        nobracket: true,
+        group: ["weiyanzhaohuan_use", "weiyanzhaohuan_respond"],
         subSkill: {
-            clear: {
-                trigger: { player: "phaseEnd" },
-                forced: true,
-                silent: true,
-                popup: false,
+            use: {
+                usable: 1,
+                enable: "chooseToUse",
+                filter: function (event, player) {
+                    if (event.filterCard({ name: "sha", isCard: true }, player, event)) return true;
+                },
+                check: function (event, player) {
+                    return true;
+
+                },
                 content: function () {
-                    delete player.storage.weiyanzhaohuan_used;
+                    "step 0";
+                    player.judge("weiyanzhaohuan", function (card) {
+                        return get.color(card) == "black" ? 1.5 : -0.5;
+                    }).judge2 = function (result) {
+                        return result.bool;
+                    };
+                    "step 1";
+                    if (result.judge > 0) {
+                        player.chooseUseTarget("sha", true);
+                    }
+                },
+                ai: {
+                    order() {
+                        return get.order({ name: "sha" }) + 3;
+                    },
+                    result: {
+                        player: 1,
+                    },
+                    threaten: 1.5,
+                },
+            },
+            respond: {
+                usable: 1,
+                trigger: {
+                    player: ["chooseToRespondBegin"],
+                },
+                filter: function (event, player) {
+                    if (event.filterCard({ name: "sha", isCard: true }, player, event)) return true;
+                },
+                check: function (event, player) {
+                    if (!event) return true;
+                    if (event.ai) {
+                        var ai = event.ai;
+                        var tmp = _status.event;
+                        _status.event = event;
+                        var result = ai({ name: "sha" }, _status.event.player, event);
+                        _status.event = tmp;
+                        return result > 0;
+                    }
+                    let evt = event.getParent();
+                    /*if (!evt || !evt.card || !evt.player || player.hasSkillTag("useShan", null, evt))
+                        return true;*/
+                    if (
+                        (evt.card.name == "juedou" || evt.card.name == "juedouba9") &&
+                        evt.player &&
+                        get.attitude(player, evt.player._trueMe || evt.player) > 0
+                    )
+                        return false;
+                    return true;
+                },
+                content: function () {
+                    "step 0";
+                    trigger.jishiyu_R1 = true;
+                    player.judge("weiyanzhaohuan", function (card) {
+                        return get.color(card) == "black" ? 1.5 : -0.5;
+                    }).judge2 = function (result) {
+                        return result.bool;
+                    };
+                    "step 1";
+                    if (result.judge > 0) {
+                        trigger.untrigger();
+                        trigger.set("responded", true);
+                        trigger.result = { bool: true, card: { name: "sha", isCard: true } };
+                    }
+                },
+                ai: {
+                    order: function (item, player) {
+                        var player = get.player();
+                        var event = _status.event;
+                        if (event.filterCard({ name: "sha" }, player, event)) {
+                            if (
+                                !player.hasShan() &&
+                                !game.hasPlayer(function (current) {
+                                    return player.canUse("sha", current) && current.hp == 1 && get.effect(current, { name: "sha" }, player, player) > 0;
+                                })
+                            ) {
+                                return 0;
+                            }
+                            return 2.95;
+                        } else {
+                            var player = get.player();
+                            return 3.15;
+                        }
+                    },
+                    respondSha: true,
+                    skillTagFilter: function (player, tag, arg) {
+                        if (arg != "use") return false;
+                    },
+                    result: {
+                        player: 1,
+                    },
                 },
             },
         },
@@ -502,7 +589,7 @@ const tebiechuanwu = {
         trigger: { player: "useCardToTargeted" },
         forced: false,
         filter: function (event, player) {
-            if (event.card.name != "sha") return false;
+            if (event.card.name != "sha" && event.card.name != "sheji9") return false;
             var hs = player.getCards("h");
             for (var card of hs) {
                 if (get.type(card) == "basic") return false;
@@ -514,7 +601,12 @@ const tebiechuanwu = {
             var evt = trigger.getParent();
             if (evt.baseDamage) evt.baseDamage++;
         },
-    },
+        ai: {
+            presha: true,
+            pretao: true,
+            threaten: 1.2,
+        },
+    },/*
     //力争上游
     lizhengshangyu: {
         audio: false,
