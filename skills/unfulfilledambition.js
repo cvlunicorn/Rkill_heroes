@@ -1724,9 +1724,6 @@ const unfulfilledambition = {
                     return null;
                 }
             )
-            if (event.triggername == 'phaseZhunbeiBegin' && top.length == 0) {
-                player.addTempSkill('reguanxing_on');
-            }
             player.popup(get.cnNumber(top.length) + '上' + get.cnNumber(bottom.length) + '下');
             game.log(player, '将' + get.cnNumber(top.length) + '张牌置于牌堆顶');
             "step 3"
