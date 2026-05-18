@@ -102,28 +102,28 @@ function probeJianRAssetExtSync(relativeBase) {
 function probeJianRAssetExt(relativeBase) {
     var key = relativeBase;
     if (skinAssetCache[key] !== undefined) {
-        console.log('[舰R牌将 probe] cache hit', key, '=', skinAssetCache[key]);
+        //console.log('[舰R牌将 probe] cache hit', key, '=', skinAssetCache[key]);
         return Promise.resolve(skinAssetCache[key]);
     }
     return new Promise(function (resolve) {
         var base = lib.assetURL + 'extension/' + '舰R牌将' + '/' + relativeBase;
-        console.log('[舰R牌将 probe] start', key, 'base=', base);
+        //console.log('[舰R牌将 probe] start', key, 'base=', base);
         var pngImg = new Image();
         pngImg.onload = function () {
             skinAssetCache[key] = '.png';
-            console.log('[舰R牌将 probe] hit .png', key);
+            //console.log('[舰R牌将 probe] hit .png', key);
             resolve('.png');
         };
         pngImg.onerror = function () {
             var jpgImg = new Image();
             jpgImg.onload = function () {
                 skinAssetCache[key] = '.jpg';
-                console.log('[舰R牌将 probe] hit .jpg', key);
+                //console.log('[舰R牌将 probe] hit .jpg', key);
                 resolve('.jpg');
             };
             jpgImg.onerror = function () {
                 skinAssetCache[key] = null;
-                console.warn('[舰R牌将 probe] miss both', key);
+                //console.warn('[舰R牌将 probe] miss both', key);
                 resolve(null);
             };
             jpgImg.src = base + '.jpg';
@@ -785,7 +785,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     try {
                         handleMissionComplete(this, skill);
                     } catch (e) {
-                        console.log("[使命变装] 切换立绘失败:", e);
+                        //console.log("[使命变装] 切换立绘失败:", e);
                     }
                 }
                 return ret;
@@ -1241,22 +1241,22 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             __jianrSyncTagCount++;
                             jianrjinji.character[characterId][4].push(syncTag);
                             if (__jianrSyncTagCount <= 3) {
-                                console.log('[舰R牌将] sync push', characterId, '->', syncTag);
+                                //console.log('[舰R牌将] sync push', characterId, '->', syncTag);
                             }
                             return;
                         }
                         // 同步拿不到（纯浏览器环境），退回异步探测
-                        console.log('[舰R牌将] fallback async probe', characterId);
+                        //console.log('[舰R牌将] fallback async probe', characterId);
                         getJianRCharacterImageTag(characterId).then(function (tag) {
                             __jianrAsyncTagCount++;
-                            console.log('[舰R牌将] async push', characterId, '->', tag, '(#' + __jianrAsyncTagCount + ')');
+                            //console.log('[舰R牌将] async push', characterId, '->', tag, '(#' + __jianrAsyncTagCount + ')');
                             jianrjinji.character[characterId][4].push(tag);
                         }).catch(function (err) {
-                            console.warn('[舰R牌将] probe failed', characterId, err);
+                            //console.warn('[舰R牌将] probe failed', characterId, err);
                         });
                     })(i);
                 }
-                console.log('[舰R牌将] sync tag total:', __jianrSyncTagCount);
+                //console.log('[舰R牌将] sync tag total:', __jianrSyncTagCount);
                 return jianrjinji;
             });
             lib.translate['jianrjinji_character_config'] = '舰R武将';

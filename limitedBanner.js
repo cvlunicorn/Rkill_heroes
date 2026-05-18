@@ -80,7 +80,7 @@ export function initLimitedBanner(resolveImageUrl) {
                     });
                 }
             } catch (e) {
-                console.log("[舰R限定技动画] 替换失败:", e);
+                //console.log("[舰R限定技动画] 替换失败:", e);
             }
         }
         return result;
