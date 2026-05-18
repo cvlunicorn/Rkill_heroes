@@ -3,6 +3,7 @@ const tebiechuanwu = {
 
     //光荣舰队SP
     guangrongjianduisp: {
+        nobracket: true,
         audio: false,
         trigger: { global: "phaseEnd" },
         forced: false,
@@ -111,6 +112,7 @@ const tebiechuanwu = {
     },
     //金雕展翅
     jindiaozhanchi: {
+        nobracket: true,
         audio: false,
         trigger: { global: "useCard" },
         direct: true,
@@ -144,50 +146,105 @@ const tebiechuanwu = {
             }
         },
     },
-    /*
+
     //南沙功臣
     nanshagonchen: {
+        nobracket: true,
         audio: false,
         trigger: { player: "useCardToTargeted" },
-        forced: true,
         filter: function (event, player) {
-            return event.card && event.card.name == "sha";
+            return event.card && event.card.name == "sha" || event.card.name == "sheji9";
+        },
+        check(event, player) {
+            return get.attitude(player, event.target) < 0;
         },
         content: function () {
+            'step 0'
             var num = game.countPlayer(function (current) {
                 return current.group == "PLAN" || current.group == "ROCN";
             });
-            if (num >= 1) {
-                var cards = trigger.target.getCards("he").randomGets(player.hp);
-                if (cards.length > 0) {
-                    trigger.target.lose(cards, ui.special);
-                    if (!trigger.target.storage.nanshagonchen_cards) trigger.target.storage.nanshagonchen_cards = [];
-                    trigger.target.storage.nanshagonchen_cards.addArray(cards);
-                }
-            }
+
             if (num >= 2) {
                 player.draw();
             }
             if (num >= 3) {
-                trigger.getParent().directHit.add(trigger.target);
+                trigger.target.addTempSkill('qinggang2');
+                trigger.target.storage.qinggang2.add(trigger.card);
             }
             if (num >= 4) {
                 var evt = trigger.getParent();
                 if (evt.baseDamage) evt.baseDamage++;
             }
+            if (num >= 1) {
+                if (trigger.target.countCards("he") >= 0) {
+                    var next = player.choosePlayerCard(trigger.target, 'he', [1, Math.min(player.hp, trigger.target.countCards('he'))], get.prompt('nanshagonchen', trigger.target));
+                    next.set('ai', function (button) {
+                        if (!_status.event.goon) return 0;
+                        var val = get.value(button.link);
+                        if (button.link == _status.event.target.getEquip(2)) return 2 * (val + 3);
+                        return val;
+                    });
+                    next.set('goon', get.attitude(player, trigger.target) <= 0);
+                    next.set('forceAuto', true);
+                }
+
+            }
+            'step 1'
+            if (result.bool) {
+                var target = trigger.target;
+                player.logSkill('nanshagonchen', target);
+                target.addSkill('nanshagonchen2');
+                target.addToExpansion('giveAuto', result.cards, target).gaintag.add('nanshagonchen2');
+            }
+        },
+        ai: {
+            unequip_ai: true,
+            directHit_ai: true,
+            skillTagFilter: function (player, tag, arg) {
+                if (get.attitude(player, arg.target) > 0) return false;
+                if (tag == 'directHit_ai') return player.hp >= Math.max(1, arg.target.countCards('h') - 1);
+                if (arg && (arg.name == 'sha' || arg.name == 'sheji9') && arg.target.getEquip(2)) return true;
+                return false;
+            }
+        },
+    },
+    nanshagonchen2: {
+        trigger: { global: 'phaseEnd' },
+        forced: true,
+        popup: false,
+        charlotte: true,
+        filter: function (event, player) {
+            return player.getExpansions('nanshagonchen2').length > 0;
+        },
+        content: function () {
+            'step 0'
+            var cards = player.getExpansions('nanshagonchen2');
+            player.gain(cards, 'draw');
+            game.log(player, '收回了' + get.cnNumber(cards.length) + '张“破军”牌');
+            'step 1'
+            player.removeSkill('nanshagonchen2');
+        },
+        intro: {
+            markcount: 'expansion',
+            mark: function (dialog, storage, player) {
+                var cards = player.getExpansions('nanshagonchen2');
+                if (player.isUnderControl(true)) dialog.addAuto(cards);
+                else return '共有' + get.cnNumber(cards.length) + '张牌';
+            },
         },
     },
     //四大金刚
-    sidajingang: {
+    sidajinganglian: {
+        nobracket: true,
         audio: false,
         trigger: { global: "roundStart" },
         direct: true,
         content: function () {
             "step 0"
             game.countPlayer(function (current) {
-                if (current.hasMark("sidajingang_mark")) {
-                    current.removeMark("sidajingang_mark", current.countMark("sidajingang_mark"));
-                    current.removeSkill("sidajingang_effect");
+                if (current.hasMark("sidajinganglian")) {
+                    current.removeMark("sidajinganglian", current.countMark("sidajinganglian"));
+                    current.removeSkill("sidajinganglian_effect");
                 }
             });
             player.chooseTarget([0, 2], "四大金刚：选择至多两名角色令其获得'联'").set("ai", function (target) {
@@ -196,15 +253,19 @@ const tebiechuanwu = {
             });
             "step 1"
             if (result.bool && result.targets && result.targets.length > 0) {
-                player.logSkill("sidajingang", result.targets);
+                player.logSkill("sidajinganglian", result.targets);
                 for (var target of result.targets) {
-                    target.addMark("sidajingang_mark", 1);
-                    target.addSkill("sidajingang_effect");
+                    target.addMark("sidajinganglian", 1);
+                    target.addSkill("sidajinganglian_effect");
                 }
             }
         },
+        group: ["sidajinganglian_damage", "sidajinganglian_draw"],
         subSkill: {
             effect: {
+                init: function (player) {
+                    player.storage.sidajinganglian_effect = 0;
+                },
                 trigger: { player: "phaseDrawBegin2" },
                 forced: true,
                 filter: function (event, player) {
@@ -213,88 +274,71 @@ const tebiechuanwu = {
                 content: function () {
                     trigger.num++;
                 },
-                group: ["sidajingang_effect_damage", "sidajingang_effect_sha"],
-                subSkill: {
-                    damage: {
-                        trigger: { source: "damageBegin1" },
-                        forced: false,
-                        filter: function (event, player) {
-                            if (!player.storage.sidajingang_damaged) return true;
-                            return false;
-                        },
-                        content: function () {
-                            "step 0"
-                            var owner = game.findPlayer(function (current) {
-                                return current.hasSkill("sidajingang");
-                            });
-                            if (owner) {
-                                owner.chooseToDiscard("he", "四大金刚：是否弃置一张牌，令" + get.translation(player) + "额外使用一张【杀】？").set("ai", function (card) {
-                                    return 7 - get.value(card);
-                                });
-                            } else {
-                                event.finish();
-                            }
-                            "step 1"
-                            if (result.bool) {
-                                player.storage.sidajingang_damaged = true;
-                                player.addTempSkill("sidajingang_effect_sha2");
-                            }
-                        },
-                    },
-                    sha2: {
-                        mod: {
-                            cardUsable: function (card, player, num) {
-                                if (card.name == "sha") return num + 1;
-                            },
-                        },
-                        trigger: { source: "damageEnd" },
-                        forced: true,
-                        filter: function (event, player) {
-                            return event.card && event.card.name == "sha";
-                        },
-                        content: function () {
-                            var owner = game.findPlayer(function (current) {
-                                return current.hasSkill("sidajingang");
-                            });
-                            if (owner) {
-                                owner.draw();
-                            }
-                            var targets = game.filterPlayer(function (current) {
-                                return current.hasMark("sidajingang_mark");
-                            });
-                            for (var target of targets) {
-                                target.draw();
-                            }
-                        },
-                    },
-                },
+
                 marktext: "联",
                 intro: {
                     content: "摸牌阶段摸牌+1；首次造成伤害时，可以额外使用一张【杀】",
                 },
             },
-            mark: {},
+            draw: {
+                silent: true,
+                lastdo: true,
+                trigger: { player: "phaseDrawBegin2" },
+                forced: true,
+                filter: function (event, player) {
+                    return !event.numFixed;
+                },
+                content: function () {
+                    trigger.num++;
+                },
+            },
+            damage: {
+                trigger: { source: "damageSource" },
+                direct: true,
+                filter: function (event, player) {
+                    return event.source.hasSkill("sidajinganglian_effect") && event.source.storage.sidajinganglian_effect < 2;
+                },
+                content: function () {
+                    "step 0"
+                    if (trigger.source.storage.sidajinganglian_effect && trigger.source.storage.sidajinganglian_effect == 1) {
+                        game.asyncDraw([player, trigger.source]);
+                        trigger.source.storage.sidajinganglian_effect = 2;
+                        event.finish();
+                        return;
+                    }
+                    player.chooseToDiscard("he", "四大金刚：是否弃置一张牌，令" + get.translation(player) + "额外使用一张【杀】？").set("ai", function (card) {
+                        return 7 - get.value(card);
+                    });
+                    "step 1"
+                    if (result.bool) {
+                        trigger.source.storage.sidajinganglian_effect = 1;
+                        trigger.source.chooseToUse('四大金刚：你可以使用一张杀', function (card) {
+                            if (get.name(card) != 'sha' && get.name(card) != 'sheji9') return false;
+                            return lib.filter.cardEnabled.apply(this, arguments)
+                        }, function (card, player, target) {
+                            return lib.filter.filterTarget.apply(this, arguments);
+                        }).set('ai2', function () {
+                            return get.effect_use.apply(this, arguments) + 0.01;
+                        });
+                    }
+
+                },
+            },
+
         },
     },
     //海鹰巡弋
     haiyingxunyi: {
+        nobracket: true,
         audio: false,
-        mod: {
-            targetEnabled: function (card, player, target) {
-                if (target.hasSkill("daoqu") && card.name == "sha") {
-                    var info = get.info(card);
-                    if (info && info.wuxie === false) return;
-                    return "ignoreEquip";
-                }
-            },
-        },
-        trigger: { player: "useCardAfter", global: "useCardAfter" },
+        global: "haiyingxunyi_qinggang_skill",
+        trigger: { global: "useCardAfter" },
         direct: true,
         filter: function (event, player, name) {
-            if (name == "useCardAfter" && event.player == player) {
+            if (event.player == player) {
                 return true;
             }
-            if (name == "useCardAfter" && event.player != player) {
+            if (event.player != player) {
                 return event.player.group == "PLAN" || event.player.group == "ROCN";
             }
             return false;
@@ -320,6 +364,30 @@ const tebiechuanwu = {
             }
         },
     },
+    haiyingxunyi_qinggang_skill: {
+        audio: true,
+        trigger: {
+            player: "useCardToPlayered",
+        },
+        filter: function (event) {
+            return event.player.hasSkill("daoqu");
+        },
+        forced: true,
+        logTarget: "target",
+        content: function () {
+            trigger.target.addTempSkill("qinggang2");
+            trigger.target.storage.qinggang2.add(trigger.card);
+            trigger.target.markSkill("qinggang2");
+        },
+        ai: {
+            unequip_ai: true,
+            skillTagFilter: function (player, tag, arg) {
+                if (arg && arg.name == "sha" || arg.name == "sheji9") return true;
+                return false;
+            },
+        },
+    },
+    /*
     //大洋鹰击
     dayangying: {
         audio: false,
@@ -585,6 +653,7 @@ const tebiechuanwu = {
     },
     //光荣舰队normal
     guangrongjianduinormal: {
+        nobracket: true,
         audio: false,
         trigger: { player: "useCardToTargeted" },
         forced: false,
@@ -606,39 +675,74 @@ const tebiechuanwu = {
             pretao: true,
             threaten: 1.2,
         },
-    },/*
+    },
     //力争上游
-    lizhengshangyu: {
+    lizhengshangyou: {
+        nobracket: true,
         audio: false,
-        trigger: { global: "gameStart", player: ["enterGame", "phaseDrawBegin2"] },
+        trigger: {
+            global: "phaseBeforeEnd",
+            player: ["phaseDrawBegin2"]
+        },
         forced: true,
+        // 初始化标记：每局游戏只触发一次
+        init: function (player) {
+            if (player.storage.lizhengshangyou_used === undefined) {
+                player.storage.lizhengshangyou_used = false;
+            }
+        },
         filter: function (event, player, name) {
+            // 已经触发过则不再触发
+            if (player.storage.lizhengshangyou_used) return false;
             if (name == "phaseDrawBegin2") {
                 return !event.numFixed;
             }
-            return true;
+            return (event.name != 'phase' || game.phaseNumber == 0);
         },
         content: function () {
+            "step 0";
             var num = game.countPlayer(function (current) {
                 return current.group == "PLAN" || current.group == "ROCN";
             });
+            // 处理摸牌阶段加成
             if (event.triggername == "phaseDrawBegin2") {
                 trigger.num += num * 2;
-            } else {
-                player.draw(num * 2);
-                player.chooseTarget("力争上游：是否令一名距离你为1的或c国的角色执行一个额外回合？", function (card, player, target) {
-                    if (target.distance(player) == 1) return true;
-                    if (target.group == "PLAN" || target.group == "ROCN") return true;
-                    return false;
-                }).set("ai", function (target) {
-                    var player = _status.event.player;
-                    return get.attitude(player, target);
-                });
-                if (result.bool && result.targets && result.targets[0]) {
-                    result.targets[0].insertPhase();
-                }
+                event.finish();
+                return;
             }
-        },
+            // 先摸牌
+            player.draw(num * 2);
+            "step 1";
+            player.chooseTarget("力争上游：是否令一名距离你为1的或c国的角色执行一个额外回合？", function (card, player, target) {
+                if (get.distance(target, player) == 1) return true;
+                if (target.group == "PLAN" || target.group == "ROCN") return true;
+                return false;
+            }).set("ai", function (target) {
+                return get.attitude(_status.event.player, target);
+            });
+            "step 2";
+            // 无论是否选择目标，都标记已使用（仅触发一次）
+            player.storage.lizhengshangyou_used = true;
+            if (!result.bool) {
+                event.finish();
+                return;
+            }
+
+            // 取消原回合剩余阶段（如果希望直接跳转到额外回合）
+            if (trigger && !trigger._finished) {
+                trigger.finish();
+                trigger._finished = true;
+                trigger.untrigger(true);
+                trigger._triggered = 5;
+            }
+            var zhu = game.filterPlayer(current => current.getSeatNum() == 1)[0];
+            zhu.insertPhase("lizhengshangyou", true);
+            var target = result.targets[0];
+            // 为目标插入一个额外回合
+            var extraPhase = target.insertPhase("lizhengshangyou", true);
+            extraPhase._noTurnOver = true;
+            event.finish();
+        }
     },
     //迫钧
     pojun: {
@@ -678,6 +782,6 @@ const tebiechuanwu = {
                 player.gainPlayerCard(trigger.target, "he", true);
             }
         },
-    },*/
+    },
 };
 export { tebiechuanwu };

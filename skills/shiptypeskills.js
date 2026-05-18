@@ -1277,6 +1277,7 @@ const shiptypeskills = {
         },
     },
     fangkongdaodan: {
+        nobracket: true,
         trigger: {
             player: "phaseZhunbeiBegin",
             global: "gameStart",
@@ -1284,13 +1285,13 @@ const shiptypeskills = {
         frequent: true,
         firstDo: true,
         filter: function (event, player) {
-            var zongshu = 1 + player.countMark('jinengup'), cunpaishu = player.getExpansions('daodan').length + player.getCards('s', function (card) { return card.hasGaintag('daodan') }).length;
+            var zongshu = 1 + player.countMark('jinengup'), cunpaishu = player.getExpansions('fangkongdaodan').length + player.getCards('s', function (card) { return card.hasGaintag('fangkongdaodan') }).length;
             return zongshu > cunpaishu && player.countCards('h');
         },
         content: function () {
             'step 0'
             var nh = Math.min(player.countCards('h'), Math.ceil(player.getHandcardLimit()));
-            var zongshu = 1 + player.countMark('jinengup'), cunpaishu = player.getExpansions('daodan').length + player.getCards('s', function (card) { return card.hasGaintag('daodan') }).length;
+            var zongshu = 1 + player.countMark('jinengup'), cunpaishu = player.getExpansions('fangkongdaodan').length + player.getCards('s', function (card) { return card.hasGaintag('fangkongdaodan') }).length;
             if (nh && zongshu > cunpaishu) {
                 player.chooseCard('h', [1, Math.min(nh, zongshu - cunpaishu)], '将任意张手牌置于你的武将牌上,<br>存牌上限为1+技能强化等级。<br>单次存牌量上限为手牌上限,<br>这些牌可以使锦囊牌无效').set('ai', function (card) {
                     var player = get.player();
@@ -1302,7 +1303,7 @@ const shiptypeskills = {
             'step 1'
             if (result.bool) {
                 // player.addToExpansion(result.cards,player,'giveAuto').gaintag.add('junfu');player.update();
-                player.loseToSpecial(result.cards, 'daodan', player).visible = true;
+                player.loseToSpecial(result.cards, 'fangkongdaodan', player).visible = true;
             }
 
         },
@@ -1325,7 +1326,7 @@ const shiptypeskills = {
                     global: ["useCard"],
                 },
                 filter: function (event, player) {
-                    return player.countCards('s', function (card) { return card.hasGaintag('daodan') }) > 0 && get.type(event.card) == "trick";
+                    return player.countCards('s', function (card) { return card.hasGaintag('fangkongdaodan') }) > 0 && get.type(event.card) == "trick";
                 },
                 check: function (event, player) {
                     var effect = 0;
@@ -1350,8 +1351,8 @@ const shiptypeskills = {
                 },
                 content: function () {
                     "step 0";
-                    if (player.getCards('s', function (card) { return card.hasGaintag('daodan') }).length <= 0) { return; }
-                    player.chooseCardButton('移去一张防空导弹', player.getCards('s', function (card) { return card.hasGaintag('daodan') }), true, 1).set('ai', function (button) {
+                    if (player.getCards('s', function (card) { return card.hasGaintag('fangkongdaodan') }).length <= 0) { return; }
+                    player.chooseCardButton('移去一张防空导弹', player.getCards('s', function (card) { return card.hasGaintag('fangkongdaodan') }), true, 1).set('ai', function (button) {
                         return 1;
                     });
                     "step 1";
@@ -1371,6 +1372,7 @@ const shiptypeskills = {
         }
     },
     fanjiandaodan: {
+        nobracket: true,
         mod: {
             //selectTarget:function(card,player,range){///是卡片作用时可选的目标数量,输出range给牌的发起事件阶段用。
             //if(range[1]==-1) return;var a=game.countPlayer(function(current){return get.attitude(player,current)<=0&&current.inRange(player)})-1;
@@ -1497,6 +1499,7 @@ const shiptypeskills = {
     },
 */
     dajiaoduguibi: {
+        nobracket: true,
         trigger: { player: ["chooseToRespondBegin", "chooseToUseBegin"] },
         filter: function (event, player) {
             if (event.responded) return false;
@@ -1584,6 +1587,7 @@ const shiptypeskills = {
         },
     },
     huokongld: {
+        nobracket: true,
         firstDo: true,
         trigger: { player: ["shaMiss", "eventNeutralized"], }, audio: "ext:舰R牌将/audio/skill:true",
         filter: function (event, player) {
@@ -2008,6 +2012,7 @@ const shiptypeskills = {
     },
     //远程打击
     yuanchengdaji: {
+        nobracket: true,
         audio: false,
         trigger: { global: "phaseBefore", player: "enterGame" },
         direct: true,
@@ -2046,6 +2051,7 @@ const shiptypeskills = {
     },
     //缓行
     bm_huanxing: {
+        nobracket: true,
         audio: false,
         trigger: { global: "phaseBefore", player: "enterGame" },
         forced: true,
