@@ -2244,7 +2244,7 @@ const unfulfilledambition = {
         skillAnimation: true,
         animationColor: "water",
         filter: function (event, player) {
-            return player.hasSkill('guli');
+            return player.hasSkill("guli");
         },
         selectTarget: [0, Infinity],
         multitarget: true,
