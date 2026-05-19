@@ -428,7 +428,7 @@ var jianrjinji = {
         fangqu: "防驱", "fangqu_info": "",
         zhongpao: "重炮", "zhongpao_info": "",
         fanjiandaodan: "反舰导弹",
-        "反舰导弹_info": "（可强化）你的攻击范围增加2+2X(x为技能强化次数),出牌阶段限一次,你可以弃置一张武器/装备牌/非基本牌,对目标使用一张不可响应的远程导弹。",
+        "fanjiandaodan_info": "（可强化）你的攻击范围增加2+2X(x为技能强化次数),出牌阶段限一次,你可以弃置一张武器/装备牌/非基本牌,对目标使用一张不可响应的远程导弹。",
         zhandouji: "战斗机",
         yaosai: "要塞", "yaosai_info": "(可强化)每局游戏限0/1/2次,出牌阶段,你可以增加一点体力上限,回复一点体力。",
         fangkongdaodan: "防空导弹",
