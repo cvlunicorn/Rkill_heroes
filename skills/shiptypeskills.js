@@ -1021,10 +1021,11 @@ const shiptypeskills = {
             player: ["phaseZhunbeiBegin", "phaseDiscardBegin"],
         },
         lastDo: true,
-        frequent: true,
+        direct:true,
         filter: function (event, player) {//意外发现function应用广泛,然而解决不了自动显示隐藏标记。航母开幕,然后根据舰种判断具体出什么杀game.log();
             return player.countCards('h') > 0 && player.getHistory("sourceDamage").length == 0;
         },
+        popup: false,
         content: function () {
             'step 0'
             var next = player.chooseToDiscard(function (card, player) {
@@ -1076,7 +1077,7 @@ const shiptypeskills = {
                         return get.useful(card1) - cardValue;
                     }
                     return -1;
-                }).set('logSkill', '潜艇');
+                });
 
             /*var next = player.chooseCardTarget({
                 prompt: ('雷杀'),
@@ -1126,6 +1127,7 @@ const shiptypeskills = {
                 player.discard(result.cards);//前面有卡牌card,可以返回card,不同于仁德主动技能直接写card。
                 //event.target = result.targets;//前面有目标target,可以返回target。player.discard(player.getCards('h').randomGet()),
                 //if (player.countCards('h') > 0) { player.useCard({ name: 'sha', nature: 'thunder', isCard: true }, event.target); }//移除选择目标这一过程,视为使用牌自带选择目标。2024.2.18
+                player.logSkill("kaimuleiji");
                 player.chooseUseTarget({
                     name: 'sha',
                     nature: 'thunder',
@@ -1341,6 +1343,7 @@ const shiptypeskills = {
                     }
                     return effect < 0;
                 },
+                popup: false,
                 prompt: function (event, player) {
                     var str = "防驱：是否拦截" + get.translation(event.player);
                     if (event.targets && event.targets.length) {
@@ -1361,6 +1364,7 @@ const shiptypeskills = {
                         player.loseToDiscardpile(cards);
                         trigger.targets.length = 0;
                         trigger.all_excluded = true;
+                        player.logSkill("fangkongdaodan_wuxie");
                     }
                 },
                 ai: {
@@ -1596,6 +1600,7 @@ const shiptypeskills = {
             return player.countCards('he', function (card) { return card != player.getEquip('guanshi'); }) >= 1 && event.target.isAlive();
         },
         direct: true,
+        popup: false,
         content: function () {
             "step 0"
             //get.prompt2('huokongld')Math.max(0,2-player.countMark('jinengup'))player.chooseToCompare(trigger.player);if(player.countMark('jinengup')>1){player.chooseToCompare(trigger.target);event.goto(2);};else if(player.countMark('jinengup')>1){player.}
@@ -1632,6 +1637,7 @@ const shiptypeskills = {
                     trigger.untrigger();
                     trigger.trigger('shaHit');
                     trigger._result.bool = false; trigger._result.result = null;
+                    player.logSkill("huokongld");
                 }
                 else { trigger.unneutralize(); }
             }
@@ -1812,6 +1818,7 @@ const shiptypeskills = {
             } return false;
         },
         direct: true,
+        popup: false,
         content: function () {
             'step 0'
             var next = player.chooseCardTarget({
@@ -1861,6 +1868,7 @@ const shiptypeskills = {
                             trigger.getParent().excluded.add(trigger.targets[i]);
                             trigger.targets[i].addSkill('fangkong2_aibiexuan');
                             game.log('取消卡牌目标', trigger.targets[i], '编号', i)
+                            player.logSkill("fangkong2");
                         }
                     }
                 };//三级选择,集合target是否包含trigger.target。同时测试是否选到了目标。
@@ -2019,7 +2027,7 @@ const shiptypeskills = {
         filter: function (event, player) {
             return (event.name != 'phase' || game.phaseNumber == 0) && player.countCards("he") >= 4;
         },
-        log: false,
+        popup: false,
         content: function () {
             "step 0"
             player.chooseToDiscard("he", 4, "远程打击：是否弃置四张牌对一至两名其他角色造成共计两点伤害？").set("ai", function (card) {

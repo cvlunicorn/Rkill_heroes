@@ -9,6 +9,10 @@
 //"step 0"必须从0开始,引号可以是单引号或双引号,但是整个技能里面不能变。
 //本扩展名称和路径中“舰R牌将”一律大写
 
+//【技能发动动画相关】
+//技能发动时不显示且不logSkill：popup: false。
+//log:false不在历史记录中显示技能，但会触发logSkill然后触发动画
+
 //【yield用法】（需要无名杀版本1.10.10或更高版本）
 //yield可以跨步骤储存变量,用于一个技能里需要多次选择目标/牌等造成系统自带result.targets和result.links失效的情况。
 //该方法需要content:function*(event,map),并且内容中player和trigger.player需要分别使用map.player和map.trigger.player代替。
