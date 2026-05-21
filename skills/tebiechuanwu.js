@@ -387,40 +387,67 @@ const tebiechuanwu = {
             },
         },
     },
-    /*
+
     //大洋鹰击
-    dayangying: {
+    dayangyingji: {
         audio: false,
-        mod: {
-            targetEnabled: function (card, player, target) {
-                if (target.hasSkill("qiantingss") && card.name == "sha") {
-                    return "ignoreEquip";
-                }
-            },
-        },
-        trigger: { global: "chooseToRespondBegin" },
+        global: ["dayangyingji_qinggang_skill"],
         forced: false,
-        filter: function (event, player) {
+        round: 1,
+        trigger: { global: ['chooseToRespondBefore', 'chooseToUseBefore'] },
+        filter(event, player) {
             if (event.responded) return false;
-            if (!event.player || !event.player.hasSkill("qiantingss")) return false;
-            return event.filterCard({ name: "shan" }, event.player, event);
+            if (!event.filterCard({ name: 'shan' }, player, event)) return false;
+            if (event.player.hasSkill('qiantingss')) return true;
         },
+        check(event, player) {
+            if (get.damageEffect(player, event.player, player) >= 0) return false;
+            return true;
+        },
+        content(event, trigger, player) {
+            trigger.result = { bool: true, card: { name: 'shan', isCard: true } };
+            trigger.responded = true;
+            trigger.animate = false;
+        },
+        ai: {
+            threaten: 1.3,
+        },
+    },
+    dayangyingji_qinggang_skill: {
+        audio: true,
+        trigger: {
+            player: "useCardToPlayered",
+        },
+        filter: function (event) {
+            return event.player.hasSkill("qiantingss");
+        },
+        forced: true,
+        logTarget: "target",
         content: function () {
-            trigger.result = { bool: true, card: { name: "shan" } };
+            trigger.target.addTempSkill("qinggang2");
+            trigger.target.storage.qinggang2.add(trigger.card);
+            trigger.target.markSkill("qinggang2");
+        },
+        ai: {
+            unequip_ai: true,
+            skillTagFilter: function (player, tag, arg) {
+                if (arg && arg.name == "sha" || arg.name == "sheji9") return true;
+                return false;
+            },
         },
     },
     //先驱者
     xianquzhe: {
         audio: false,
-        trigger: { global: "gameStart", player: "enterGame" },
+        trigger: { global:'phaseBefore', player: "enterGame" },
         forced: true,
+        nobracket:true,
         content: function () {
             "step 0"
             player.addSkill("xianquzhe_range");
             player.chooseTarget("先驱者：令一名角色攻击范围-2", true).set("ai", function (target) {
                 var player = _status.event.player;
-                if (get.attitude(player, target) < 0) return 1;
-                return 0;
+                return -get.attitude(player, target);
             });
             "step 1"
             if (result.bool && result.targets && result.targets[0]) {
@@ -439,8 +466,8 @@ const tebiechuanwu = {
         subSkill: {
             range: {
                 mod: {
-                    attackRange: function (player, distance) {
-                        return distance + 2;
+                    attackRange: function (player, num) {
+                        return num + 2;
                     },
                 },
             },
@@ -468,26 +495,20 @@ const tebiechuanwu = {
             },
             discard: {
                 trigger: { player: "useCardToTargeted" },
-                forced: false,
                 filter: function (event, player) {
-                    return event.target && event.target.countCards("h") > 0;
+                    return event.card&&get.type(event.card)=="trick"&&event.target &&event.targets.length == 1&&event.target.countCards("h") > 0;
+                },
+                check: function (event, player) {
+                    if (get.attitude(player, event.target) < 0) return true;
                 },
                 content: function () {
                     "step 0"
-                    player.chooseControl("弃牌", "cancel2").set("prompt", "先驱者：是否令" + get.translation(trigger.target) + "弃置一半手牌？").set("ai", function () {
-                        var player = _status.event.player;
-                        var target = _status.event.getTrigger().target;
-                        if (get.attitude(player, target) < 0) return "弃牌";
-                        return "cancel2";
-                    });
+                    var num = Math.floor(trigger.target.countCards("h") / 2);
+                    trigger.target.chooseToDiscard("h", num, true);
                     "step 1"
-                    if (result.control == "弃牌") {
-                        var num = Math.floor(trigger.target.countCards("h") / 2);
-                        trigger.target.chooseToDiscard("h", num, true);
-                        var diamonds = trigger.target.countCards("h", { suit: "diamond" });
-                        var evt = trigger.getParent();
-                        if (evt.baseDamage) evt.baseDamage += diamonds;
-                    }
+                    var diamonds = trigger.target.countCards("h", { suit: "diamond" });
+                    var evt = trigger.getParent();
+                    if (evt.baseDamage) evt.baseDamage += diamonds;
                 },
             },
         },
@@ -497,6 +518,7 @@ const tebiechuanwu = {
         audio: false,
         enable: "phaseUse",
         usable: 1,
+        nobracket:true,
         filterTarget: function (card, player, target) {
             return target != player;
         },
@@ -539,7 +561,7 @@ const tebiechuanwu = {
                 target: -1,
             },
         },
-    },*/
+    },
     //威严召唤
     weiyanzhaohuan: {
         nobracket: true,
