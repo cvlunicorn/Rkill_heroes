@@ -240,11 +240,14 @@ const shuileizhandui = {
                     return get.type(currentCard, "trick") == "basic" && player.canUse(currentCard, current, false);
                 });
             });
+            var basecards = cards.filter(function (currentCard) {
+                return get.type(currentCard, "trick") == "basic" && !get.info(currentCard).notarget;
+            });
             if (hasBasicTarget) {
                 basicTargetResult = await player.chooseTarget(
                     true,
                     get.prompt("yuleizhantujin"),
-                    "选择一名角色，依次对其使用亮出牌中的可用基本牌",
+                    "选择一名角色，依次对其使用" + get.translation(basecards),
                     function (card, player, target) {
                         return _status.event.cards.some(function (currentCard) {
                             return get.type(currentCard, "trick") == "basic" && player.canUse(currentCard, target, false);
