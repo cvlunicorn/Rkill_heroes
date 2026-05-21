@@ -154,7 +154,7 @@ const others = {
             //if (player.storage.pangguanzhe.length) return false;
             return true;
         },
-        bannedList: ["pangguanzhe", "zhanliebb", "hangmucv", "kaimuhangkong", "zhongxunca", "qingxuncl", "quzhudd", "qiantingss", "kaimuleiji", "junfu", "daoqu", "fanjiandaodan", "fangqu", "fangkongdaodan", "zhuangjiafh", "dajiaoduguibi", "huokongld", "fangkong2", "shixiangquanneng", "yaosai", "tiaozhanzhuangbei", "zhongleizhuangjiantuxi", "juejingfengsheng","bm_huanxing","zhongpao","daoxun","yuanchengdaji"],
+        bannedList: ["pangguanzhe", "zhanliebb", "hangmucv", "kaimuhangkong", "zhongxunca", "qingxuncl", "quzhudd", "qiantingss", "kaimuleiji", "junfu", "daoqu", "fanjiandaodan", "fangqu", "fangkongdaodan", "zhuangjiafh", "dajiaoduguibi", "huokongld", "fangkong2", "shixiangquanneng", "yaosai", "tiaozhanzhuangbei", "zhongleizhuangjiantuxi", "juejingfengsheng", "bm_huanxing", "zhongpao", "daoxun", "yuanchengdaji"],
         content: function () {
             "step 0"
             if (player.storage.pangguanzhe.length) {
@@ -2468,8 +2468,9 @@ const others = {
         mod: {
             cardSavable: function (card, player, target) {
                 if (!target || player == target) return;
-                if (!target.getStorage("yingxiongzhijia_nosave")) return;
-                if (card.name == 'tao' || card.name == 'kuaixiu9') return false;
+                if (target.getStorage("yingxiongzhijia_nosave")==true) {
+                    if (card.name == 'tao' || card.name == 'kuaixiu9') return false;
+                }
             },
         },
     },
