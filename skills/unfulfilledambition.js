@@ -2370,7 +2370,7 @@ const unfulfilledambition = {
                     return 1.5;
                 },
                 player: function (player) {
-                    if (player.canUse("sha") && player.countCards("h", { name: "sha" }) > 0) return 0;
+                    if (player.getCardUsable('sha', true) && player.countCards("h", { name: "sha" }) > 0) return 0;
                     return 1
                 },
             },
