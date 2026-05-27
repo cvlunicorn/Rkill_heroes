@@ -37,7 +37,9 @@ const tebiechuanwu = {
                 if (list.length > 0) {
                     player.chooseButton(["光荣舰队：是否使用一张牌？", list]).set("ai", function (button) {
                         var player = _status.event.player;
-                        if (player.canUse(button.link, false)) return get.value(button.link);
+                        var hasBasicTarget = game.hasPlayer(function (current) {
+                            if (player.canUse(button.link), current) return get.value(button.link);
+                        });
                         return 0;
                     });
                 } else {
@@ -439,9 +441,9 @@ const tebiechuanwu = {
     //先驱者
     xianquzhe: {
         audio: false,
-        trigger: { global:'phaseBefore', player: "enterGame" },
+        trigger: { global: 'phaseBefore', player: "enterGame" },
         forced: true,
-        nobracket:true,
+        nobracket: true,
         content: function () {
             "step 0"
             player.addSkill("xianquzhe_range");
@@ -496,7 +498,7 @@ const tebiechuanwu = {
             discard: {
                 trigger: { player: "useCardToTargeted" },
                 filter: function (event, player) {
-                    return event.card&&get.type(event.card)=="trick"&&event.target &&event.targets.length == 1&&event.target.countCards("h") > 0;
+                    return event.card && get.type(event.card) == "trick" && event.target && event.targets.length == 1 && event.target.countCards("h") > 0;
                 },
                 check: function (event, player) {
                     if (get.attitude(player, event.target) < 0) return true;
@@ -518,7 +520,7 @@ const tebiechuanwu = {
         audio: false,
         enable: "phaseUse",
         usable: 1,
-        nobracket:true,
+        nobracket: true,
         filterTarget: function (card, player, target) {
             return target != player;
         },
