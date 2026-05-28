@@ -1528,7 +1528,6 @@ const historybattles = {
                     player.loseToDiscardpile(event.cards);
                     'step 2'
                     player.judge(function (card) {
-
                         if (!trigger.source.hasSkill('cardsDisabled_color')) {
                             trigger.source.addTempSkill('cardsDisabled_color', { player: 'phaseAfter' });
                         }
@@ -1543,6 +1542,7 @@ const historybattles = {
         nobracket: true,
         charlotte: true,
         direct: true,
+        lastDo:true,
         trigger: {
             player: ['phaseEnd', 'dieAfter'],
         },
@@ -1570,6 +1570,7 @@ const historybattles = {
         },
         content: function () {
             player.unmarkSkill('cardsDisabled_color');
+            player.removeSkill('cardsDisabled_color');
         },
         "_priority": 0,
     },
