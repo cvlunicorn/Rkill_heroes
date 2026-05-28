@@ -38,7 +38,7 @@ const tebiechuanwu = {
                     player.chooseButton(["光荣舰队：是否使用一张牌？", list]).set("ai", function (button) {
                         var player = _status.event.player;
                         var hasBasicTarget = game.hasPlayer(function (current) {
-                            if (player.canUse(button.link), current) return get.value(button.link);
+                            if (player.canUse(button.link, current)) return get.value(button.link);
                         });
                         return 0;
                     });
