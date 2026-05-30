@@ -983,12 +983,19 @@ const others = {
         frequent: true,
         content: function () {
             "step 0"
+            var list = ['摸两张牌', '下一张杀无法被响应', '下一次造成伤害+1', '获得一点护甲'];
+
+            if (player.storage.mijian) {
+                var newList = list.filter(item => item != player.storage.mijian);
+            } else {
+                var newList = list;
+            }
             //弹出四选一控制框，AI逻辑在ai回调中
-            player.chooseControl('摸两张牌', '下一张杀无法被响应', '下一次造成伤害+1', '获得一点护甲')
+            player.chooseControl(newList)
                 .set('prompt', get.prompt('mijian'))//技能名作为标题
                 .set('ai', function () {
                     var player = get.player();//get.player()获取当前做选择的角色
-                    if (player.hp <= 1) return 3;//濒死时优先护甲以抵御下次伤害
+                    if (player.hp <= 3) return 3;//血少时优先护甲以抵御下次伤害
                     if (player.countCards('h') < 2) return 0;//手牌极少时优先摸牌补充资源
                     return 2;//默认选伤害+1，攻击性更强
                 });
@@ -997,17 +1004,21 @@ const others = {
             switch (result.index) {
                 case 0:
                     player.draw(2);//摸两张牌
+                    player.storage.mijian = '摸两张牌';
                     break;
                 case 1:
                     //添加临时技能标记，下次使用杀时触发
-                    player.addTempSkill('mijian_nores');
+                    player.addSkill('mijian_nores');
+                    player.storage.mijian = '下一张杀无法被响应';
                     break;
                 case 2:
                     //添加临时技能标记，下次造成伤害时触发
-                    player.addTempSkill('mijian_jiashang');
+                    player.addSkill('mijian_jiashang');
+                    player.storage.mijian = '下一次造成伤害+1';
                     break;
                 case 3:
                     player.changeHujia(1);//护甲+1
+                    player.storage.mijian = '获得一点护甲';
                     break;
             }
         },
@@ -1020,6 +1031,7 @@ const others = {
     mijian_nores: {//弥坚子技能：下一张杀不可被响应（无法闪避）
         trigger: { player: "useCard" },//使用牌时触发
         forced: true,//锁定触发，不询问玩家
+        direct:true,
         filter: function (event, player) {
             //只对杀和自制杀（sheji9）生效
             return event.card.name == "sha" || event.card.name == "sheji9";
@@ -1034,6 +1046,7 @@ const others = {
     mijian_jiashang: {//弥坚子技能：下一次造成伤害+1
         trigger: { source: "damageBegin1" },//造成伤害开始时触发，source表示伤害来源是自己
         forced: true,
+        direct: true,
         content: function () {
             trigger.num++;//伤害值+1
             player.removeSkill('mijian_jiashang');//触发一次后移除
