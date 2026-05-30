@@ -249,9 +249,9 @@ const tebiechuanwu = {
                     current.removeSkill("sidajinganglian_effect");
                 }
             });
-            player.chooseTarget([0, 2], "四大金刚：选择至多两名其他角色令其获得'联'",function (card, player, target) {
-                    return target != player;
-                }).set("ai", function (target) {
+            player.chooseTarget([0, 2], "四大金刚：选择至多两名其他角色令其获得'联'", function (card, player, target) {
+                return target != player;
+            }).set("ai", function (target) {
                 var player = _status.event.player;
                 return get.attitude(player, target);
             });
@@ -366,6 +366,12 @@ const tebiechuanwu = {
                 player.logSkill("haiyingxunyi", result.targets);
                 result.targets[0].draw();
             }
+        },
+        ai: {
+            threaten: function (player, target) {
+                if (player.group == "PLAN" || player.group == "ROCN") return 3;
+                return 2.1;
+            },
         },
     },
     haiyingxunyi_qinggang_skill: {
@@ -499,6 +505,7 @@ const tebiechuanwu = {
             },
             discard: {
                 trigger: { player: "useCardToTargeted" },
+                usable: 1,
                 filter: function (event, player) {
                     return event.card && get.type(event.card) == "trick" && event.target && event.targets.length == 1 && event.target.countCards("h") > 0;
                 },
@@ -507,12 +514,22 @@ const tebiechuanwu = {
                 },
                 content: function () {
                     "step 0"
-                    var num = Math.floor(trigger.target.countCards("h") / 2);
-                    trigger.target.chooseToDiscard("h", num, true);
+                    trigger.target.chooseToDiscard("h", [0, trigger.target.countCards("h")], true).set("ai", function (card) {
+                        var player = get.player();
+                        if (!get.tag(_status.event.card, 'damage')) return 0;
+                        var respondCards = player.countCards("h", { name: 'shan' });
+                        if (get.name(_status.event.card) == "wanjian" && respondCards > 0) return 0;
+                        var saveCards = player.countCards("h", { name: 'tao', suit: 'diamond' }) + player.countCards("h", { name: 'jiu', suit: 'diamond' }) + player.countCards("h", { name: 'kuaixiu9', suit: 'diamond' }) + player.countCards("h", { name: 'Zziqi9', suit: 'diamond' });
+                        if (saveCards) return 0;
+                        if (get.suit(card) == "diamond") return 3;
+                    });
                     "step 1"
                     var diamonds = trigger.target.countCards("h", { suit: "diamond" });
                     var evt = trigger.getParent();
-                    if (evt.baseDamage) evt.baseDamage += diamonds;
+                    if (evt.baseDamage) evt.baseDamage += diamonds.length ? 1 : 0;
+                },
+                ai: {
+                    threaten: 1.2
                 },
             },
         },

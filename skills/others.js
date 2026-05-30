@@ -3827,7 +3827,7 @@ const others = {
                 sub: true,
             },
         },
-        ai: { threaten: 1.5 },
+        ai: { threaten: 2.3 },
         "_priority": 0,
     },
     /*

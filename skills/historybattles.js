@@ -1542,7 +1542,7 @@ const historybattles = {
         nobracket: true,
         charlotte: true,
         direct: true,
-        lastDo:true,
+        lastDo: true,
         trigger: {
             player: ['phaseEnd', 'dieAfter'],
         },
@@ -1978,12 +1978,16 @@ const historybattles = {
         nobracket: true,
         enable: "chooseToUse",
         usable: 1,
+        check: function (card) {
+            return 9 - get.value(card);
+        },
         viewAs: {
             name: "juedou",
-            isCard: true,
+            isCard: false,
         },
-        filterCard: () => false,
-        selectCard: -1,
+        filterCard: true,
+        selectCard: 1,
+        position: "h",
         log: false,
         precontent: function () {
             'step 0'
