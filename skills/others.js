@@ -1027,11 +1027,15 @@ const others = {
                 return get.translation('mijian_info');
             },
         },
+        ai: {
+            maixue: true,
+            threaten: 0.85,
+        },
     },
     mijian_nores: {//弥坚子技能：下一张杀不可被响应（无法闪避）
         trigger: { player: "useCard" },//使用牌时触发
         forced: true,//锁定触发，不询问玩家
-        direct:true,
+        direct: true,
         filter: function (event, player) {
             //只对杀和自制杀（sheji9）生效
             return event.card.name == "sha" || event.card.name == "sheji9";
