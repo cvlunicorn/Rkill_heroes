@@ -2468,7 +2468,7 @@ const others = {
         mod: {
             cardSavable: function (card, player, target) {
                 if (!target || player == target) return;
-                if (target.getStorage("yingxiongzhijia_nosave")==true) {
+                if (target.getStorage("yingxiongzhijia_nosave") == true) {
                     if (card.name == 'tao' || card.name == 'kuaixiu9') return false;
                 }
             },
@@ -3705,10 +3705,15 @@ const others = {
     tasafalongge: {
         audio: false,
         nobracket: true,
+        limited: true,
+        skillAnimation: true,
+        animationColor: "wood",
         trigger: { player: "phaseEnd" },
+        init(player) {
+            player.storage.tasafalongge = false;
+        },
         filter: function (event, player) {
-            var count = player.storage.tasafalongge || 0;
-            if (count >= 3) return false;
+            if (player.storage.tasafalongge == true) return false;
             var discardedCount = 0;
             player.getHistory("lose", function (evt) {
                 if (evt.type == "discard" && evt.hs && evt.hs.length > 0) {
@@ -3720,6 +3725,8 @@ const others = {
         direct: true,
         content: function () {
             "step 0"
+
+            player.storage.tasafalongge = true;
             var discardedCount = 0;
             player.getHistory("lose", function (evt) {
                 if (evt.type == "discard" && evt.hs && evt.hs.length > 0) {
@@ -3727,10 +3734,9 @@ const others = {
                 }
             });
             event.discardedCount = discardedCount;
-            var remaining = 3 - (player.storage.tasafalongge || 0);
             player.chooseTarget(
                 get.prompt("tasafalongge"),
-                "选择至多" + discardedCount + "名其他角色，令其无法使用或打出牌直到你的下回合开始（剩余" + remaining + "次）",
+                "选择至多" + discardedCount + "名其他角色，令其无法使用或打出牌直到你的下回合开始",
                 function (card, player, target) {
                     return target != player;
                 }
@@ -3742,16 +3748,11 @@ const others = {
             if (result.bool && result.targets && result.targets.length > 0) {
                 player.logSkill("tasafalongge", result.targets);
                 if (!player.storage.tasafalongge) player.storage.tasafalongge = 0;
-                player.storage.tasafalongge++;
                 player.markSkill("tasafalongge");
                 //记录被封印的目标（存 playerid 避免在 storage 中持有 player 引用）
                 player.storage.tasafalongge_sealed = result.targets.map(function (t) { return t.playerid; });
                 for (var i = 0; i < result.targets.length; i++) {
                     result.targets[i].addSkill("tasafalongge_seal");
-                }
-                //若已使用3次，灰掉技能
-                if (player.storage.tasafalongge >= 3) {
-                    player.awakenSkill("tasafalongge");
                 }
             }
         },
@@ -3783,6 +3784,7 @@ const others = {
                         if (t && t.isIn()) t.removeSkill("tasafalongge_seal");
                     }
                     delete player.storage.tasafalongge_sealed;
+                    player.awakenSkill("tasafalongge");
                 },
                 sub: true,
             },
@@ -3806,12 +3808,6 @@ const others = {
                     },
                 },
                 sub: true,
-            },
-        },
-        intro: {
-            content: function (storage, player) {
-                var count = storage || 0;
-                return "已使用" + count + "/3次";
             },
         },
         ai: { threaten: 1.5 },

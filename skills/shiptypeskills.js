@@ -1407,11 +1407,8 @@ const shiptypeskills = {
                 var card = {
                     name: "yuanchengdaodan9",
                     isCard: true,
-
                 };
-                player.useCard(card, target, false).set("oncard", function () {
-                    _status.event.directHit.addArray(game.filterPlayer());
-                });
+                player.useCard(card, target, false);
             } else {
                 target.damage(1);
             }

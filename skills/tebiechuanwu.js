@@ -249,7 +249,9 @@ const tebiechuanwu = {
                     current.removeSkill("sidajinganglian_effect");
                 }
             });
-            player.chooseTarget([0, 2], "四大金刚：选择至多两名角色令其获得'联'").set("ai", function (target) {
+            player.chooseTarget([0, 2], "四大金刚：选择至多两名其他角色令其获得'联'",function (card, player, target) {
+                    return target != player;
+                }).set("ai", function (target) {
                 var player = _status.event.player;
                 return get.attitude(player, target);
             });
