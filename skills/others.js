@@ -784,9 +784,11 @@ const others = {
                 if (target.countCards("h", { suit: suit })) {
                     dialog.push('<div class="text center">' + get.translation(suit + "2") + "牌</div>");
                     dialog.push(target.getCards("h", { suit: suit }));
-                    if (player.countCards("h", { suit: suit })) {
-                        list.push(suit);
-                    }
+                    list.push(suit);
+
+                }
+                if (player.countCards("h", { suit: suit }) && !target.countCards("h", { suit: suit })) {
+                    list.push(suit);
                 }
             }
             list.push('cancel2');
