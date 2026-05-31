@@ -53,63 +53,113 @@ const tebiechuanwu = {
                 player.chooseUseTarget(result.links[0], true);
             }
         },
+        group: ["guangrongjianduisp_draw"],
+        subSkill: {
+            draw: {
+                trigger: { player: "turnOverAfter" },
+                forced: true,
+                filter: function (event, player) {
+                    return !player.isTurnedOver();
+                },
+                content: function () {
+                    player.draw();
+                },
+            },
+        },
     },
     //威严
     weiyan: {
         audio: false,
-        trigger: { player: "phaseBegin" },
+        trigger: { player: ['phaseJudgeBefore', 'phaseDrawBefore', 'phaseUseBefore', 'phaseDiscardBefore'] },
+        filter: function (event, player) {
+            return player.countCards('h') > 0;
+        },
         direct: true,
+        preHidden: true,
         content: function () {
-            "step 0"
-            player.chooseToDiscard("he", "威严：是否弃置一张牌并跳过一个阶段？").set("ai", function (card) {
-                return 6 - get.value(card);
-            });
-            "step 1"
+            'step 0'
+            var check, str = '弃置一张手牌，翻面并跳过';
+            str += ['判定', '摸牌', '出牌', '弃牌'][lib.skill.weiyan.trigger.player.indexOf(event.triggername)];
+            str += '阶段';
+            if (trigger.name == 'phaseDraw') str += '，然后本回合你使用的第一张牌结算两次';
+            if (trigger.name == 'phaseUse') str += '，然后本回合你使用的牌无视距离限制且不可被响应';
+            switch (trigger.name) {
+                case 'phaseJudge':
+                    check = player.countCards('j');
+                    break;
+                case 'phaseDraw':
+                    var valueCards = player.countCards("h", function (card) {
+                        return get.type(card) == 'basic' || get.type(card) == 'trick' && player.getUseValue({ name, isCard: true }, null, true) > 7;
+                    });
+                    check = valueCards > 0;
+                    break;
+                case 'phaseUse':
+                    var attackCards = player.countCards("h", function (card) {
+                        return get.tag(card, 'damage');
+                    })
+                    check = attackCards > 0;
+                    break;
+                case 'phaseDiscard':
+                    check = player.needsToDiscard();
+                    break;
+            }
+            player.chooseToDiscard(get.prompt('weiyan'), str, lib.filter.cardDiscardable).set('ai', card => {
+                if (!_status.event.check) return -1;
+                return 7 - get.value(card);
+            }).set('check', check).set('logSkill', 'weiyan').setHiddenSkill('weiyan');
+            'step 1'
             if (result.bool) {
-                player.logSkill("weiyan");
-                player.chooseControl("判定阶段", "摸牌阶段", "出牌阶段", "弃牌阶段").set("prompt", "威严：选择跳过的阶段").set("ai", function () {
-                    return "弃牌阶段";
-                });
-            } else {
-                event.finish();
+                trigger.cancel();
+                game.log(player, '跳过了', '#y' + ['判定', '摸牌', '出牌', '弃牌'][lib.skill.weiyan.trigger.player.indexOf(event.triggername)] + '阶段');
+                if (trigger.name == 'phaseUse') {
+                    player.addTempSkill("weiyan_phaseUse");
+                    player.turnOver();
+                }
+                else if (trigger.name == 'phaseDraw') {
+                    player.addTempSkill("weiyan_phaseDraw");
+                    player.turnOver();
+                }
+                else { player.turnOver(); };
             }
-            "step 2"
-            if (result.control == "判定阶段") {
-                player.skip("phaseJudge");
-            } else if (result.control == "摸牌阶段") {
-                player.skip("phaseDraw");
-            } else if (result.control == "出牌阶段") {
-                player.skip("phaseUse");
-            } else if (result.control == "弃牌阶段") {
-                player.skip("phaseDiscard");
-            }
-            player.turnOver();
-            player.addMark("weiyan_mark", 1);
-            player.addSkill("weiyan_effect");
+            else event.finish();
         },
         subSkill: {
-            effect: {
-                trigger: { target: "useCardToTargeted" },
-                forced: false,
-                filter: function (event, player) {
-                    return player.hasMark("weiyan_mark");
-                },
+            weiyan_phaseUse: {
+                charlotte: true,
+                trigger: { player: 'useCard1' },
+                forced: true,
+                popup: false,
                 content: function () {
-                    player.removeMark("weiyan_mark", 1);
-                    trigger.getParent().excluded.add(player);
-                    if (!player.hasMark("weiyan_mark")) {
-                        player.removeSkill("weiyan_effect");
-                    }
+                    trigger.directHit.addArray(game.players);
+                    game.log(trigger.card, '不可被响应');
                 },
-                marktext: "威",
+                mark: true,
                 intro: {
-                    content: "当你被指定目标时，你可以取消并失去'威'",
+                    content: '使用牌无距离限制且不能被响应',
                 },
-                ai: {
-                    threaten: 0.8,
+                mod: {
+                    targetInRange: () => true,
                 },
             },
-            mark: {},
+            phaseDraw: {
+                trigger: { player: 'useCard' },
+                direct: true,
+                usable: 1,
+                charlotte: true,
+                popup: false,
+                filter: function (event, player) {
+                    var type = get.type(event.card, false);
+                    if (type != 'basic' && type != 'trick') return false;
+                    return true
+                },
+                content: function () {
+                    trigger.effectCount++;
+                },
+                mark: true,
+                intro: {
+                    content: '使用的第一张牌结算两次',
+                },
+            },
         },
     },
     //金雕展翅
@@ -340,10 +390,22 @@ const tebiechuanwu = {
         direct: true,
         filter: function (event, player, name) {
             if (event.player == player) {
-                return true;
+                if (_status.currentPhase != player) return false;
+                var evt = player.getLastUsed(1);
+                if (!evt) return false;
+                var color1 = get.color(evt.card);
+                var color2 = get.color(event.card);
+                return color1 && color2 && color1 != 'none' && color2 != 'none' && color1 != color2;
             }
             if (event.player != player) {
-                return event.player.group == "PLAN" || event.player.group == "ROCN";
+                if (event.player.group == "PLAN" || event.player.group == "ROCN") {
+                    if (_status.currentPhase != event.player) return false;
+                    var evt = event.player.getLastUsed(1);
+                    if (!evt) return false;
+                    var color1 = get.color(evt.card);
+                    var color2 = get.color(event.card);
+                    return color1 && color2 && color1 != 'none' && color2 != 'none' && color1 != color2;
+                }
             }
             return false;
         },
@@ -369,8 +431,8 @@ const tebiechuanwu = {
         },
         ai: {
             threaten: function (player, target) {
-                if (player.group == "PLAN" || player.group == "ROCN") return 3;
-                return 2.1;
+                if (player.group == "PLAN" || player.group == "ROCN") return 2;
+                return 1.2;
             },
         },
     },

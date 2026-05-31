@@ -372,7 +372,7 @@ const fallendemon = {
                         isCard: false,
                     },
                     filterCard: true,
-                    selectCard: 2,
+                    selectCard: 1,
                     audio: "loki_R_xiance2",
                     popname: true,
                     check: function (card) {
@@ -388,7 +388,7 @@ const fallendemon = {
                 };
             },
             prompt: function (links, player) {
-                return "将两张牌当做" + (get.translation(links[0][3]) || "") + get.translation(links[0][2]) + "使用";
+                return "将一张牌当做" + (get.translation(links[0][3]) || "") + get.translation(links[0][2]) + "使用";
             },
         },
         hiddenCard: function (player, name) {
@@ -498,7 +498,7 @@ const fallendemon = {
         },
         discard: false,
         lose: false,
-        targetprompt: ["决斗目标", "获得牌"],
+        targetprompt: ["决斗目标", "决斗来源"],
         selectTarget: 2,
         multitarget: true,
         filterTarget: function (card, player, target) {
@@ -512,7 +512,7 @@ const fallendemon = {
             return game.countPlayer(current => current != player && current.hasSkill("southdakota_R_gumei") && current.getStorage('southdakota_R_gumei') != true) >= 1;
         },
         content: function () {
-            player.give(cards[0], event.targets[1]);
+            player.discard(cards[0]);
             event.targets[1].useCard({ name: "juedou", isCard: true }, event.targets[0], "noai");
         },
         ai: {
