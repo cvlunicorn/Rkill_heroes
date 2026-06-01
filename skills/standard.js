@@ -3137,7 +3137,6 @@ const standard = {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
         enable: "phaseUse",
-        usable: 3,
         init: function (player) {
             player.storage.duomianshou = [];
 
