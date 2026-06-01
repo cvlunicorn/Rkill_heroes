@@ -4075,6 +4075,45 @@ const others = {
             },
         },
     },*/
+    "jiashuzhidao": {
+        audio: 1,
+        trigger: {
+            global: "phaseUseBegin",
+        },
+        filter: function (event, player) {
+            return event.player != player && event.player.isIn() && player.countCards('he') > 0 && event.player.inRange(player);
+        },
+        direct: true,
+        derivation: ["new_zhixi"],
+        checkx: function (event, player) {
+            if (get.attitude(player, event.player) >= 0) return false;
+            var e2 = player.getEquip(2);
+            if (e2) {
+                if (e2.name == 'tengjia') return true;
+                if (e2.name == 'bagua') return true;
+            }
+            return event.player.countCards('h') > event.player.hp;
+        },
+        content: function () {
+            "step 0"
+            var check = lib.skill.new_meibu.checkx(trigger, player);
+            player.chooseToDiscard(get.prompt2('jiashuzhidao', trigger.player), 'he').set('ai', function (card) {
+                if (_status.event.check) return 6 - get.value(card);
+                return 0;
+            }).set('check', check).set('logSkill', ['jiashuzhidao', trigger.player]);
+            "step 1"
+            if (result.bool) {
+                var target = trigger.player;
+                var card = result.cards[0];
+                player.line(target, 'green');
+                target.addTempSkill('new_zhixi', 'phaseUseAfter');
+                target.markSkillCharacter('jiashuzhidao', player, '魅步', '锁定技，出牌阶段，你至多可使用X张牌，你使用了锦囊牌后不能再使用牌（X为你的体力值）。');
+            }
+        },
+        ai: {
+            expose: 0.2,
+        },
+    },
 };
 
 export { others };
