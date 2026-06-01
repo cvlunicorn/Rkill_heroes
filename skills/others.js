@@ -1147,9 +1147,11 @@ const others = {
         forced: true,
         charlotte: true,
         content: function () {
-            //清除本轮已使用次数的标记
+            //清除本轮已使用次数的标记和造成伤害标记
             var used = player.countMark('shanzhan_used');
             if (used > 0) player.removeMark('shanzhan_used', used);
+            var damaged = player.countMark('shanzhan_damage');
+            if (damaged > 0) player.removeMark('shanzhan_damage', damaged);
         },
     },
 
