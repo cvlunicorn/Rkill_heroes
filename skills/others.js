@@ -2865,7 +2865,7 @@ const others = {
             var history = game.getGlobalHistory('cardMove');
             var cards = [];
             for (var i = 0; i < history.length; i++) {
-                if (history[i].name == 'cardsDiscard' && history[i].cards) {
+                if (history[i].name == 'lose' && history[i].cards) {
                     for (var j = 0; j < history[i].cards.length; j++) {
                         if (get.position(history[i].cards[j]) == 'd') {
                             cards.add(history[i].cards[j]);
@@ -2922,7 +2922,7 @@ const others = {
                 event.target.chooseCardButton("赫尔戈兰湾的初阵：选择" + event.swapNum + "张牌", event.swapNum, true, event.discardCards).set("ai", function (button) {
                     var card = button.link;
                     //AI倾向于拿走杀和决斗，阻止对方使用
-                    if (card.name == 'sha' || card.name == 'juedou') return 10;
+                    if (card.name == 'sha' || card.name == 'juedou' || card.name == 'sheji9' || card.name == 'juedouba9') return 10;
                     return get.value(card);
                 });
             } else {
@@ -2953,7 +2953,7 @@ const others = {
                 return;
             }
             var useCards = event.discardCards.filter(function (card) {
-                return get.position(card) == 'd' && (card.name == 'sha' || card.name == 'juedou');
+                return get.position(card) == 'd' && (card.name == 'sha' || card.name == 'sheji9' || card.name == 'juedouba9' || card.name == 'juedou');
             });
             event.useCards = useCards;
             event.useIndex = 0;
