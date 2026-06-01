@@ -698,7 +698,7 @@ var jianrjinji = {
         noDoubts: "不质疑",
         bismarck_R_chajin_tempBan: "查禁失效",
         bismarck_R_fanji: "反击", "bismarck_R_fanji_info": "你受到伤害后,你可以对伤害来源使用一张无视距离的【杀】",
-        tirpitz_R_jinshu: "禁书", "tirpitz_R_jinshu_info": "每轮开始时,你可以展示一张手牌,并且跳过你本轮的出牌阶段和弃牌阶段。若如此做,每当一张与展示牌花色相同的牌进入弃牌堆时,你摸一张牌。",
+        tirpitz_R_jinshu: "禁书", "tirpitz_R_jinshu_info": "每轮开始时,你可以展示一张手牌,并且跳过你本轮的出牌阶段和弃牌阶段。若如此做,每当一张与展示牌花色相同的牌被使用时,你摸一张牌。",
         tirpitz_R_chuanyue: "传阅", "tirpitz_R_chuanyue_info": "其他角色准备阶段开始时,你可以展示并交给其一张牌,其本回合无法弃置与展示牌相同花色的牌。",
         tirpitz_R_nvwangfugui: "女王复归", "tirpitz_R_nvwangfugui_info": "觉醒技,场上的“俾斯麦”死亡时,你将体力值调整至1点,获得X点护甲并修改“禁书”（X为因“女王复归”而减少的体力值数量）（修改禁书：每轮开始时,你可以展示一张手牌,若如此做,每当一张与弃置牌花色相同的牌进入弃牌堆时,你摸一张牌。）",
         shuangzi: "双子", shuangzi_info: "转换技,阳：你使用或打出基本牌时摸一张牌；阴：你使用或打出锦囊牌时摸一张牌",

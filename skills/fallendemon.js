@@ -1221,7 +1221,7 @@ const fallendemon = {
                     },
                 },
                 init: (player) => {
-                    game.addGlobalSkill('lingce_global');
+                    game.addGlobalSkill('tirpitz_R_jinshu_global');
                 },
                 trigger: {
                     global: ["useCardAfter", "respond"],
