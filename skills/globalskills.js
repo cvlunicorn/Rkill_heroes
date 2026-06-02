@@ -1172,7 +1172,7 @@ const globalskills = {
             if (trigger.nature == 'thunder' && !player.hasSkill('hanbing_skill')) {
                 if (trigger.player.hasSkill('_wulidebuff_jinshui')) { trigger.player.addSkill('_wulidebuff_jinshui'); }
                 trigger.player.addMark('_wulidebuff_jinshui', 1);
-                if ((trigger.player.hujia > 0 || trigger.player.hasSkillTag('maixie_defend')) && (!trigger.player.isLinked() || (trigger.player.isLinked() && link < 2 || trigger.num < 2))) {
+                if ((trigger.player.hujia > 0 )) {
                     var loseNum = trigger.num;
                     trigger.player.loseHp(loseNum);
                     game.log('雷杀穿透护甲:', loseNum);
