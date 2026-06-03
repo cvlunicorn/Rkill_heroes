@@ -1860,21 +1860,27 @@ const fallendemon = {
     cassone_R_weizhuangqixi: {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
-        enable: "phaseUse",
-        usable: 1,
-        selectTarget: 1,
+        trigger: { player: "phaseBegin" },
         filter: function (event, player) {
-            return player.countCards("h") > 0;
+            return player.countCards("h") > 0 && game.hasPlayer(current => player.canCompare(current));
         },
         check: function (event, player) {
             return player.countCards("h") > 1;
         },
-        filterTarget: function (card, player, target) {
-            return player.canCompare(target);
-        },
+        direct: true,
+        log: false,
         content: function () {
-            "step 0"
-            player.chooseToCompare(target);
+            'step 0'
+            player.chooseTarget(get.prompt('cassone_R_weizhuangqixi'), '你可以与一名角色拼点：若你赢,你与其之间距离视作1,且每回合你对其使用的第一张牌不可响应,直到其回合结束；若其赢,你失去一点体力,那之后,直到其回合结束,你受到其造成的伤害后,恢复1点体力', (card, player, target) => {
+                return player.canCompare(target);
+            }).set('ai', target => {
+                var player = _status.event.player;
+                return -get.attitude(player, target);
+            });
+            "step 1"
+            if(result.bool){
+            player.chooseToCompare(result.targets[0]);
+            }
             "step 1"
             if (result.bool) {
                 player.addTempSkill("cassone_R_weizhuangqixi_win");
@@ -1888,11 +1894,10 @@ const fallendemon = {
             }
         },
         ai: {
-            order: 10,
-            threaten: 1.4,
+            threaten: 1.1,
             result: {
                 player: function (player) {
-                    if (player.hp < 2) return -100;
+                    if (player.hp < 2) return -10;
                     if (player.countCards('h', function (card) {
                         return get.tag(card, "damage");
                     }) > 0 && player.getHistory("useCard").length < 1) return 1;
@@ -2203,16 +2208,16 @@ const fallendemon = {
                             ai1: function (card) {
                                 var player = get.player();
                                 // 先评估是否有值得攻击的目标
-                                var hasWorthyTarget = game.hasPlayer(function(current) {
+                                var hasWorthyTarget = game.hasPlayer(function (current) {
                                     return player.canUse({ name: 'wanjian' }, current) &&
-                                           get.effect(current, { name: 'wanjian' }, player, player) > 0;
+                                        get.effect(current, { name: 'wanjian' }, player, player) > 0;
                                 });
 
                                 if (!hasWorthyTarget) return -1; // 没有值得攻击的目标，不弃牌
 
                                 // 计算总攻击效果
                                 var totalEffect = 0;
-                                game.countPlayer(function(current) {
+                                game.countPlayer(function (current) {
                                     if (player.canUse({ name: 'wanjian' }, current)) {
                                         totalEffect += get.effect(current, { name: 'wanjian' }, player, player);
                                     }
@@ -2246,16 +2251,16 @@ const fallendemon = {
                             ai1: function (card) {
                                 var player = get.player();
                                 // 先评估是否有值得攻击的目标
-                                var hasWorthyTarget = game.hasPlayer(function(current) {
+                                var hasWorthyTarget = game.hasPlayer(function (current) {
                                     return player.canUse({ name: 'wanjian' }, current) &&
-                                           get.effect(current, { name: 'wanjian' }, player, player) > 0;
+                                        get.effect(current, { name: 'wanjian' }, player, player) > 0;
                                 });
 
                                 if (!hasWorthyTarget) return -1; // 没有值得攻击的目标，不弃牌
 
                                 // 计算总攻击效果
                                 var totalEffect = 0;
-                                game.countPlayer(function(current) {
+                                game.countPlayer(function (current) {
                                     if (player.canUse({ name: 'wanjian' }, current)) {
                                         totalEffect += get.effect(current, { name: 'wanjian' }, player, player);
                                     }
@@ -2288,16 +2293,16 @@ const fallendemon = {
                             ai1: function (card) {
                                 var player = get.player();
                                 // 先评估是否有值得攻击的目标
-                                var hasWorthyTarget = game.hasPlayer(function(current) {
+                                var hasWorthyTarget = game.hasPlayer(function (current) {
                                     return player.canUse({ name: 'wanjian' }, current) &&
-                                           get.effect(current, { name: 'wanjian' }, player, player) > 0;
+                                        get.effect(current, { name: 'wanjian' }, player, player) > 0;
                                 });
 
                                 if (!hasWorthyTarget) return -1; // 没有值得攻击的目标，不弃牌
 
                                 // 计算总攻击效果
                                 var totalEffect = 0;
-                                game.countPlayer(function(current) {
+                                game.countPlayer(function (current) {
                                     if (player.canUse({ name: 'wanjian' }, current)) {
                                         totalEffect += get.effect(current, { name: 'wanjian' }, player, player);
                                     }
