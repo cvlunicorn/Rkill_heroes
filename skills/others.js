@@ -643,7 +643,7 @@ const others = {
         },
         check: function (event, player) {
             if ((player.getHistory("useCard", function (evt) {
-                return evt.isPhaseUsing() && ["tao", "taoyuan", "kuaixiu9", "jinjixiuli9"].includes(get.name(evt.card));
+                return evt.isPhaseUsing() && ["tao", "taoyuan", "kuaixiu9", "jingjixiuli9"].includes(get.name(evt.card));
             }).length > 0) && (player.hp == player.maxHp)) return false;
             return player.getHistory("useCard", function (evt) {
                 return evt.isPhaseUsing() && ["basic", "trick"].includes(get.type(evt.card));

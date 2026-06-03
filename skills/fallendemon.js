@@ -1438,7 +1438,7 @@ const fallendemon = {
             if (typeof player.storage.akagikaga_R_zongyu_turnOver === 'undefined') player.storage.akagikaga_R_zongyu_turnOver = 0;
         },
         filter: function (event, player) {
-            return event.card.name == "tao" || event.card.name == "jiu" || event.card.name == "taoyuan";
+            return event.card.name == "tao" || event.card.name == "jiu" || event.card.name == "taoyuan"||event.card.name == "kuaixiu9"||event.card.name == "zzqi9"||event.card.name == "jingjixiuli9";
         },
         direct: true,
         charlotte: true,
