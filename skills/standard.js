@@ -925,7 +925,7 @@ const standard = {
             if (name == 'sha') return player.countCards('hs', { color: 'black' }) > 0;
         },
         ai: {
-             yingbian: function (card, player, targets, viewer) {
+            yingbian: function (card, player, targets, viewer) {
                 return lib.card.sha.ai.yingbian(card, player, targets, viewer);
             },
             canLink: function (player, target, card) {
@@ -940,7 +940,7 @@ const standard = {
             },
             result: {
                 target: function (player, target, card, isLink) {
-                   return lib.card.sha.ai.result.target.apply(this, arguments);
+                    return lib.card.sha.ai.result.target.apply(this, arguments);
                 },
             },
             tag: {
@@ -1420,7 +1420,7 @@ const standard = {
                         if (get.equipValue(card) <= 8) return 0;
                     }
                     if (!player.hasEmptySlot(2)) return;
-                    if ((!player.getStat('skill').zhanxianfangyu1||player.getStat('skill').zhanxianfangyu1 == 0) && card.name == "sha" && get.color(card) == "black") return "zerotarget";
+                    if ((!player.getStat('skill').zhanxianfangyu1 || player.getStat('skill').zhanxianfangyu1 == 0) && card.name == "sha" && get.color(card) == "black") return "zerotarget";
                 },
             },
         },
@@ -2042,7 +2042,7 @@ const standard = {
 
                         // 脆皮输出更需要防御距离
                         if ((player.hasSkill('kaimuhangkong') || player.hasSkill('zhongxunca') ||
-                             player.hasSkill('fanjiandaodan') || player.hasSkill('kaimuleiji')) && hp <= 2) {
+                            player.hasSkill('fanjiandaodan') || player.hasSkill('kaimuleiji')) && hp <= 2) {
                             baseScore += 1.5;
                         }
                         break;
@@ -2087,7 +2087,7 @@ const standard = {
                 // === 第四步：团队需求调整 ===
                 var teamHasDamage = game.hasPlayer(function (current) {
                     return current != player && get.attitude(player, current) > 0 &&
-                           (current.hasSkill('kaimuhangkong') || current.hasSkill('zhongxunca') ||
+                        (current.hasSkill('kaimuhangkong') || current.hasSkill('zhongxunca') ||
                             current.hasSkill('fanjiandaodan') || current.hasSkill('kaimuleiji'));
                 });
 
@@ -3640,9 +3640,14 @@ const standard = {
             const { result } = await next;
             const cardsA = [];
             const videoId = lib.status.videoId++;
-
+            
+            if (!result || result.length !== targets.length) {
+                game.log('展示过程出错，技能中断');
+                player.getStat('skill').xinqidian -= 1;
+                return;
+            }
             for (let i = 0; i < targets.length; i++) {
-                if (result && result[i] && result[i].cards && result[i].cards[0]) {
+                if (result[i] && result[i].cards && result[i].cards[0]) {
                     cardsA.push(result[i].cards[0]);
                     game.log(get.translation(targets[i]), '展示了', result[i].cards[0]);
                 } else {
@@ -3666,31 +3671,18 @@ const standard = {
             }, targets, cardsA, videoId, player);
             await game.asyncDelayx(4);
             game.broadcastAll('closeDialog', videoId);
+
             const suit = get.suit(cardsA[0], false);
-            let flag = false;
-            for (let i = 0; i < targets.length; i++) {
-                for (let j = 0; j < i; j++) {
-                    if (get.suit(cardsA[j], false) != get.suit(cardsA[i], false)) {
-                        flag = true;
-                    }
-                    else {
-                        flag = false;
-                        i = targets.length;//触发上级停止条件,跳出循环
-
-                        break;
-                    }
-
-                }
-
-            }
+            const suits = cardsA.map(card => get.suit(card, false));
+            const allDifferent = new Set(suits).size === suits.length;
             for (let j = 0; j < targets.length; j++) {
-                if (flag) {
+                if (allDifferent) {
 
                     game.log(get.translation(targets[j]) + "摸牌");
                     targets[j].draw();
                 }
 
-                if (!flag) {
+                if (!allDifferent) {
 
                     game.log(get.translation(targets[j]) + "获得技能");
                     targets[j].addTempSkill("mashu", { player: "phaseJieshuBegin" });
