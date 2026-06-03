@@ -3834,15 +3834,17 @@ const others = {
         ai: { threaten: 2.3 },
         "_priority": 0,
     },
-    /*
+
     //烟雾掩护
     yanwuyanhu: {
         audio: false,
         trigger: { global: "loseAfter" },
         direct: true,
+        nobracket: true,
         filter: function (event, player) {
             if (event.type == "use") return false;
             if (!event.cards || event.cards.length == 0) return false;
+            if (player == event.player) return false;
             for (var card of event.cards) {
                 if (get.position(card) == "d") return true;
             }
@@ -3862,30 +3864,22 @@ const others = {
                 return 1;
             });
             "step 1"
-            if (!result.bool) {
+            if (!result.bool || !result.links[0]) {
                 event.finish();
                 return;
             }
             event.card = result.links[0];
-            player.chooseControl("牌堆顶", "角色武将牌上").set("prompt", "烟雾掩护：将" + get.translation(event.card) + "置于牌堆顶还是角色武将牌上？").set("ai", function () {
-                return "角色武将牌上";
-            });
-            "step 2"
-            if (result.control == "牌堆顶") {
-                event.card.fix();
-                ui.cardPile.insertBefore(event.card, ui.cardPile.firstChild);
-                game.log(player, "将", event.card, "置于牌堆顶");
-            } else {
-                player.chooseTarget("烟雾掩护：将" + get.translation(event.card) + "置于一名角色武将牌上", true).set("ai", function (target) {
-                    var player = _status.event.player;
-                    var att = get.attitude(player, target);
-                    if (att > 0) return att;
-                    return 0;
+            var target = trigger.player;
+            var max = target.maxHp * 2;
+            if (!target.storage.yanwuyanhu_yan) target.storage.yanwuyanhu_yan = [];
+            if (target.storage.yanwuyanhu_yan.length < max) {
+                player.chooseControl("牌堆顶", "角色武将牌上").set("prompt", "烟雾掩护：将" + get.translation(event.card) + "置于牌堆顶还是角色武将牌上？").set("ai", function () {
+                    return "角色武将牌上";
                 });
             }
-            "step 3"
-            if (result.bool && result.targets && result.targets[0]) {
-                var target = result.targets[0];
+            "step 2"
+            if (result.control == "角色武将牌上") {
+                var target = trigger.player;
                 var max = target.maxHp * 2;
                 if (!target.storage.yanwuyanhu_yan) target.storage.yanwuyanhu_yan = [];
                 if (target.storage.yanwuyanhu_yan.length < max) {
@@ -3895,6 +3889,12 @@ const others = {
                     target.markSkill("yanwuyanhu_yan");
                     game.log(player, "将", event.card, "置于", target, "的武将牌上");
                 }
+
+            } else {
+                event.card.fix();
+                ui.cardPile.insertBefore(event.card, ui.cardPile.firstChild);
+                game.log(player, "将", event.card, "置于牌堆顶");
+
             }
         },
         subSkill: {
@@ -3966,7 +3966,7 @@ const others = {
                 },
             },
         },
-    },
+    },/*
     //投石机
     toushiji: {
         audio: false,
