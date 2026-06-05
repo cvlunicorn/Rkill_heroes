@@ -503,7 +503,7 @@ const fallendemon = {
         multitarget: true,
         filterTarget: function (card, player, target) {
             if (ui.selected.targets.length == 1) {
-                return (target.hasSkill("southdakota_R_gumei") && target.getStorage('southdakota_R_gumei') != true) && target.canUse({ name: "juedou" }, ui.selected.targets[0]);
+                return (target.hasSkill("southdakota_R_gumei") /*&& target.getStorage('southdakota_R_gumei') != true*/) && target.canUse({ name: "juedou" }, ui.selected.targets[0]);
             }
             return true;
         },
@@ -540,9 +540,9 @@ const fallendemon = {
                 player.getHistory("lose", function (evt) {
                     if (evt.getParent() != event) return false;
                     for (var i in evt.gaintag_map) {
-                        if (evt.gaintag_map[i].includes("southdakota_R_jianmiemoshi")) return false;
+                        if (evt.gaintag_map[i].includes("southdakota_R_jianmiemoshi")) return true;
                     }
-                    return true;
+                    return false;
                 }).length > 0
             );
         },
