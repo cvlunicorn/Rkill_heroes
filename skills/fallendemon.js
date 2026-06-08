@@ -1944,8 +1944,8 @@ const fallendemon = {
                     return player.getStorage('cassone_R_weizhuangqixi_win').includes(event.target);
                 },
                 logTarget: 'target',
-                content(event, trigger, player) {
-                    trigger.directHit.add(event.target);
+                content() {
+                    trigger.directHit.add(trigger.target);
                 },
                 ai: {
                     directHit_ai: true,
@@ -1980,8 +1980,8 @@ const fallendemon = {
                     return (player.getStorage('cassone_R_weizhuangqixi_win').includes(event.player) && player.hasSkill("cassone_R_weizhuangqixi_win")) || (player.getStorage('cassone_R_weizhuangqixi_lose').includes(event.player) && player.hasSkill("cassone_R_weizhuangqixi_lose"));
                 },
                 content: function () {
-                    if (player.hasSkill("cassone_R_weizhuangqixi_win")) player.removeSkill("cassone_R_weizhuangqixi_win");
-                    if (player.hasSkill("cassone_R_weizhuangqixi_lose")) player.removeSkill("cassone_R_weizhuangqixi_lose");
+                    if (player.hasSkill("cassone_R_weizhuangqixi_win")) {player.storage.cassone_R_weizhuangqixi_win = [];player.removeSkill("cassone_R_weizhuangqixi_win");}
+                    if (player.hasSkill("cassone_R_weizhuangqixi_lose")) {player.storage.cassone_R_weizhuangqixi_lose = [];player.removeSkill("cassone_R_weizhuangqixi_lose");}
                 },
             },
         },
