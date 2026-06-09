@@ -578,7 +578,7 @@ const fallendemon = {
                     return player.getExpansions('J').length > 0;
                 },
                 check(event, player) {
-                    return player.countCards("h")+1 < player.getExpansions('J').length;
+                    return player.countCards("h") < player.getExpansions('J').length;
                 },
                 content: function () {
                     var handCards = player.getCards("h");
