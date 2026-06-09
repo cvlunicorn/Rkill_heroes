@@ -512,7 +512,7 @@ const fallendemon = {
             return game.countPlayer(current => current != player && current.hasSkill("southdakota_R_gumei") && current.getStorage('southdakota_R_gumei') != true) >= 1;
         },
         content: function () {
-            player.discard(cards[0]);
+            player.give(cards[0], event.targets[1]);
             event.targets[1].useCard({ name: "juedou", isCard: true }, event.targets[0], "noai");
         },
         ai: {
@@ -528,15 +528,27 @@ const fallendemon = {
             },
         },
     },
+    J: {
+        marktext: "J",
+        intro: {
+            content: "expansion",
+            markcount: "expansion",
+        },
+        onremove(player, skill) {
+            var cards = player.getExpansions(skill);
+            if (cards.length) player.loseToDiscardpile(cards);
+        },
+    },
     southdakota_R_jianmiemoshi: {
         nobracket: true,
         direct: true,
         trigger: {
             player: "useCard",
         },
+        forced: true,
         direct: true,
         filter(event, player) {
-            return (
+            /*return (
                 player.getHistory("lose", function (evt) {
                     if (evt.getParent() != event) return false;
                     for (var i in evt.gaintag_map) {
@@ -544,23 +556,51 @@ const fallendemon = {
                     }
                     return false;
                 }).length > 0
-            );
+            );*/
+            return event.cards.length > 0;
         },
         preHidden: true,
         async content(event, trigger, player) {
             trigger.nowuxie = true;
             trigger.directHit.addArray(game.players);
         },
-        group: ["southdakota_R_jianmiemoshi_end"],
+        onremove(player, skill) {
+            var cards = player.getExpansions(skill);
+            if (cards.length) player.loseToDiscardpile(cards);
+        },
+        group: ["southdakota_R_jianmiemoshi_zhunbei", "southdakota_R_jianmiemoshi_gain", "J"],
         subSkill: {
-            end: {
+            zhunbei: {
                 trigger: {
-                    player: "phaseEnd",
+                    player: "phaseZhunbeiBegin",
                 },
-                direct: true,
+                filter(event, player) {
+                    return player.getExpansions('J').length > 0;
+                },
+                check(event, player) {
+                    return player.countCards("h")+1 < player.getExpansions('J').length;
+                },
                 content: function () {
-                    player.addGaintag(player.getCards("h"), "southdakota_R_jianmiemoshi");
+                    var handCards = player.getCards("h");
+                    if (handCards && handCards.length) player.discard(handCards);
+                    var jianmieCards = player.getExpansions('J');
+                    player.gain(jianmieCards, "gain2");
                 },
+            },
+            gain: {
+                log: false,
+                forced: true,
+                direct: true,
+                trigger: {
+                    player: "gainAfter",
+                },
+                filter(event, player) {
+                    var parent = event.getParent("southdakota_R_jianmiemoshi_zhunbei");
+                    return !(parent && parent.name == "southdakota_R_jianmiemoshi_zhunbei");
+                },
+                content: function () {
+                    player.addToExpansion(trigger.cards, player, 'giveAuto').gaintag.add('J');
+                }
             },
         },
         ai: {
@@ -1438,7 +1478,7 @@ const fallendemon = {
             if (typeof player.storage.akagikaga_R_zongyu_turnOver === 'undefined') player.storage.akagikaga_R_zongyu_turnOver = 0;
         },
         filter: function (event, player) {
-            return event.card.name == "tao" || event.card.name == "jiu" || event.card.name == "taoyuan"||event.card.name == "kuaixiu9"||event.card.name == "zzqi9"||event.card.name == "jingjixiuli9";
+            return event.card.name == "tao" || event.card.name == "jiu" || event.card.name == "taoyuan" || event.card.name == "kuaixiu9" || event.card.name == "zzqi9" || event.card.name == "jingjixiuli9";
         },
         direct: true,
         charlotte: true,
@@ -1878,8 +1918,8 @@ const fallendemon = {
                 return -get.attitude(player, target);
             });
             "step 1"
-            if(result.bool){
-            player.chooseToCompare(result.targets[0]);
+            if (result.bool) {
+                player.chooseToCompare(result.targets[0]);
             }
             "step 1"
             if (result.bool) {
@@ -1980,8 +2020,8 @@ const fallendemon = {
                     return (player.getStorage('cassone_R_weizhuangqixi_win').includes(event.player) && player.hasSkill("cassone_R_weizhuangqixi_win")) || (player.getStorage('cassone_R_weizhuangqixi_lose').includes(event.player) && player.hasSkill("cassone_R_weizhuangqixi_lose"));
                 },
                 content: function () {
-                    if (player.hasSkill("cassone_R_weizhuangqixi_win")) {player.storage.cassone_R_weizhuangqixi_win = [];player.removeSkill("cassone_R_weizhuangqixi_win");}
-                    if (player.hasSkill("cassone_R_weizhuangqixi_lose")) {player.storage.cassone_R_weizhuangqixi_lose = [];player.removeSkill("cassone_R_weizhuangqixi_lose");}
+                    if (player.hasSkill("cassone_R_weizhuangqixi_win")) { player.storage.cassone_R_weizhuangqixi_win = []; player.removeSkill("cassone_R_weizhuangqixi_win"); }
+                    if (player.hasSkill("cassone_R_weizhuangqixi_lose")) { player.storage.cassone_R_weizhuangqixi_lose = []; player.removeSkill("cassone_R_weizhuangqixi_lose"); }
                 },
             },
         },
