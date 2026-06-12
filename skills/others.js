@@ -3966,49 +3966,81 @@ const others = {
                 },
             },
         },
-    },/*
+    },
     //投石机
     toushiji: {
         audio: false,
         mod: {
-            cardEnabled2: function (card, player) {
-                if (card.name != "sha") return;
+            cardEnabled: function (card, player) {
+                if (card.name == "sha") return;
                 var lostHp = player.maxHp - player.hp;
                 if (lostHp <= 0) return;
-                var color = get.color(card);
-                if (!player.storage.toushiji_count) player.storage.toushiji_count = {};
-                var count = player.storage.toushiji_count[color] || 0;
+                var count = player.getHistory('useCard', evt => {
+                    return get.name(evt.card) == 'sha' && evt.addCount !== false;
+                }).length || 0;
                 if (count < lostHp) {
-                    if (get.type(card) != "basic") return true;
+                    if (get.type(card) != "basic") return false;
                 }
+                return;
+            },
+            cardUsable(card, player, num) {
+                var lostHp = player.maxHp - player.hp;
+                if (lostHp <= 0) return;
+                var count = player.getHistory('useCard', evt => {
+                    return get.name(evt.card) == 'sha' && evt.addCount !== false;
+                }).length || 0;
+                if (count < lostHp) {
+                    if (get.type(card) == "basic" && (get.nature(card) == "fire" || get.nature(card) == "thunder")) return Infinity;
+                }
+                return;
             },
         },
-        trigger: { player: "useCard1" },
-        forced: true,
-        silent: true,
-        popup: false,
+        enable: "chooseToUse",
+        filterCard: function (card) {
+            return get.type(card) != "basic";
+        },
+        position: "h",
+        viewAs: function (card) {
+            return { name: "sha", nature: get.color(card) == "red" ? "fire" : "thunder", };
+        },
         filter: function (event, player) {
-            return event.card && event.card.name == "sha";
+            var lostHp = player.maxHp - player.hp;
+            if (lostHp <= 0) return false;
+            var count = player.getHistory('useCard', evt => {
+                return evt.card.name == 'sha' && evt.addCount != false;
+            }).length || 0;
+            if (count < lostHp) {
+                return player.countCards("h", function (card) {
+                    return get.type(card) != "basic";
+                }) > 0;
+            } else {
+                return false;
+            }
         },
-        content: function () {
-            if (!player.storage.toushiji_count) player.storage.toushiji_count = {};
-            var color = get.color(trigger.card);
-            if (!player.storage.toushiji_count[color]) player.storage.toushiji_count[color] = 0;
-            player.storage.toushiji_count[color]++;
+        viewAsFilter: function (player) {
+            var lostHp = player.maxHp - player.hp;
+            if (lostHp <= 0) return false;
+            var count = player.getHistory('useCard', evt => {
+                return get.name(evt.card) == 'sha' && evt.addCount !== false;
+            }).length || 0;
+            if (count < lostHp) {
+                return player.countCards("h", function (card) {
+                    return get.type(card) != "basic";
+                }) > 0;
+            } else {
+                return false;
+            }
         },
-        group: "toushiji_clear",
-        subSkill: {
-            clear: {
-                trigger: { player: "phaseUseEnd" },
-                forced: true,
-                silent: true,
-                popup: false,
-                content: function () {
-                    delete player.storage.toushiji_count;
-                },
-            },
+        prompt: "将一张非基本牌当属性杀使用",
+        check: function (card) {
+            return 8 - get.value(card);
         },
-    },
+        ai: {
+            fireAttack: true,
+            thunderAttack: true,
+            threaten: 1.05,
+        },
+    },/*
     //近援
     jianyuan: {
         audio: false,
