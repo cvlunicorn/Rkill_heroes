@@ -3280,33 +3280,24 @@ const unfulfilledambition = {
             }
         },
     },
-    /*
+
     //防御伞
     fangyusan: {
-        audio: false,
-        trigger: { player: "damageBefore", global: "useCardToTarget" },
+        nobracket:true,
+        audio: 1,
+        trigger: { global: "useCardToTarget" },
         forced: true,
         filter: function (event, player, name) {
-            if (name == "damageBefore") {
-                var evt = event.getParent();
-                if (!evt || !evt.card) return false;
-                var cardname = evt.card.name;
-                return cardname == "wanjian" || cardname == "zhiyuangongji" || cardname == "jinjuzhiyuan";
-            }
-            if (name == "useCardToTarget") {
-                if (event.player == player) return false;
-                var card = event.card;
-                if (!card) return false;
-                var cardname = card.name;
-                if (cardname != "wanjian" && cardname != "zhiyuangongji" && cardname != "jinjuzhiyuan") return false;
-                if (!event.target) return false;
-                return player.inRange(event.target);
-            }
-            return false;
+            var card = event.card;
+            if (!card) return false;
+            var cardname = card.name;
+            if (cardname != "wanjian" && cardname != "zhiyuangongji9" && cardname != "jinjuzhiyuan9") return false;
+            if (!event.target) return false;
+            return event.target == player || event.target.inRange(player);
         },
         content: function () {
-            if (event.triggername == "damageBefore") {
-                trigger.cancel();
+            if (trigger.target == player) {
+                trigger.getParent().excluded.add(player);
             } else {
                 player.chooseToDiscard("he", "防御伞：是否弃置一张牌取消" + get.translation(trigger.target) + "成为目标？").set("ai", function (card) {
                     var player = _status.event.player;
@@ -3324,13 +3315,14 @@ const unfulfilledambition = {
         ai: {
             effect: {
                 target: function (card, player, target) {
-                    if (card.name == "wanjian" || card.name == "zhiyuangongji" || card.name == "jinjuzhiyuan") return "zeroplayertarget";
+                    if (card.name == "wanjian" || card.name == "zhiyuangongji9" || card.name == "jinjuzhiyuan9") return "zeroplayertarget";
                 },
             },
         },
     },
     //舰队防御
     jianduifangyu: {
+        nobracket:true,
         audio: false,
         enable: "phaseUse",
         usable: 1,
@@ -3344,11 +3336,11 @@ const unfulfilledambition = {
             return target != player;
         },
         check: function (card) {
-            return 6 - get.value(card);
+            return 9 - get.value(card);
         },
         content: function () {
             target.gain(cards, player, "giveAuto");
-            target.useCard({ name: "kuaixiu" }, target, false);
+            if(target.isDamaged())target.useCard({ name: "tao" }, target, false);
             if (get.color(cards[0]) == "red" && (get.number(cards[0]) == 9 || get.number(cards[0]) == 11)) {
                 player.draw();
             }
@@ -3362,7 +3354,7 @@ const unfulfilledambition = {
                 },
             },
         },
-    },
+    },/*
     //迷途
     mitu: {
         audio: false,
