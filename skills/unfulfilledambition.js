@@ -3354,11 +3354,12 @@ const unfulfilledambition = {
                 },
             },
         },
-    },/*
+    },
     //迷途
     mitu: {
         audio: false,
         trigger: { player: "phaseEnd" },
+        direct:true,
         content: function () {
             "step 0"
             player.chooseControl("回复体力并翻面", "cancel2").set("prompt", "迷途：是否回复一点体力并翻面？").set("ai", function () {
@@ -3395,7 +3396,7 @@ const unfulfilledambition = {
                         if (draw > 0) {
                             player.draw(draw);
                         }
-                        player.addTempSkill("mitu_give", { player: "turnOverAfter" });
+                        player.addTempSkill("mitu_give", { player: "phaseBefore" });
                     }
                 },
             },
@@ -3403,13 +3404,16 @@ const unfulfilledambition = {
                 audio: false,
                 trigger: { global: "phaseBegin" },
                 forced: true,
+                direct:true,
                 filter: function (event, player) {
                     return event.player != player && player.countCards("h") > 0;
                 },
                 content: function () {
-                    player.chooseCard("h", true, "迷途：交给" + get.translation(trigger.player) + "一张牌").set("ai", function (card) {
-                        return 6 - get.value(card);
+                    "step 0"
+                    player.chooseCard("h", true, "迷途：交给" + get.translation(trigger.player) + "一张牌",true).set("ai", function (card) {
+                        return 7 - get.value(card);
                     });
+                    "step 1"
                     if (result.bool) {
                         player.give(result.cards, trigger.player);
                     }
@@ -3417,7 +3421,7 @@ const unfulfilledambition = {
             },
         },
     },
-
+/*
     //扎实的铁锤
     zhashidechuizi: {
         audio: false,
