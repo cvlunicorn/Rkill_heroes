@@ -3484,7 +3484,7 @@ const unfulfilledambition = {
                     "step 1"
                     if (result.bool) {
                         player.addExpose(0.25);
-                        var suit0=get.suit(result.links[0]);
+                        var suit0 = get.suit(result.links[0]);
                         trigger.fixedResult = {
                             suit: suit0,
                             color: get.color({ suit: suit0 }),
@@ -3497,54 +3497,61 @@ const unfulfilledambition = {
             },
         },
     },
-    /*
+
     //王牌猎手
     wangpaielieshou: {
         audio: false,
         trigger: { player: "phaseBegin" },
         direct: true,
+        filter: function (event, player) {
+            return game.countPlayer(current => current.countCards("ej") > 0);
+        },
         content: function () {
             "step 0"
-            player.chooseTarget(get.prompt("wangpaielieshou"), "弃置场上的一张牌，然后选择一名手牌数大于其体力值的角色，从左至右依次弃置其手牌，直至小于其当前体力值", function (card, player, target) {
-                return target.countCards("h") > target.hp;
-            }).set("ai", function (target) {
+            player.chooseTarget("王牌猎手：你可以弃置场上的一张牌，然后选择一名手牌数大于其体力值的角色，从左至右依次弃置其手牌，直至小于其当前体力值", function (card, player, target) {
+                return target.countCards("ej") > 0;
+            }, false).set("ai", function (target) {
                 var player = _status.event.player;
                 if (get.attitude(player, target) < 0) {
-                    return target.countCards("h") - target.hp;
+                    return get.effect(target, { name: "guohe" }, player, player);
                 }
                 return 0;
             });
+
             "step 1"
             if (result.bool && result.targets && result.targets[0]) {
+                player.discardPlayerCard(result.targets[0], "ej", true);
+            }
+            "step 2"
+            if (result.bool) {
                 player.logSkill("wangpaielieshou", result.targets);
-                event.target = result.targets[0];
-                player.chooseTarget("王牌猎手：弃置场上的一张牌", function (card, player, target) {
-                    return target.countCards("hej") > 0;
-                }, true).set("ai", function (target) {
+                player.chooseTarget(get.prompt("wangpaielieshou"), "选择一名手牌数大于其体力值的角色，从左至右依次弃置其手牌，直至小于其当前体力值", function (card, player, target) {
+                    return target.countCards("h") > target.hp;
+                }).set("ai", function (target) {
                     var player = _status.event.player;
                     if (get.attitude(player, target) < 0) {
-                        return get.effect(target, { name: "guohe" }, player, player);
+                        return target.countCards("h") - target.hp;
                     }
                     return 0;
                 });
             } else {
                 event.finish();
             }
-            "step 2"
-            if (result.bool && result.targets && result.targets[0]) {
-                player.discardPlayerCard(result.targets[0], "hej", true);
-            }
             "step 3"
-            if (event.target && event.target.countCards("h") > event.target.hp) {
-                var cards = event.target.getCards("h");
-                var num = event.target.countCards("h") - event.target.hp;
-                if (num > 0 && cards.length > 0) {
-                    var toDiscard = cards.slice(0, num);
-                    event.target.discard(toDiscard);
+            if (result.bool && result.targets && result.targets[0]) {
+                event.target = result.targets[0];
+                if (event.target && event.target.countCards("h") > event.target.hp) {
+                    var cards = event.target.getCards("h");
+                    var num = event.target.countCards("h") - event.target.hp;
+                    if (event.target.countCards("h")>= event.target.hp && cards.length > 0) {
+                        var toDiscard = cards.slice(0, num);
+                        event.target.discard(toDiscard);
+                    }
                 }
             }
         },
     },
+    /*
     //SP青叶技能
     sp_qingye_R_hongbaiouzhanxiang: {
         audio: false,
