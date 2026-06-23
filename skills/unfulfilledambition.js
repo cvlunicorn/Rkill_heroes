@@ -3543,7 +3543,7 @@ const unfulfilledambition = {
                 if (event.target && event.target.countCards("h") > event.target.hp) {
                     var cards = event.target.getCards("h");
                     var num = event.target.countCards("h") - event.target.hp;
-                    if (event.target.countCards("h")>= event.target.hp && cards.length > 0) {
+                    if (event.target.countCards("h") >= event.target.hp && cards.length > 0) {
                         var toDiscard = cards.slice(0, num);
                         event.target.discard(toDiscard);
                     }
@@ -3551,7 +3551,7 @@ const unfulfilledambition = {
             }
         },
     },
-    
+
     //SP青叶技能
     sp_qingye_R_hongbaiouzhanxiang: {
         audio: false,
@@ -3598,7 +3598,7 @@ const unfulfilledambition = {
                 },
             },
         },
-    },/*
+    },
     //前迫
     qianpo: {
         audio: false,
@@ -3607,14 +3607,14 @@ const unfulfilledambition = {
                 if (card.name == "sha" && range[1] != -1) range[1]++;
             },
         },
-        trigger: { source: "damageBegin1", player: "useCardToTargeted" },
+        trigger: { source: "damageBegin1", player: "juedou", target: "juedou" },
         forced: true,
         filter: function (event, player, name) {
             if (name == "damageBegin1") {
                 return event.card && event.card.name == "sha";
             }
-            if (name == "useCardToTargeted") {
-                return event.card && event.card.name == "juedou" && event.target == player;
+            if (name == "juedou") {
+                return event.turn == player;
             }
             return false;
         },
@@ -3622,56 +3622,57 @@ const unfulfilledambition = {
             if (event.triggername == "damageBegin1") {
                 trigger.num++;
             } else {
-                player.addTempSkill("qianpo_discard");
+                if (player.countCards("h") > 0) {
+                    player.chooseToDiscard("前迫：请弃置一张牌", 1, true);
+                }
             }
         },
-        subSkill: {
-            discard: {
-                mod: {
-                    cardRespondable: function (card, player) {
-                        if (card.name == "sha" && _status.event.name == "chooseToRespond") {
-                            if (!player.countCards("he")) return false;
-                        }
-                    },
-                },
-                trigger: { player: "chooseToRespondBefore" },
-                forced: true,
-                filter: function (event, player) {
-                    return event.filterCard({ name: "sha" }, player, event);
-                },
-                content: function () {
-                    "step 0"
-                    player.chooseToDiscard("he", "前迫：须弃置一张牌才可以打出一张【杀】", true);
-                    "step 1"
-                    if (!result.bool) {
-                        trigger.result = { bool: false };
-                    }
-                },
-            },
+        ai: {
+            effect: {
+                target: function (card, player, target, current) {
+                    if (card.name == 'juedou') return 2;
+                }
+            }
         },
     },
     //精防
     jingfang: {
         audio: false,
         trigger: { player: "damageBegin3" },
-        forced: true,
         filter: function (event, player) {
             if (!player.storage.jingfang_damaged) return false;
             return true;
         },
+        direct: true,
         content: function () {
             trigger.num--;
         },
-        group: "jingfang_mark",
+        effect: {
+            target: function (card, player, target) {
+                if (get.tag(card, 'damage')) {
+                    if (target.getHistory('damage').length > 0) {
+                        return 0;
+                    }
+                }
+            },
+        },
+        group: ["jingfang_mark", "jingfang_reset"],
         subSkill: {
             mark: {
                 trigger: { player: "damageEnd" },
-                forced: true,
                 silent: true,
                 popup: false,
                 content: function () {
-                    if (!player.storage.jingfang_damaged) {
-                        player.storage.jingfang_damaged = true;
+                    player.storage.jingfang_damaged = true;
+                },
+            },
+            reset: {
+                trigger: { global: "roundStart" },
+                silent: true,
+                popup: false,
+                content: function () {
+                    if (player.storage.jingfang_damaged) {
+                        player.storage.jingfang_damaged = false;
                     }
                 },
             },
@@ -3681,20 +3682,13 @@ const unfulfilledambition = {
     zhanduan: {
         audio: false,
         trigger: { player: "die" },
-        forced: false,
+        forceDie: true,
         skillAnimation: true,
         animationColor: "fire",
         content: function () {
-            "step 0"
-            player.chooseControl("发动", "cancel2").set("prompt", "战端：是否令场上的所有【杀】与锦囊牌造成的伤害+1？").set("ai", function () {
-                return "发动";
+            game.countPlayer(function (current) {
+                current.addSkill("zhanduan_effect");
             });
-            "step 1"
-            if (result.control == "发动") {
-                game.countPlayer(function (current) {
-                    current.addSkill("zhanduan_effect");
-                });
-            }
         },
         subSkill: {
             effect: {
@@ -3713,7 +3707,7 @@ const unfulfilledambition = {
                 },
             },
         },
-    },
+    },/*
     //381警告
     sanbayi_jinggao: {
         audio: false,
