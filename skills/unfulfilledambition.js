@@ -3283,7 +3283,7 @@ const unfulfilledambition = {
 
     //防御伞
     fangyusan: {
-        nobracket:true,
+        nobracket: true,
         audio: 1,
         trigger: { global: "useCardToTarget" },
         forced: true,
@@ -3322,7 +3322,7 @@ const unfulfilledambition = {
     },
     //舰队防御
     jianduifangyu: {
-        nobracket:true,
+        nobracket: true,
         audio: false,
         enable: "phaseUse",
         usable: 1,
@@ -3340,7 +3340,7 @@ const unfulfilledambition = {
         },
         content: function () {
             target.gain(cards, player, "giveAuto");
-            if(target.isDamaged())target.useCard({ name: "tao" }, target, false);
+            if (target.isDamaged()) target.useCard({ name: "tao" }, target, false);
             if (get.color(cards[0]) == "red" && (get.number(cards[0]) == 9 || get.number(cards[0]) == 11)) {
                 player.draw();
             }
@@ -3359,7 +3359,7 @@ const unfulfilledambition = {
     mitu: {
         audio: false,
         trigger: { player: "phaseEnd" },
-        direct:true,
+        direct: true,
         content: function () {
             "step 0"
             player.chooseControl("回复体力并翻面", "cancel2").set("prompt", "迷途：是否回复一点体力并翻面？").set("ai", function () {
@@ -3404,13 +3404,13 @@ const unfulfilledambition = {
                 audio: false,
                 trigger: { global: "phaseBegin" },
                 forced: true,
-                direct:true,
+                direct: true,
                 filter: function (event, player) {
                     return event.player != player && player.countCards("h") > 0;
                 },
                 content: function () {
                     "step 0"
-                    player.chooseCard("h", true, "迷途：交给" + get.translation(trigger.player) + "一张牌",true).set("ai", function (card) {
+                    player.chooseCard("h", true, "迷途：交给" + get.translation(trigger.player) + "一张牌", true).set("ai", function (card) {
                         return 7 - get.value(card);
                     });
                     "step 1"
@@ -3421,9 +3421,9 @@ const unfulfilledambition = {
             },
         },
     },
-/*
+
     //扎实的铁锤
-    zhashidechuizi: {
+    zhashidetiechui: {
         audio: false,
         trigger: { player: "useCardToTargeted" },
         direct: true,
@@ -3443,57 +3443,61 @@ const unfulfilledambition = {
             });
             "step 1"
             if (result.bool && result.cards && result.cards[0]) {
-                player.logSkill("zhashidechuizi", trigger.target);
-                var card = result.cards[0];
-                if (!player.storage.zhashidechuizi_cards) player.storage.zhashidechuizi_cards = [];
-                player.storage.zhashidechuizi_cards.push(card);
-                player.addSkill("zhashidechuizi_effect");
-                player.syncStorage("zhashidechuizi_cards");
-                player.markSkill("zhashidechuizi_effect");
-                trigger.target.lose(card, ui.special);
+                player.addToExpansion(result.cards, player, 'give').gaintag.add('zhashidetiechui');
+                player.logSkill("zhashidetiechui", trigger.target);
             }
         },
+        intro: {
+            content: 'expansion',
+            markcount: 'expansion',
+        },
+        group: ["zhashidetiechui_effect"],
         subSkill: {
             effect: {
                 audio: false,
-                trigger: { global: "judgeBegin" },
+                trigger: { global: "judge" },
                 direct: true,
                 filter: function (event, player) {
-                    return player.storage.zhashidechuizi_cards && player.storage.zhashidechuizi_cards.length > 0;
+                    return player.getExpansions('zhashidetiechui') && player.getExpansions('zhashidetiechui').length > 0;
                 },
                 content: function () {
                     "step 0"
-                    player.chooseButton(["扎实的铁锤：是否将一张牌交给" + get.translation(trigger.player) + "，令判定牌视为此牌的花色？", player.storage.zhashidechuizi_cards]).set("ai", function (button) {
-                        var player = _status.event.player;
-                        var target = _status.event.getTrigger().player;
-                        if (get.attitude(player, target) > 0) {
-                            var judge = _status.event.getTrigger().judge(button.link);
-                            if (judge > 0) return judge;
-                        }
-                        return 0;
-                    });
+                    var list = player.getExpansions('zhashidetiechui');
+                    player.chooseButton([get.translation(trigger.player) + '的' + (trigger.judgestr || '') + '判定为' + get.translation(trigger.player.judging[0]) +
+                        '，' + get.prompt('zhashidetiechui'), list, 'hidden'], function (button) {
+                            var card = button.link;
+                            var trigger = _status.event.getTrigger();
+                            var player = _status.event.player;
+                            var judging = _status.event.judging;
+                            var result = trigger.judge(card) - trigger.judge(judging);
+                            var attitude = get.attitude(player, trigger.player);
+                            return result * attitude;
+                        }).set('judging', trigger.player.judging[0]).set('filterButton', function (button) {
+                            var player = _status.event.player;
+                            var card = button.link;
+                            var mod2 = game.checkMod(card, player, 'unchanged', 'cardEnabled2', player);
+                            if (mod2 != 'unchanged') return mod2;
+                            var mod = game.checkMod(card, player, 'unchanged', 'cardRespondable', player);
+                            if (mod != 'unchanged') return mod;
+                            return true;
+                        });
                     "step 1"
-                    if (result.bool && result.links && result.links[0]) {
-                        player.logSkill("zhashidechuizi", trigger.player);
-                        var card = result.links[0];
-                        player.storage.zhashidechuizi_cards.remove(card);
-                        player.syncStorage("zhashidechuizi_cards");
-                        if (player.storage.zhashidechuizi_cards.length == 0) {
-                            player.removeSkill("zhashidechuizi_effect");
-                        } else {
-                            player.markSkill("zhashidechuizi_effect");
-                        }
-                        player.give(card, trigger.player);
-                        trigger.fixedResult = { suit: get.suit(card) };
+                    if (result.bool) {
+                        player.addExpose(0.25);
+                        var suit0=get.suit(result.links[0]);
+                        trigger.fixedResult = {
+                            suit: suit0,
+                            color: get.color({ suit: suit0 }),
+                        };
+                        game.log(trigger.player, '的判定花色改为了', suit0);
+                        game.delay(2);
+                        trigger.player.gain(result.links[0], "gain2");
                     }
-                },
-                marktext: "锤",
-                intro: {
-                    content: "cards",
                 },
             },
         },
     },
+    /*
     //王牌猎手
     wangpaielieshou: {
         audio: false,
