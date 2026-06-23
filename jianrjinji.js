@@ -939,7 +939,7 @@ var jianrjinji = {
         wangpaielieshou: "王牌猎手",
         wangpaielieshou_info: "你回合开始时，你可以弃置场上的一张牌，然后选择一个手牌数大于其体力值的角色，从左至右依次弃置其手牌，直至小于其当前体力值。",
         sp_qingye_R_hongbaiouzhanxiang: "红白偶像战",
-        sp_qingye_R_hongbaiouzhanxiang_info: "回合开始，你摸一张牌并弃置一张牌获得以下效果：如此牌是基本牌，你的基本牌无次数限制；装备牌，你使用牌无视距离限制；锦囊牌，你选择一名目标，你摸两张牌，其摸一张牌。",
+        sp_qingye_R_hongbaiouzhanxiang_info: "回合开始，你摸一张牌并弃置一张牌,依据弃置的牌得以下效果：如此牌是基本牌，你的基本牌无次数限制；装备牌，你使用牌无视距离限制；锦囊牌，你选择一名目标，你摸两张牌，其摸一张牌。",
         qianpo: "前迫",
         qianpo_info: "你的【杀】可以额外指定一个目标，造成的伤害值+1，且你成为【决斗】的目标时，你须弃置一张牌才可以打出一张【杀】。",
         jingfang: "精防",

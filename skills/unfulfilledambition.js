@@ -3551,7 +3551,7 @@ const unfulfilledambition = {
             }
         },
     },
-    /*
+    
     //SP青叶技能
     sp_qingye_R_hongbaiouzhanxiang: {
         audio: false,
@@ -3560,7 +3560,7 @@ const unfulfilledambition = {
             "step 0"
             player.draw();
             "step 1"
-            player.chooseToDiscard("h", true, "回响：弃置一张牌");
+            player.chooseToDiscard("he", true, "弃置一张牌");
             "step 2"
             if (result.bool && result.cards && result.cards[0]) {
                 var card = result.cards[0];
@@ -3570,7 +3570,7 @@ const unfulfilledambition = {
                 } else if (type == "equip") {
                     player.addTempSkill("sp_qingye_R_hongbaiouzhanxiang_equip");
                 } else if (type == "trick") {
-                    player.chooseTarget("回响：选择一名角色，你摸两张牌，其摸一张牌", true).set("ai", function (target) {
+                    player.chooseTarget("选择一名角色，你摸两张牌，其摸一张牌", true).set("ai", function (target) {
                         var player = _status.event.player;
                         return get.attitude(player, target);
                     });
@@ -3598,7 +3598,7 @@ const unfulfilledambition = {
                 },
             },
         },
-    },
+    },/*
     //前迫
     qianpo: {
         audio: false,
