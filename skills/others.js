@@ -4040,73 +4040,61 @@ const others = {
             thunderAttack: true,
             threaten: 1.05,
         },
-    },/*
+    },
     //近援
     jianyuan: {
         audio: false,
         mod: {
             cardname: function (card, player) {
-                if (get.subtype(card) == "equip1") {
-                    var range = get.info(card).distance;
-                    if (range && range.attackRange && range.attackRange > 1) {
-                        return "zhiyuangongji";
+                if (lib.card[card.name].subtype == "equip1") {
+                    var range = card.distance;
+                    if (card.name!="zhuge"||card.name!="sushepao") {
+                        return "zhiyuangongji9";
                     }
                 }
-                if (get.subtype(card) == "equip3" || get.subtype(card) == "equip4") {
+                if ( lib.card[card.name].subtype== "equip3" ||lib.card[card.name].subtype== "equip4") {
                     return "sha";
                 }
             },
         },
     },
     //岸轰
-    anghong: {
-        audio: false,
+    anhong: {
         trigger: { player: "phaseUseBegin" },
-        direct: true,
-        content: function () {
-            "step 0"
-            var str = "阴：随机获得牌堆中一张装备牌";
-            if (player.storage.anghong_yin) {
-                str = "阳：你的攻击范围改为3，然后回复一点体力";
-            }
-            player.chooseControl("阴", "阳", "cancel2").set("prompt", "岸轰：" + str).set("ai", function () {
-                var player = _status.event.player;
-                if (player.storage.anghong_yin) {
-                    if (player.hp < player.maxHp) return "阳";
-                }
-                return "阴";
-            });
-            "step 1"
-            if (result.control == "阴") {
-                player.logSkill("anghong");
-                player.storage.anghong_yin = true;
-                var list = [];
-                for (var i = 0; i < lib.card.list.length; i++) {
-                    if (get.type(lib.card.list[i][2]) == "equip") {
-                        list.push(lib.card.list[i]);
-                    }
-                }
-                if (list.length > 0) {
-                    var card = game.createCard(list.randomGet());
-                    player.gain(card, "gain2");
-                }
-            } else if (result.control == "阳") {
-                player.logSkill("anghong");
-                delete player.storage.anghong_yin;
-                player.addTempSkill("anghong_range");
-                player.recover();
-            }
+        init: function (player) {
+            if (typeof player.storage.anhong === 'undefined') player.storage.anhong = false;
         },
-        subSkill: {
-            range: {
-                mod: {
-                    attackRange: function (player, distance) {
-                        return 3;
-                    },
-                },
+        audio: "ext:舰R牌将/audio/skill:true",
+        zhuanhuanji: true,
+        mark: true,
+        marktext: "☯",
+        mod: {
+            attackRange: function (player, distance) {
+                if (player.storage.anhong == false) {
+                    return 3;
+                }
+                return distance;
             },
         },
-    },*/
+        intro: {
+            content: function (storage, player, skill) {
+                if (player.storage.anhong) return '出牌阶段开始时，你可以随机获得牌堆中一张装备牌';
+                return '出牌阶段开始时，你可以令攻击范围改为3，然后回复一点体力';
+            },
+        },
+        content: function () {
+            if (player.storage.anhong) {
+                var card = get.cardPile2(function (card) {
+                    return get.type(card, "trick") == "equip";
+                });
+                if (card) { player.gain(card, "gain2", "log"); } else { game.log("牌堆中没有符合要求的装备牌"); }
+            } else {
+                player.recover();
+            }
+            player.logSkill('anhong');
+            player.changeZhuanhuanji('anhong');
+        },
+    },
     "jiashuzhidao": {
         audio: 1,
         trigger: {
