@@ -3707,24 +3707,34 @@ const unfulfilledambition = {
                 },
             },
         },
-    },/*
+    },
     //381警告
     sanbayi_jinggao: {
+        nobracket:true,
         audio: false,
-        trigger: { global: "gameStart", player: "enterGame" },
-        forced: true,
+        trigger: { player: "phaseBegin" },
+        init: function (player, skill) {
+            if (!player.storage.sanbayi_jinggao) player.storage.sanbayi_jinggao = false;
+        },
+        filter: function (event, player) {
+            return player.storage.sanbayi_jinggao == false;
+        },
+        direct: true,
         content: function () {
             var targets = game.filterPlayer(function (current) {
                 var name = current.name;
-                if (name == "weineituo" || name == "lituoliao" || name == "luoma" || name == "diguo") return true;
-                if (current.name1 && (current.name1 == "weineituo" || current.name1 == "lituoliao" || current.name1 == "luoma" || current.name1 == "diguo")) return true;
-                if (current.name2 && (current.name2 == "weineituo" || current.name2 == "lituoliao" || current.name2 == "luoma" || current.name2 == "diguo")) return true;
+                if (name == "weineituo_R" || name == "lituoliao_R" || name == "luoma_R" || name == "diguo_R") return true;
+                if (current.name1 && (current.name1 == "weineituo_R" || current.name1 == "lituoliao_R" || current.name1 == "luoma_R" || current.name1 == "diguo_R")) return true;
+                if (current.name2 && (current.name2 == "weineituo_R" || current.name2 == "lituoliao_R" || current.name2 == "luoma_R" || current.name2 == "diguo_R")) return true;
                 return false;
             });
+            game.log(targets);
             for (var target of targets) {
-                target.addMark("sanbayi_jinggao_mark", 1);
-                target.addSkill("sanbayi_jinggao_effect");
+                target.addSkill("sanbayi_jinggao_effect1");
+                target.addSkill("sanbayi_jinggao_effect2");
+                target.addMark("sanbayi_jinggao_effect2", 1);
             }
+            player.storage.sanbayi_jinggao = true;
         },
         group: "sanbayi_jinggao_add",
         subSkill: {
@@ -3736,32 +3746,18 @@ const unfulfilledambition = {
                 },
                 position: "he",
                 filterTarget: function (card, player, target) {
-                    return !target.hasMark("sanbayi_jinggao_mark");
+                    if (game.countPlayer(function (current) {
+                        return current.hasMark("sanbayi_jinggao_effect2");
+                    }) >= 4) return false;
+                    return !target.hasMark("sanbayi_jinggao_effect2");
                 },
                 check: function (card) {
                     return 6 - get.value(card);
                 },
                 content: function () {
-                    target.addMark("sanbayi_jinggao_mark", 1);
-                    target.addSkill("sanbayi_jinggao_effect");
-                    var count = 0;
-                    game.countPlayer(function (current) {
-                        if (current.hasMark("sanbayi_jinggao_mark")) count++;
-                    });
-                    if (count > 4) {
-                        var targets = game.filterPlayer(function (current) {
-                            return current.hasMark("sanbayi_jinggao_mark");
-                        });
-                        targets.sort(function (a, b) {
-                            return a.countMark("sanbayi_jinggao_mark") - b.countMark("sanbayi_jinggao_mark");
-                        });
-                        if (targets[0]) {
-                            targets[0].removeMark("sanbayi_jinggao_mark", 1);
-                            if (!targets[0].hasMark("sanbayi_jinggao_mark")) {
-                                targets[0].removeSkill("sanbayi_jinggao_effect");
-                            }
-                        }
-                    }
+                    event.targets[0].addMark("sanbayi_jinggao_effect2", 1);
+                    event.targets[0].addSkill("sanbayi_jinggao_effect2")
+                    event.targets[0].addSkill("sanbayi_jinggao_effect1");
                 },
                 ai: {
                     order: 8,
@@ -3770,97 +3766,143 @@ const unfulfilledambition = {
                     },
                 },
             },
-            effect: {
-                mod: {
-                    cardRespondable: function (card, player, target) {
-                        if (!target) return;
-                        var num = get.number(card);
-                        if (num == 3 || num == 8 || num == 1) {
-                            return false;
-                        }
-                    },
+            effect1: {
+                trigger: { player: "useCardToPlayered" },
+                forced: true,
+                filter(event, player) {
+                    return event.card.number == 3 || event.card.number == 8 || event.card.number == 1;
                 },
+                content() {
+                    trigger.getParent().directHit.addArray(game.players);
+                    game.log(trigger.targets, "不可响应", trigger.card);
+                },
+            },
+            effect2: {
+                onremove: true,
                 trigger: { player: "dyingBegin" },
                 forced: true,
                 content: function () {
-                    player.removeMark("sanbayi_jinggao_mark", player.countMark("sanbayi_jinggao_mark"));
-                    player.removeSkill("sanbayi_jinggao_effect");
+                    player.removeMark("sanbayi_jinggao_effect2", player.countMark("sanbayi_jinggao_effect2"));
+                    player.removeSkill("sanbayi_jinggao_effect1");
+                    player.removeSkill("sanbayi_jinggao_effect2");
                     player.recover(1 - player.hp);
                 },
+                mark: true,
                 marktext: "警",
                 intro: {
                     content: "使用点数为3、8、1的牌时不可被响应；进入濒死状态时失去此标记并将体力恢复至一点",
                 },
             },
-            mark: {},
         },
     },
+    /*
     //执政官的公裁
-    zhigongdegongcai: {
+    zhizhengguandegongcai: {
+        nobracket:true,
         audio: false,
-        trigger: { global: "judgeBegin" },
-        direct: true,
-        content: function () {
-            "step 0"
-            player.chooseControl("发动", "cancel2").set("prompt", "执政官的公裁：是否发动议事？").set("ai", function () {
-                var player = _status.event.player;
-                var target = _status.event.getTrigger().player;
-                if (get.attitude(player, target) > 0) return "发动";
-                return "cancel2";
-            });
-            "step 1"
-            if (result.control == "发动") {
-                player.logSkill("zhigongdegongcai");
-                event.videoId = lib.status.videoId++;
-                var cards = get.cards(3);
-                game.cardsGotoOrdering(cards);
-                var next = player.chooseButton(["议事：选择一张牌", cards], true);
-                next.set("ai", function (button) {
-                    var player = _status.event.player;
-                    var color = get.color(button.link);
-                    if (color == "red") return 2;
-                    return 1;
-                });
-                next.set("videoId", event.videoId);
-                "step 2"
-                game.broadcastAll("closeDialog", event.videoId);
-                if (result.bool && result.links && result.links[0]) {
-                    var card = result.links[0];
-                    var color = get.color(card);
-                    if (color == "red") {
-                        game.log(player, "议事结果为红色");
-                    } else {
-                        game.log(player, "议事结果为黑色");
-                        player.chooseControl("弃牌代替", "cancel2").set("prompt", "执政官的公裁：是否弃置一张牌代替判定牌？").set("ai", function () {
-                            return "弃牌代替";
-                        });
-                    }
-                    event.议事color = color;
-                }
-                "step 3"
-                if (event.议事color == "black" && result.control == "弃牌代替") {
-                    player.chooseToDiscard("he", true, "执政官的公裁：弃置一张牌代替判定牌");
-                } else {
-                    event.finish();
-                }
-                "step 4"
-                if (result.bool && result.cards && result.cards[0]) {
-                    trigger.fixedResult = result.cards[0];
-                    player.gain(trigger.player.judging[0], "gain2");
-                    player.chooseTarget("执政官的公裁：获得一名角色此次议事展示的牌", true).set("ai", function (target) {
-                        return 1;
-                    });
-                }
-                "step 5"
-                if (result.bool && result.targets && result.targets[0]) {
-                    var target = result.targets[0];
-                    if (target.countCards("h") > 0) {
-                        player.gainPlayerCard(target, "h", true);
-                    }
-                }
-            }
+        trigger: { global: "judge" },
+        filter: function (event,player) {
+            return player.countCards("h") > 0;
         },
-    },
+        check:true,
+        async content(event, trigger, player) {
+            const num = player.countCards('h');
+            const targets = game.filterPlayer(true);
+            player.chooseToDebate(targets).set('callback', function () {
+                const result = event.debateResult;
+                if (result.bool && result.opinion) {
+                    const opinion = result.opinion;
+                    const target = event.getParent(2).target;
+                    const {cards:fixedCards}=event.getParent('zhizhengguandegongcai');
+                    game.log(fixedCards);
+                    if (opinion == 'red') {
+                        game.log(event.getParent(2).cards);
+                    }
+                    else {
+
+                    }
+                }
+            });
+        },
+        
+        subSkill: {
+            red: {
+                trigger: { player: "logSkill" },
+                direct: true,
+                filter: function (player, event) {
+                    game.log("gongcai+"+event.name);
+                    return event.getParent("zhizhengguandegongcai") == "zhizhengguandegongcai" && player.storage.zhizhengguandegongcai && player.storage.zhizhengguandegongcai == 1;
+                },
+                content: function () {
+                    var card = cards[0];
+                    var cardx = game.createCard2(card.name, card.suit, card.number, card.nature);
+                    player.gain(cardx);
+                },
+                ai: {
+                    order: 15,
+                    result: {
+                        player: 1
+                    }
+                },
+            },
+            black: {
+                trigger: { player: "logSkill" },
+                direct: true,
+                filter: function (player, event) {
+                    game.log("gongcai+"+event.name);
+                    return event.name == "zhizhengguandegongcai" && player.countCards('hs') > 0 && player.storage.zhizhengguandegongcai && player.storage.zhizhengguandegongcai == 2;
+                },
+                direct: true,
+                async content(event, trigger, player) {
+                    const { result: { bool: chooseCardResultBool, cards: chooseCardResultCards } } = await player.chooseCard(get.translation(trigger.player) + '的' + (trigger.judgestr || '') + '判定为' +
+                        get.translation(trigger.player.judging[0]) + '，' + get.prompt('guicai'), get.mode() == 'guozhan' ? 'hes' : 'hs', card => {
+                            const player = _status.event.player;
+                            const mod2 = game.checkMod(card, player, 'unchanged', 'cardEnabled2', player);
+                            if (mod2 != 'unchanged') return mod2;
+                            const mod = game.checkMod(card, player, 'unchanged', 'cardRespondable', player);
+                            if (mod != 'unchanged') return mod;
+                            return true;
+                        }).set('ai', card => {
+                            const trigger = _status.event.getTrigger();
+                            const player = _status.event.player;
+                            const judging = _status.event.judging;
+                            const result = trigger.judge(card) - trigger.judge(judging);
+                            const attitude = get.attitude(player, trigger.player);
+                            if (attitude == 0 || result == 0) return 0;
+                            if (attitude > 0) {
+                                return result - get.value(card) / 2;
+                            }
+                            else {
+                                return -result - get.value(card) / 2;
+                            }
+                        }).set('judging', trigger.player.judging[0]).setHiddenSkill('guicai');
+                    if (!chooseCardResultBool) return;
+                    player.respond(chooseCardResultCards, 'guicai', 'highlight', 'noOrdering');
+                    if (trigger.player.judging[0].clone) {
+                        trigger.player.judging[0].clone.classList.remove('thrownhighlight');
+                        game.broadcast(function (card) {
+                            if (card.clone) {
+                                card.clone.classList.remove('thrownhighlight');
+                            }
+                        }, trigger.player.judging[0]);
+                        game.addVideo('deletenode', player, get.cardsInfo([trigger.player.judging[0].clone]));
+                    }
+                    game.cardsDiscard(trigger.player.judging[0]);
+                    trigger.player.judging[0] = chooseCardResultCards[0];
+                    trigger.orderingCards.addArray(chooseCardResultCards);
+                    game.log(trigger.player, '的判定牌改为', chooseCardResultCards[0]);
+                    game.asyncDelay(2);
+                },
+                ai: {
+                    rejudge: true,
+                    tag: {
+                        rejudge: 1,
+                    }
+                }
+
+            },
+        },
+    },*/
     //刺玫
     cimei: {
         audio: false,
@@ -4609,7 +4651,7 @@ const unfulfilledambition = {
                 },
             },
         },
-    },*/
+    }, */
 };
 
 export { unfulfilledambition };
