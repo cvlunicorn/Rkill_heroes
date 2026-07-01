@@ -3710,7 +3710,7 @@ const unfulfilledambition = {
     },
     //381警告
     sanbayi_jinggao: {
-        nobracket:true,
+        nobracket: true,
         audio: false,
         trigger: { player: "phaseBegin" },
         init: function (player, skill) {
@@ -3795,114 +3795,115 @@ const unfulfilledambition = {
             },
         },
     },
-    /*
+/*
     //执政官的公裁
     zhizhengguandegongcai: {
-        nobracket:true,
-        audio: false,
-        trigger: { global: "judge" },
-        filter: function (event,player) {
-            return player.countCards("h") > 0;
-        },
-        check:true,
-        async content(event, trigger, player) {
-            const num = player.countCards('h');
-            const targets = game.filterPlayer(true);
-            player.chooseToDebate(targets).set('callback', function () {
-                const result = event.debateResult;
-                if (result.bool && result.opinion) {
-                    const opinion = result.opinion;
-                    const target = event.getParent(2).target;
-                    const {cards:fixedCards}=event.getParent('zhizhengguandegongcai');
-                    game.log(fixedCards);
-                    if (opinion == 'red') {
-                        game.log(event.getParent(2).cards);
-                    }
-                    else {
+    audio: 2,
+    trigger: { global: 'judge' },
+    filter: function(event, player) {
+        return player.isIn();
+    },
+    content: function(event, trigger, player) {
+        "step 0";
+        // 询问是否发动
+        var chooseBoolEvent = player.chooseBool('是否发动【执政官的公裁】？');
+        chooseBoolEvent.set('callback', function() {
+            if (event.result.bool) {
+                event.getParent().goto(1);
+                game.resume();
+            } else {
+                event.getParent().finish();
+                game.resume();
+            }
+        });
+        game.pause();
 
-                    }
+        "step 1";
+        // 发起议事
+        var targets = game.filterPlayer(function(p) { return p !== player; });
+        if (targets.length === 0) {
+            event.finish();
+            return;
+        }
+        player.chooseToDebate(targets).set('callback', function() {
+            var debateResult = event.debateResult;
+            var parent = event.getParent();
+            parent._debateResult = debateResult;
+            parent.goto(2);
+            game.resume();
+        });
+        game.pause();
+
+        "step 2";
+        var debateResult = event._debateResult;
+        if (!debateResult || !debateResult.bool || !debateResult.opinion) {
+            event.finish();
+            return;
+        }
+        var opinion = debateResult.opinion;
+
+        if (opinion === 'red') {
+            // 收集展示的牌
+            var displayedCards = [];
+            if (debateResult.red) {
+                displayedCards = displayedCards.concat(debateResult.red.map(function(item) { return item[1]; }));
+            }
+            if (debateResult.black) {
+                displayedCards = displayedCards.concat(debateResult.black.map(function(item) { return item[1]; }));
+            }
+            if (displayedCards.length === 0) {
+                event.finish();
+                return;
+            }
+            // 选择一张复制
+            var chooseButtonEvent = player.chooseButton(['请选择一张要复制的手牌', displayedCards]);
+            chooseButtonEvent.set('callback', function() {
+                var result = event.result;
+                if (result.bool && result.links && result.links.length) {
+                    var original = result.links[0];
+                    var newCard = game.createCard2(original.name, original.suit, original.number, original.nature);
+                    player.gain(newCard, 'gain2');
+                    game.log(player, '通过公裁复制了', newCard);
                 }
+                event.getParent().goto(3);
+                game.resume();
             });
-        },
-        
-        subSkill: {
-            red: {
-                trigger: { player: "logSkill" },
-                direct: true,
-                filter: function (player, event) {
-                    game.log("gongcai+"+event.name);
-                    return event.getParent("zhizhengguandegongcai") == "zhizhengguandegongcai" && player.storage.zhizhengguandegongcai && player.storage.zhizhengguandegongcai == 1;
-                },
-                content: function () {
-                    var card = cards[0];
-                    var cardx = game.createCard2(card.name, card.suit, card.number, card.nature);
-                    player.gain(cardx);
-                },
-                ai: {
-                    order: 15,
-                    result: {
-                        player: 1
+            game.pause();
+        } else if (opinion === 'black') {
+            if (player.countCards('h') === 0) {
+                game.log(player, '没有手牌，无法替换判定牌');
+                event.finish();
+                return;
+            }
+            var chooseCardEvent = player.chooseCard('请选择一张手牌代替判定牌', 'h');
+            chooseCardEvent.set('callback', function() {
+                var result = event.result;
+                if (result.bool && result.cards && result.cards.length) {
+                    var newJudge = result.cards[0];
+                    var oldJudge = trigger.player.judging[0];
+                    if (oldJudge) {
+                        game.cardsDiscard(oldJudge);
                     }
-                },
-            },
-            black: {
-                trigger: { player: "logSkill" },
-                direct: true,
-                filter: function (player, event) {
-                    game.log("gongcai+"+event.name);
-                    return event.name == "zhizhengguandegongcai" && player.countCards('hs') > 0 && player.storage.zhizhengguandegongcai && player.storage.zhizhengguandegongcai == 2;
-                },
-                direct: true,
-                async content(event, trigger, player) {
-                    const { result: { bool: chooseCardResultBool, cards: chooseCardResultCards } } = await player.chooseCard(get.translation(trigger.player) + '的' + (trigger.judgestr || '') + '判定为' +
-                        get.translation(trigger.player.judging[0]) + '，' + get.prompt('guicai'), get.mode() == 'guozhan' ? 'hes' : 'hs', card => {
-                            const player = _status.event.player;
-                            const mod2 = game.checkMod(card, player, 'unchanged', 'cardEnabled2', player);
-                            if (mod2 != 'unchanged') return mod2;
-                            const mod = game.checkMod(card, player, 'unchanged', 'cardRespondable', player);
-                            if (mod != 'unchanged') return mod;
-                            return true;
-                        }).set('ai', card => {
-                            const trigger = _status.event.getTrigger();
-                            const player = _status.event.player;
-                            const judging = _status.event.judging;
-                            const result = trigger.judge(card) - trigger.judge(judging);
-                            const attitude = get.attitude(player, trigger.player);
-                            if (attitude == 0 || result == 0) return 0;
-                            if (attitude > 0) {
-                                return result - get.value(card) / 2;
-                            }
-                            else {
-                                return -result - get.value(card) / 2;
-                            }
-                        }).set('judging', trigger.player.judging[0]).setHiddenSkill('guicai');
-                    if (!chooseCardResultBool) return;
-                    player.respond(chooseCardResultCards, 'guicai', 'highlight', 'noOrdering');
-                    if (trigger.player.judging[0].clone) {
-                        trigger.player.judging[0].clone.classList.remove('thrownhighlight');
-                        game.broadcast(function (card) {
-                            if (card.clone) {
-                                card.clone.classList.remove('thrownhighlight');
-                            }
-                        }, trigger.player.judging[0]);
-                        game.addVideo('deletenode', player, get.cardsInfo([trigger.player.judging[0].clone]));
-                    }
-                    game.cardsDiscard(trigger.player.judging[0]);
-                    trigger.player.judging[0] = chooseCardResultCards[0];
-                    trigger.orderingCards.addArray(chooseCardResultCards);
-                    game.log(trigger.player, '的判定牌改为', chooseCardResultCards[0]);
-                    game.asyncDelay(2);
-                },
-                ai: {
-                    rejudge: true,
-                    tag: {
-                        rejudge: 1,
-                    }
+                    newJudge.remove();
+                    trigger.player.judging[0] = newJudge;
+                    if (!trigger.orderingCards) trigger.orderingCards = [];
+                    trigger.orderingCards.push(newJudge);
+                    game.log(player, '用手牌', newJudge, '替换了判定牌');
                 }
+                event.getParent().goto(3);
+                game.resume();
+            });
+            game.pause();
+        } else {
+            event.finish();
+        }
 
-            },
-        },
-    },*/
+        "step 3";
+        // 完成
+        event.finish();
+    }
+}*/
+    
     //刺玫
     cimei: {
         audio: false,
@@ -3927,36 +3928,10 @@ const unfulfilledambition = {
             "step 2"
             if (result.bool && result.targets && result.targets[0]) {
                 var target = result.targets[0];
-                target.addSkill("cimei_effect");
-                target.addTempSkill("cimei_remove", { player: "phaseEnd" });
+                target.addTempSkill("cimei", { player: "phaseEnd" });
             }
         },
-        subSkill: {
-            effect: {
-                trigger: { player: "phaseDiscardEnd" },
-                forced: true,
-                filter: function (event, player) {
-                    return player.getStat("card").discard == 0 || !player.getStat("card").discard;
-                },
-                content: function () {
-                    player.loseHp();
-                },
-                mark: true,
-                intro: {
-                    content: "弃牌阶段结束时，若你于本阶段未弃置牌，你失去一点体力",
-                },
-            },
-            remove: {
-                trigger: { player: "phaseEnd" },
-                forced: true,
-                silent: true,
-                popup: false,
-                content: function () {
-                    player.removeSkill("cimei_effect");
-                },
-            },
-        },
-    },
+    },/*
     //破交袭击
     pojiaoxiji: {
         audio: false,
