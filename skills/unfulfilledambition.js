@@ -3795,115 +3795,115 @@ const unfulfilledambition = {
             },
         },
     },
-/*
-    //执政官的公裁
-    zhizhengguandegongcai: {
-    audio: 2,
-    trigger: { global: 'judge' },
-    filter: function(event, player) {
-        return player.isIn();
-    },
-    content: function(event, trigger, player) {
-        "step 0";
-        // 询问是否发动
-        var chooseBoolEvent = player.chooseBool('是否发动【执政官的公裁】？');
-        chooseBoolEvent.set('callback', function() {
-            if (event.result.bool) {
-                event.getParent().goto(1);
-                game.resume();
-            } else {
-                event.getParent().finish();
-                game.resume();
-            }
-        });
-        game.pause();
-
-        "step 1";
-        // 发起议事
-        var targets = game.filterPlayer(function(p) { return p !== player; });
-        if (targets.length === 0) {
-            event.finish();
-            return;
-        }
-        player.chooseToDebate(targets).set('callback', function() {
-            var debateResult = event.debateResult;
-            var parent = event.getParent();
-            parent._debateResult = debateResult;
-            parent.goto(2);
-            game.resume();
-        });
-        game.pause();
-
-        "step 2";
-        var debateResult = event._debateResult;
-        if (!debateResult || !debateResult.bool || !debateResult.opinion) {
-            event.finish();
-            return;
-        }
-        var opinion = debateResult.opinion;
-
-        if (opinion === 'red') {
-            // 收集展示的牌
-            var displayedCards = [];
-            if (debateResult.red) {
-                displayedCards = displayedCards.concat(debateResult.red.map(function(item) { return item[1]; }));
-            }
-            if (debateResult.black) {
-                displayedCards = displayedCards.concat(debateResult.black.map(function(item) { return item[1]; }));
-            }
-            if (displayedCards.length === 0) {
-                event.finish();
-                return;
-            }
-            // 选择一张复制
-            var chooseButtonEvent = player.chooseButton(['请选择一张要复制的手牌', displayedCards]);
-            chooseButtonEvent.set('callback', function() {
-                var result = event.result;
-                if (result.bool && result.links && result.links.length) {
-                    var original = result.links[0];
-                    var newCard = game.createCard2(original.name, original.suit, original.number, original.nature);
-                    player.gain(newCard, 'gain2');
-                    game.log(player, '通过公裁复制了', newCard);
+    /*
+        //执政官的公裁
+        zhizhengguandegongcai: {
+        audio: 2,
+        trigger: { global: 'judge' },
+        filter: function(event, player) {
+            return player.isIn();
+        },
+        content: function(event, trigger, player) {
+            "step 0";
+            // 询问是否发动
+            var chooseBoolEvent = player.chooseBool('是否发动【执政官的公裁】？');
+            chooseBoolEvent.set('callback', function() {
+                if (event.result.bool) {
+                    event.getParent().goto(1);
+                    game.resume();
+                } else {
+                    event.getParent().finish();
+                    game.resume();
                 }
-                event.getParent().goto(3);
-                game.resume();
             });
             game.pause();
-        } else if (opinion === 'black') {
-            if (player.countCards('h') === 0) {
-                game.log(player, '没有手牌，无法替换判定牌');
-                event.finish();
-                return;
-            }
-            var chooseCardEvent = player.chooseCard('请选择一张手牌代替判定牌', 'h');
-            chooseCardEvent.set('callback', function() {
-                var result = event.result;
-                if (result.bool && result.cards && result.cards.length) {
-                    var newJudge = result.cards[0];
-                    var oldJudge = trigger.player.judging[0];
-                    if (oldJudge) {
-                        game.cardsDiscard(oldJudge);
-                    }
-                    newJudge.remove();
-                    trigger.player.judging[0] = newJudge;
-                    if (!trigger.orderingCards) trigger.orderingCards = [];
-                    trigger.orderingCards.push(newJudge);
-                    game.log(player, '用手牌', newJudge, '替换了判定牌');
-                }
-                event.getParent().goto(3);
-                game.resume();
-            });
-            game.pause();
-        } else {
-            event.finish();
-        }
-
-        "step 3";
-        // 完成
-        event.finish();
-    }
-}*/
     
+            "step 1";
+            // 发起议事
+            var targets = game.filterPlayer(function(p) { return p !== player; });
+            if (targets.length === 0) {
+                event.finish();
+                return;
+            }
+            player.chooseToDebate(targets).set('callback', function() {
+                var debateResult = event.debateResult;
+                var parent = event.getParent();
+                parent._debateResult = debateResult;
+                parent.goto(2);
+                game.resume();
+            });
+            game.pause();
+    
+            "step 2";
+            var debateResult = event._debateResult;
+            if (!debateResult || !debateResult.bool || !debateResult.opinion) {
+                event.finish();
+                return;
+            }
+            var opinion = debateResult.opinion;
+    
+            if (opinion === 'red') {
+                // 收集展示的牌
+                var displayedCards = [];
+                if (debateResult.red) {
+                    displayedCards = displayedCards.concat(debateResult.red.map(function(item) { return item[1]; }));
+                }
+                if (debateResult.black) {
+                    displayedCards = displayedCards.concat(debateResult.black.map(function(item) { return item[1]; }));
+                }
+                if (displayedCards.length === 0) {
+                    event.finish();
+                    return;
+                }
+                // 选择一张复制
+                var chooseButtonEvent = player.chooseButton(['请选择一张要复制的手牌', displayedCards]);
+                chooseButtonEvent.set('callback', function() {
+                    var result = event.result;
+                    if (result.bool && result.links && result.links.length) {
+                        var original = result.links[0];
+                        var newCard = game.createCard2(original.name, original.suit, original.number, original.nature);
+                        player.gain(newCard, 'gain2');
+                        game.log(player, '通过公裁复制了', newCard);
+                    }
+                    event.getParent().goto(3);
+                    game.resume();
+                });
+                game.pause();
+            } else if (opinion === 'black') {
+                if (player.countCards('h') === 0) {
+                    game.log(player, '没有手牌，无法替换判定牌');
+                    event.finish();
+                    return;
+                }
+                var chooseCardEvent = player.chooseCard('请选择一张手牌代替判定牌', 'h');
+                chooseCardEvent.set('callback', function() {
+                    var result = event.result;
+                    if (result.bool && result.cards && result.cards.length) {
+                        var newJudge = result.cards[0];
+                        var oldJudge = trigger.player.judging[0];
+                        if (oldJudge) {
+                            game.cardsDiscard(oldJudge);
+                        }
+                        newJudge.remove();
+                        trigger.player.judging[0] = newJudge;
+                        if (!trigger.orderingCards) trigger.orderingCards = [];
+                        trigger.orderingCards.push(newJudge);
+                        game.log(player, '用手牌', newJudge, '替换了判定牌');
+                    }
+                    event.getParent().goto(3);
+                    game.resume();
+                });
+                game.pause();
+            } else {
+                event.finish();
+            }
+    
+            "step 3";
+            // 完成
+            event.finish();
+        }
+    }*/
+
     //刺玫
     cimei: {
         audio: false,
@@ -3931,7 +3931,7 @@ const unfulfilledambition = {
                 target.addTempSkill("cimei", { player: "phaseEnd" });
             }
         },
-    },/*
+    },
     //破交袭击
     pojiaoxiji: {
         audio: false,
@@ -4005,7 +4005,14 @@ const unfulfilledambition = {
             if (result.bool && result.cards && result.cards[0]) {
                 var card = result.cards[0];
                 player.showCards(card);
-                player.storage.yanfu_banned = card.name;
+                player.storage.yanfu_banned=[];
+                if(card.name=="sheji9"){player.storage.yanfu_banned.push("sha");}
+                if(card.name=="huibi9"){player.storage.yanfu_banned.push("shan");}
+                if(card.name=="zzqi9"){player.storage.yanfu_banned.push("jiu");}
+                if(card.name=="zhikongquan9"){player.storage.yanfu_banned.push("wuxie");}
+                if(card.name=="kuaixiu9"){player.storage.yanfu_banned.push("tao");}
+                player.storage.yanfu_banned.push(card.name);
+                game.log("yanfu"+player.storage.yanfu_banned);
                 player.addTempSkill("yanfu_ban");
             }
         },
@@ -4022,33 +4029,22 @@ const unfulfilledambition = {
             ban: {
                 mod: {
                     cardEnabled: function (card, player) {
-                        if (card.name == player.storage.yanfu_banned) return false;
+                        game.log("ban"+player.storage.yanfu_banned);
+                        if (player.storage.yanfu_banned.includes(card.name)) return false;
                     },
                     cardRespondable: function (card, player) {
-                        if (card.name == player.storage.yanfu_banned) return false;
+                        if (player.storage.yanfu_banned.includes(card.name)) return false;
                     },
                     cardSavable: function (card, player) {
-                        if (card.name == player.storage.yanfu_banned) return false;
+                        if (player.storage.yanfu_banned.includes(card.name)) return false;
                     },
-                },
-                trigger: { player: "loseAfter" },
-                forced: true,
-                silent: true,
-                popup: false,
-                filter: function (event, player) {
-                    if (event.type != "discard") return false;
-                    if (!event.cards) return false;
-                    for (var card of event.cards) {
-                        if (card.name == player.storage.yanfu_banned) return true;
+                    cardDiscardable: function (card, player) {
+                        if (player.storage.yanfu_banned.includes(card.name)) return false;
                     }
-                    return false;
-                },
-                content: function () {
-                    game.log(player, "违反了【焉福】的限制");
                 },
             },
         },
-    },
+    },/*
     //震撼我妈
     zhenhanjingwoma: {
         audio: false,
