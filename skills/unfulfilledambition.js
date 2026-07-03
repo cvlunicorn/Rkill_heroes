@@ -3795,114 +3795,71 @@ const unfulfilledambition = {
             },
         },
     },
-    /*
-        //执政官的公裁
-        zhizhengguandegongcai: {
-        audio: 2,
-        trigger: { global: 'judge' },
-        filter: function(event, player) {
-            return player.isIn();
-        },
-        content: function(event, trigger, player) {
-            "step 0";
-            // 询问是否发动
-            var chooseBoolEvent = player.chooseBool('是否发动【执政官的公裁】？');
-            chooseBoolEvent.set('callback', function() {
-                if (event.result.bool) {
-                    event.getParent().goto(1);
-                    game.resume();
-                } else {
-                    event.getParent().finish();
-                    game.resume();
-                }
-            });
-            game.pause();
-    
-            "step 1";
-            // 发起议事
-            var targets = game.filterPlayer(function(p) { return p !== player; });
-            if (targets.length === 0) {
-                event.finish();
-                return;
-            }
-            player.chooseToDebate(targets).set('callback', function() {
-                var debateResult = event.debateResult;
-                var parent = event.getParent();
-                parent._debateResult = debateResult;
-                parent.goto(2);
-                game.resume();
-            });
-            game.pause();
-    
-            "step 2";
-            var debateResult = event._debateResult;
-            if (!debateResult || !debateResult.bool || !debateResult.opinion) {
-                event.finish();
-                return;
-            }
-            var opinion = debateResult.opinion;
-    
-            if (opinion === 'red') {
-                // 收集展示的牌
-                var displayedCards = [];
-                if (debateResult.red) {
-                    displayedCards = displayedCards.concat(debateResult.red.map(function(item) { return item[1]; }));
-                }
-                if (debateResult.black) {
-                    displayedCards = displayedCards.concat(debateResult.black.map(function(item) { return item[1]; }));
-                }
-                if (displayedCards.length === 0) {
-                    event.finish();
-                    return;
-                }
-                // 选择一张复制
-                var chooseButtonEvent = player.chooseButton(['请选择一张要复制的手牌', displayedCards]);
-                chooseButtonEvent.set('callback', function() {
-                    var result = event.result;
-                    if (result.bool && result.links && result.links.length) {
-                        var original = result.links[0];
-                        var newCard = game.createCard2(original.name, original.suit, original.number, original.nature);
-                        player.gain(newCard, 'gain2');
-                        game.log(player, '通过公裁复制了', newCard);
-                    }
-                    event.getParent().goto(3);
-                    game.resume();
+    zhizhengguandegongcai: {
+    audio: 2,
+    trigger: { global: "judge" },
+    filter(event, player) {
+        return game.hasPlayer(current => current.countCards("h") > 0);
+    },
+    async content(event, trigger, player) {
+        const { result: { bool: launch } } = await player
+            .chooseBool("公裁：是否发动，与所有角色议事？")
+            .set("ai", () => get.attitude(player, trigger.player) !== 0);
+        if (!launch) return;
+        player.logSkill("zhizhengguandegongcai");
+
+        const debate = await player.chooseToDebate(game.filterPlayer()).forResult();
+        if (!debate.bool || !debate.opinion) return;
+
+        if (debate.opinion === "red") {
+            // 红色：选择一名角色，获得其此次议事展示的手牌
+            const shown = debate.red.concat(debate.black);
+            const { result } = await player
+                .chooseTarget(
+                    "公裁：选择一名角色，获得其此次议事展示的手牌",
+                    (card, player, target) => shown.some(i => i[0] == target)
+                )
+                .set("shown", shown)
+                .set("ai", target => {
+                    const player = get.player();
+                    const item = get.event("shown").find(i => i[0] == target);
+                    return get.attitude(player, target) < 0 ? get.value(item[1], player) : 0;
                 });
-                game.pause();
-            } else if (opinion === 'black') {
-                if (player.countCards('h') === 0) {
-                    game.log(player, '没有手牌，无法替换判定牌');
-                    event.finish();
-                    return;
-                }
-                var chooseCardEvent = player.chooseCard('请选择一张手牌代替判定牌', 'h');
-                chooseCardEvent.set('callback', function() {
-                    var result = event.result;
-                    if (result.bool && result.cards && result.cards.length) {
-                        var newJudge = result.cards[0];
-                        var oldJudge = trigger.player.judging[0];
-                        if (oldJudge) {
-                            game.cardsDiscard(oldJudge);
-                        }
-                        newJudge.remove();
-                        trigger.player.judging[0] = newJudge;
-                        if (!trigger.orderingCards) trigger.orderingCards = [];
-                        trigger.orderingCards.push(newJudge);
-                        game.log(player, '用手牌', newJudge, '替换了判定牌');
-                    }
-                    event.getParent().goto(3);
-                    game.resume();
-                });
-                game.pause();
-            } else {
-                event.finish();
+            if (result.bool && result.targets?.length) {
+                const target = result.targets[0];
+                const item = shown.find(i => i[0] == target);
+                if (item) player.gain(item[1], "gain2");
             }
-    
-            "step 3";
-            // 完成
-            event.finish();
+        } else {
+            // 黑色：可以打出一张手牌代替判定牌（照抄 guicai 的换牌逻辑，无需暗置）
+            const { result } = await player
+                .chooseCard(
+                    "h", "公裁：是否打出一张手牌代替判定牌？",
+                    card => game.checkMod(card, player, "unchanged", "cardRespondable", player) !== false
+                )
+                .set("ai", card => 6 - get.value(card));
+            if (!result.bool) return;
+
+            player.respond(result.cards, "zhizhengguandegongcai", "highlight", "noOrdering");
+            if (trigger.player.judging[0].clone) {
+                trigger.player.judging[0].clone.classList.remove("thrownhighlight");
+                game.broadcast(function (card) {
+                    if (card.clone) card.clone.classList.remove("thrownhighlight");
+                }, trigger.player.judging[0]);
+                game.addVideo("deletenode", player, get.cardsInfo([trigger.player.judging[0].clone]));
+            }
+            game.cardsDiscard(trigger.player.judging[0]);
+            trigger.player.judging[0] = result.cards[0];
+            trigger.orderingCards.addArray(result.cards);
+            game.log(trigger.player, "的判定牌改为", result.cards[0]);
+            game.asyncDelay(2);
         }
-    }*/
+    },
+    ai: {
+        rejudge: true,
+        tag: { rejudge: 1 },
+    },
+},
 
     //刺玫
     cimei: {
