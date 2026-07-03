@@ -3796,70 +3796,70 @@ const unfulfilledambition = {
         },
     },
     zhizhengguandegongcai: {
-    audio: 2,
-    trigger: { global: "judge" },
-    filter(event, player) {
-        return game.hasPlayer(current => current.countCards("h") > 0);
-    },
-    async content(event, trigger, player) {
-        const { result: { bool: launch } } = await player
-            .chooseBool("公裁：是否发动，与所有角色议事？")
-            .set("ai", () => get.attitude(player, trigger.player) !== 0);
-        if (!launch) return;
-        player.logSkill("zhizhengguandegongcai");
+        audio: 2,
+        trigger: { global: "judge" },
+        filter(event, player) {
+            return game.hasPlayer(current => current.countCards("h") > 0);
+        },
+        async content(event, trigger, player) {
+            const { result: { bool: launch } } = await player
+                .chooseBool("公裁：是否发动，与所有角色议事？")
+                .set("ai", () => get.attitude(player, trigger.player) !== 0);
+            if (!launch) return;
+            player.logSkill("zhizhengguandegongcai");
 
-        const debate = await player.chooseToDebate(game.filterPlayer()).forResult();
-        if (!debate.bool || !debate.opinion) return;
+            const debate = await player.chooseToDebate(game.filterPlayer()).forResult();
+            if (!debate.bool || !debate.opinion) return;
 
-        if (debate.opinion === "red") {
-            // 红色：选择一名角色，获得其此次议事展示的手牌
-            const shown = debate.red.concat(debate.black);
-            const { result } = await player
-                .chooseTarget(
-                    "公裁：选择一名角色，获得其此次议事展示的手牌",
-                    (card, player, target) => shown.some(i => i[0] == target)
-                )
-                .set("shown", shown)
-                .set("ai", target => {
-                    const player = get.player();
-                    const item = get.event("shown").find(i => i[0] == target);
-                    return get.attitude(player, target) < 0 ? get.value(item[1], player) : 0;
-                });
-            if (result.bool && result.targets?.length) {
-                const target = result.targets[0];
-                const item = shown.find(i => i[0] == target);
-                if (item) player.gain(item[1], "gain2");
+            if (debate.opinion === "red") {
+                // 红色：选择一名角色，获得其此次议事展示的手牌
+                const shown = debate.red.concat(debate.black);
+                const { result } = await player
+                    .chooseTarget(
+                        "公裁：选择一名角色，获得其此次议事展示的手牌",
+                        (card, player, target) => shown.some(i => i[0] == target)
+                    )
+                    .set("shown", shown)
+                    .set("ai", target => {
+                        const player = get.player();
+                        const item = get.event("shown").find(i => i[0] == target);
+                        return get.attitude(player, target) < 0 ? get.value(item[1], player) : 0;
+                    });
+                if (result.bool && result.targets?.length) {
+                    const target = result.targets[0];
+                    const item = shown.find(i => i[0] == target);
+                    if (item) player.gain(item[1], "gain2");
+                }
+            } else {
+                // 黑色：可以打出一张手牌代替判定牌（照抄 guicai 的换牌逻辑，无需暗置）
+                const { result } = await player
+                    .chooseCard(
+                        "h", "公裁：是否打出一张手牌代替判定牌？",
+                        card => game.checkMod(card, player, "unchanged", "cardRespondable", player) !== false
+                    )
+                    .set("ai", card => 6 - get.value(card));
+                if (!result.bool) return;
+
+                player.respond(result.cards, "zhizhengguandegongcai", "highlight", "noOrdering");
+                if (trigger.player.judging[0].clone) {
+                    trigger.player.judging[0].clone.classList.remove("thrownhighlight");
+                    game.broadcast(function (card) {
+                        if (card.clone) card.clone.classList.remove("thrownhighlight");
+                    }, trigger.player.judging[0]);
+                    game.addVideo("deletenode", player, get.cardsInfo([trigger.player.judging[0].clone]));
+                }
+                game.cardsDiscard(trigger.player.judging[0]);
+                trigger.player.judging[0] = result.cards[0];
+                trigger.orderingCards.addArray(result.cards);
+                game.log(trigger.player, "的判定牌改为", result.cards[0]);
+                game.asyncDelay(2);
             }
-        } else {
-            // 黑色：可以打出一张手牌代替判定牌（照抄 guicai 的换牌逻辑，无需暗置）
-            const { result } = await player
-                .chooseCard(
-                    "h", "公裁：是否打出一张手牌代替判定牌？",
-                    card => game.checkMod(card, player, "unchanged", "cardRespondable", player) !== false
-                )
-                .set("ai", card => 6 - get.value(card));
-            if (!result.bool) return;
-
-            player.respond(result.cards, "zhizhengguandegongcai", "highlight", "noOrdering");
-            if (trigger.player.judging[0].clone) {
-                trigger.player.judging[0].clone.classList.remove("thrownhighlight");
-                game.broadcast(function (card) {
-                    if (card.clone) card.clone.classList.remove("thrownhighlight");
-                }, trigger.player.judging[0]);
-                game.addVideo("deletenode", player, get.cardsInfo([trigger.player.judging[0].clone]));
-            }
-            game.cardsDiscard(trigger.player.judging[0]);
-            trigger.player.judging[0] = result.cards[0];
-            trigger.orderingCards.addArray(result.cards);
-            game.log(trigger.player, "的判定牌改为", result.cards[0]);
-            game.asyncDelay(2);
-        }
+        },
+        ai: {
+            rejudge: true,
+            tag: { rejudge: 1 },
+        },
     },
-    ai: {
-        rejudge: true,
-        tag: { rejudge: 1 },
-    },
-},
 
     //刺玫
     cimei: {
@@ -3962,14 +3962,14 @@ const unfulfilledambition = {
             if (result.bool && result.cards && result.cards[0]) {
                 var card = result.cards[0];
                 player.showCards(card);
-                player.storage.yanfu_banned=[];
-                if(card.name=="sheji9"){player.storage.yanfu_banned.push("sha");}
-                if(card.name=="huibi9"){player.storage.yanfu_banned.push("shan");}
-                if(card.name=="zzqi9"){player.storage.yanfu_banned.push("jiu");}
-                if(card.name=="zhikongquan9"){player.storage.yanfu_banned.push("wuxie");}
-                if(card.name=="kuaixiu9"){player.storage.yanfu_banned.push("tao");}
+                player.storage.yanfu_banned = [];
+                if (card.name == "sheji9") { player.storage.yanfu_banned.push("sha"); }
+                if (card.name == "huibi9") { player.storage.yanfu_banned.push("shan"); }
+                if (card.name == "zzqi9") { player.storage.yanfu_banned.push("jiu"); }
+                if (card.name == "zhikongquan9") { player.storage.yanfu_banned.push("wuxie"); }
+                if (card.name == "kuaixiu9") { player.storage.yanfu_banned.push("tao"); }
                 player.storage.yanfu_banned.push(card.name);
-                game.log("yanfu"+player.storage.yanfu_banned);
+                game.log("yanfu" + player.storage.yanfu_banned);
                 player.addTempSkill("yanfu_ban");
             }
         },
@@ -3986,7 +3986,7 @@ const unfulfilledambition = {
             ban: {
                 mod: {
                     cardEnabled: function (card, player) {
-                        game.log("ban"+player.storage.yanfu_banned);
+                        game.log("ban" + player.storage.yanfu_banned);
                         if (player.storage.yanfu_banned.includes(card.name)) return false;
                     },
                     cardRespondable: function (card, player) {
@@ -4001,41 +4001,40 @@ const unfulfilledambition = {
                 },
             },
         },
-    },/*
+    },
     //震撼我妈
-    zhenhanjingwoma: {
+    zhenhanwoma: {
         audio: false,
         trigger: { global: "roundStart" },
-        direct: true,
+        filter: function (event, player) {
+            return player.getSeatNum() > 1;
+        },
         content: function () {
-            "step 0"
-            player.chooseControl("移动座次", "cancel2").set("prompt", "震撼我妈：是否将座次向前移动一位？").set("ai", function () {
-                return "移动座次";
-            });
-            "step 1"
-            if (result.control == "移动座次") {
-                player.logSkill("zhenhanjingwoma");
-                var list = game.players.slice(0);
-                var index = list.indexOf(player);
-                if (index > 0) {
-                    list.remove(player);
-                    list.splice(index - 1, 0, player);
-                    game.players = list;
-                    game.arrangePlayers();
-                }
+            if (player.getSeatNum() > 1) {
+                game.swapSeat(player, player.previous, false, false);
             }
         },
     },
     //一整年
     yizhengnian: {
         audio: false,
+        firstDo: true,
         trigger: { global: "roundStart" },
         forced: true,
         content: function () {
-            if (!_status.roundCount) _status.roundCount = 1;
-            player.draw(_status.roundCount);
+            if (!game.roundNumber) {
+                var drawnum = 1;
+            } else { 
+                var drawnum = game.roundNumber; 
+            }
+            player.draw(drawnum);
         },
-    },
+        ai: {
+            threaten(player, target) {
+                return 1 + 0.5 * game.roundNumber;
+            },
+        },
+    },/*
     //岛勋
     t23_daoxun: {
         audio: false,
