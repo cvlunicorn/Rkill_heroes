@@ -42,7 +42,7 @@ const globalskills = {
                 sub: true,
             },
             kaishi: {
-                name: "远航回合开始时", fixed: true, silent: true,  frequent: true,
+                name: "远航回合开始时", fixed: true, silent: true, frequent: true,
                 trigger: {
                     player: "phaseBegin",
                 },
@@ -93,30 +93,30 @@ const globalskills = {
                 sub: true,
             },
             bingsimopai: {
-            name: "濒死摸牌",
-            //usable: 2,
-            fixed: true,
-            mark: false,
-            trigger: { player: "changeHp", },
-            filter: function (event, player) {
-                if (lib.config.extension_舰R牌将__yuanhang === false) return false;
-                return player.hp <= 0 && event.num < 0 && (get.mode() != 'boss' || (get.mode() == 'boss' && !lib.character[player.name][4].includes('boss') && player.identity == 'cai'));
+                name: "濒死摸牌",
+                //usable: 2,
+                fixed: true,
+                mark: false,
+                trigger: { player: "changeHp", },
+                filter: function (event, player) {
+                    if (lib.config.extension_舰R牌将__yuanhang === false) return false;
+                    return player.hp <= 0 && event.num < 0 && (get.mode() != 'boss' || (get.mode() == 'boss' && !lib.character[player.name][4].includes('boss') && player.identity == 'cai'));
+                },
+                "prompt2": function (event, player) {
+                    return '当你进入濒死状态时,你可以摸一张牌,<br>若血量上限大于2,你须失去一点体力上限,改为摸两张牌。'
+                },
+                content: function () {
+                    if (player.maxHp <= 2) {
+                        player.draw(1);
+                    } else if (player.maxHp > 2) {
+                        player.loseMaxHp(1);
+                        player.draw(2);
+                    }
+                },
+                sub: true,
             },
-            "prompt2": function (event, player) {
-                return '当你进入濒死状态时,你可以摸一张牌,<br>若血量上限大于2,你须失去一点体力上限,改为摸两张牌。'
-            },
-            content: function () {
-                if (player.maxHp <= 2) {
-                    player.draw(1);
-                } else if (player.maxHp > 2) {
-                    player.loseMaxHp(1);
-                    player.draw(2);
-                }
-            },
-            sub: true,
         },
-        },
-        
+
     },
     _jianzaochuan: {
         name: "建造",
@@ -763,6 +763,9 @@ const globalskills = {
                                 baseScore += 1.5;
                             }
                         }
+                        if (player.hasSkill('yuanchengdaji') || playerhasSkill('bm_huanxing')) {
+                            baseScore = 0;
+                        }
                         break;
 
                     case 'wuqiup':
@@ -794,7 +797,7 @@ const globalskills = {
 
                         // 脆皮输出更需要防御距离
                         if ((player.hasSkill('kaimuhangkong') || player.hasSkill('zhongxunca') ||
-                             player.hasSkill('fanjiandaodan') || player.hasSkill('kaimuleiji')) && hp <= 2) {
+                            player.hasSkill('fanjiandaodan') || player.hasSkill('kaimuleiji')) && hp <= 2) {
                             baseScore += 1.5;
                         }
                         break;
@@ -839,7 +842,7 @@ const globalskills = {
                 // === 第四步：团队需求调整 ===
                 var teamHasDamage = game.hasPlayer(function (current) {
                     return current != player && get.attitude(player, current) > 0 &&
-                           (current.hasSkill('kaimuhangkong') || current.hasSkill('zhongxunca') ||
+                        (current.hasSkill('kaimuhangkong') || current.hasSkill('zhongxunca') ||
                             current.hasSkill('fanjiandaodan') || current.hasSkill('kaimuleiji'));
                 });
 
@@ -1172,7 +1175,7 @@ const globalskills = {
             if (trigger.nature == 'thunder' && !player.hasSkill('hanbing_skill')) {
                 if (trigger.player.hasSkill('_wulidebuff_jinshui')) { trigger.player.addSkill('_wulidebuff_jinshui'); }
                 trigger.player.addMark('_wulidebuff_jinshui', 1);
-                if ((trigger.player.hujia > 0 )) {
+                if ((trigger.player.hujia > 0)) {
                     var loseNum = trigger.num;
                     trigger.player.loseHp(loseNum);
                     game.log('雷杀穿透护甲:', loseNum);
@@ -1568,7 +1571,7 @@ const globalskills = {
         subSkill: {
             jieshu: {
                 trigger: { player: "phaseJieshuBegin", },
-                priority: 1, fixed: true, silent: true,  frequent: true, forced: true, popup: false,
+                priority: 1, fixed: true, silent: true, frequent: true, forced: true, popup: false,
                 filter: function (event, player) {
                     if (lib.config.extension_舰R牌将__kaishimopai === false) return false;
                     return true;
@@ -1637,7 +1640,7 @@ const globalskills = {
                             var enemyCount = game.countPlayer(function (current) {
                                 return current != player && get.attitude(player, current) < 0;
                             });
-                            var hasControlTrick = player.countCards('h', function(card) {
+                            var hasControlTrick = player.countCards('h', function (card) {
                                 return get.type(card) == 'trick' && (card.name == 'wuxie' || card.name == 'wuzhong' || card.name == 'guohe' || card.name == 'shunshou');
                             }) > 0;
                             if (enemyCount >= 2 && !hasControlTrick) return 2; // 锦囊
@@ -1698,7 +1701,7 @@ const globalskills = {
                         if (player.countCards('h') >= handLimit) return 0; // 发动
 
                         // 3. 本回合有大量出牌机会（出牌阶段能打出多张牌）：结束时摸牌可以避免超手牌上限弃牌
-                        var canUseMultipleCards = player.countCards('h', function(card) {
+                        var canUseMultipleCards = player.countCards('h', function (card) {
                             return player.hasUseTarget(card);
                         }) >= 3;
                         if (canUseMultipleCards) return 0; // 发动
