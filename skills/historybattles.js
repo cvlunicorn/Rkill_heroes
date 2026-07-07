@@ -1574,7 +1574,7 @@ const historybattles = {
         },
         "_priority": 0,
     },
-    matapanjiao: {
+    matapanjiaozhijian: {
         audio: "ext:舰R牌将/audio/skill:true",
 
         frequent: true,
@@ -1602,7 +1602,7 @@ const historybattles = {
         },
         content: function () {
             'step 0'
-            player.chooseToDiscard(get.prompt('matapanjiao', trigger.target), "弃置任意张牌,然后指定至多等量名角色为目标", [1, Infinity], 'hes').set('ai', card => {
+            player.chooseToDiscard(get.prompt('matapanjiaozhijianzhijian', trigger.target), "弃置任意张牌,然后指定至多等量名角色为目标", [1, Infinity], 'hes').set('ai', card => {
                 if (ui.selected.cards.length >= _status.event.max) return 0;
                 if (_status.event.goon) return 4.5 - get.value(card);
                 return 0;
@@ -1610,7 +1610,7 @@ const historybattles = {
             'step 1'
             if (result.bool) {
                 var num = result.cards.length;
-                player.chooseTarget(get.prompt('matapanjiao'),
+                player.chooseTarget(get.prompt('matapanjiaozhijianzhijianzhijian'),
                     [1, num], function (card, player, target) {
                         return _status.event.targets.includes(target);
                     }).set('ai', function (target) {
