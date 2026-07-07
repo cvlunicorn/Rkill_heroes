@@ -763,7 +763,7 @@ const globalskills = {
                                 baseScore += 1.5;
                             }
                         }
-                        if (player.hasSkill('yuanchengdaji') || playerhasSkill('bm_huanxing')) {
+                        if (player.hasSkill('yuanchengdaji') || player.hasSkill('bm_huanxing')) {
                             baseScore = 0;
                         }
                         break;
