@@ -1879,6 +1879,13 @@ const fallendemon = {
             }
             game.log(event.target0, "的", get.position(event.card) == "h" ? "一张手牌" : event.card, "被移动给了", event.target1);
             player.changeZhuanhuanji('cassone_R_yibing');
+            if (lib.config.extension_舰R牌将_enable_effects !== false) {
+                        var banner = ui.create.div('.popup', '下次拼点将会反转！', ui.window);
+                        banner.style.cssText = 'font-size: 40px; font-weight: bold; color: #000000; text-shadow: 0 0 10px #555555, 0 0 20px #555555; animation: pindian-reverse 2s ease-out; position: fixed; left: 50%; top: 30%; transform: translate(-50%, -50%); z-index: 999999; background: rgba(66, 204, 255, 0.8); padding: 20px 40px; border-radius: 10px; border: 3px solid #66ccff;';
+                        setTimeout(function () {
+                            banner.delete();
+                        }, 2000);
+                    }
         },
         group: ["cassone_R_yibing_number"],
         subSkill: {
@@ -1893,6 +1900,14 @@ const fallendemon = {
                     game.log('拼点牌点数视为14-x');
                     trigger.num1 = 14 - trigger.num1;
                     trigger.num2 = 14 - trigger.num2;
+                    // 添加横幅动画提示
+                    if (lib.config.extension_舰R牌将_enable_effects !== false) {
+                        var banner = ui.create.div('.popup', '拼点结果反转！', ui.window);
+                        banner.style.cssText = 'font-size: 48px; font-weight: bold; color: #ff3333; text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000; animation: pindian-reverse 2s ease-out; position: fixed; left: 50%; top: 30%; transform: translate(-50%, -50%); z-index: 999999; background: rgba(0,0,0,0.8); padding: 20px 40px; border-radius: 10px; border: 3px solid #ff0000;';
+                        setTimeout(function () {
+                            banner.delete();
+                        }, 2000);
+                    }
                 },
             },
         },

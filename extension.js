@@ -1091,7 +1091,6 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
                 bg.addEventListener('click', showSkinPanel);
             };
-
             // ╔══════════════════════════════════════════════════════════════╗
             // ║ 9. 替换透明立绘的默认剪影背景                                  ║
             // ╚══════════════════════════════════════════════════════════════╝
@@ -1131,6 +1130,37 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         };
                     }
                 });
+            }
+            // ╔══════════════════════════════════════════════════════════════╗
+            // ║ 10. 动画效果                           ║
+            // ╚══════════════════════════════════════════════════════════════╝
+            // 此处为banner.style.cssText创建的横幅定义动画效果
+            // 当前已使用的属性有animation: pindian-reverse 2s ease-out拼点动画，用于卡萨诺方案的拼点反转
+            if (typeof document !== 'undefined') {
+                var style = document.createElement('style');
+                style.textContent = `
+                @keyframes pindian-reverse {
+            0% { 
+                opacity: 0; 
+                transform: translate(-50%, -50%) scale(0.5) rotate(-10deg); 
+            }
+            20% { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(1.2) rotate(5deg); 
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1.0) rotate(-2deg); 
+            }
+            100% { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(1.0) rotate(0deg); 
+            }
+        }
+    `;//0%（起始）：透明 (opacity:0)，缩小并逆时针旋转 -10 度。
+                //20%（回弹顶点）：完全不透明，放大到 1.2 倍并顺时针旋转 5 度（产生“弹出过头”的效果）。
+                //50%（回弹收回）：恢复正常大小，轻微逆时针回调至 -2 度。
+                //100%（结束）：完全可见，保持正常大小和 0 度旋转。
+                document.head.appendChild(style);
             }
 
             //全局技能写在这上面
@@ -1366,7 +1396,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                     }
                                     if (!card) card = event.dialog.buttons[0].link;
                                 }
-             
+
                                 var button;
                                 for (var i = 0; i < dialog.buttons.length; i++) {
                                     if (dialog.buttons[i].link == card) {
