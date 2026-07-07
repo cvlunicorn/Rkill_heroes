@@ -40,7 +40,7 @@ const tebiechuanwu = {
                         var hasBasicTarget = game.hasPlayer(function (current) {
                             if (player.canUse(button.link, current)) return get.value(button.link);
                         });
-                        return 0;
+                        return hasBasicTarget>0;
                     });
                 } else {
                     event.finish();
