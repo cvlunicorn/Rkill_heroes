@@ -1,4 +1,3 @@
-
 //===================================
 
 //【基础语法注意事项】
@@ -43,14 +42,13 @@
 //武将列表、武将技能、武将和技能翻译、卡牌包与卡牌技能、卡牌翻译、配置（config）、扩展简介
 
 //===================================
-let connect;
-try {
-    const ws = require("ws");
-    connect = ws.connect;
-} catch (error) {
-    console.warn("require('ws') failed");
-}
-//const { connect } = require("ws");///vscode生成出来的,vscodeAI检测到enable认为没导入自动添加了导入但其实enable只是一个标签。目前使用try-catch包裹起来。
+//const { connect } = require("ws");
+//此段代码出现原因是在正文中将content误写为了connect，出现报错后检查代码所在文件最顶部删除“const ws = require("ws");”，以及删除正在修改的代码正文中的“connect”。
+//此代码是vscode生成出来的,vscodeAI检测到connect认为没导入自动添加了导入.在项目根目录新建.vscode/settings.json，内容写
+//{
+//  "typescript.suggest.autoImports": false
+//}
+//可以关闭自动导入功能。
 import { lib, game, ui, get, ai, _status } from '../../noname.js'
 //import { checkBegin } from '../../noname/library/assembly/buildin.js';
 //import { delay, freezeButExtensible } from '../../noname/util/index.js';
@@ -1132,7 +1130,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 });
             }
             // ╔══════════════════════════════════════════════════════════════╗
-            // ║ 10. 动画效果                           ║
+            // ║ 10. 动画效果                                                  ║
             // ╚══════════════════════════════════════════════════════════════╝
             // 此处为banner.style.cssText创建的横幅定义动画效果
             // 当前已使用的属性有animation: pindian-reverse 2s ease-out拼点动画，用于卡萨诺方案的拼点反转
