@@ -4312,7 +4312,7 @@ const unfulfilledambition = {
                 },
             },
         },
-    }, /*
+    }, 
         //魔术兔子
         moshutuzi: {
              audio: "ext:舰R牌将/audio:2",
@@ -4323,7 +4323,7 @@ const unfulfilledambition = {
     direct: true,
     content() {
         "step 0";
-        player.chooseTarget(get.prompt("moshutuzi"), "选择一名角色，与其进行点数翻牌").set("ai", target => {
+        player.chooseTarget(get.prompt("moshutuzi"), "选择一名角色，与其进行点数翻牌",lib.filter.notMe).set("ai", target => {
             var att = get.attitude(_status.event.player, target);
             // 优先选敌方，获得牌概率高；若无敌方选友方（可能让友方翻面摸牌）
             if (att < 0) return -att + 5;
@@ -4346,7 +4346,7 @@ const unfulfilledambition = {
         game.cardsGotoOrdering(card);
         event.current.showCards(card, get.translation(event.current) + "展示");
         event.cards.push(card);
-        game.log(event.current, "展示了", card);
+        //.log(event.current, "展示了", card);
         game.delay(1);
         "step 3";
         // 检查点数是否重复
