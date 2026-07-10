@@ -219,7 +219,7 @@ var jianrjinji = {
         geluozini_R: ["female", "ΒΜΦCCCP", 4, ["daoxun", "yuanchengdaji", "weiyanzhaohuan", "guangrongjianduinormal"], ["des:1“波浪”对空导弹系统，同时亦装备了76mm舰炮、鱼雷发射管和反潜火箭弹装置。在当时是十分强力的反舰防空导弹巡洋舰。首舰格罗兹尼号是音译，直译为“威严”。该舰先后在北方舰队、黑海舰队和波罗的海舰队服役。参与了1973年在地中海的苏联舰队与美国航母编队对峙的任务，并将后者逼退。1991年6月格罗兹尼号退役。"]],
         anshan_R: ["female", "PLAN", 3, ["daoqu", "fanjiandaodan", "lizhengshangyou"], ["des:鞍山号原本是s国驱逐舰，在50年代移交海军。由于这是海军最早的四艘驱逐舰，是当时海军最强主力，这四艘驱逐舰被亲切称为四大金刚。而鞍山号舷号为101（早期为201）位列四大金刚之首。作为海军主力舰，鞍山号参与了海军多次重大活动。国产反舰导弹研制成功后，鞍山号在内的四大金刚驱逐舰均以反舰导弹发射器替换了鱼雷，成为导弹驱逐舰。鞍山号于90年代退役，作为纪念舰停泊于海军博物馆。"]],
         luobaici_abeikelongbi_R: ["female", "RN", 3, ["zhongpao", "bm_huanxing", "jianyuan", "anhong"], ["des:罗伯茨级浅水重炮舰首舰，装备了381毫米主炮。相比之前的级别，罗伯茨级加强了结构吨位和动力，作战能力有了较大提高。该级拥有比较完善的雷达和不弱的防空火力，在二战中罗伯茨号主要执行支援任务，先后参与了火炬行动、西西里登陆、诺曼底登陆。战后罗伯茨号担任火炮训练舰和港口炮台，在60年代退役拆毁。"]],
-        mist_edu_R: ["female", "MN", 3, ["qingxuncl", "chuanchengzhiwu", "miaoyi"], ["des:提督～初次见面，我是驱逐舰恶毒。做自我介绍的时候别靠那么近吗？诶？被小孩子抱着有什么不好的吗？不是这种问题吗？喵噫，恶毒可不管哦。"]],//恶毒注册
+        mist_edu_R: ["female", "MN", 3, ["qingxuncl", "fangkong2","chuanchengzhiwu", "miaoyi"], ["des:提督～初次见面，我是驱逐舰恶毒。做自我介绍的时候别靠那么近吗？诶？被小孩子抱着有什么不好的吗？不是这种问题吗？喵噫，恶毒可不管哦。"]],//恶毒注册
 
         //新武将写在这行上面
         skilltest: ["male", "OTHER", 9, ["guanxing", "jujianmengxiang", "huodezhuangbei", "huodeyanshi", "paoxiao", "guankanpaidui"], ["forbidai", "des:测试用"]],
@@ -1018,8 +1018,8 @@ var jianrjinji = {
         anhong_info: "转换技，出牌阶段开始时，你可以：阴：随机获得牌堆中一张装备牌。阳：你的攻击范围改为3，然后回复一点体力。",
         "jiashuzhidao": "架束制导",
         "jiashuzhidao_info": "其他角色的出牌阶段开始时，若你在其攻击范围内，你可以弃置一张牌，令该角色于本回合内获得技能〖止息〗。",
-        miaoyi: `每当你使用"回避"抵消一张"射击"，你可以立即对该角色使用一张手牌当"射击"。此效果每轮限一次。`,
-        chuanchengzhiwu: `锁定技。每当其他角色回复体力，你摸一张牌`,
+        miaoyi: "喵噫！",miaoyi_info:`每当你使用"回避"抵消一张"射击"，你可以立即对该角色使用一张手牌当"射击"。此效果每轮限一次。`,
+        chuanchengzhiwu: "传承之物",chuanchengzhiwu_info:`锁定技。每当其他角色回复体力，你摸一张牌`,
 
 
 
