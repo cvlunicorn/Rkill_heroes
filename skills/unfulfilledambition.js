@@ -4096,81 +4096,86 @@ const unfulfilledambition = {
             },
         },
 
-    },/*
-    //破隧
+    },
     posui: {
-        audio: false,
         trigger: { player: "loseAfter" },
-        direct: true,
         filter: function (event, player) {
-            return event.type == "discard" && event.cards && event.cards.length > 0 && game.hasPlayer(function (current) {
-                if (player.storage.posui && player.storage.posui.includes(current)) return false;
-                return true;
+            if (event.type != "discard" || !event.cards || !event.cards.length) return false;
+            return game.hasPlayer(function (current) {
+                return current != player &&
+                    current.countCards("h") > 0 &&
+                    !player.getStorage("posui_used").includes(current);
             });
         },
+        direct: true,
         content: function () {
             "step 0"
-            if (!player.storage.posui) player.storage.posui = [];
             player.chooseTarget(get.prompt("posui"), "展示其他角色一张手牌", function (card, player, target) {
-                if (player.storage.posui && player.storage.posui.includes(target)) return false;
-                return target != player && target.countCards("h") > 0;
+                return target != player &&
+                    target.countCards("h") > 0 &&
+                    !player.getStorage("posui_used").includes(target);
             }).set("ai", function (target) {
                 var player = _status.event.player;
-                if (get.attitude(player, target) < 0) {
-                    return target.countCards("h");
-                }
-                return 0;
+                var list = game.players.slice(0);
+                var bonus = list.indexOf(target) > list.indexOf(player) ? 3 : 0;
+                return bonus + target.countCards("h") - get.attitude(player, target);
             });
+
             "step 1"
-            if (result.bool && result.targets && result.targets[0]) {
-                player.logSkill("posui", result.targets);
-                event.target = result.targets[0];
-                player.choosePlayerCard(event.target, "h", true);
+            if (result.bool) {
+                var target = result.targets[0];
+                event.target = target;
+                player.logSkill("posui", target);
+
+                player.addTempSkill("posui_used", { global: "roundStart" });
+                player.markAuto("posui_used", [target]);
+
+                player.choosePlayerCard(target, "h", true);
             } else {
                 event.finish();
             }
+
             "step 2"
             if (result.bool && result.cards && result.cards[0]) {
                 player.showCards(result.cards);
-                // 存储已选择的目标，防止重复（变量应为 event.target）
-                player.storage.posui.push(event.target);
                 event.card = result.cards[0];
 
-                // ---------- 左右判定（不变） ----------
-                var index1 = player.getSeatNum() + 1;
-                var index2 = event.target.getSeatNum() + 1;
-                var count = game.countPlayer();
-                if ((index1 - index2 + count) % count > count / 2) {
+                // 使用 get.distance 的 absolute 模式判断座位
+                var dist = get.distance(player, event.target, "absolute");
+                var totalPlayers = game.players.length;
+
+                if (dist > 0 && dist < totalPlayers / 2) {
                     player.draw();
                 }
             } else {
                 event.finish();
+                return;
             }
+
             "step 3"
-            // 判断目标能否使用该牌
-            if (event.target.canUse(event.card, false)) {
+            // 检查目标能否使用该牌（改用 hasUseTarget）
+            if (event.target.hasUseTarget(event.card, false)) {
                 player.chooseControl("令其使用", "cancel2")
                     .set("prompt", "破隧：是否令" + get.translation(event.target) + "使用" + get.translation(event.card) + "？")
                     .set("ai", function () {
                         var evt = _status.event.getParent();
-                        if (evt.card.name == "sha") {
-                            // 杀由你指定目标，倾向于发动
+                        if (evt.card.name == "sha" || evt.card.name == "sheji9") {
                             return "令其使用";
                         }
-                        // 其他牌简单判断
                         return get.value(evt.card, evt.target) > 4 ? "令其使用" : "cancel2";
                     });
             } else {
                 event.finish();
+                return;
             }
 
             "step 4"
             if (result.control == "令其使用") {
-                // 杀需要指定目标
-                if (event.card.name == "sha") {
+                if (event.card.name == "sha" || event.card.name == "sheji9") {
                     player.chooseTarget("破隧：选择【杀】的目标", true, function (card, player, target) {
                         var evt = _status.event.getParent();
-                        return evt.target.canUse(evt.card, target);
+                        // 第二个参数必须是目标玩家对象
+                        return evt.target.canUse(evt.card, target, false);
                     }).set("ai", function (target) {
                         var evt = _status.event.getParent();
                         var player = _status.event.player;
@@ -4181,41 +4186,35 @@ const unfulfilledambition = {
                 }
             } else {
                 event.finish();
+                return
             }
 
             "step 5"
             if (result.bool) {
-                // 杀：由你指定目标且不可被响应
                 event.target.useCard(event.card, result.targets[0], false);
                 event.target.addTempSkill("posui_unrespondable");
-                event.finish();
-            }
 
+            }
+            event.finish();
+            return;
             "step 6"
-            // 非杀：直接使用
-            event.target.useCard(event.card, false);
+            event.target.chooseUseTarget(event.card);
         },
-        group: ["posui_reset"],
         subSkill: {
+            used: {
+                onremove: true,
+                charlotte: true,
+            },
             unrespondable: {
+                charlotte: true,
                 mod: {
-                    cardRespondable: function (card, player, target) {
-                        if (card.name == "sha") return false;
+                    cardRespondable: function (card, player) {
+                        if (card.name == "sha" || card.name == "sheji9") return false;
                     },
                 },
             },
-            reset: {
-                trigger: { global: "phaseBegin" },
-                lastDo: true,
-                forced: true,
-                charlotte: true,
-                direct: true,
-                content() {
-                    player.storage.posui = [];
-                }
-            },
         },
-    },*/
+    },
     //取首
     qushou: {
         audio: false,
@@ -4312,92 +4311,92 @@ const unfulfilledambition = {
                 },
             },
         },
-    }, 
-        //魔术兔子
-        moshutuzi: {
-             audio: "ext:舰R牌将/audio:2",
-    trigger: { player: "phaseDrawBegin2" },
-    filter(event, player) {
-        return !event.numFixed;
     },
-    direct: true,
-    content() {
-        "step 0";
-        player.chooseTarget(get.prompt("moshutuzi"), "选择一名角色，与其进行点数翻牌",lib.filter.notMe).set("ai", target => {
-            var att = get.attitude(_status.event.player, target);
-            // 优先选敌方，获得牌概率高；若无敌方选友方（可能让友方翻面摸牌）
-            if (att < 0) return -att + 5;
-            return att;
-        });
-        "step 1";
-        if (result.bool) {
-            var target = result.targets[0];
-            player.logSkill("moshutuzi", target);
-            trigger.cancel();
-            event.target = target;
-            event.cards = []; // 已展示的所有牌
-            event.current = player; // 当前翻牌者
-        } else {
-            event.finish();
-        }
-        "step 2";
-        // 翻牌
-        var card = get.cards(1)[0];
-        game.cardsGotoOrdering(card);
-        event.current.showCards(card, get.translation(event.current) + "展示");
-        event.cards.push(card);
-        //.log(event.current, "展示了", card);
-        game.delay(1);
-        "step 3";
-        // 检查点数是否重复
-        var currentCard = event.cards[event.cards.length - 1];
-        var currentNumber = get.number(currentCard);
-        var matchIndex = -1;
-        
-        for (var i = 0; i < event.cards.length - 1; i++) {
-            if (get.number(event.cards[i]) == currentNumber) {
-                matchIndex = i;
-                break;
+    //魔术兔子
+    moshutuzi: {
+        audio: "ext:舰R牌将/audio:2",
+        trigger: { player: "phaseDrawBegin2" },
+        filter(event, player) {
+            return !event.numFixed;
+        },
+        direct: true,
+        content() {
+            "step 0";
+            player.chooseTarget(get.prompt("moshutuzi"), "选择一名角色，与其进行点数翻牌", lib.filter.notMe).set("ai", target => {
+                var att = get.attitude(_status.event.player, target);
+                // 优先选敌方，获得牌概率高；若无敌方选友方（可能让友方翻面摸牌）
+                if (att < 0) return -att + 5;
+                return att;
+            });
+            "step 1";
+            if (result.bool) {
+                var target = result.targets[0];
+                player.logSkill("moshutuzi", target);
+                trigger.cancel();
+                event.target = target;
+                event.cards = []; // 已展示的所有牌
+                event.current = player; // 当前翻牌者
+            } else {
+                event.finish();
             }
-        }
-        
-        if (matchIndex >= 0) {
-            // 找到重复点数
-            var matchCard = event.cards[matchIndex];
-            var matchOwner = event.cards.indexOf(matchCard) % 2 == 0 ? player : event.target;
-            
-            game.log(event.current, "翻出了重复点数", currentNumber);
-            
-            // 获得两张同点数牌（含）之间的所有牌
-            var gainCards = event.cards.slice(matchIndex);
-            var discardCards = event.cards.slice(0, matchIndex);
-            
-            if (gainCards.length > 0) {
-                event.current.gain(gainCards, "gain2");
+            "step 2";
+            // 翻牌
+            var card = get.cards(1)[0];
+            game.cardsGotoOrdering(card);
+            event.current.showCards(card, get.translation(event.current) + "展示");
+            event.cards.push(card);
+            //.log(event.current, "展示了", card);
+            game.delay(1);
+            "step 3";
+            // 检查点数是否重复
+            var currentCard = event.cards[event.cards.length - 1];
+            var currentNumber = get.number(currentCard);
+            var matchIndex = -1;
+
+            for (var i = 0; i < event.cards.length - 1; i++) {
+                if (get.number(event.cards[i]) == currentNumber) {
+                    matchIndex = i;
+                    break;
+                }
             }
-            if (discardCards.length > 0) {
-                game.cardsDiscard(discardCards);
-                game.log(discardCards, "进入了弃牌堆");
+
+            if (matchIndex >= 0) {
+                // 找到重复点数
+                var matchCard = event.cards[matchIndex];
+                var matchOwner = event.cards.indexOf(matchCard) % 2 == 0 ? player : event.target;
+
+                game.log(event.current, "翻出了重复点数", currentNumber);
+
+                // 获得两张同点数牌（含）之间的所有牌
+                var gainCards = event.cards.slice(matchIndex);
+                var discardCards = event.cards.slice(0, matchIndex);
+
+                if (gainCards.length > 0) {
+                    event.current.gain(gainCards, "gain2");
+                }
+                if (discardCards.length > 0) {
+                    game.cardsDiscard(discardCards);
+                    game.log(discardCards, "进入了弃牌堆");
+                }
+
+                event.winner = event.current;
+            } else {
+                // 未重复，切换翻牌者
+                event.current = (event.current == player) ? event.target : player;
+                event.goto(2);
             }
-            
-            event.winner = event.current;
-        } else {
-            // 未重复，切换翻牌者
-            event.current = (event.current == player) ? event.target : player;
-            event.goto(2);
-        }
-        "step 4";
-        // 追加效果：若你未获得牌
-        if (event.winner != player) {
-            event.target.turnOver();
-            player.gainPlayerCard(event.target, "h", 2, true);
-        }
-    },
-    ai: {
-        threaten: 2.5,
-        expose: 0.3
-    },
-},/*
+            "step 4";
+            // 追加效果：若你未获得牌
+            if (event.winner != player) {
+                event.target.turnOver();
+                player.gainPlayerCard(event.target, "h", 2, true);
+            }
+        },
+        ai: {
+            threaten: 2.5,
+            expose: 0.3
+        },
+    },/*
     //强装药主炮
     qiangzhuangyaozhupao: {
         audio: false,
