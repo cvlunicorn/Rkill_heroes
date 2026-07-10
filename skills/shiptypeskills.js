@@ -105,6 +105,20 @@ const shiptypeskills = {
             },
         },
     },
+    qingmu: {
+        intro: {
+            content: function () {
+                return get.translation(skill + '_info');
+            },
+        },
+    },
+    buji: {
+        intro: {
+            content: function () {
+                return get.translation(skill + '_info');
+            },
+        },
+    },
     kaimuhangkong: {
         audio: "ext:舰R牌将/audio/skill:true",
         trigger: { player: "phaseUseBegin" },
