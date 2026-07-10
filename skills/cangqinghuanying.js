@@ -616,6 +616,9 @@ const cangqinghuanying = {
         content: function () {
             player.draw(1); //摸一张牌（可以留空，就是1
         },
+        ai: {
+            threaten: 1.3,  // 队友回复越多，摸牌越多
+        }
     },//写完了，没ai
 
     miaoyi: {//喵噫！】：每当你使用"闪"抵消一张"杀"，你可以立即对该角色使用一张手牌当"杀"。此效果每轮限一次。
@@ -626,9 +629,9 @@ const cangqinghuanying = {
 
         filter(event, player) {//过滤器
             // 检查：使用的是闪 && 用来响应杀
-            return ['shan', 'huibi9'].includes(event.card.name) //用的是不是闪
+            return event.card && event.getParent(2) && event.getParent(2).isIn() && ['shan', 'huibi9'].includes(event.card.name) //用的是不是闪
                 &&//且
-                ['sha', 'sheji9'].includes(event.getParent(2).name);//响应的是不是射击
+                ['sha', 'sheji9'].includes(event.getParent(2).name) && player.countCards("h") > 0;//响应的是不是射击
         },
 
         content() {
