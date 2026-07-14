@@ -66,56 +66,77 @@ const shiptypeskills = {
     hangmucv: {
         intro: {
             content: function () {
-                return get.translation(skill + '_info');
+                return '<div style="text-align:center;"><img src="' + lib.assetURL + 'extension/舰R牌将/image/shiptype/hangmucv.webp" style="width:50px;height:50px;display:block;margin:0 auto 5px;"><div>航母</div></div>';
             },
         },
     },
     qiantingss: {
         intro: {
             content: function () {
-                return get.translation(skill + '_info');
+                return '<div style="text-align:center;"><img src="' + lib.assetURL + 'extension/舰R牌将/image/shiptype/qiantingss.webp" style="width:50px;height:50px;display:block;margin:0 auto 5px;"><div>潜艇</div></div>';
             },
         },
     },
     fangqu: {
         intro: {
             content: function () {
-                return get.translation(skill + '_info');
+                return '<div style="text-align:center;"><img src="' + lib.assetURL + 'extension/舰R牌将/image/shiptype/fangqu.webp" style="width:50px;height:50px;display:block;margin:0 auto 5px;"><div>防驱</div></div>';
             },
         },
     },
     daoqu: {
         intro: {
             content: function () {
-                return get.translation(skill + '_info');
+                return '<div style="text-align:center;"><img src="' + lib.assetURL + 'extension/舰R牌将/image/shiptype/daoqu.webp" style="width:50px;height:50px;display:block;margin:0 auto 5px;"><div>导驱</div></div>';
             },
         },
     },
     daoxun: {
         intro: {
             content: function () {
-                return get.translation(skill + '_info');
+                return '<div style="text-align:center;"><img src="' + lib.assetURL + 'extension/舰R牌将/image/shiptype/daoxun.webp" style="width:50px;height:50px;display:block;margin:0 auto 5px;"><div>导巡</div></div>';
             },
         },
     },
     zhongpao: {
         intro: {
             content: function () {
-                return get.translation(skill + '_info');
+                return '<div style="text-align:center;"><img src="' + lib.assetURL + 'extension/舰R牌将/image/shiptype/zhongpao.webp" style="width:50px;height:50px;display:block;margin:0 auto 5px;"><div>重炮</div></div>';
             },
         },
     },
     qingmu: {
         intro: {
             content: function () {
-                return get.translation(skill + '_info');
+                return '<div style="text-align:center;"><img src="' + lib.assetURL + 'extension/舰R牌将/image/shiptype/qingmu.webp" style="width:50px;height:50px;display:block;margin:0 auto 5px;"><div>轻型航母</div></div>';
             },
         },
     },
     buji: {
         intro: {
             content: function () {
-                return get.translation(skill + '_info');
+                return '<div style="text-align:center;"><img src="' + lib.assetURL + 'extension/舰R牌将/image/shiptype/buji.webp" style="width:50px;height:50px;display:block;margin:0 auto 5px;"><div>补给舰</div></div>';
+            },
+        },
+    },
+    yaosaibiaoshi: {
+        intro: {
+            content: function () {
+                return '<div style="text-align:center;"><img src="' + lib.assetURL + 'extension/舰R牌将/image/shiptype/yaosai.png" style="width:50px;height:50px;display:block;margin:0 auto 5px;"><div>要塞</div></div>';
+            },
+        },
+    },
+    hangxun: {
+        intro: {
+            content: function () {
+                return '<div style="text-align:center;"><img src="' + lib.assetURL + 'extension/舰R牌将/image/shiptype/hangxun.png" style="width:50px;height:50px;display:block;margin:0 auto 5px;"><div>航巡</div></div>';
+            },
+        },
+    },
+    leixun: {
+        intro: {
+            content: function () {
+                return '<div style="text-align:center;"><img src="' + lib.assetURL + 'extension/舰R牌将/image/shiptype/leixun.png" style="width:50px;height:50px;display:block;margin:0 auto 5px;"><div>雷巡</div></div>';
             },
         },
     },
@@ -344,21 +365,21 @@ const shiptypeskills = {
     zhanliebb: {
         intro: {
             content: function () {
-                return get.translation(skill + '_info');
+                return '<div style="text-align:center;"><img src="' + lib.assetURL + 'extension/舰R牌将/image/shiptype/zhanliebb.webp" style="width:50px;height:50px;display:block;margin:0 auto 5px;"><div>战列舰</div></div>';
             },
         },
     },
     qingxuncl: {
         intro: {
             content: function () {
-                return get.translation(skill + '_info');
+                return '<div style="text-align:center;"><img src="' + lib.assetURL + 'extension/舰R牌将/image/shiptype/qingxuncl.webp" style="width:50px;height:50px;display:block;margin:0 auto 5px;"><div>轻巡</div></div>';
             },
         },
     },
     zhongxunca: {
         intro: {
             content: function () {
-                return get.translation(skill + '_info');
+                return '<div style="text-align:center;"><img src="' + lib.assetURL + 'extension/舰R牌将/image/shiptype/zhongxunca.webp" style="width:50px;height:50px;display:block;margin:0 auto 5px;"><div>重巡</div></div>';
             },
         },
     },
@@ -1288,7 +1309,7 @@ const shiptypeskills = {
         },
         intro: {
             content: function () {
-                return get.translation(skill);
+                return '<div style="text-align:center;"><img src="' + lib.assetURL + 'extension/舰R牌将/image/shiptype/quzhudd.webp" style="width:50px;height:50px;display:block;margin:0 auto 5px;"><div>驱逐</div></div>';
             },
         },
     },
@@ -1922,6 +1943,11 @@ const shiptypeskills = {
                 }
             },
             threaten: 1.1,
+        },
+        intro: {
+            content: function () {
+                return '<div style="text-align:center;"><img src="' + lib.assetURL + 'extension/舰R牌将/image/shiptype/yaosai.png" style="width:50px;height:50px;display:block;margin:0 auto 5px;"><div>要塞</div></div>';
+            },
         },
     },
     shixiangquanneng: {

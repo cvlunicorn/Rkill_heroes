@@ -649,8 +649,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     ui.jian_R_readme = ui.create.system('舰R杀机制介绍', function () {
                         game.jianRAlert(
                             // 保留悬挂缩进的文本结构
-                            "<p style='margin: 0; padding: 0; margin-bottom: 12px;'><b>开启军争篇卡牌包或舰R美化包战术包时装备栏共有五个,分别是：武器、防具、+1马、-1马、宝物。</b></p>" +
+                            "<p style='margin: 0; padding: 0; margin-bottom: 12px;'><b>使用鼠标滚轮或上下滑动观看机制介绍，点击介绍页面最下面的确定键关闭介绍</b></p>" +
+                            "<p style='margin: 0; padding: 0; margin-bottom: 12px;'>开启军争篇卡牌包或舰R美化包战术包时装备栏共有五个,分别是：武器、防具、+1马、-1马、宝物。</p>" +
                             "<p style='margin: 0; padding: 0; margin-bottom: 12px;'>皮肤系统：可以在武将编辑界面左键单击，或对局中左键双击武将立绘呼出武将详情，点击详情立绘下滑选择、点击切换皮肤</p>" +
+                            "<p style='margin: 0; padding: 0; margin-bottom: 12px;'>舰种标识：点击武将左上角舰种标识可以在舰种、国籍、苍青舰队之间切换显示</p>" +
                             "<p style='margin: 0; padding: 0; margin-bottom: 12px;'>所有全局技能均可在扩展详情中查看说明和配置开关,以下是默认开启的全局技能</p>" +
                             "<p style='margin: 0; padding: 0; margin-bottom: 10px; text-indent: -3em; padding-left: 3em;'><b>远航：</b>你受伤时手牌上限+1,挑战模式不屈时手牌上限+1；<br>每轮限1/2/3次,失去手牌后,若手牌数少于一半,你可以摸一张牌。<br>当你进入濒死状态时,若你的体力上限大于2,你可以减少一点体力上限,摸两张牌,否则摸一张牌；<br>你死亡后,若你为忠臣,你可以令主公摸一张牌。</p>" +
                             "<p style='margin: 0; padding: 0; margin-bottom: 10px; text-indent: -3em; padding-left: 3em;'><b>建造：</b>若你进行了至少一次强化：出牌阶段你可以弃置3张不同花色的牌,提升一点血量上限,解锁强化二级效果。</p>" +
@@ -1160,6 +1162,221 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 //100%（结束）：完全可见，保持正常大小和 0 度旋转。
                 document.head.appendChild(style);
             }
+
+            // ╔══════════════════════════════════════════════════════════════╗
+            // ║ UI增强 - 舰种/国籍/舰队三态切换显示                          ║
+            // ╚══════════════════════════════════════════════════════════════╝
+
+            // 舰种标识技能 → 图标文件名映射
+            var _jianrShipTypeMap = {
+                'zhanliebb': 'zhanliebb.webp',
+                'hangmucv': 'hangmucv.webp',
+                'zhongxunca': 'zhongxunca.webp',
+                'qingxuncl': 'qingxuncl.webp',
+                'quzhudd': 'quzhudd.webp',
+                'qiantingss': 'qiantingss.webp',
+                'daoqu': 'daoqu.webp',
+                'daoxun': 'daoxun.webp',
+                'fangqu': 'fangqu.webp',
+                'zhongpao': 'zhongpao.webp',
+                'qingmu': 'qingmu.webp',
+                'buji': 'buji.webp',
+                'yaosaibiaoshi': 'yaosai.png',
+                'hangxun': 'hangxun.webp',
+                'leixun': 'leixun.webp',
+            };
+
+            // 国籍代码 → 简写文字映射
+            var _jianrGroupShortName = {
+                'PLAN': 'C',
+                'KMS': 'G',
+                'USN': 'U',
+                'ΒΜΦCCCP': 'S',
+                'IJN': 'J',
+                'MN': 'F',
+                'RN': 'E',
+                'RM': 'I',
+                'ROCN': 'C',
+                'wei': '魏',
+                'shu': '蜀',
+                'wu': '吴',
+                'qun': '群',
+                'jin': '晋'
+            };
+
+            // 国籍代码 → 颜色映射
+            var _jianrGroupColors = {
+                'PLAN': '#FF0000',
+                'KMS': '#800000',
+                'USN': '#0000A0',
+                'ΒΜΦCCCP': '#FFA500',
+                'IJN': '#FFFF80',
+                'MN': '#87CEEB',
+                'RN': '#00FF80',
+                'RM': '#9370DB',
+                'ROCN': '#FFB6C1',
+                'wei': '#4169E1',
+                'shu': '#DC143C',
+                'wu': '#32CD32',
+                'qun': '#FFD700',
+                'jin': '#9370DB'
+            };
+
+            // 玩家对象扩展方法：显示/刷新徽章
+            lib.element.Player.prototype.showShipBadge = function () {
+                var player = this;
+
+                // 获取或创建徽章容器
+                var badge = player.node.shipBadge;
+                if (!badge) {
+                    badge = ui.create.div('.jianr-ship-badge', player);
+                    badge.style.position = 'absolute';
+                    badge.style.left = '7px';
+                    badge.style.top = '7px';
+                    badge.style.transform = 'translate(-50%, -50%)';
+                    badge.style.width = '30px';
+                    badge.style.height = '30px';
+                    badge.style.display = 'flex';
+                    badge.style.alignItems = 'center';
+                    badge.style.justifyContent = 'center';
+                    badge.style.cursor = 'pointer';
+                    badge.style.zIndex = '6';
+                    badge.style.pointerEvents = 'auto';
+
+                    // 点击切换模式
+                    badge.addEventListener('click', function() {
+                        var currentMode = lib.config.jianr_badge_mode || 0;
+                        var nextMode = (currentMode + 1) % 3;
+                        game.saveConfig('jianr_badge_mode', nextMode);
+                        // 刷新所有玩家的徽章
+                        game.players.concat(game.dead).forEach(function(p) {
+                            if (p.showShipBadge) p.showShipBadge();
+                        });
+                    });
+
+                    player.node.shipBadge = badge;
+                }
+
+                // 清空内容
+                badge.innerHTML = '';
+
+                // 获取当前显示模式 (0=舰种, 1=国籍, 2=舰队)
+                var mode = lib.config.jianr_badge_mode || 0;
+
+                if (mode === 0) {
+                    // 模式0：显示舰种图标
+                    var shipType = null;
+                    for (var skillName in _jianrShipTypeMap) {
+                        if (player.hasSkill(skillName)) {
+                            shipType = skillName;
+                            break;
+                        }
+                    }
+
+                    if (shipType) {
+                        var icon = document.createElement('img');
+                        icon.src = lib.assetURL + 'extension/舰R牌将/image/shiptype/' + _jianrShipTypeMap[shipType];
+                        icon.style.width = '100%';
+                        icon.style.height = '100%';
+                        icon.style.objectFit = 'contain';
+                        badge.appendChild(icon);
+                    }
+                } else if (mode === 1) {
+                    // 模式1：显示国籍文字
+                    var group = player.group;
+                    var shortName = _jianrGroupShortName[group] || group.slice(0, 1).toUpperCase();
+                    var color = _jianrGroupColors[group] || '#FFFFFF';
+
+                    var text = document.createElement('div');
+                    text.textContent = shortName;
+                    text.style.fontSize = '18px';
+                    text.style.fontWeight = 'bold';
+                    text.style.color = color;
+                    text.style.textShadow = '0 0 2px #000';
+                    badge.appendChild(text);
+                } else if (mode === 2) {
+                    // 模式2：显示舰队标志（苍青系）
+                    var fleetNum = null;
+                    var fleetTags = {
+                        'fleet1': '1',
+                        'fleet2': '2',
+                        'fleet3': '3',
+                        'fleet4': '4'
+                    };
+                    var fleetSkills = {
+                        'cangqinghuanying1': '1',
+                        'cangqinghuanying2': '2',
+                        'cangqinghuanying3': '3',
+                        'cangqinghuanying4': '4'
+                    };
+
+                    // 优先读取武将数据中的舰队标签，兼容双将模式。
+                    var characterNames = [player.name, player.name1, player.name2];
+                    for (var i = 0; i < characterNames.length && !fleetNum; i++) {
+                        var characterInfo = lib.character[characterNames[i]];
+                        var characterTags = characterInfo && characterInfo[4];
+                        if (!Array.isArray(characterTags)) continue;
+                        for (var tag in fleetTags) {
+                            if (characterTags.indexOf(tag) !== -1) {
+                                fleetNum = fleetTags[tag];
+                                break;
+                            }
+                        }
+                    }
+
+                    // 兼容通过技能动态赋予舰队的旧写法。
+                    for (var skill in fleetSkills) {
+                        if (!fleetNum && player.hasSkill(skill)) {
+                            fleetNum = fleetSkills[skill];
+                            break;
+                        }
+                    }
+
+                    var fleetIcons = {
+                        '1': '01.png',
+                        '2': '02.png',
+                        '3': '03.png',
+                        '4': '04.png'
+                    };
+
+                    if (fleetNum) {
+                        var fleetIcon = document.createElement('img');
+                        fleetIcon.src = lib.assetURL + 'extension/舰R牌将/image/shiptype/' + fleetIcons[fleetNum];
+                        fleetIcon.style.width = '100%';
+                        fleetIcon.style.height = '100%';
+                        fleetIcon.style.objectFit = 'contain';
+                        fleetIcon.style.backgroundColor = 'rgba(0, 0, 0, 0.45)';
+                        fleetIcon.style.borderRadius = '4px';
+                        badge.appendChild(fleetIcon);
+                    } else {
+                        var text = document.createElement('div');
+                        text.textContent = '无';
+                        text.style.fontSize = '12px';
+                        text.style.color = '#888';
+                        text.style.textShadow = '0 0 2px #000';
+                        badge.appendChild(text);
+                    }
+                }
+            };
+
+            // 钩子：玩家获得技能时刷新徽章
+            var originalAddSkill = lib.element.Player.prototype.addSkill;
+            lib.element.Player.prototype.addSkill = function() {
+                var result = originalAddSkill.apply(this, arguments);
+                if (this.showShipBadge) {
+                    this.showShipBadge();
+                }
+                return result;
+            };
+
+            // 钩子：游戏开始时为所有玩家显示徽章
+            lib.arenaReady.push(function() {
+                game.players.forEach(function(player) {
+                    if (player.showShipBadge) {
+                        player.showShipBadge();
+                    }
+                });
+            });
 
             //全局技能写在这上面
         },
