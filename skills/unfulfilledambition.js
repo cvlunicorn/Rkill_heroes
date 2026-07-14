@@ -4396,9 +4396,10 @@ const unfulfilledambition = {
             threaten: 2.5,
             expose: 0.3
         },
-    },/*
+    },
     //强装药主炮
     qiangzhuangyaozhupao: {
+        nobracket: true,
         audio: false,
         trigger: { player: "useCardToTargeted" },
         forced: true,
@@ -4410,68 +4411,86 @@ const unfulfilledambition = {
             player.judge();
             "step 1"
             if (result.color == "red") {
-                trigger.getParent().directHit.addArray(game.players);
-            }
-            if (trigger.targets && trigger.targets.length == 1) {
-                var evt = trigger.getParent();
-                if (evt.name == "damage") {
-                    evt.nature = "loseHp";
+                for (i of trigger.targets) {
+                    i.addTempSkill('qinggang2');
+                    i.storage.qinggang2.add(trigger.card);
                 }
             }
+            if (trigger.targets && trigger.targets.length == 1) {
+                player.addTempSkill("qiangzhuangyaozhupao_liushitili", { player: "useCardAfter" })
+            }
+        },
+        subSkill: {
+            liushitili: {
+                nobracket: true,
+                audio: "ext:舰R牌将/audio/skill:true",
+                trigger: {
+                    source: "damageBefore",
+                },
+                forced: true,
+                check: function () { return false; },
+                content: function () {
+                    var num = trigger.num;
+                    trigger.cancel();
+                    trigger.player.loseHp(num);
+
+                    // 将体力流失计入萤火虫的造成伤害统计
+                    var sourceStat = player.getStat();
+                    if (!sourceStat.damage) sourceStat.damage = 0;
+                    sourceStat.damage += num;
+
+                    // 将体力流失计入承受者的受伤统计
+                    var targetStat = trigger.player.getStat();
+                    if (!targetStat.damaged) targetStat.damaged = 0;
+                    targetStat.damaged += num;
+                },
+                ai: {
+                    jueqing: true,
+                },
+                "_priority": 0,
+            },
         },
     },
     //大道
     dadao: {
         audio: false,
         trigger: { player: "phaseBegin" },
-        direct: true,
+        nobracket: true,
+        check: function (event, player) {
+            return game.countPlayer(function (current) {
+                if (current != player && current.countCards("hej") > 0) return 1;
+            }) >= 3;
+        },
         content: function () {
             "step 0"
-            player.chooseControl("发动", "cancel2").set("prompt", "大道：是否获得每名其他角色区域内一张牌，然后跳过判定和摸牌阶段？").set("ai", function () {
-                var player = _status.event.player;
-                var num = 0;
-                game.countPlayer(function (current) {
-                    if (current != player && current.countCards("hej") > 0) num++;
-                });
-                if (num >= 3) return "发动";
-                return "cancel2";
+            event.targets = game.filterPlayer(function (current) {
+                return current != player && current.countCards("hej") > 0;
             });
+            event.num = 0;
             "step 1"
-            if (result.control == "发动") {
-                player.logSkill("dadao");
-                event.targets = game.filterPlayer(function (current) {
-                    return current != player && current.countCards("hej") > 0;
-                });
-                event.num = 0;
-            } else {
-                event.finish();
-            }
-            "step 2"
             if (event.num < event.targets.length) {
                 player.gainPlayerCard(event.targets[event.num], "hej", true);
                 event.num++;
                 event.redo();
             } else {
-                var next = player.phaseSkip("phaseJudge");
-                next = player.phaseSkip("phaseDraw");
+                var next = player.skip("phaseJudge");
+                next = player.skip("phaseDraw");
             }
         },
         group: "dadao_end",
         subSkill: {
             end: {
                 trigger: { player: "phaseUseEnd" },
-                forced: false,
+                direct: true,
                 filter: function (event, player) {
                     return player.countCards("h") > player.hp;
                 },
                 content: function () {
                     "step 0"
                     var num = game.countPlayer() - 1;
-                    var give = Math.min(num, player.countCards("h") - player.hp);
+                    var give = Math.min(num, player.countCards("h"));
                     if (give > 0) {
                         player.chooseCard("h", give, "大道：按座次交给其他角色各一张牌", true);
-                    } else {
-                        event.finish();
                     }
                     "step 1"
                     if (result.bool && result.cards && result.cards.length > 0) {
@@ -4480,26 +4499,22 @@ const unfulfilledambition = {
                             return current != player;
                         });
                         event.num = 0;
-                    } else {
-                        event.finish();
                     }
                     "step 2"
                     if (event.num < event.cards.length && event.num < event.targets.length) {
                         player.give(event.cards[event.num], event.targets[event.num]);
                         event.num++;
                         event.redo();
-                    } else {
-                        if (event.cards.length < event.targets.length) {
-                            player.chooseControl("失去体力", "翻面").set("prompt", "大道：交出的牌数少于其他角色数，选择失去一点体力或翻面").set("ai", function () {
-                                var player = _status.event.player;
-                                if (player.hp > 2) return "失去体力";
-                                return "翻面";
-                            });
-                        } else {
-                            event.finish();
-                        }
                     }
                     "step 3"
+                    if (!event.cards || event.cards.length < event.targets.length) {
+                        player.chooseControl("失去体力", "翻面").set("prompt", "大道：交出的牌数少于其他角色数，选择失去一点体力或翻面").set("ai", function () {
+                            var player = _status.event.player;
+                            if (player.hp > 2) return "失去体力";
+                            return "翻面";
+                        });
+                    }
+                    "step 4"
                     if (result.control == "失去体力") {
                         player.loseHp();
                     } else {
@@ -4508,7 +4523,7 @@ const unfulfilledambition = {
                 },
             },
         },
-    },
+    },/*
     //特混攻击
     tehungongji: {
         audio: false,
