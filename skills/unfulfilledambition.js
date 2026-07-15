@@ -4404,7 +4404,7 @@ const unfulfilledambition = {
         trigger: { player: "useCardToTargeted" },
         forced: true,
         filter: function (event, player) {
-            return event.targets && event.targets.length == 1;
+            return get.type(event.card) != "equip" && event.targets && event.targets.length == 1;
         },
         content: function () {
             "step 0"
@@ -4453,23 +4453,33 @@ const unfulfilledambition = {
     },
     //大道
     dadao: {
+        mod: {
+            maxHandcard: function (player, num) {
+                let icount = game.countPlayer(function (current) {
+                    if (current.group == "RM")
+                        return true;
+                });
+                let acount = game.countPlayer(true);
+                return Math.max(2, acount - 2 * icount);
+            },
+        },
         audio: false,
         trigger: { player: "phaseBegin" },
         nobracket: true,
         check: function (event, player) {
             return game.countPlayer(function (current) {
-                if (current != player && current.countCards("hej") > 0) return 1;
+                if (current != player && current.countCards("h") > 0) return 1;
             }) >= 3;
         },
         content: function () {
             "step 0"
             event.targets = game.filterPlayer(function (current) {
-                return current != player && current.countCards("hej") > 0;
+                return current != player && current.countCards("h") > 0;
             });
             event.num = 0;
             "step 1"
             if (event.num < event.targets.length) {
-                player.gainPlayerCard(event.targets[event.num], "hej", true);
+                player.gainPlayerCard(event.targets[event.num], "h", true);
                 event.num++;
                 event.redo();
             } else {
@@ -4483,7 +4493,7 @@ const unfulfilledambition = {
                 trigger: { player: "phaseUseEnd" },
                 direct: true,
                 filter: function (event, player) {
-                    return player.countCards("h") > player.hp;
+                    return player.countCards("h") > player.hp && game.countPlayer() > 1;
                 },
                 content: function () {
                     "step 0"
@@ -4499,6 +4509,8 @@ const unfulfilledambition = {
                             return current != player;
                         });
                         event.num = 0;
+                    } else {
+                        event.finish(); return;
                     }
                     "step 2"
                     if (event.num < event.cards.length && event.num < event.targets.length) {
@@ -4507,21 +4519,26 @@ const unfulfilledambition = {
                         event.redo();
                     }
                     "step 3"
-                    if (!event.cards || event.cards.length < event.targets.length) {
+                    if (event.cards.length < event.targets.length) {
                         player.chooseControl("失去体力", "翻面").set("prompt", "大道：交出的牌数少于其他角色数，选择失去一点体力或翻面").set("ai", function () {
                             var player = _status.event.player;
                             if (player.hp > 2) return "失去体力";
                             return "翻面";
                         });
+                    } else {
+                        event.finish(); return;
                     }
                     "step 4"
                     if (result.control == "失去体力") {
                         player.loseHp();
-                    } else {
+                    } else if (result.control == "翻面") {
                         player.turnOver();
                     }
                 },
             },
+        },
+        ai: {
+            threaten: 1.1,
         },
     },/*
     //特混攻击
@@ -4541,13 +4558,11 @@ const unfulfilledambition = {
         subSkill: {
             damage: {
                 trigger: { player: "useCard1" },
-                forced: true,
+                usable:1,
                 filter: function (event, player) {
-                    if (!player.storage.tehungongji_used) return true;
-                    return false;
+                 return true;
                 },
                 content: function () {
-                    player.storage.tehungongji_used = true;
                     var evt = trigger.getParent();
                     if (evt.name == "damage") {
                         evt.num++;
@@ -4572,20 +4587,51 @@ const unfulfilledambition = {
         },
     },
     //特混攻击2
-    tehungongji2: {
+      tehungongji2: {
         audio: false,
-        trigger: { global: ["phaseSkipped", "phaseBegin"] },
+        trigger: {
+            global: [
+                "phaseZhunbeiSkipped", "phaseZhunbeiCancelled",
+                "phaseJudgeSkipped", "phaseJudgeCancelled",
+                "phaseDrawSkipped", "phaseDrawCancelled",
+                "phaseUseSkipped", "phaseUseCancelled",
+                "phaseDiscardSkipped", "phaseDiscardCancelled",
+                "phaseJieshuSkipped", "phaseJieshuCancelled",
+                "judgeAfter", "drawAfter", "useCardAfter", "discardAfter",
+            ],
+        },
         forced: true,
+        locked: true,
         filter: function (event, player, name) {
-            if (event.player == player) return false;
-            if (name == "phaseSkipped") return true;
-            if (name == "phaseBegin") {
-                return _status.currentPhase == event.player;
+            if (typeof name != "string") return false;
+            if (name.endsWith("Skipped") || name.endsWith("Cancelled")) {
+                return event.player && event.player != player;
             }
-            return false;
+
+            if (!event.player || event.player == player || event.player != _status.currentPhase) {
+                return false;
+            }
+            if (name == "judgeAfter" && !event.result?.card) return false;
+            if (name == "drawAfter" && (!Array.isArray(event.result) || !event.result.length)) return false;
+            if (name == "useCardAfter" && !event.card) return false;
+            if (name == "discardAfter" && (!Array.isArray(event.cards) || !event.cards.length)) return false;
+
+            var phase = event.getParent("phase", true);
+            if (!phase || phase.player != event.player) return false;
+
+            var matchingPhase = {
+                judgeAfter: "phaseJudge",
+                drawAfter: "phaseDraw",
+                useCardAfter: "phaseUse",
+                discardAfter: "phaseDiscard",
+            }[name];
+            return matchingPhase && phase.currentPhase != matchingPhase;
         },
         content: function () {
             player.draw();
+        },
+        ai:{
+        threaten:1.4,
         },
     },
     //航空曙光
