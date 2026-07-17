@@ -89,7 +89,7 @@ const tebiechuanwu = {
                     break;
                 case 'phaseDraw':
                     var valueCards = player.countCards("h", function (card) {
-                        return get.type(card) == 'basic' || get.type(card) == 'trick' && player.getUseValue({ name, isCard: true }, null, true) > 7;
+                        return get.type(card) == 'basic' || get.type(card) == 'trick' && player.getUseValue(card, null, true) > 7;
                     });
                     check = valueCards > 0;
                     break;
@@ -124,7 +124,7 @@ const tebiechuanwu = {
             else event.finish();
         },
         subSkill: {
-            weiyan_phaseUse: {
+            phaseUse: {
                 charlotte: true,
                 trigger: { player: 'useCard1' },
                 forced: true,
