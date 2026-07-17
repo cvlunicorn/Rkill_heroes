@@ -4540,54 +4540,362 @@ const unfulfilledambition = {
         ai: {
             threaten: 1.1,
         },
-    },/*
+    },
     //特混攻击
     tehungongji: {
         audio: false,
         trigger: { player: "phaseBegin" },
+        direct: true,
         content: function () {
             "step 0"
-            player.judge();
+            player.chooseBool(get.prompt2("tehungongji")).set("ai", function () {
+                return true;
+            });
             "step 1"
-            if (result.color == "red") {
-                player.addTempSkill("tehungongji_damage");
+            if (result.bool) {
+                player.logSkill("tehungongji");
+                player.judge();
             } else {
-                player.addTempSkill("tehungongji_multi");
+                event.finish();
+            }
+            "step 2"
+            if (result.color == "red") {
+                player.addTempSkill("tehungongji_damage", "phaseAfter");
+            } else if (result.color == "black") {
+                player.addTempSkill("tehungongji_multi", "phaseAfter");
             }
         },
         subSkill: {
             damage: {
                 trigger: { player: "useCard1" },
-                usable:1,
-                filter: function (event, player) {
-                 return true;
-                },
+                forced: true,
+                charlotte: true,
+                popup: false,
                 content: function () {
-                    var evt = trigger.getParent();
-                    if (evt.name == "damage") {
-                        evt.num++;
-                    }
+                    if (get.tag(trigger.card, "damage")) trigger.baseDamage++;
+                    player.removeSkill("tehungongji_damage");
                 },
             },
             multi: {
                 trigger: { player: "useCard1" },
                 forced: true,
-                filter: function (event, player) {
-                    if (!player.storage.tehungongji_used) return true;
-                    return false;
+                charlotte: true,
+                popup: false,
+                content: function () {
+                    var targets = game.filterPlayer(function (current) {
+                        return current != player && get.distance(player, current) == 1 &&
+                            lib.filter.targetEnabled2(trigger.card, player, current);
+                    }).sortBySeat(player);
+                    trigger.targets.splice(0, trigger.targets.length);
+                    trigger.targets.addArray(targets);
+                    player.removeSkill("tehungongji_multi");
+                },
+            },
+        },
+    },
+    //航空曙光
+    hangkongshuguang: {
+        audio: false,
+        trigger: { player: "phaseUseEnd" },
+        direct: true,
+        filter: function (event, player) {
+            return player.needsToDiscard() > 0;
+        },
+        content: function () {
+            "step 0"
+            var num = Math.min(player.countCards("h"), player.needsToDiscard());
+            player.chooseCard("h", [1, num], "航空曙光：将超出手牌上限的任意张牌置于武将牌上").set("ai", function (card) {
+                return 6 - get.value(card);
+            });
+            "step 1"
+            if (result.bool && result.cards && result.cards.length) {
+                player.logSkill("hangkongshuguang");
+                player.addToExpansion(result.cards, player, "giveAuto").gaintag.add("hangkongshuguang");
+            }
+            "step 2"
+            lib.skill.hangkongshuguang_effect.syncAll();
+        },
+        global: "hangkongshuguang_effect",
+        marktext: "曙",
+        intro: {
+            content: "expansion",
+            markcount: "expansion",
+        },
+        onremove: function (player, skill) {
+            var cards = player.getExpansions(skill);
+            if (cards.length) {
+                lib.skill.hangkongshuguang_effect.removeProxies(cards.map(function (card) {
+                    return card.cardid;
+                }));
+            }
+            if (cards.length) player.loseToDiscardpile(cards);
+        },
+        subSkill: {
+            effect: {
+                charlotte: true,
+                forced: true,
+                silent: true,
+                popup: false,
+                firstDo: true,
+                trigger: {
+                    player: ["useCardBefore", "respondBefore", "chooseCardBegin", "chooseToUseAfter", "chooseToRespondAfter"],
+                    global: ["addToExpansionAfter", "loseAfter", "loseAsyncAfter", "dieAfter"],
+                },
+                getCards: function () {
+                    var cards = [];
+                    game.countPlayer(function (current) {
+                        if (current.hasSkill("hangkongshuguang")) {
+                            cards.addArray(current.getExpansions("hangkongshuguang"));
+                        }
+                    });
+                    return cards;
+                },
+                isProxyCard: function (card) {
+                    return Boolean(card && card.hasGaintag && card.hasGaintag("hangkongshuguang") &&
+                        lib.skill.hangkongshuguang_effect.getSourceCardId(card) != null);
+                },
+                getProxyCardId: function (player, sourceCardId) {
+                    return "hangkongshuguang:" + JSON.stringify([player.playerid || "", sourceCardId]);
+                },
+                getSourceCardId: function (card) {
+                    if (!card) return;
+                    if (card._cardid != null) return card._cardid;
+                    var prefix = "hangkongshuguang:";
+                    if (typeof card.cardid != "string" || !card.cardid.startsWith(prefix)) return;
+                    try {
+                        var info = JSON.parse(card.cardid.slice(prefix.length));
+                        if (Array.isArray(info) && info.length == 2) return info[1];
+                    } catch (e) { }
+                },
+                getSourceCard: function (card) {
+                    var sourceCardId = lib.skill.hangkongshuguang_effect.getSourceCardId(card);
+                    if (sourceCardId == null) return;
+                    return lib.skill.hangkongshuguang_effect.getCards().find(function (current) {
+                        return current.cardid == sourceCardId;
+                    });
+                },
+                getMaterialOwner: function (card, player) {
+                    var effect = lib.skill.hangkongshuguang_effect;
+                    if (effect.isProxyCard(card)) {
+                        var sourceCard = effect.getSourceCard(card);
+                        return sourceCard && get.owner(sourceCard);
+                    }
+                    return get.owner(card) || player;
+                },
+                getProxyCards: function (player) {
+                    return player.getCards("s", function (card) {
+                        return card.hasGaintag("hangkongshuguang");
+                    });
+                },
+                blockPlayerProxies: function (player) {
+                    lib.skill.hangkongshuguang_effect.getProxyCards(player).forEach(function (card) {
+                        card.uncheck("hangkongshuguang");
+                    });
+                },
+                allowPlayerProxies: function (player) {
+                    lib.skill.hangkongshuguang_effect.getProxyCards(player).forEach(function (card) {
+                        card.recheck("hangkongshuguang");
+                    });
+                },
+                removePlayerProxies: function (player, cards) {
+                    if (!cards || !cards.length) return;
+                    if (player.isOnline2()) {
+                        player.send(function (cards, current) {
+                            cards.forEach(function (card) {
+                                card.delete();
+                            });
+                            if (current == game.me) ui.updatehl();
+                        }, cards, player);
+                    }
+                    cards.forEach(function (card) {
+                        card.delete();
+                    });
+                    if (player == game.me) ui.updatehl();
+                },
+                removeProxies: function (cardids) {
+                    if (!cardids || !cardids.length) return;
+                    var effect = lib.skill.hangkongshuguang_effect;
+                    game.players.concat(game.dead || []).forEach(function (current) {
+                        var cards = effect.getProxyCards(current).filter(function (card) {
+                            return cardids.includes(effect.getSourceCardId(card));
+                        });
+                        effect.removePlayerProxies(current, cards);
+                    });
+                },
+                syncPlayer: function (player) {
+                    if (!player || !player.node || !player.node.handcards1) return;
+                    var effect = lib.skill.hangkongshuguang_effect;
+                    var cards = effect.getCards();
+                    var cardids = cards.map(function (card) {
+                        return card.cardid;
+                    });
+                    var proxies = effect.getProxyCards(player);
+                    var stale = proxies.filter(function (card) {
+                        return player.group != "RM" || player.isDead() || !cardids.includes(effect.getSourceCardId(card));
+                    });
+                    effect.removePlayerProxies(player, stale);
+                    if (player.group != "RM" || player.isDead()) return;
+
+                    var existing = effect.getProxyCards(player).map(function (card) {
+                        return effect.getSourceCardId(card);
+                    });
+                    var missing = cards.filter(function (card) {
+                        return !existing.includes(card.cardid);
+                    }).map(function (card) {
+                        var proxy = ui.create.card();
+                        proxy.init(get.cardInfo(card));
+                        proxy._cardid = card.cardid;
+                        if (_status.connectMode) {
+                            if (lib.cardOL && proxy.cardid && lib.cardOL[proxy.cardid] == proxy) {
+                                delete lib.cardOL[proxy.cardid];
+                            }
+                            proxy.cardid = effect.getProxyCardId(player, card.cardid);
+                            if (lib.cardOL) lib.cardOL[proxy.cardid] = proxy;
+                        }
+                        return proxy;
+                    });
+                    if (missing.length) player.directgains(missing, null, "hangkongshuguang");
+                    effect.blockPlayerProxies(player);
+                },
+                syncAll: function () {
+                    var effect = lib.skill.hangkongshuguang_effect;
+                    game.players.concat(game.dead || []).forEach(function (current) {
+                        effect.syncPlayer(current);
+                    });
+                },
+                patchChoiceEvent: function (event) {
+                    if (!event || event._hangkongshuguangPatched) return;
+                    event._hangkongshuguangPatched = true;
+                    var originalBackup = event.backup;
+                    event.backup = function (skill) {
+                        var result = originalBackup.apply(this, arguments);
+                        var info = get.info(skill);
+                        if (info && !info.viewAs && this.filterCard) {
+                            var originalFilterCard = this.filterCard;
+                            this.filterCard = function (card) {
+                                if (lib.skill.hangkongshuguang_effect.isProxyCard(card)) return false;
+                                return originalFilterCard.apply(this, arguments);
+                            };
+                        }
+                        return result;
+                    };
+                },
+                onChooseToUse: function (event) {
+                    var effect = lib.skill.hangkongshuguang_effect;
+                    effect.syncPlayer(event.player);
+                    effect.allowPlayerProxies(event.player);
+                    effect.patchChoiceEvent(event);
+                },
+                onChooseToRespond: function (event) {
+                    var effect = lib.skill.hangkongshuguang_effect;
+                    effect.syncPlayer(event.player);
+                    effect.allowPlayerProxies(event.player);
+                    effect.patchChoiceEvent(event);
+                },
+                mod: {
+                    cardEnabled2: function (card, player) {
+                        var effect = lib.skill.hangkongshuguang_effect;
+                        var isProxy = effect.isProxyCard(card);
+                        var evt = _status.event;
+                        if (!evt || !evt.skill) return;
+                        var info = get.info(evt.skill);
+                        if (!info || !info.viewAs) {
+                            if (isProxy) return false;
+                            return;
+                        }
+                        var selected = ui.selected.cards || [];
+                        if (!isProxy && !selected.some(function (current) {
+                            return effect.isProxyCard(current);
+                        })) return;
+                        var owner = effect.getMaterialOwner(card, player);
+                        if (!owner) return false;
+                        if (selected.some(function (current) {
+                            return effect.getMaterialOwner(current, player) != owner;
+                        })) return false;
+                    },
+                    cardRespondable: function (card, player) {
+                        return lib.skill.hangkongshuguang_effect.mod.cardEnabled2(card, player);
+                    },
+                    cardDiscardable: function (card) {
+                        if (lib.skill.hangkongshuguang_effect.isProxyCard(card)) return false;
+                    },
+                    canBeDiscarded: function (card) {
+                        if (lib.skill.hangkongshuguang_effect.isProxyCard(card)) return false;
+                    },
+                    canBeGained: function (card) {
+                        if (lib.skill.hangkongshuguang_effect.isProxyCard(card)) return false;
+                    },
+                },
+                filter: function (event, player, name) {
+                    if (name == "chooseCardBegin" || name == "chooseToUseAfter" || name == "chooseToRespondAfter") {
+                        return true;
+                    }
+                    if (name != "useCardBefore" && name != "respondBefore") {
+                        return game.players.length > 0 && player == game.players[0];
+                    }
+                    if (!event.cards || !event.cards.length) return false;
+                    return event.cards.some(function (card) {
+                        return lib.skill.hangkongshuguang_effect.isProxyCard(card);
+                    });
                 },
                 content: function () {
-                    player.storage.tehungongji_used = true;
-                    var targets = game.filterPlayer(function (current) {
-                        return current.distance(player) == 1;
+                    var effect = lib.skill.hangkongshuguang_effect;
+                    if (event.triggername == "chooseCardBegin" || event.triggername == "chooseToUseAfter" || event.triggername == "chooseToRespondAfter") {
+                        effect.blockPlayerProxies(player);
+                        return;
+                    }
+                    if (event.triggername != "useCardBefore" && event.triggername != "respondBefore") {
+                        effect.syncAll();
+                        return;
+                    }
+                    var cards = effect.getCards();
+                    var selectedIds = [];
+                    var missing = false;
+                    var replace = function (card) {
+                        if (!effect.isProxyCard(card)) return card;
+                        var sourceCardId = effect.getSourceCardId(card);
+                        selectedIds.add(sourceCardId);
+                        var sourceCard = cards.find(function (current) {
+                            return current.cardid == sourceCardId;
+                        });
+                        if (!sourceCard) missing = true;
+                        return sourceCard;
+                    };
+                    var replacedCards = trigger.cards.map(replace);
+                    if (missing) {
+                        effect.removeProxies(selectedIds);
+                        effect.syncAll();
+                        var chooseEvent = trigger.getParent(event.triggername == "respondBefore" ? "chooseToRespond" : "chooseToUse");
+                        if (chooseEvent && (chooseEvent.name == "chooseToUse" || chooseEvent.name == "chooseToRespond")) {
+                            chooseEvent.result = { bool: false, cards: [], targets: [] };
+                            chooseEvent._result = chooseEvent.result;
+                        }
+                        trigger.cancel();
+                        return;
+                    }
+                    var owners = replacedCards.map(function (card) {
+                        return get.owner(card) || player;
                     });
-                    trigger.targets = targets;
+                    if (owners.some(function (owner) {
+                        return owner != owners[0];
+                    })) {
+                        var chooseEvent = trigger.getParent(event.triggername == "respondBefore" ? "chooseToRespond" : "chooseToUse");
+                        if (chooseEvent && (chooseEvent.name == "chooseToUse" || chooseEvent.name == "chooseToRespond")) {
+                            chooseEvent.result = { bool: false, cards: [], targets: [] };
+                            chooseEvent._result = chooseEvent.result;
+                        }
+                        trigger.cancel();
+                        return;
+                    }
+                    trigger.cards = replacedCards;
+                    if (trigger.card) trigger.card.cards = trigger.cards.slice();
+                    effect.removeProxies(selectedIds);
                 },
             },
         },
     },
     //特混攻击2
-      tehungongji2: {
+    tehungongji2: {
         audio: false,
         trigger: {
             global: [
@@ -4630,63 +4938,11 @@ const unfulfilledambition = {
         content: function () {
             player.draw();
         },
-        ai:{
-        threaten:1.4,
+        ai: {
+            threaten: 1.4,
         },
     },
-    //航空曙光
-    hangkongshuguang: {
-        audio: false,
-        trigger: { player: "phaseUseEnd" },
-        direct: true,
-        filter: function (event, player) {
-            return player.countCards("h") > player.maxHp;
-        },
-        content: function () {
-            "step 0"
-            var num = player.countCards("h") - player.maxHp;
-            player.chooseCard("h", [1, num], "航空曙光：将超出上限的任意张牌置于武将牌上").set("ai", function (card) {
-                return 6 - get.value(card);
-            });
-            "step 1"
-            if (result.bool && result.cards && result.cards.length > 0) {
-                player.logSkill("hangkongshuguang");
-                player.lose(result.cards, ui.special);
-                if (!_status.hangkongshuguang_cards) _status.hangkongshuguang_cards = [];
-                _status.hangkongshuguang_cards.addArray(result.cards);
-                game.addGlobalSkill("hangkongshuguang_effect");
-            }
-        },
-        subSkill: {
-            effect: {
-                enable: ["chooseToUse", "chooseToRespond"],
-                filter: function (event, player) {
-                    if (player.group != "MN") return false;
-                    if (!_status.hangkongshuguang_cards || _status.hangkongshuguang_cards.length == 0) return false;
-                    return true;
-                },
-                chooseButton: {
-                    dialog: function (event, player) {
-                        return ui.create.dialog("航空曙光", _status.hangkongshuguang_cards, "hidden");
-                    },
-                    filter: function (button, player) {
-                        return lib.filter.cardEnabled(button.link, player);
-                    },
-                    check: function (button) {
-                        return get.value(button.link);
-                    },
-                    backup: function (links, player) {
-                        return {
-                            filterCard: function () { return false; },
-                            selectCard: -1,
-                            card: links[0],
-                            popname: true,
-                        };
-                    },
-                },
-            },
-        },
-    }, */
+
 };
 
 export { unfulfilledambition };
