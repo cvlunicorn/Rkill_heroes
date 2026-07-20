@@ -4926,6 +4926,7 @@ const unfulfilledambition = {
             if (!event.player || event.player == player || event.player != _status.currentPhase) {
                 return false;
             }
+            if (event.getParent("_qianghuazhuang") || event.getParent("_yuanhang")) return false;
             if (name == "judgeAfter" && !event.result?.card) return false;
             if (name == "drawAfter" && (!Array.isArray(event.result) || !event.result.length)) return false;
             if (name == "useCardAfter" && !event.card) return false;

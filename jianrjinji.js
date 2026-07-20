@@ -982,7 +982,7 @@ var jianrjinji = {
         tehungongji: "特混攻击",
         tehungongji_info: "回合开始时，你可以进行一次判定，红色:你本回合使用的第一张牌伤害+1;黑色：你本回合使用的第一张牌改为指定距离为1的所有角色。",
         tehungongji2: "特混攻击2",
-        tehungongji2_info: "锁定技，其他角色跳过阶段或在其回合内执行与当前阶段不同名的操作时，你摸一张牌。",
+        tehungongji2_info: "锁定技，其他角色跳过阶段或在其回合内执行与当前阶段不同名的操作时（强化、远航除外），你摸一张牌。",
         hangkongshuguang: "航空曙光",
         hangkongshuguang_info: "你出牌阶段结束时，可以将超出手牌上限的任意张牌置于武将牌上，场上所有I国角色可以如手牌般使用这些牌。",
 
