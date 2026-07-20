@@ -134,6 +134,57 @@ function probeJianRAssetExt(relativeBase) {
     });
 }
 
+function patchStoredCardViewAs() {
+    var skill = lib.skill._kapaizhuanhua_muniu;
+    if (!skill && lib.imported && lib.imported.card) {
+        for (var packName in lib.imported.card) {
+            var pack = lib.imported.card[packName];
+            if (pack && pack.skill && pack.skill._kapaizhuanhua_muniu) {
+                skill = pack.skill._kapaizhuanhua_muniu;
+                break;
+            }
+        }
+    }
+    if (!skill) return false;
+    // 下划线卡包技能默认会随卡包开关被跳过；此转换是牌将存牌机制的依赖。
+    skill.forceLoad = true;
+    var nameMap = {
+        huibi9: "shan",
+        sheji9: "sha",
+        zhikongquan9: "wuxie",
+        kuaixiu9: "tao",
+        zziqi9: "jiu",
+    };
+    if (!skill._jianrStoredCardRawNamePatched) {
+        skill.viewAs = function (cards, player) {
+            if (!cards || !cards.length) return null;
+            var rawName = get.name(cards[0], false);
+            var name = nameMap[rawName];
+            if (!name) return null;
+            return {
+                name: name,
+                nature: name == "sha" ? get.nature(cards[0], player) : null,
+            };
+        };
+        skill._jianrStoredCardRawNamePatched = true;
+    }
+    if (!skill._jianrStoredCardChoicePatched) {
+        var patchChoiceEvent = function (event) {
+            if (!event || event._jianrStoredCardChoicePatched || typeof event.filterCard != "function") return;
+            event._jianrStoredCardChoicePatched = true;
+            var originalFilterCard = event.filterCard;
+            event.filterCard = function (card) {
+                if (get.position(card) == "s" && nameMap[get.name(card, false)]) return false;
+                return originalFilterCard.apply(this, arguments);
+            };
+        };
+        skill.onChooseToUse = patchChoiceEvent;
+        skill.onChooseToRespond = patchChoiceEvent;
+        skill._jianrStoredCardChoicePatched = true;
+    }
+    return true;
+}
+
 game.import("extension", function (lib, game, ui, get, ai, _status) {
 
     return {
@@ -1381,6 +1432,19 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             //全局技能写在这上面
         },
         precontent: function () {
+            // onload 修正尚未合并的卡包源对象；arenaReady 在合并完成后兜底。
+            // 两者都覆盖联机，而无头模式也会执行 onload 队列。
+            var patchScheduled = false;
+            if (Array.isArray(lib.onload)) {
+                lib.onload.add(patchStoredCardViewAs);
+                patchScheduled = true;
+            }
+            if (Array.isArray(lib.arenaReady)) {
+                lib.arenaReady.add(patchStoredCardViewAs);
+                patchScheduled = true;
+            }
+            if (!patchScheduled) patchStoredCardViewAs();
+
             // ╔══════════════════════════════════════════════════════════════╗
             // ║ A. 工具函数挂载（供技能代码访问）                              ║
             // ╚══════════════════════════════════════════════════════════════╝

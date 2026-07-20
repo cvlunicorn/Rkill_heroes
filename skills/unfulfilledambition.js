@@ -4763,6 +4763,13 @@ const unfulfilledambition = {
                         effect.syncPlayer(current);
                     });
                 },
+                hiddenCard: function (player, name) {
+                    if (!player || player.group != "RM" || player.isDead()) return false;
+                    return lib.skill.hangkongshuguang_effect.getCards().some(function (card) {
+                        var proxyCard = get.autoViewAs({ name: get.name(card, player) });
+                        return proxyCard && proxyCard.name == name;
+                    });
+                },
                 patchChoiceEvent: function (event) {
                     if (!event || event._hangkongshuguangPatched) return;
                     event._hangkongshuguangPatched = true;
