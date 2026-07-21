@@ -962,19 +962,19 @@ const unfulfilledambition = {
                     event.finish();
                     return 0;
                 }
-                player.chooseToDiscard("你可以弃置一张手牌视为使用" + get.translation(event.card), 1, false);
+                //player.chooseToDiscard("你可以弃置一张手牌视为使用" + get.translation(event.card), 1, false);
             }
             'step 2';
-            if (result.bool) {
-                player.chooseUseTarget(
-                    {
-                        name: event.card.name,
-                        isCard: true,
-                    },
-                    "请选择" + get.translation(event.card) + "的目标",
-                    false
-                );
-            }
+            //if (result.bool) {
+            player.chooseUseTarget(
+                {
+                    name: event.card.name,
+                    isCard: true,
+                },
+                "请选择" + get.translation(event.card) + "的目标",
+                false
+            );
+            //}
         },
         ai: {
             order: 4,
@@ -986,6 +986,14 @@ const unfulfilledambition = {
                     if (target.countCards('h') == 1) return -0.1;
                     return -0.5;
                 },
+                target: function (card, player, target) {
+                    if (get.type(card) == "equip" && player == target) {
+                        var distance = get.info(card).distance;
+                        if (distance) {
+                            if (distance.attackFrom < 0 || distance.globalFrom < 0) return 0;
+                        }
+                    }
+                }
             },
         },
     },
@@ -1054,6 +1062,15 @@ const unfulfilledambition = {
         content: function (event, player) {
             player.removeSkill("longgu_trick");
         },
+        ai: {
+            effect: {
+                player: function (card, player, target, current, isLink) {
+                    if (get.type(card) == "trick") {
+                        return get.value(card) - 3;
+                    }
+                },
+            },
+        },
         "_priority": 0,
     },
     longgu_basic: {
@@ -1074,6 +1091,15 @@ const unfulfilledambition = {
         },
         content: function (event, player) {
             player.removeSkill("longgu_basic");
+        },
+        ai: {
+            effect: {
+                player: function (card, player, target, current, isLink) {
+                    if (get.type(card) == "basic") {
+                        return get.value(card) - 3;
+                    }
+                },
+            },
         },
         "_priority": 0,
     },
