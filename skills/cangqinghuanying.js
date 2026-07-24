@@ -629,7 +629,7 @@ const cangqinghuanying = {
 
         filter(event, player) {//过滤器
             // 检查：使用的是闪 && 用来响应杀
-            return event.card && event.getParent(2) && event.getParent(2).isIn() && ['shan', 'huibi9'].includes(event.card.name) //用的是不是闪
+            return event.card && event.getParent(2) && event.getParent(2).player.isIn() && ['shan', 'huibi9'].includes(event.card.name) //用的是不是闪
                 &&//且
                 ['sha', 'sheji9'].includes(event.getParent(2).name) && player.countCards("h") > 0;//响应的是不是射击
         },
