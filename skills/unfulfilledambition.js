@@ -3822,6 +3822,7 @@ const unfulfilledambition = {
         },
     },
     zhizhengguandegongcai: {
+        round:1,
         audio: 2,
         trigger: { global: "judge" },
         filter(event, player) {
