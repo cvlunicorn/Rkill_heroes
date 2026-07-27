@@ -3155,6 +3155,7 @@ const standard = {
             for (var i of ui.cardPile.childNodes) {
 
                 var name = get.name(i);
+                var type = get.type(i);
                 if (type == 'trick' || type == 'basic') {
                     if (lib.filter.cardEnabled({ name: name }, player) && get.number(card) == get.number(i)) {
                         list.push(i);
@@ -3192,10 +3193,10 @@ const standard = {
             // game.log("卡牌类型" + get.type(card));
             var list = [];
             for (var i of ui.cardPile.childNodes) {
-
+                var type = get.type(i);
                 var name = get.name(i);
                 if (type == 'trick' || type == 'basic') {
-                    if (lib.filter.cardEnabled({ name: name }, player)&& get.number(card) == get.number(i)) {
+                    if (lib.filter.cardEnabled({ name: name }, player) && get.number(card) == get.number(i)) {
                         //game.log(type);
                         //game.log(i);
                         list.push(i);
