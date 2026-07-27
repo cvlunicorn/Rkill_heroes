@@ -2779,6 +2779,17 @@ const unfulfilledambition = {
     weizhidemingyun: {
         audio: false,
         nobracket: true,
+        mod: {
+            cardEnabled2: function (card, player) {
+                if (get.itemtype(card) == 'card' && card.hasGaintag('weizhidemingyun')) return false;
+            },
+            ignoredHandcard: function (card, player) {
+                if (card.hasGaintag('weizhidemingyun')) return true;
+            },
+        },
+        onremove: function (player) {
+            player.removeGaintag('rexiahui');
+        },
         trigger: { player: "phaseDrawEnd" },
         forced: true,
         filter: function (event, player) {
@@ -2794,7 +2805,7 @@ const unfulfilledambition = {
             delete player.storage.xiwang_extra;
             delete player.storage.xiwang_handBefore;
             player.chooseControl("选项一", "选项二").set("prompt", "未知的命运：选择一项").set("choiceList", [
-                '依靠"遥远的希望"获得的牌本回合无法使用且不计入手牌上限',
+                '本回合依靠"遥远的希望"获得的牌无法使用且不计入手牌上限直到此技能不生效',
                 "弃置" + x + "张牌"
             ]).set("ai", function () {
                 var player = _status.event.player;
@@ -2807,8 +2818,7 @@ const unfulfilledambition = {
             if (result.index == 0) {
                 //选项一：锁定牌（无法使用但不计入手牌上限）
                 if (event.lockCards.length > 0) {
-                    player.storage.weizhidemingyun_locked = event.lockCards.map(function (c) { return c.cardid; });
-                    player.addTempSkill("weizhidemingyun_lock", "phaseEnd");
+                    player.addGaintag(event.lockCards, 'weizhidemingyun');
                     game.log(player, "锁定了", event.lockCards.length, "张牌");
                 }
             } else {
@@ -2816,25 +2826,7 @@ const unfulfilledambition = {
                 player.chooseToDiscard(event.x, true, "he");
             }
         },
-        subSkill: {
-            lock: {
-                charlotte: true,
-                mod: {
-                    cardEnabled: function (card, player) {
-                        if (player.storage.weizhidemingyun_locked &&
-                            player.storage.weizhidemingyun_locked.includes(card.cardid)) return false;
-                    },
-                    ignoredHandcard: function (card, player) {
-                        if (player.storage.weizhidemingyun_locked &&
-                            player.storage.weizhidemingyun_locked.includes(card.cardid)) return true;
-                    },
-                },
-                onremove: function (player) {
-                    delete player.storage.weizhidemingyun_locked;
-                },
-                sub: true,
-            },
-        },
+
         "_priority": 0,
     },
     //如愿的曙光 - 觉醒技，体力变化累计超过4点后觉醒
@@ -3822,7 +3814,7 @@ const unfulfilledambition = {
         },
     },
     zhizhengguandegongcai: {
-        round:1,
+        round: 1,
         audio: 2,
         trigger: { global: "judge" },
         filter(event, player) {
@@ -4050,19 +4042,19 @@ const unfulfilledambition = {
             if (!game.roundNumber) {
                 var drawnum = 1;
             } else {
-                var drawnum = Math.max(1,game.roundNumber%game.countPlayer());
+                var drawnum = Math.max(1, game.roundNumber % game.countPlayer());
             }
             player.draw(drawnum);
         },
         ai: {
             threaten(player, target) {
-                return 1 + 0.5 * game.roundNumber%game.countPlayer();
+                return 1 + 0.5 * game.roundNumber % game.countPlayer();
             },
         },
     },
     //岛勋
     t23_daoxun: {
-        usable:1,
+        usable: 1,
         audio: false,
         trigger: { player: "gainAfter" },
         filter: function (event, player) {
@@ -4074,21 +4066,21 @@ const unfulfilledambition = {
         content: function () {
             "step 0"
             if (!player.storage.t23_daoxun) player.storage.t23_daoxun = [];
-                player.logSkill("t23_daoxun");
-                player.showCards(trigger.cards);
-                var colors = [];
-                for (var card of trigger.cards) {
-                    var color = get.color(card);
-                    if (!colors.includes(color)) colors.push(color);
-                }
-                event.num = colors.length;
-                player.chooseTarget("岛勋：令一名角色获得" + event.num + "点护甲", function (card, player, target) {
-                    if (player.storage.t23_daoxun && player.storage.t23_daoxun.includes(target)) return false;
-                    return true;
-                }, true).set("ai", function (target) {
-                    var player = _status.event.player;
-                    return get.attitude(player, target);
-                });
+            player.logSkill("t23_daoxun");
+            player.showCards(trigger.cards);
+            var colors = [];
+            for (var card of trigger.cards) {
+                var color = get.color(card);
+                if (!colors.includes(color)) colors.push(color);
+            }
+            event.num = colors.length;
+            player.chooseTarget("岛勋：令一名角色获得" + event.num + "点护甲", function (card, player, target) {
+                if (player.storage.t23_daoxun && player.storage.t23_daoxun.includes(target)) return false;
+                return true;
+            }, true).set("ai", function (target) {
+                var player = _status.event.player;
+                return get.attitude(player, target);
+            });
             "step 1"
             if (result.bool && result.targets && result.targets[0]) {
                 var target = result.targets[0];
@@ -4117,7 +4109,7 @@ const unfulfilledambition = {
 
     },
     posui: {
-        usable:1,
+        usable: 1,
         trigger: { player: "loseAfter" },
         filter: function (event, player) {
             if (event.type != "discard" || !event.cards || !event.cards.length) return false;
@@ -4128,7 +4120,7 @@ const unfulfilledambition = {
             });
         },
         direct: true,
-        log:false,
+        log: false,
         content: function () {
             "step 0"
             player.chooseTarget(get.prompt("posui"), "展示其他角色一张手牌", function (card, player, target) {

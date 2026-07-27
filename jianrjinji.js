@@ -904,7 +904,7 @@ var jianrjinji = {
         yaoyuandexiwang2: "遥远希望",
         yaoyuandexiwang2_info: "锁定技，摸牌阶段，你多摸X张牌（X为当前轮数/2，向上取整）。",
         weizhidemingyun: "未知命运",
-        weizhidemingyun_info: 'G势力技，摸牌阶段结束时，你选择一项：1、依靠"遥远的希望"获得的牌本回合无法使用且不计入手牌上限；2、弃置X张牌（X为当前轮数/2，向下取整且最低为1）。',
+        weizhidemingyun_info: 'G势力技，摸牌阶段结束时，你选择一项：1、本回合依靠"遥远的希望"获得的牌本回合无法使用且不计入手牌上限直到此技能失效；2、弃置X张牌（X为当前轮数/2，向下取整且最低为1）。',
         ruyuandeshuguang: "如愿曙光",
         ruyuandeshuguang_info: '觉醒技，当你的体力值变化累计超过4点后，你变更势力为F，你升级"防空""遥远的希望"并获得"核试验旗舰"。',
         heshiyan: "核试验",
