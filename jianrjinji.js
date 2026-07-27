@@ -964,7 +964,7 @@ var jianrjinji = {
         zhenhanwoma: "震撼我妈",
         zhenhanwoma_info: "每轮开始时，你可以将座次向前移动一位。",
         yizhengnian: "一整年",
-        yizhengnian_info: "锁定技，每轮开始时，你摸X张牌。（X为当前轮数）",
+        yizhengnian_info: "锁定技，每轮开始时，你摸X张牌。（X为当前轮数除场上人数的余数）",
         t23_daoxun: "岛勋",
         t23_daoxun_info: "每回合每名角色限一次，你获得牌时可展示之，然后令一名角色获得X点护甲，若其在你左侧，你弃置一张牌。X=你展示牌的颜色数。",
         posui: "破隧",

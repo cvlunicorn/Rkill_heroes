@@ -4050,13 +4050,13 @@ const unfulfilledambition = {
             if (!game.roundNumber) {
                 var drawnum = 1;
             } else {
-                var drawnum = game.roundNumber;
+                var drawnum = Math.max(1,game.roundNumber%game.countPlayer());
             }
             player.draw(drawnum);
         },
         ai: {
             threaten(player, target) {
-                return 1 + 0.5 * game.roundNumber;
+                return 1 + 0.5 * game.roundNumber%game.countPlayer();
             },
         },
     },
