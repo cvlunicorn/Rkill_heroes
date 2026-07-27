@@ -2478,15 +2478,15 @@ const others = {
             "step 2"
             //对自己造成一点雷击伤害，标记nosave
             player.storage.yingxiongzhijia_nosave = true;
-            player.damage(1, 'thunder');
+            player.damage(3, 'thunder');
             "step 3"
             delete player.storage.yingxiongzhijia_nosave;
         },
         ai: {
             order: 1,
             result: {
-                player: -3,
-                target: -2,
+                player: -10,
+                target: -8,
             },
         },
         "_priority": 0,
