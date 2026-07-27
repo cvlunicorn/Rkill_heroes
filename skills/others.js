@@ -2455,6 +2455,11 @@ const others = {
         filterTarget: function (card, player, target) {
             return target != player && target.hp == player.hp;
         },
+        check(event, player) {
+            var num = game.countPlayer(function (current) { return player!=current&&get.attitude(player, current) < 0 && (current.isLinked()||current.hp==player.hp) });
+            return num >= game.countPlayer(function (current) { return get.attitude(player, current) < 0 })/2+1;
+        },
+
         selectTarget: [0, 4],
         content: function () {
             "step 0"
@@ -2480,7 +2485,8 @@ const others = {
         ai: {
             order: 1,
             result: {
-                player: -10,
+                player: -3,
+                target: -2,
             },
         },
         "_priority": 0,
@@ -4048,11 +4054,11 @@ const others = {
             cardname: function (card, player) {
                 if (lib.card[card.name].subtype == "equip1") {
                     var range = card.distance;
-                    if (card.name!="zhuge"||card.name!="sushepao") {
+                    if (card.name != "zhuge" || card.name != "sushepao") {
                         return "zhiyuangongji9";
                     }
                 }
-                if ( lib.card[card.name].subtype== "equip3" ||lib.card[card.name].subtype== "equip4") {
+                if (lib.card[card.name].subtype == "equip3" || lib.card[card.name].subtype == "equip4") {
                     return "sha";
                 }
             },
