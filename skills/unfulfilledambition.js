@@ -4310,8 +4310,8 @@ const unfulfilledambition = {
                 },
                 content: function () {
                     "step 0"
-                    player.chooseTarget("高速轻弹：是否选择一名有牌的目标视为对其使用一张【决斗】？", function (card, player, target) {
-                        return target.countCards("he") > 0 && player.canUse({ name: "juedou" }, target);
+                    player.chooseTarget("高速轻弹：选择一名目标视为对其使用一张【决斗】", function (card, player, target) {
+                        return player.canUse({ name: "juedou" }, target);
                     }).set("ai", function (target) {
                         var player = _status.event.player;
                         return get.effect(target, { name: "juedou" }, player, player);
