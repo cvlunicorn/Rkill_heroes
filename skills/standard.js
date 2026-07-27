@@ -3151,7 +3151,17 @@ const standard = {
                     numbers.add(get.number(player.storage.duomianshou[i]));
                 }
             }
+            var list = [];
+            for (var i of ui.cardPile.childNodes) {
 
+                var name = get.name(i);
+                if (type == 'trick' || type == 'basic') {
+                    if (lib.filter.cardEnabled({ name: name }, player) && get.number(card) == get.number(i)) {
+                        list.push(i);
+                    }
+                }
+            }
+            if (list.length == 0) { return false; }
             if (!numbers.includes(get.number(card))) {
                 return true;
             }
@@ -3169,6 +3179,8 @@ const standard = {
         position: "hs",
         discard: false,
         lose: false,
+        log: false,
+        usable: 3,
         check: function (card) {
             return 7.5 - get.value(card);
         },
@@ -3182,9 +3194,8 @@ const standard = {
             for (var i of ui.cardPile.childNodes) {
 
                 var name = get.name(i);
-                var type = get.type(i);
                 if (type == 'trick' || type == 'basic') {
-                    if (lib.filter.cardEnabled({ name: name }, player) && type != get.type(card) && get.number(card) == get.number(i)) {
+                    if (lib.filter.cardEnabled({ name: name }, player)&& get.number(card) == get.number(i)) {
                         //game.log(type);
                         //game.log(i);
                         list.push(i);
@@ -3225,7 +3236,7 @@ const standard = {
             }).set('selectButton', 1);
 
             //var dialog = ui.create.dialog('多面手', [list, 'vcard']);
-            game.log("多面手列表已生成");
+            //game.log("多面手列表已生成");
 
 
             /*player.chooseButton(dialog).ai = function (button) {
@@ -3249,18 +3260,26 @@ const standard = {
             
             }*/
             'step 1'
-            //game.log("结果bool" + result.bool);
-
-
-
             if (result && result.bool && result.links[0]) {
                 player.discard(cards[0]);
                 //player.addTempSkill("duomianshou_1", "useCardToTargeted");
                 player.chooseUseTarget(true, get.name(result.links[0]));
-                player.storage.duomianshou = [];
+                player.logSkill("duomianshou");
+
             } else {
                 player.getStat('skill').duomianshou -= 1;
+                player.storage.duomianshou.push(cards[0]);
             }
+        },
+        group: ["duomianshou_reset"],
+        subSkill: {
+            reset: {
+                charlotte: true,
+                trigger: { player: "phaseBegin" },
+                content() {
+                    player.storage.duomianshou = [];
+                },
+            },
         },
         ai: {
             order: 10,
@@ -3640,7 +3659,7 @@ const standard = {
             const { result } = await next;
             const cardsA = [];
             const videoId = lib.status.videoId++;
-            
+
             if (!result || result.length !== targets.length) {
                 game.log('展示过程出错，技能中断');
                 player.getStat('skill').xinqidian -= 1;
