@@ -660,7 +660,7 @@ var jianrjinji = {
         xunqian: "巡潜", "xunqian_info": "你使用锦囊牌时,你可以摸一张牌,然后你选择：1.弃置一张牌；2.将任意张牌交给一名其他角色。",
         jinyangmaozhishi: "金羊毛之誓", "jinyangmaozhishi_info": "限定技,当你成为其他角色使用牌的目标时,若你已受伤,你可以令此牌对你无效。",
         zhengzhansihai: "征战四海", "zhengzhansihai_info": "每回合限一次,当你造成或受到伤害后,你可以摸x张牌,x为你已损失的体力值。",
-        shuqinzhiyin: "竖琴之音", "shuqinzhiyin_info": "每轮限一次,其他角色技能结算后,你可以弃置两张牌,重置一名其他角色武将牌上的技能,然后其回复一点体力",
+        shuqinzhiyin: "竖琴之音", "shuqinzhiyin_info": "每回合限一次,其他角色技能结算后,你可以弃置一张牌,重置其武将牌上的技能,然后其回复一点体力",
         yixinyiyi: "一心一意", "yixinyiyi_info": "出牌阶段限X次,你可以将一张手牌当作雷杀使用,此法使用的牌无次数限制。X为主公已损失体力值。",
         buxiuzhanshi: "不朽战士", "buxiuzhanshi_info": "出牌阶段限一次,你可以弃置任意张牌,视为对等量名角色使用决斗。下个回合摸牌阶段,你的摸牌数量+x（x为你本回合以此法对其他角色造成的伤害数）",
         hailangchuji: "海狼出击", "hailangchuji_info": "有潜艇使用雷杀指定其他角色为目标后,你可以摸一张牌。",

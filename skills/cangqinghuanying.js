@@ -3,26 +3,60 @@ const cangqinghuanying = {
     shuqinzhiyin: {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
-        round: 1,
+        usable: 1,
         trigger: {
             global: ["useSkillAfter", "logSkill"],
         },
         filter: function (event, player) {
-            return event.type == "player" && event.player != player && player.countCards("h") >= 2;
+            return event.type == "player" && event.player != player && player.countCards("h") >= 1;
         },
         check(event, player) {
-            return true;
+            var target = event.player;
+            var skills = target.getOriginalSkills();
+            var list = [];
+            for (var i = 0; i < skills.length; i++) {
+                var skillKey = skills[i];
+                if (!skillKey || typeof skillKey !== "string") {
+                    continue;
+                }
+                var info = get.info(skills[i]);
+                if (!info || typeof info !== "object") {
+                    continue;
+                }
+                if (typeof info.usable == "number") {
+                    if (target.hasSkill("counttrigger") && target.storage.counttrigger[skills[i]] && target.storage.counttrigger[skills[i]] >= 1) {
+                        list.push(skills[i]);
+                    }
+                    if (typeof get.skillCount(skills[i]) == "number" && get.skillCount(skills[i]) >= 1) {
+                        list.push(skills[i]);
+                    }
+                }
+                if (info.round && target.storage[skills[i] + "_roundcount"]) {
+                    list.push(skills[i]);
+                }
+                if (target.storage[`temp_ban_${skills[i]}`]) {
+                    list.push(skills[i]);
+                }
+                if (target.awakenedSkills.includes(skills[i])) {
+                    list.push(skills[i]);
+                }
+            }
+            //game.log(list);
+            if (target.isDamaged() || list.length >= 1) {
+                return get.attitude(player, target);
+            }
+            return 0;
         },
-        direct: true,
         content() {
             "step 0";
-            player.chooseTarget(get.prompt2("shuqinzhiyin"), function (card, player, target) {
-                return target != player;
-            })
-                .set("ai", function (target) {
-                    var player = get.player();
+            player
+                .chooseToDiscard(1, "hes", get.prompt("shuqinzhiyin"))
+                .set("target", trigger.player)
+                .set("ai", function (card) {
+                    var target = trigger.player;
+                    if (get.attitude(player, target) <= 0) { return 0; }
+                    if (target.isDamaged() && target.hp < 3) return 9 - get.value(card);
                     var skills = target.getOriginalSkills();
-                    var list = [];
                     for (var i = 0; i < skills.length; i++) {
                         var skillKey = skills[i];
                         if (!skillKey || typeof skillKey !== "string") {
@@ -33,74 +67,28 @@ const cangqinghuanying = {
                             continue;
                         }
                         if (typeof info.usable == "number") {
-                            if (target.hasSkill("counttrigger") && target.storage.counttrigger[skills[i]] && target.storage.counttrigger[skills[i]] >= 1) {
-                                list.push(skills[i]);
+                            if (target.hasSkill("counttrigger") && target.storage.counttrigger[skills[i]] && target.storage.counttrigger[skills[i]] >= 1 && !target.isDamaged()) {
+                                return 5 - get.value(card);
                             }
-                            if (typeof get.skillCount(skills[i]) == "number" && get.skillCount(skills[i]) >= 1) {
-                                list.push(skills[i]);
+                            if (typeof get.skillCount(skills[i]) == "number" && get.skillCount(skills[i]) >= 1 && !target.isDamaged()) {
+                                return 5 - get.value(card);
                             }
                         }
                         if (info.round && target.storage[skills[i] + "_roundcount"]) {
-                            list.push(skills[i]);
+                            return 7.5 - get.value(card);
                         }
                         if (target.storage[`temp_ban_${skills[i]}`]) {
-                            list.push(skills[i]);
+                            return 7 - get.value(card);
                         }
                         if (target.awakenedSkills.includes(skills[i])) {
-                            list.push(skills[i]);
+                            return 9 - get.value(card);
                         }
                     }
-                    //game.log(list);
-                    if (target.isDamaged() || list.length >= 1) {
-                        return get.attitude(player, target);
-                    }
-                    return 0;
+                    return 7 - get.value(card);
                 });
-
             "step 1";
             if (result.bool) {
-                event.targets0 = result.targets[0];
-                player
-                    .chooseToDiscard(2, "hes", get.prompt("shuqinzhiyin"))
-                    .set("target", event.targets0)
-                    .set("ai", function (card) {
-                        var target = event.targets0;
-                        if (target.isDamaged() && target.hp < 3) return 9 - get.value(card);
-                        var skills = target.getOriginalSkills();
-                        for (var i = 0; i < skills.length; i++) {
-                            var skillKey = skills[i];
-                            if (!skillKey || typeof skillKey !== "string") {
-                                continue;
-                            }
-                            var info = get.info(skills[i]);
-                            if (!info || typeof info !== "object") {
-                                continue;
-                            }
-                            if (typeof info.usable == "number") {
-                                if (target.hasSkill("counttrigger") && target.storage.counttrigger[skills[i]] && target.storage.counttrigger[skills[i]] >= 1 && !target.isDamaged()) {
-                                    return 5 - get.value(card);
-                                }
-                                if (typeof get.skillCount(skills[i]) == "number" && get.skillCount(skills[i]) >= 1 && !target.isDamaged()) {
-                                    return 5 - get.value(card);
-                                }
-                            }
-                            if (info.round && target.storage[skills[i] + "_roundcount"]) {
-                                return 7.5 - get.value(card);
-                            }
-                            if (target.storage[`temp_ban_${skills[i]}`]) {
-                                return 7 - get.value(card);
-                            }
-                            if (target.awakenedSkills.includes(skills[i])) {
-                                return 9 - get.value(card);
-                            }
-                        }
-                        return 7 - get.value(card);
-                    });
-            }
-            "step 2";
-            if (result.bool) {
-                player.logSkill("shuqinzhiyin");
-                var skills = event.targets0.getStockSkills(true, true);
+                var skills = trigger.player.getStockSkills(true, true);
                 game.expandSkills(skills);
                 //game.log(skills);
                 var resetSkills = [];
@@ -116,29 +104,29 @@ const cangqinghuanying = {
                         continue;
                     }
                     if (typeof info.usable == "number") {
-                        if (event.targets0.hasSkill("counttrigger") && event.targets0.storage.counttrigger[skill] && event.targets0.storage.counttrigger[skill] >= 1) {
-                            delete event.targets0.storage.counttrigger[skill];
+                        if (trigger.player.hasSkill("counttrigger") && trigger.player.storage.counttrigger[skill] && trigger.player.storage.counttrigger[skill] >= 1) {
+                            delete trigger.player.storage.counttrigger[skill];
                             resetSkills.add(skill);
                         }
                         if (typeof get.skillCount(skill) == "number" && get.skillCount(skill) >= 1) {
-                            delete event.targets0.getStat("skill")[skill];
+                            delete trigger.player.getStat("skill")[skill];
                             resetSkills.add(skill);
                         }
                     }
-                    if (info.round && event.targets0.storage[skill + "_roundcount"]) {
-                        delete event.targets0.storage[skill + "_roundcount"];
+                    if (info.round && trigger.player.storage[skill + "_roundcount"]) {
+                        delete trigger.player.storage[skill + "_roundcount"];
                         resetSkills.add(skill);
                     }
-                    if (event.targets0.storage[`temp_ban_${skill}`]) {
-                        delete event.targets0.storage[`temp_ban_${skill}`];
+                    if (trigger.player.storage[`temp_ban_${skill}`]) {
+                        delete trigger.player.storage[`temp_ban_${skill}`];
                     }
-                    if (event.targets0.awakenedSkills.includes(skill)) {
-                        event.targets0.restoreSkill(skill);
+                    if (trigger.player.awakenedSkills.includes(skill)) {
+                        trigger.player.restoreSkill(skill);
                         resetSkills.add(skill);
                     }
                     for (var suffix of suffixs) {
-                        if (event.targets0.hasSkill(skill + "_" + suffix)) {
-                            event.targets0.removeSkill(skill + "_" + suffix);
+                        if (trigger.player.hasSkill(skill + "_" + suffix)) {
+                            trigger.player.removeSkill(skill + "_" + suffix);
                             resetSkills.add(skill);
                         }
                     }
@@ -148,10 +136,10 @@ const cangqinghuanying = {
                     for (var i of resetSkills) {
                         str += "【" + get.translation(i) + "】、";
                     }
-                    game.log(event.targets0, "重置了技能", "#g" + str.slice(0, -1));
+                    game.log(trigger.player, "重置了技能", "#g" + str.slice(0, -1));
                 }
-                if (event.targets0.isDamaged()) {
-                    event.targets0.recover(1);
+                if (trigger.player.isDamaged()) {
+                    trigger.player.recover(1);
                 }
             } else {
                 delete player.storage["shuqinzhiyin_roundcount"];
