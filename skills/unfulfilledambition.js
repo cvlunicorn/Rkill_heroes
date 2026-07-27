@@ -4062,9 +4062,9 @@ const unfulfilledambition = {
     },
     //岛勋
     t23_daoxun: {
+        usable:1,
         audio: false,
         trigger: { player: "gainAfter" },
-        direct: true,
         filter: function (event, player) {
             return event.cards && event.cards.length > 0 && game.hasPlayer(function (current) {
                 if (player.storage.t23_daoxun && player.storage.t23_daoxun.includes(current)) return false;
@@ -4074,11 +4074,6 @@ const unfulfilledambition = {
         content: function () {
             "step 0"
             if (!player.storage.t23_daoxun) player.storage.t23_daoxun = [];
-            player.chooseControl("展示", "cancel2").set("prompt", "岛勋：是否展示获得的牌？").set("ai", function () {
-                return "展示";
-            });
-            "step 1"
-            if (result.control == "展示") {
                 player.logSkill("t23_daoxun");
                 player.showCards(trigger.cards);
                 var colors = [];
@@ -4094,10 +4089,7 @@ const unfulfilledambition = {
                     var player = _status.event.player;
                     return get.attitude(player, target);
                 });
-            } else {
-                event.finish();
-            }
-            "step 2"
+            "step 1"
             if (result.bool && result.targets && result.targets[0]) {
                 var target = result.targets[0];
                 target.changeHujia(event.num);
@@ -4125,6 +4117,7 @@ const unfulfilledambition = {
 
     },
     posui: {
+        usable:1,
         trigger: { player: "loseAfter" },
         filter: function (event, player) {
             if (event.type != "discard" || !event.cards || !event.cards.length) return false;
@@ -4135,6 +4128,7 @@ const unfulfilledambition = {
             });
         },
         direct: true,
+        log:false,
         content: function () {
             "step 0"
             player.chooseTarget(get.prompt("posui"), "展示其他角色一张手牌", function (card, player, target) {
