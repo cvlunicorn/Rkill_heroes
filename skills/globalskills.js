@@ -182,7 +182,7 @@ const globalskills = {
             }
         },
         ai: {
-            save: true,
+            //save: true,
             expose: 0,
             threaten: 0,
             order: 2,
