@@ -3264,7 +3264,7 @@ const standard = {
             if (result && result.bool && result.links[0]) {
                 player.discard(cards[0]);
                 //player.addTempSkill("duomianshou_1", "useCardToTargeted");
-                player.chooseUseTarget(true, get.name(result.links[0]));
+                player.chooseUseTarget(true, get.name(result.links[0]),false);
                 player.logSkill("duomianshou");
 
             } else {
@@ -3275,6 +3275,7 @@ const standard = {
         group: ["duomianshou_reset"],
         subSkill: {
             reset: {
+                direct:true,
                 charlotte: true,
                 trigger: { player: "phaseBegin" },
                 content() {
