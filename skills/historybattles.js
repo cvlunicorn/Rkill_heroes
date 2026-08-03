@@ -55,6 +55,19 @@ const historybattles = {
             global: ["damageEnd", "loseHpEnd", "dying"],
         },
         direct: true,
+        getRecordValue: function (player, target) {
+            var attitude = get.attitude(player, target);
+            var hp = Math.max(target.hp, 0);
+            var hand = target.countCards("h");
+            if (attitude > 0) {
+                if (hp <= 1) return 0;
+                return (hp - 1) * 1.6 + Math.min(hand, 4) * 0.5;
+            }
+            if (attitude < 0) {
+                return Math.max(0, target.maxHp - hp) * 1.8 + Math.max(0, 3 - hand) * 0.8;
+            }
+            return 0;
+        },
         filter(event, player) {
             if (player.countCards('he', { color: 'black' }) <= 0) return false;
             if (!event.player.isIn()) return false;
@@ -82,12 +95,8 @@ const historybattles = {
             "step 0"
             player.chooseToDiscard(1, 'he', '是否弃置一张黑色牌并记录' + get.translation(trigger.player) + '状态？', { color: 'black' }).set('ai', function (card, player) {
                 var player = get.player(), target = _status.event.getTrigger().player;
-                if (get.attitude(player, target) >= 0) {
-                    if (target.hp < 3 && target.countCards("h") < 3) return 0;
-                } else {
-                    if (target.hp > 2 && target.countCards("h") > 2) return 0;
-                };
-                return 12 - get.value(card);
+                var recordValue = lib.skill.u47_xinbiao.getRecordValue(player, target);
+                return recordValue + 2 - get.value(card, player);
             });
             "step 1"
             if (result.bool) {
@@ -135,25 +144,29 @@ const historybattles = {
         nobracket: true,
         enable: "phaseUse",
         usable: 1,
+        getTargetValue: function (player, target) {
+            var savedHp = Number(target.getStorage('u47_xinbiao_hp')[0]);
+            var savedCards = Number(target.getStorage('u47_xinbiao_cards')[0]);
+            if (!Number.isFinite(savedHp) || !Number.isFinite(savedCards)) return 0;
+            var hpDelta = savedHp - target.hp;
+            var cardDelta = savedCards - target.countCards("h");
+            var attitude = get.attitude(player, target);
+            var adjustment = attitude >= 0
+                ? hpDelta * 2 + cardDelta
+                : -hpDelta * 2 - cardDelta;
+            return adjustment;
+        },
         filter: function (event, player) {
-            var filterHuxi = game.countPlayer(function (current) {
-                return current.hasSkill('u47_xinbiao_hp');
+            return game.hasPlayer(function (current) {
+                return current.hasSkill('u47_xinbiao_hp') && lib.skill.u47_huxi.getTargetValue(player, current) > 0;
             });
-            return filterHuxi > 0;
         },
         content: function () {
             "step 0"
             player.chooseTarget(get.prompt2('u47_huxi'), function (card, player, target) {
                 return target.hasSkill('u47_xinbiao_hp');
             }).set('ai', target => {
-                var att = get.attitude(player, target);
-                if (att >= 0) {
-                    return (target.getStorage('u47_xinbiao_hp') - target.hp) * 2 + (target.getStorage('u47_xinbiao_cards') - target.countCards("h"));
-                } else if (att < 0) {
-                    return (target.hp - target.getStorage('u47_xinbiao_hp')) * 2 + (target.countCards("h") - target.getStorage('u47_xinbiao_cards'));
-                } else {
-                    return 1;
-                }
+                return lib.skill.u47_huxi.getTargetValue(player, target);
             });
             'step 1'
             if (result.bool) {
@@ -1200,9 +1213,15 @@ const historybattles = {
             }
         },
         ai: {
+            order: 7.5,
             result: {
                 target: function (player, target) {
-                    return get.attitude(player, target) <= 0;
+                    if (target == player) return 3;
+                    if (get.attitude(player, target) < 0) {
+                        var hand = target.countCards("h");
+                        return hand > 1 ? -0.6 : 0;
+                    }
+                    return 0;
                 },
             },
         },
@@ -1212,7 +1231,9 @@ const historybattles = {
                 enable: "phaseUse",
                 prompt: "你可以移去一张Z,观看一名角色的手牌,然后视为使用一张火攻。",
                 filter: function (event, player) {
-                    return player.getExpansions('Z').length;
+                    return player.getExpansions('Z').length && game.hasPlayer(function (current) {
+                        return current.countCards('h') && player.canUse({ name: 'huogong', isCard: true }, current);
+                    });
 
                 },
                 filterTarget: function (card, player, target) {
@@ -1223,7 +1244,7 @@ const historybattles = {
                     var cards = player.getExpansions('Z'), count = cards.length;
                     if (count > 0) {
                         player.chooseCardButton('移去一张Z,观看一名角色的手牌,然后视为使用一张火攻。', true, cards).set('ai', function (button) {
-                            return 1;
+                            return 6 - get.value(button.link, player);
                         });
                     }
                     else { event.finish(); return; }
@@ -1238,7 +1259,13 @@ const historybattles = {
                     }, target);
                 },
                 ai: {
+                    order: 8,
                     threaten: 1.2,
+                    result: {
+                        target: function (player, target) {
+                            return get.effect(target, { name: 'huogong', isCard: true }, player, player);
+                        },
+                    },
                 },
             },
 
@@ -2955,7 +2982,15 @@ const historybattles = {
             return event.num > 0 && event.player != player;
         },
         check: function (event, player) {
-            return get.attitude(player, event.player) > 2 && !event.player.hasSkillTag("maixue");
+            if (get.attitude(player, event.player) <= 2 || event.player.hasSkillTag("maixue")) return false;
+            var redirectedDamage = event.num - (event.player.hasSkill("hangmucv") ? 1 : 0);
+            if (redirectedDamage <= 0) return true;
+            var canSelfSave = player.countCards("hs", function (card) {
+                return ["tao", "jiu", "kuaixiu9", "zziqi9"].includes(get.name(card, player));
+            }) > 0;
+            if (redirectedDamage >= player.hp && !canSelfSave) return false;
+            if (event.num >= event.player.hp) return true;
+            return player.hp - redirectedDamage >= 2 && event.player.hp <= 2;
         },
         prompt2: function (event, player) {
             return "你可以代替" + get.translation(event.player) + "承受此伤害,然后摸x张牌,将x张手牌交给一名其他角色或弃置(x为你已损失的体力值)。若目标为航母,此伤害值-1。";

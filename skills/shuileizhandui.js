@@ -475,10 +475,8 @@ const shuileizhandui = {
             order: 7,
             result: {
                 player: function (player, target) {
-                    if (player.hp < 2) return -2;
-                    var damage = Math.floor(Math.max(target.getHp(), 0) / 2);
-                    if (damage <= 0) return 0;
-                    return get.damageEffect(target, player, player) * damage - get.damageEffect(player, player, player);
+                    if (player.hp <= 1) return -20;
+                    return get.damageEffect(player, player, player);
                 },
                 target: function (player, target) {
                     var damage = Math.floor(Math.max(target.getHp(), 0) / 2);

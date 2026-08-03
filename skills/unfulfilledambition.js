@@ -3913,6 +3913,22 @@ const unfulfilledambition = {
         audio: false,
         enable: "phaseUse",
         usable: 1,
+        getFollowupValue: function (player, swappedTarget, handAfterSwap) {
+            var best = 0;
+            game.countPlayer(function (current) {
+                if (current == player) return;
+                var currentHand = current == swappedTarget ? player.countCards("h") : current.countCards("h");
+                if (currentHand <= handAfterSwap) return;
+                if (!player.canUse({ name: "sha", isCard: true }, current)) return;
+                best = Math.max(best, get.effect(current, { name: "sha", isCard: true }, player, player));
+            });
+            return best;
+        },
+        getPlayerValue: function (player, target) {
+            var myHand = player.countCards("h");
+            var targetHand = target.countCards("h");
+            return targetHand - myHand + lib.skill.pojiaoxiji.getFollowupValue(player, target, targetHand);
+        },
         filterTarget: function (card, player, target) {
             return target != player && target.countCards("h") <= player.countCards("h");
         },
@@ -3939,11 +3955,13 @@ const unfulfilledambition = {
         ai: {
             order: 8,
             result: {
+                player: function (player, target) {
+                    return lib.skill.pojiaoxiji.getPlayerValue(player, target);
+                },
                 target: function (player, target) {
                     var hs1 = player.countCards("h");
                     var hs2 = target.countCards("h");
-                    if (hs1 > hs2) return hs1 - hs2;
-                    return 0;
+                    return (hs1 - hs2) * 0.8;
                 },
             },
         },
@@ -4275,6 +4293,17 @@ const unfulfilledambition = {
     gaosuqingdan: {
         audio: false,
         enable: "phaseUse",
+        getTargetValue: function (player, target) {
+            if (get.attitude(player, target) >= 0) return 0;
+            var mayHaveSha = typeof target.mayHaveSha == "function" && target.mayHaveSha(player, "use");
+            if (mayHaveSha) {
+                var mayDefend = typeof player.mayHaveShan == "function" && player.mayHaveShan(target, "use");
+                if (!mayDefend && player.hp <= 2) return 0;
+                return Math.max(0, get.effect(player, { name: "sha", isCard: true }, target, player) + 0.5);
+            }
+            var damageValue = get.damageEffect(target, player, player);
+            return Math.max(0, damageValue + Math.min(1.5, target.countCards("he") * 0.4));
+        },
         filterTarget: function (card, player, target) {
             return target != player && player.inRange(target) && target.countCards("he") > 0;
         },
@@ -4294,9 +4323,11 @@ const unfulfilledambition = {
         },
         group: "gaosuqingdan_damage",
         ai: {
-            order: 8,
+            order: 5,
             result: {
-                target: -1,
+                target: function (player, target) {
+                    return -lib.skill.gaosuqingdan.getTargetValue(player, target);
+                },
             },
         },
         subSkill: {

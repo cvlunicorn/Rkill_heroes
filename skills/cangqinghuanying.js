@@ -231,7 +231,15 @@ const cangqinghuanying = {
             return false;
         },
         prompt: "将一张手牌当雷杀使用",
-        check(card) { return 4 - get.value(card) },
+        check(card) {
+            var player = get.player();
+            var name = get.name(card, player);
+            if (player.hp <= 2 && ['tao', 'jiu', 'kuaixiu9', 'zziqi9'].includes(name)) return 0;
+            if (['shan', 'huibi9'].includes(name) && player.countCards('h', function (current) {
+                return ['shan', 'huibi9'].includes(get.name(current, player));
+            }) <= 1) return 0;
+            return 6 - get.value(card, player);
+        },
         ai: {
             threaten(player, target) {
                 let zhu = false;

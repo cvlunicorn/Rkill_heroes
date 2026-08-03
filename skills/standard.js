@@ -44,18 +44,22 @@ const standard = {
         trigger: { player: 'phaseZhunbeiBegin' },
 
         check: function (event, player) {
-            var nh = player.countCards('h') - player.countCards('h', { type: 'equip' });
-            if (nh <= 2) return true;
-            //if (player.countCards('h', 'tao')) return false;
-            if (nh <= 3) return Math.random() < 0.7;
-            if (nh <= 4) return Math.random() < 0.4;
-            return false;
+            var cards = player.getCards('h');
+            if (player.hp <= 2 && cards.some(function (card) {
+                return ['tao', 'jiu', 'kuaixiu9', 'zziqi9'].includes(get.name(card, player));
+            })) return false;
+            if (cards.length <= 2) return true;
+            var lowValueCards = cards.filter(function (card) {
+                return get.value(card, player) <= 4;
+            }).length;
+            return lowValueCards >= Math.ceil(cards.length / 2);
         },
         content: function () {
 
             player.addTempSkill('guzhuyizhi2', { player: 'phaseBegin' });
+            var handCount = player.countCards("h");
             player.discard(player.getCards("h"));
-            player.draw(player.countCards("h") + 2);
+            player.draw(handCount + 2);
         },
         intro: {
             content: function () {
@@ -2327,10 +2331,18 @@ const standard = {
             global: "useCardToTargeted",
         },
         filter: function (event, player) {
-            return (event.card.name == 'sha' || event.card.name == 'sheji9') && event.target.isIn();
+            if ((event.card.name != 'sha' && event.card.name != 'sheji9') || !event.target.isIn()) return false;
+            if (event.targets && event.targets.length != 1) return false;
+            if (event.target != player) return player.countCards('he') > 0;
+            return game.hasPlayer(function (current) {
+                return current != player && current.countCards('he') > 0 && get.attitude(player, current) > 0;
+            });
         },
         check: function (event, player) {
-            return get.attitude(player, event.target) >= 0 || player == event.target;
+            if (event.target != player) return get.attitude(player, event.target) > 0;
+            return game.hasPlayer(function (current) {
+                return current != player && current.countCards('he') > 0 && get.attitude(player, current) > 0;
+            });
         },
         logTarget: "target",
         content: function () {
@@ -2362,9 +2374,9 @@ const standard = {
                 //game.log(target);
                 //game.log(get.distance(player, target));
                 //if (get.distance(player, target) <= 1) { return 1 }
-                return 1;
+                return target != player && target.countCards('he') > 0;
             }, "你可以选择一名其他角色,其可以交给你一张牌并获得你场上的一张牌。").set('ai', function (ard, player, target) {
-                return get.attitude(player, target) > 0;
+                return get.attitude(player, target);
             });
             "step 3"
             if (result.bool) {
@@ -2972,6 +2984,12 @@ const standard = {
         ai: {
             order: 1,
             result: {
+                player: function (player) {
+                    var hasSave = player.countCards('hs', function (card) {
+                        return ['tao', 'jiu', 'kuaixiu9', 'zziqi9'].includes(get.name(card, player));
+                    }) > 0;
+                    return hasSave ? -8 - player.hp : -14 - player.hp;
+                },
                 target: function (player, target) {
                     // 无畏装击：失去所有体力对目标造成等同于体力上限的伤害
                     // 这是一个自杀式攻击技能，需要谨慎评估
@@ -3141,6 +3159,30 @@ const standard = {
             player.storage.duomianshou = [];
 
         },
+        getConversionCandidates: function (card, player) {
+            var list = [];
+            var seen = [];
+            for (var pileCard of ui.cardPile.childNodes) {
+                if (get.number(card) != get.number(pileCard)) continue;
+                var name = get.name(pileCard);
+                if (seen.includes(name)) continue;
+                var type = get.type(pileCard);
+                var converted = { name: name, nature: get.nature(pileCard), isCard: true };
+                if ((type != 'trick' && type != 'basic') || !lib.filter.cardEnabled(converted, player)) continue;
+                if (!player.hasUseTarget(converted, false, false)) continue;
+                seen.push(name);
+                list.push(pileCard);
+            }
+            return list;
+        },
+        getBestUseValue: function (card, player) {
+            var best = 0;
+            for (var pileCard of lib.skill.duomianshou.getConversionCandidates(card, player)) {
+                var converted = { name: get.name(pileCard), nature: get.nature(pileCard), isCard: true };
+                best = Math.max(best, player.getUseValue(converted, false, false));
+            }
+            return best;
+        },
         filterCard(card, player) {
             var player = get.player();
             var numbers = [];
@@ -3151,17 +3193,7 @@ const standard = {
                     numbers.add(get.number(player.storage.duomianshou[i]));
                 }
             }
-            var list = [];
-            for (var i of ui.cardPile.childNodes) {
-
-                var name = get.name(i);
-                var type = get.type(i);
-                if (type == 'trick' || type == 'basic') {
-                    if (lib.filter.cardEnabled({ name: name }, player) && get.number(card) == get.number(i)) {
-                        list.push(i);
-                    }
-                }
-            }
+            var list = lib.skill.duomianshou.getConversionCandidates(card, player);
             if (list.length == 0) { return false; }
             if (!numbers.includes(get.number(card))) {
                 return true;
@@ -3183,7 +3215,10 @@ const standard = {
         log: false,
         usable: 3,
         check: function (card) {
-            return 7.5 - get.value(card);
+            var player = get.player();
+            var bestUseValue = lib.skill.duomianshou.getBestUseValue(card, player);
+            if (bestUseValue <= 0) return 0;
+            return bestUseValue + 2 - get.value(card, player);
         },
         content: function () {
             'step 0'
@@ -3191,19 +3226,7 @@ const standard = {
             //var cardtype=get.type(card);
             //game.log("卡牌价值" + get.value(card));
             // game.log("卡牌类型" + get.type(card));
-            var list = [];
-            for (var i of ui.cardPile.childNodes) {
-                var type = get.type(i);
-                var name = get.name(i);
-                if (type == 'trick' || type == 'basic') {
-                    if (lib.filter.cardEnabled({ name: name }, player) && get.number(card) == get.number(i)) {
-                        //game.log(type);
-                        //game.log(i);
-                        list.push(i);
-                        //list.push(game.createCard2(get.name(i), get.suit(card), get.number(i), get.nature(i)));
-                    }
-                }
-            }
+            var list = lib.skill.duomianshou.getConversionCandidates(card, player);
             if (list.length == 0) {
                 game.log('牌堆中没有符合要求的牌');
                 player.getStat('skill').duomianshou -= 1;
@@ -3219,20 +3242,8 @@ const standard = {
                     return true;
                 }
             }).set('ai', function (button) {
-                var MostValue = -1;
-                var MostValuableCard = card;
-                //game.log(get.translation(button.link) + "价值" + get.value(button.link));
-
-                //game.log("最大卡牌价值" + MostValue);
-
-                /* if (get.value(button.link) > MostValue) {
-                    MostValuableCard = button.link;
-                    MostValue = get.value(button.link);
-                    //game.log("最有价值的卡牌变更为" + get.name(MostValuableCard));
-                } */
-                //game.log("button.link[0]"+JSON.stringify(button.link));
-                //game.log("MostValuableCard"+JSON.stringify(MostValuableCard));
-                return (get.value(button.link) || 1);//(button.link == MostValuableCard) ? 1 : -1;
+                var player = get.player();
+                return player.getUseValue(button.link, false, false);
 
             }).set('selectButton', 1);
 
@@ -3264,7 +3275,7 @@ const standard = {
             if (result && result.bool && result.links[0]) {
                 player.discard(cards[0]);
                 //player.addTempSkill("duomianshou_1", "useCardToTargeted");
-                player.chooseUseTarget(true, get.name(result.links[0]),false);
+                player.chooseUseTarget(true, get.name(result.links[0]), false);
                 player.logSkill("duomianshou");
 
             } else {
@@ -3275,7 +3286,6 @@ const standard = {
         group: ["duomianshou_reset"],
         subSkill: {
             reset: {
-                direct:true,
                 charlotte: true,
                 trigger: { player: "phaseBegin" },
                 content() {
@@ -3843,7 +3853,12 @@ const standard = {
             result: {
                 target(player, target) {
                     if (!player || !target) return 0;
-                    if (get.attitude(player, target) >= 0) return 1;
+                    var attitude = get.attitude(player, target);
+                    if (attitude > 0) {
+                        var drawCount = target.hasSkill("hangmucv") ? 2 : 1;
+                        var need = Math.max(0, target.maxHp - target.countCards("h"));
+                        return attitude * (drawCount + Math.min(need, 2) * 0.25);
+                    }
                     return 0;
                 },
             },

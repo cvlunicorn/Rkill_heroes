@@ -1172,7 +1172,7 @@ const others = {
             return !event.numFixed;//摸牌数未被固定（未被其他效果锁定）才能放弃摸牌
         },
         check: function (event, player) {
-            return player.countCards('h') < player.maxHp;//AI：手牌未满时发动（摸4张比摸2张更有可能补充资源）
+            return !event.num || event.num <= 2;//常规摸两张时，顶四张按类型取牌的期望收益更高
         },
         content: function () {
             "step 0"
@@ -1244,9 +1244,9 @@ const others = {
         },
         frequent: true,
         check: function (event, player) {
-            //AI：场上有敌人（用代课干扰敌人）时发动
+            var targets = event.targets || [];
             return game.hasPlayer(function (current) {
-                return get.attitude(player, current) < 0;
+                return current != player && !targets.includes(current) && get.attitude(player, current) > 0;
             });
         },
         content: function () {
@@ -1259,7 +1259,9 @@ const others = {
                 return target != player && !tgts.includes(target);
             }).set('ai', function (target) {
                 var player = get.player();
-                return get.attitude(player, target);
+                var attitude = get.attitude(player, target);
+                if (attitude <= 0) return 0;
+                return attitude + Math.max(0, target.getDamagedHp()) * 0.3;
             });
             "step 1"
             if (!result.bool) { event.finish(); return; }
@@ -1413,6 +1415,11 @@ const others = {
                 && event.targets.some(function (t) { return !t.isLinked(); });
         },
         frequent: true,
+        getTargetValue: function (player, target, card) {
+            var cancelledCardValue = -get.effect(target, card, player, player);
+            var linkValue = get.effect(target, { name: "tiesuo", isCard: true }, player, player);
+            return cancelledCardValue + linkValue;
+        },
         content: function () {
             "step 0";
             //复制targets列表（防止在遍历中修改原数组导致跳过）
@@ -1423,8 +1430,7 @@ const others = {
                 .set("ai", function (target) {
                     var player = _status.event.player;
                     var card = _status.event.card;
-                    //对目标的态度 × 此牌对其的效果 - 横置带来的负收益
-                    return get.attitude(player, target) * get.effect(target, card, player, player) - get.effect(target, { name: "tiesuo" }, player, player);
+                    return lib.skill.xianfeng.getTargetValue(player, target, card);
                 })
                 .set("card", trigger.card)
                 .set("targetlist", targetlist);
@@ -1478,8 +1484,12 @@ const others = {
             return player.countCards('h') > 0 && game.hasPlayer(function (t) { return t.isLinked(); });
         },
         check: function (event, player) {
-            return game.hasPlayer(function (t) {
-                return t.isLinked() && get.attitude(player, t) > 0;
+            var lowestCardValue = Math.min.apply(null, player.getCards('h').map(function (card) {
+                return get.value(card, player);
+            }));
+            return game.hasPlayer(function (target) {
+                return target.isLinked() && get.attitude(player, target) > 0
+                    && get.attitude(player, target) + 1 > lowestCardValue;
             });
         },
         content: function () {
@@ -1964,6 +1974,11 @@ const others = {
         nobracket: true,
         trigger: { player: "enterGame", global: "gameStart", },
         forced: true,
+        getTargetValue: function (player, target) {
+            var attitude = get.attitude(player, target);
+            if (attitude <= 0) return -10;
+            return attitude + Math.max(0, get.threaten(target) - 1) * 0.4 + Math.max(0, 2 - target.hp) * 0.5;
+        },
         filter: function (event, player) {
             return game.hasPlayer(function (current) {
                 return current != player;
@@ -1972,10 +1987,9 @@ const others = {
         content: function () {
             "step 0"
             player.chooseTarget(get.prompt2('butaihegedehuwei'), true, function (card, player, target) {
-                return target != player;
-            }).set("ai", function (target) {
-                var player = _status.event.player;
-                return get.attitude(player, target) + Math.random();
+            return target != player;
+        }).set("ai", function (target) {
+                return lib.skill.butaihegedehuwei.getTargetValue(_status.event.player, target);
             });
             "step 1"
             if (result.bool && result.targets && result.targets.length > 0) {
@@ -2062,8 +2076,7 @@ const others = {
                         player.chooseTarget("不太合格的护卫：是否更换护卫目标？", function (card, player, target) {
                             return target != player;
                         }).set("ai", function (target) {
-                            var player = _status.event.player;
-                            return get.attitude(player, target) + Math.random();
+                            return lib.skill.butaihegedehuwei.getTargetValue(_status.event.player, target);
                         });
                     } else {
                         delete player.storage.butaihegedehuwei_guarding;
@@ -2144,8 +2157,10 @@ const others = {
         check: function (event, player) {
             var myCards = player.getCards("hej");
             var myNames = [];
+            var discardCost = 0;
             for (var i = 0; i < myCards.length; i++) {
                 myNames.push(myCards[i].name);
+                discardCost += Math.max(0, get.value(myCards[i], player));
             }
             //寻找能造成最大伤害的敌方目标
             var bestDamage = 0;
@@ -2160,8 +2175,8 @@ const others = {
                 if (damage > bestDamage) bestDamage = damage;
             });
             //能造成3+伤害，或2+伤害且自身危急时使用
-            if (bestDamage >= 3) return true;
-            if (bestDamage >= 2 && player.hp <= 2) return true;
+            if (bestDamage >= 3 && bestDamage * 4 > discardCost * 0.6) return true;
+            if (bestDamage >= 2 && player.hp <= 2 && bestDamage * 4 > discardCost * 0.6) return true;
             return false;
         },
         content: function () {
@@ -2364,7 +2379,15 @@ const others = {
             return player.countCards("h") > 0;
         },
         check: function (event, player) {
-            return player.countCards("h") >= 2;
+            if (player.isTurnedOver()) return true;
+            var lowValueCards = player.countCards("h", function (card) {
+                return get.value(card, player) <= 4;
+            });
+            var hostilePlayers = game.countPlayer(function (current) {
+                return current != player && get.attitude(player, current) < 0 && current.countCards("h") > 0;
+            });
+            if (player.hp <= 1) return lowValueCards >= 1 && hostilePlayers >= 1;
+            return player.hp <= 2 && lowValueCards >= 2 && hostilePlayers >= 2;
         },
         content: function () {
             "step 0"
@@ -3248,6 +3271,16 @@ const others = {
     //========== 祥凤&瑞凤 ==========
     //直卫1级 - 锁定技，出牌阶段内使用的第二张牌指定目标后，弃置所有目标角色各一张牌
     zhiwei: {
+        mod:{
+					aiOrder:function(player,card,num){
+						if(player!=_status.currentPhase||player.getHistory('useCard').length>1||!game.hasPlayer(function(current){
+							return current!=player&&(get.realAttitude||get.attitude)(current,player)<0&&current.hasSkill('ciwei')&&current.countCards('he')>0;
+						})) return;
+						if(['basic','trick'].includes(get.type(card))) return num+10;
+						
+						return num;
+					},
+				},
         audio: false,
         locked: true,
         forced: true,
@@ -3266,7 +3299,10 @@ const others = {
             player.addTempSkill("zhiwei_active", "phaseEnd");
             player.discardPlayerCard(trigger.target, "he", true);
         },
-        ai: { threaten: 1.5 },
+        ai: { 
+            threaten: 1.5,
+
+        },
         "_priority": 0,
     },
     //直卫 已发动标记（供剑气觉醒判定用）
@@ -4122,7 +4158,7 @@ const others = {
         },
         content: function () {
             "step 0"
-            var check = lib.skill.new_meibu.checkx(trigger, player);
+            var check = lib.skill.jiashuzhidao.checkx(trigger, player);
             player.chooseToDiscard(get.prompt2('jiashuzhidao', trigger.player), 'he').set('ai', function (card) {
                 if (_status.event.check) return 6 - get.value(card);
                 return 0;
