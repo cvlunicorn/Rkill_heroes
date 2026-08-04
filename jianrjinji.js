@@ -427,6 +427,7 @@ var jianrjinji = {
         hangmucv: "航母", "hangmucv_info": "",
         qiantingss: "潜艇", "qiantingss_info": "",
         daoqu: "导驱", "daoqu_info": "",
+        daoxun: "导巡", "daoxun_info": "",
         fangqu: "防驱", "fangqu_info": "",
         zhongpao: "重炮", "zhongpao_info": "",
         qingmu: "轻母", "qingmu_info": "",
@@ -1023,8 +1024,8 @@ var jianrjinji = {
         anhong_info: "转换技，出牌阶段开始时，你可以：阴：随机获得牌堆中一张装备牌。阳：你的攻击范围改为3，然后回复一点体力。",
         "jiashuzhidao": "架束制导",
         "jiashuzhidao_info": "其他角色的出牌阶段开始时，若你在其攻击范围内，你可以弃置一张牌，令该角色于本回合内获得技能〖止息〗。",
-        miaoyi: "喵噫！",miaoyi_info:`每当你使用"回避"抵消一张"射击"，你可以立即对该角色使用一张手牌当"射击"。此效果每轮限一次。`,
-        chuanchengzhiwu: "传承之物",chuanchengzhiwu_info:`锁定技。每当其他角色回复体力，你摸一张牌`,
+        miaoyi: "喵噫！",miaoyi_info:"每当你使用'回避'抵消一张'射击'，你可以立即对该角色使用一张手牌当'射击'。此效果每轮限一次。",
+        chuanchengzhiwu: "传承之物",chuanchengzhiwu_info:"锁定技。每当其他角色回复体力，你摸一张牌",
 
 
 
