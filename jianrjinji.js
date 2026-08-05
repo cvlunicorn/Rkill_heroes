@@ -139,7 +139,7 @@ var jianrjinji = {
         Xfliegerkorps_R: ["female", "KMS", 4, ["yaosaibiaoshi", "yaosai", "Xfliegerkorps_R_piaobodeying"], ["des:漂泊的“鹰”，戴着奇怪的帽子,不喜欢与其他人交流。但,实力很强。"]],
         "401_R": ["female", "IJN", 4, ["buji","junfu", "shujuzaisheng"], ["des:401的诞生是由于获得yamato_R智能模块的一半。后为了拯救暴走的芙蕾雅Cyou-yamato_R而把自己的智能模块捐献出来,捐献模块后消失。不过因为S113在之前留下了yamato_R的数据备份而复活。"]],
         chaoyamato_R: ["female", "IJN", 4, ["zhuangjiafh", "zhanliebb", "yapogan"], ["des:日本战列舰A150。"]],
-        jiagu_R: ["female", "IJN", 4, ["zhongxunca", "xietongzuozhan"], ["des:　加古属古鹰型2番舰,于26年完工。同古鹰号一样,在37年也进行了全面的改装以提升性能。战争爆发时加古号和古鹰号编入相通的部队作战。42年,一同编入三川的第八舰队,在萨沃岛海战中,夜战熟练的日军重创了美军,不过在归途中,加古号被美军潜艇击沉。"]],
+        jiagu_R: ["female", "IJN", 4, ["zhongxunca","huokongld","xietongzuozhan"], ["des:　加古属古鹰型2番舰,于26年完工。同古鹰号一样,在37年也进行了全面的改装以提升性能。战争爆发时加古号和古鹰号编入相通的部队作战。42年,一同编入三川的第八舰队,在萨沃岛海战中,夜战熟练的日军重创了美军,不过在归途中,加古号被美军潜艇击沉。"]],
         yamato_R: ["female", "IJN", 4, ["zhuangjiafh", "zhanliebb", "yamato_R_tongchou", "yamato_R_dikai", "yamato_R_nizhuanfanji", "yamato_R_ying_gain"], ["des:深海化的大和级战列舰。她以自毁般的同仇反噬敌我,于濒死边缘掀起最后的逆转反击。"]],
         kelaosaiweici_R: ["female", "KMS", 4, ["zhuangjiafh", "zhanliebb", "kelaosaiweici_R_jinji", "kelaosaiweici_R_lunzhan"], ["des:以普鲁士军事理论家克劳塞维茨命名的德国战列舰方案。她强调持续压迫与战场调度,既能在炮战中不断寻找突破口,也能在战局开始前通过推演争夺主动。"]],
 
