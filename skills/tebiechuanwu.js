@@ -9,27 +9,34 @@ const tebiechuanwu = {
         forced: false,
         frequent: true,
         filter: function (event, player) {
+            if (!player.isTurnedOver()) return false;
             var evt = _status.event.getParent("phase");
             if (!evt || !evt.player) return false;
+
+            // 检查本回合该角色是否造成过伤害
+            var phasePlayer = evt.player;
+            var dealtDamage = phasePlayer.getHistory('sourceDamage').length > 0;
+            if (dealtDamage) return false;
+
+            // 检查弃牌堆中该角色本回合弃置的牌
             var list = [];
-            evt.player.getHistory("lose", function (evt) {
-                if (evt.type == "discard" && evt.cards) {
-                    list.addArray(evt.cards.filter(function (card) {
+            phasePlayer.getHistory("lose", function (loseEvt) {
+                if (loseEvt.type == "discard" && loseEvt.cards) {
+                    list.addArray(loseEvt.cards.filter(function (card) {
                         return get.position(card) == "d";
                     }));
                 }
             });
-            if (list.length <= 0) return false;
-            return player.isTurnedOver();
+            return list.length > 0;
         },
         content: function () {
             "step 0"
             var evt = _status.event.getParent("phase");
             if (evt && evt.player) {
                 var list = [];
-                evt.player.getHistory("lose", function (evt) {
-                    if (evt.type == "discard" && evt.cards) {
-                        list.addArray(evt.cards.filter(function (card) {
+                evt.player.getHistory("lose", function (loseEvt) {
+                    if (loseEvt.type == "discard" && loseEvt.cards) {
+                        list.addArray(loseEvt.cards.filter(function (card) {
                             return get.position(card) == "d";
                         }));
                     }
@@ -37,10 +44,30 @@ const tebiechuanwu = {
                 if (list.length > 0) {
                     player.chooseButton(["光荣舰队：是否使用一张牌？", list]).set("ai", function (button) {
                         var player = _status.event.player;
-                        var hasBasicTarget = game.hasPlayer(function (current) {
-                            if (player.canUse(button.link, current)) return get.value(button.link);
+                        var card = button.link;
+
+                        // 评估此牌的使用价值
+                        var maxValue = 0;
+                        game.countPlayer(function (target) {
+                            if (player.canUse(card, target)) {
+                                var eff = get.effect(target, card, player, player);
+                                if (eff > maxValue) maxValue = eff;
+                            }
                         });
-                        return hasBasicTarget>0;
+
+                        // 如果有威严_phaseUse标记，额外加成（无视距离+不可被响应）
+                        if (player.hasSkill('weiyan_phaseUse') && get.tag(card, 'damage')) {
+                            maxValue += 3;
+                        }
+                        // 如果有威严_phaseDraw标记，评估双倍结算价值
+                        if (player.hasSkill('weiyan_phaseDraw')) {
+                            var cardType = get.type(card, false);
+                            if (cardType == 'basic' || cardType == 'trick') {
+                                maxValue *= 1.8;
+                            }
+                        }
+
+                        return maxValue;
                     });
                 } else {
                     event.finish();
@@ -83,32 +110,150 @@ const tebiechuanwu = {
             str += '阶段';
             if (trigger.name == 'phaseDraw') str += '，然后本回合你使用的第一张牌结算两次';
             if (trigger.name == 'phaseUse') str += '，然后本回合你使用的牌无视距离限制且不可被响应';
+
+            // Strategy B优化版: 判定阶段时制定全回合计划
+            if (trigger.name == 'phaseJudge' && !player.storage.weiyan_plan) {
+                // 评估本轮翻面结束的价值（仅当拥有光荣舰队SP时）
+                var fleetValue = 0;
+                if (player.hasSkill('guangrongjianduisp')) {
+                    // 预测其他角色会弃牌且不造成伤害的次数
+                    var predictedTriggers = 0;
+                    game.countPlayer(function (current) {
+                        if (current == player) return;
+                        // 简化预测：手牌多的角色更可能弃牌，血量低的更可能不造成伤害
+                        var discardProb = Math.min(0.8, current.countCards('h') / 8);
+                        var noDamageProb = current.hp <= 2 ? 0.7 : 0.4;
+                        predictedTriggers += discardProb * noDamageProb;
+                    });
+                    // 光荣舰队价值 = 预测触发次数 * 每次平均价值(约4) + 翻回正面摸牌(1.5)
+                    fleetValue = predictedTriggers * 4 + 1.5;
+                }
+
+                // 失去下回合的代价 (约4-5点价值：2摸牌 + 2-3出牌阶段)
+                var skipTurnCost = 4.5;
+
+                // 决定目标状态：如果光荣舰队价值 > 跳过回合代价，目标是翻面结束
+                player.storage.weiyan_plan = {
+                    targetTurnedOver: fleetValue > skipTurnCost,
+                    fleetValue: fleetValue,
+                    skipCount: 0,  // 已跳过的阶段数
+                    hasDiscarded: false  // 本回合是否已有弃牌
+                };
+            }
+
+            var plan = player.storage.weiyan_plan || { targetTurnedOver: false, skipCount: 0, hasDiscarded: false };
+            var currentTurnedOver = player.isTurnedOver();
+
+            // 计算本次跳过后的翻面状态
+            var skipCountAfter = plan.skipCount + 1;
+            var willBeTurnedOver = (skipCountAfter % 2 == 1) ? !currentTurnedOver : currentTurnedOver;
+
+            // 评估本阶段跳过的直接收益（buff价值 - 阶段本身价值）
+            var directBenefit = 0;
             switch (trigger.name) {
                 case 'phaseJudge':
-                    check = player.countCards('j');
+                    // 有负面判定时跳过：收益 = 避免负面判定
+                    directBenefit = player.countCards('j') > 0 ? 3 : -1;
                     break;
                 case 'phaseDraw':
+                    // 跳过摸牌获得"第一张牌双倍结算"buff
                     var valueCards = player.countCards("h", function (card) {
-                        return get.type(card) == 'basic' || get.type(card) == 'trick' && player.getUseValue(card, null, true) > 7;
+                        var type = get.type(card);
+                        if (type != 'basic' && type != 'trick') return false;
+                        var value = player.getUseValue(card, null, true);
+                        return value > 6;
                     });
-                    check = valueCards > 0;
+                    // buff价值（约3-5） - 摸牌阶段价值（2） = 净收益1-3
+                    directBenefit = valueCards > 0 ? (valueCards >= 2 ? 3 : 1) : -2;
                     break;
                 case 'phaseUse':
+                    // 跳过出牌获得"无视距离+不可被响应"buff
                     var attackCards = player.countCards("h", function (card) {
                         return get.tag(card, 'damage');
-                    })
-                    check = attackCards > 0;
+                    });
+                    // buff价值（约4-6） - 出牌阶段价值（3） = 净收益1-3
+                    directBenefit = attackCards > 0 ? (attackCards >= 2 ? 3 : 1) : -3;
+
+                    // 警告：如果跳过出牌+弃牌，本回合可能没有弃牌进入弃牌堆
+                    if (!plan.hasDiscarded && player.countCards('h') <= player.getHandcardLimit()) {
+                        // 手牌不超过上限，弃牌阶段不会弃牌
+                        // 如果还跳过出牌阶段，光荣舰队SP可能无牌可用
+                        if (plan.targetTurnedOver && player.hasSkill('guangrongjianduisp')) {
+                            directBenefit -= 2;  // 扣除部分光荣舰队预期价值
+                        }
+                    }
                     break;
                 case 'phaseDiscard':
-                    check = player.needsToDiscard();
+                    // 需要弃牌时跳过：收益 = 保留手牌价值
+                    var needDiscard = player.countCards('h') - player.getHandcardLimit();
+                    directBenefit = needDiscard > 0 ? needDiscard * 1.5 : -1;
+
+                    // 如果需要弃牌却跳过了，标记本回合有弃牌机会但放弃了
+                    if (needDiscard > 0) {
+                        plan.hasDiscarded = true;  // 本应弃牌，视为有弃牌
+                    }
                     break;
             }
+
+            // 检查本回合是否已经有弃牌（威严弃置手牌也算）
+            if (!plan.hasDiscarded && trigger.name != 'phaseJudge') {
+                var discardHistory = player.getHistory('lose', function(evt) {
+                    return evt.type == 'discard';
+                });
+                if (discardHistory.length > 0) {
+                    plan.hasDiscarded = true;
+                }
+            }
+
+            // 决策逻辑：直接收益 + 翻面状态对齐奖励
+            check = directBenefit;
+
+            // 只有当直接收益为正（跳过本身有价值）时，才考虑翻面状态对齐
+            if (directBenefit > 0) {
+                if (plan.targetTurnedOver && willBeTurnedOver) {
+                    // 目标翻面 & 跳过后翻面 → 完美对齐，加成
+                    check += 1;
+                } else if (!plan.targetTurnedOver && !willBeTurnedOver) {
+                    // 目标正面 & 跳过后正面 → 完美对齐，加成
+                    check += 1;
+                } else {
+                    // 不对齐：虽然跳过本身有收益，但最终状态不符合预期
+                    // 如果还有后续阶段可以调整，则允许；否则扣分
+                    var remainingPhases = 0;
+                    var phaseIndex = lib.skill.weiyan.trigger.player.indexOf(event.triggername);
+                    remainingPhases = 3 - phaseIndex;  // 还有几个阶段可以调整
+
+                    if (remainingPhases > 0) {
+                        // 还有机会调整，轻微扣分
+                        check -= 0.5;
+                    } else {
+                        // 最后一个阶段了，状态不对齐，重扣
+                        check -= 2;
+                    }
+                }
+            }
+
+            // 单技能情况（仅威严，无光荣舰队）：翻面是纯代价
+            if (!player.hasSkill('guangrongjianduisp')) {
+                // 只有跳过本身收益足够大（>1），才值得牺牲下回合
+                if (directBenefit <= 1) {
+                    check = -2;
+                }
+            }
+
             player.chooseToDiscard(get.prompt('weiyan'), str, lib.filter.cardDiscardable).set('ai', card => {
-                if (!_status.event.check) return -1;
+                if (_status.event.check <= 0) return -1;
                 return 7 - get.value(card);
             }).set('check', check).set('logSkill', 'weiyan').setHiddenSkill('weiyan');
             'step 1'
             if (result.bool) {
+                // 更新计划中的跳过计数和弃牌标记
+                if (player.storage.weiyan_plan) {
+                    player.storage.weiyan_plan.skipCount++;
+                    // 威严弃置手牌，标记本回合已有弃牌
+                    player.storage.weiyan_plan.hasDiscarded = true;
+                }
+
                 trigger.cancel();
                 game.log(player, '跳过了', '#y' + ['判定', '摸牌', '出牌', '弃牌'][lib.skill.weiyan.trigger.player.indexOf(event.triggername)] + '阶段');
                 if (trigger.name == 'phaseUse') {
@@ -123,7 +268,18 @@ const tebiechuanwu = {
             }
             else event.finish();
         },
+        // 回合结束时清除计划
+        group: 'weiyan_cleanup',
         subSkill: {
+            cleanup: {
+                trigger: { player: 'phaseAfter' },
+                forced: true,
+                silent: true,
+                popup: false,
+                content: function () {
+                    delete player.storage.weiyan_plan;
+                },
+            },
             phaseUse: {
                 charlotte: true,
                 trigger: { player: 'useCard1' },
