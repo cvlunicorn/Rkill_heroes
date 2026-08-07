@@ -665,7 +665,7 @@ const others = {
             player.turnOver();
             "step 1";
             event._result = {};
-            if (event.count && event.history.length && player.countCards("hs")) {
+            if (event.count && event.history.length) {
                 event.count--;
                 var card = event.history.shift().card;
                 card = { name: card.name, nature: card.nature };
