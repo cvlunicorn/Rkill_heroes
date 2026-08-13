@@ -197,7 +197,7 @@ const tebiechuanwu = {
 
             // 检查本回合是否已经有弃牌（威严弃置手牌也算）
             if (!plan.hasDiscarded && trigger.name != 'phaseJudge') {
-                var discardHistory = player.getHistory('lose', function(evt) {
+                var discardHistory = player.getHistory('lose', function (evt) {
                     return evt.type == 'discard';
                 });
                 if (discardHistory.length > 0) {
@@ -670,6 +670,7 @@ const tebiechuanwu = {
         trigger: { global: 'phaseBefore', player: "enterGame" },
         forced: true,
         nobracket: true,
+
         content: function () {
             "step 0"
             player.addSkill("xianquzhe_range");
@@ -698,6 +699,13 @@ const tebiechuanwu = {
                         return num + 2;
                     },
                 },
+                mark: true,
+                marktext: "先",
+                intro: {
+                    content: function () {
+                        return '攻击范围+2';
+                    }
+                },
             },
             range_minus: {
                 mod: {
@@ -706,6 +714,7 @@ const tebiechuanwu = {
                     },
                 },
                 mark: true,
+                marktext: "减",
                 intro: {
                     content: "攻击范围-2",
                 },
@@ -717,6 +726,7 @@ const tebiechuanwu = {
                     },
                 },
                 mark: true,
+                marktext: "加",
                 intro: {
                     content: "攻击范围+1",
                 },
