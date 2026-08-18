@@ -1239,14 +1239,14 @@ const others = {
             //必须有非目标玩家（被目标的玩家已被直接影响，不重复操作）
             var targets = event.targets || [];
             return game.hasPlayer(function (current) {
-                return current != player && !targets.includes(current);
+                return !targets.includes(current);
             });
         },
         frequent: true,
         check: function (event, player) {
             var targets = event.targets || [];
             return game.hasPlayer(function (current) {
-                return current != player && !targets.includes(current) && get.attitude(player, current) > 0;
+                return !targets.includes(current) && get.attitude(player, current) > 0;
             });
         },
         content: function () {
@@ -1256,7 +1256,7 @@ const others = {
             player.chooseTarget(get.prompt('daike'), function (card, player, target) {
                 var evt = _status.event.getTrigger();//获取触发的useCard事件
                 var tgts = evt.targets || [];
-                return target != player && !tgts.includes(target);
+                return !tgts.includes(target);
             }).set('ai', function (target) {
                 var player = get.player();
                 var attitude = get.attitude(player, target);
