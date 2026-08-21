@@ -674,7 +674,7 @@ const tebiechuanwu = {
         content: function () {
             "step 0"
             player.addSkill("xianquzhe_range");
-            player.chooseTarget("先驱者：令一名角色攻击范围-2", true).set("ai", function (target) {
+            player.chooseTarget("先驱者：令一名角色攻击范围-2").set("ai", function (target) {
                 var player = _status.event.player;
                 return -get.attitude(player, target);
             });
@@ -682,7 +682,7 @@ const tebiechuanwu = {
             if (result.bool && result.targets && result.targets[0]) {
                 result.targets[0].addSkill("xianquzhe_range_minus");
             }
-            player.chooseTarget("先驱者：令一名角色攻击范围+1", true).set("ai", function (target) {
+            player.chooseTarget("先驱者：令一名角色攻击范围+1").set("ai", function (target) {
                 var player = _status.event.player;
                 return get.attitude(player, target);
             });
