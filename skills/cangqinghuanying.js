@@ -619,20 +619,19 @@ const cangqinghuanying = {
 
     miaoyi: {//喵噫！】：每当你使用"闪"抵消一张"杀"，你可以立即对该角色使用一张手牌当"杀"。此效果每轮限一次。
         trigger: {//使用闪触发。时机
-            player: 'respondAfter' //打出，因为只是响应杀。用闪响应杀这个时机触发
+            player: ['useCardAfter', 'respondAfter'] //打出，因为只是响应杀。用闪响应杀这个时机触发
         },
         round: 1,//每轮限一次
-
         filter(event, player) {//过滤器
             // 检查：使用的是闪 && 用来响应杀
-            return event.card && event.getParent(2) && event.getParent(2).player.isIn() && ['shan', 'huibi9'].includes(event.card.name) //用的是不是闪
+            return event.card && event.getParent(2) && event.getParent(2).player && event.getParent(2).player.isIn() && ['shan', 'huibi9'].includes(event.card.name) //用的是不是闪
                 &&//且
                 ['sha', 'sheji9'].includes(event.getParent(2).name) && player.countCards("h") > 0;//响应的是不是射击
         },
 
         content() {
             'step 0'//第一步
-            var source = trigger.getParent(2).player; // 获取出杀的角色
+            event.source = trigger.getParent(2).player; // 获取出杀的角色
             player.chooseCard('h', '是否将一张手牌当【射击】对' +//h手牌
                 get.translation(source) + '使用？')
                 .set('ai', function (card) {//关于判断。不打队友，不用7以上价值的牌，优先使用低权重牌
@@ -649,7 +648,7 @@ const cangqinghuanying = {
                 player.useCard(
                     { name: 'sheji9' },//视为的卡牌
                     result.cards,//实际消耗的卡牌
-                    source, //单目标
+                    event.source, //单目标
                     false//不计数
                 );//射击
                 //没写不能无懈可击所以就是可以无懈可击
