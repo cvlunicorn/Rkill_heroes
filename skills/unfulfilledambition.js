@@ -3883,29 +3883,75 @@ const unfulfilledambition = {
     //刺玫
     cimei: {
         audio: false,
-        trigger: { player: "phaseDiscardEnd" },
-        forced: true,
+        trigger: { global: "roundStart" },
+        direct: true,
+        init: function (player) {
+            player.storage.cimei_targets = 1;
+            player.storage.cimei_discarded = [];
+        },
         filter: function (event, player) {
-            return player.getStat("card").discard == 0 || !player.getStat("card").discard;
+            var discarded = player.storage.cimei_discarded || [];
+            if (game.phaseNumber == 0) return false;
+            return game.hasPlayer(function (current) {
+                return current != player && !discarded.includes(current.playerid);
+            });
         },
         content: function () {
             "step 0"
-            player.loseHp();
-            "step 1"
-            player.chooseTarget("刺玫：是否令一名体力值低于你的角色获得'刺玫'直至其下个回合结束？", function (card, player, target) {
-                return target.hp < player.hp;
-            }).set("ai", function (target) {
+            event.discarded = player.storage.cimei_discarded || [];
+            player.storage.cimei_discarded = [];
+            event.num = player.storage.cimei_targets || 1;
+            player.storage.cimei_targets = 1;
+            player.chooseTarget(get.prompt("cimei"), "令至多" + event.num + "名上一轮中未于弃牌阶段弃置牌的其他角色失去一点体力", [1, event.num], function (card, player, target) {
+                return target != player && !_status.event.discarded.includes(target.playerid);
+            }).set("discarded", event.discarded).set("ai", function (target) {
                 var player = _status.event.player;
                 if (get.attitude(player, target) < 0) {
                     return -get.attitude(player, target);
                 }
                 return 0;
             });
-            "step 2"
-            if (result.bool && result.targets && result.targets[0]) {
-                var target = result.targets[0];
-                target.addTempSkill("cimei", { player: "phaseEnd" });
+            "step 1"
+            if (!result.bool || !result.targets || !result.targets.length) {
+                event.finish();
+                return;
             }
+            player.logSkill("cimei", result.targets);
+            for (var i = 0; i < result.targets.length; i++) {
+                result.targets[i].loseHp();
+            }
+            "step 2"
+            var isMaxHp = true;
+            game.countPlayer(function (current) {
+                if (current.hp > player.hp) isMaxHp = false;
+            });
+            if (isMaxHp) {
+                player.storage.cimei_targets = 2;
+                player.popup("刺玫+1");
+                game.log(player, "下一轮发动刺玫可指定的角色数+1");
+            }
+        },
+        subSkill: {
+            record: {
+                trigger: { global: "phaseDiscardEnd" },
+                forced: true,
+                popup: false,
+                filter: function (event, player) {
+                    var discarded = false;
+                    event.player.getHistory("lose", function (loseEvt) {
+                        if (loseEvt.type == "discard" && loseEvt.getParent("phaseDiscard")) {
+                            discarded = true;
+                        }
+                    });
+                    return discarded;
+                },
+                content: function () {
+                    var discarded = player.storage.cimei_discarded;
+                    if (!discarded.includes(trigger.player.playerid)) {
+                        discarded.push(trigger.player.playerid);
+                    }
+                },
+            },
         },
     },
     //破交袭击
