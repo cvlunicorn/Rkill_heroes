@@ -3657,66 +3657,55 @@ const standard = {
         },
         multiline: true,
         multitarget: true,
-        async content(event, trigger, player) {//这里由“浮海”（卫温诸葛直）修改而来,可能因为目标选择不同存在部分bug,需要注意。能跑就行暂不动他。2024.3.9
-
-            const targets = event.targets.sortBySeat();
-            targets.push(player);
-            const next = player.chooseCardOL(targets, '请展示一张手牌', true).set('ai', card => {
-                return -get.value(card);
-            }).set('aiCard', target => {
-                const hs = target.getCards('h');
-                return { bool: true, cards: [hs.randomGet()] };
-            });
-            next._args.remove('glow_result');
-            const { result } = await next;
-            const cardsA = [];
-            const videoId = lib.status.videoId++;
-
-            if (!result || result.length !== targets.length) {
-                game.log('展示过程出错，技能中断');
-                player.getStat('skill').xinqidian -= 1;
+        content: function () {
+            "step 0"
+            event.targets = event.targets.slice(0).sortBySeat();
+            event.targets.push(player);
+            event.cards = [];
+            event.index = 0;
+            "step 1"
+            if (event.index >= event.targets.length) {
+                event.goto(3);
                 return;
             }
-            for (let i = 0; i < targets.length; i++) {
-                if (result[i] && result[i].cards && result[i].cards[0]) {
-                    cardsA.push(result[i].cards[0]);
-                    game.log(get.translation(targets[i]), '展示了', result[i].cards[0]);
-                } else {
-                    game.log(get.translation(targets[i]), "未能展示牌,技能中止");
-                    player.getStat('skill').xinqidian -= 1;
-                    return;
-                }
+            event.current = event.targets[event.index];
+            event.current.chooseCard("请展示一张手牌", true).set("ai", function (card) {
+                return -get.value(card);
+            });
+            "step 2"
+            if (!result.bool || !result.cards || !result.cards[0]) {
+                game.log(get.translation(event.current), "未能展示牌，技能中止");
+                player.getStat("skill").xinqidian -= 1;
+                event.finish();
+                return;
             }
-            game.broadcastAll((targets, cardsA, id, player) => {
-                var dialog = ui.create.dialog(get.translation(player) + '发动了【新起点】', cardsA);
-                dialog.videoId = id;
-                const getName = (target) => {
-                    if (target._tempTranslate) return target._tempTranslate;
-                    var name = target.name;
-                    if (lib.translate[name + '_ab']) return lib.translate[name + '_ab'];
-                    return get.translation(name);
+            // 仅记录选择结果；全部角色选牌完成后再统一展示。
+            event.cards.push(result.cards[0]);
+            event.index++;
+            event.goto(1);
+            "step 3"
+            player.showCards(event.cards, get.translation(player) + "发动了【新起点】");
+            for (var i = 0; i < event.targets.length; i++) {
+                game.log(event.targets[i], "展示了", event.cards[i]);
+            }
+            event.allDifferent = true;
+            for (var i = 0; i < event.cards.length; i++) {
+                for (var j = 0; j < i; j++) {
+                    if (get.suit(event.cards[i], false) == get.suit(event.cards[j], false)) {
+                        event.allDifferent = false;
+                        break;
+                    }
                 }
-                for (let i = 0; i < targets.length; i++) {
-                    dialog.buttons[i].querySelector('.info').innerHTML = getName(targets[i]) + '|' + get.translation(cardsA[i].suit);
-                }
-            }, targets, cardsA, videoId, player);
-            await game.asyncDelayx(4);
-            game.broadcastAll('closeDialog', videoId);
-
-            const suit = get.suit(cardsA[0], false);
-            const suits = cardsA.map(card => get.suit(card, false));
-            const allDifferent = new Set(suits).size === suits.length;
-            for (let j = 0; j < targets.length; j++) {
-                if (allDifferent) {
-
-                    game.log(get.translation(targets[j]) + "摸牌");
-                    targets[j].draw();
-                }
-
-                if (!allDifferent) {
-
-                    game.log(get.translation(targets[j]) + "获得技能");
-                    targets[j].addTempSkill("mashu", { player: "phaseJieshuBegin" });
+                if (!event.allDifferent) break;
+            }
+            "step 4"
+            for (var k = 0; k < event.targets.length; k++) {
+                if (event.allDifferent) {
+                    game.log(event.targets[k], "摸牌");
+                    event.targets[k].draw();
+                } else {
+                    game.log(event.targets[k], "获得技能");
+                    event.targets[k].addTempSkill("mashu", { player: "phaseJieshuBegin" });
                 }
             }
         },
