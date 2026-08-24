@@ -4138,7 +4138,7 @@ const unfulfilledambition = {
                 if (!colors.includes(color)) colors.push(color);
             }
             event.num = colors.length;
-            player.chooseTarget("岛勋：令一名角色获得" + event.num + "点护甲", function (card, player, target) {
+            player.chooseTarget("岛勋：令一名角色获得" + event.num + "点护甲，护甲值至多为5", function (card, player, target) {
                 if (player.storage.t23_daoxun && player.storage.t23_daoxun.includes(target)) return false;
                 return true;
             }, true).set("ai", function (target) {
@@ -4148,7 +4148,11 @@ const unfulfilledambition = {
             "step 1"
             if (result.bool && result.targets && result.targets[0]) {
                 var target = result.targets[0];
-                target.changeHujia(event.num);
+                if (target.hujia + event.num > 5) {
+                    target.changeHujia(5 - target.hujia);
+                } else {
+                    target.changeHujia(event.num);
+                }
                 player.storage.t23_daoxun.push(target);
                 var index1 = player.getSeatNum() + 1;
                 var index2 = target.getSeatNum() + 1;
