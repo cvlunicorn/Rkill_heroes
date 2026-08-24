@@ -57,6 +57,7 @@ import { weightedRandom } from "./utils.js";
 import { skillAnimations } from "./skillAnimations.js";
 import { skinRegistry } from "./skinSystem.js";
 import { initLimitedBanner } from "./limitedBanner.js";
+import { jianrguozhan } from "./jianrguozhan.js";
 
 // —— 扩展名缓存与探测 ——
 // 目录模式下启动时探测每张立绘真实扩展名：先试 .png，404 再试 .jpg。
@@ -1295,12 +1296,12 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     badge.style.pointerEvents = 'auto';
 
                     // 点击切换模式
-                    badge.addEventListener('click', function() {
+                    badge.addEventListener('click', function () {
                         var currentMode = lib.config.jianr_badge_mode || 0;
                         var nextMode = (currentMode + 1) % 3;
                         game.saveConfig('jianr_badge_mode', nextMode);
                         // 刷新所有玩家的徽章
-                        game.players.concat(game.dead).forEach(function(p) {
+                        game.players.concat(game.dead).forEach(function (p) {
                             if (p.showShipBadge) p.showShipBadge();
                         });
                     });
@@ -1412,7 +1413,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
             // 钩子：玩家获得技能时刷新徽章
             var originalAddSkill = lib.element.Player.prototype.addSkill;
-            lib.element.Player.prototype.addSkill = function() {
+            lib.element.Player.prototype.addSkill = function () {
                 var result = originalAddSkill.apply(this, arguments);
                 if (this.showShipBadge) {
                     this.showShipBadge();
@@ -1421,14 +1422,104 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             };
 
             // 钩子：游戏开始时为所有玩家显示徽章
-            lib.arenaReady.push(function() {
-                game.players.forEach(function(player) {
+            lib.arenaReady.push(function () {
+                game.players.forEach(function (player) {
                     if (player.showShipBadge) {
                         player.showShipBadge();
                     }
                 });
             });
-
+            // 选将池筛选劫持（国战模式）
+            if (get.mode() === 'guozhan') {
+                var originalGetCharacterChoice = game.getCharacterChoice;
+                game.getCharacterChoice = function (list, num) {
+                    // 1. 统计所有常规势力（非士兵、非野心家）的主势力武将数量
+                    var nationCount = {};
+                    list.forEach(function (name) {
+                        var char = lib.character[name];
+                        if (!char) return;
+                        var group = char[1];
+                        if (group && !group.startsWith('gz_shibing') && group !== 'ye') {
+                            nationCount[group] = (nationCount[group] || 0) + 1;
+                        }
+                    });
+                    var viableNations = Object.keys(nationCount).filter(function (n) { return nationCount[n] >= 2; });
+                    if (viableNations.length === 0) {
+                        return originalGetCharacterChoice.call(this, list, num);
+                    }
+                    // 随机选2~4个势力
+                    var chooseCount = Math.min(viableNations.length, Math.floor(Math.random() * 3) + 2);
+                    var shuffled = viableNations.slice().sort(function () { return Math.random() - 0.5; });
+                    var selectedNations = shuffled.slice(0, chooseCount);
+                    // 构建筛选池：属于选中势力的武将 + 野心家
+                    var filteredList = list.filter(function (name) {
+                        var char = lib.character[name];
+                        if (!char) return false;
+                        if (char[1] === 'ye') return true;
+                        if (selectedNations.indexOf(char[1]) !== -1) return true;
+                        // 双势力兼容（若有）
+                        var double = char.doublegroup;
+                        if (Array.isArray(double) && double.some(function (g) { return selectedNations.indexOf(g) !== -1; })) {
+                            return true;
+                        }
+                        return false;
+                    });
+                    // 若数量不足，追加更多势力
+                    var remainingNations = viableNations.filter(function (n) { return selectedNations.indexOf(n) === -1; });
+                    while (filteredList.length < num && remainingNations.length > 0) {
+                        var extra = remainingNations.shift();
+                        selectedNations.push(extra);
+                        filteredList = list.filter(function (name) {
+                            var char = lib.character[name];
+                            if (!char) return false;
+                            if (char[1] === 'ye') return true;
+                            if (selectedNations.indexOf(char[1]) !== -1) return true;
+                            var double = char.doublegroup;
+                            if (Array.isArray(double) && double.some(function (g) { return selectedNations.indexOf(g) !== -1; })) {
+                                return true;
+                            }
+                            return false;
+                        });
+                    }
+                    // 如果还不足，回退全池
+                    if (filteredList.length < num) {
+                        return originalGetCharacterChoice.call(this, list, num);
+                    }
+                    // 手动构造最终列表：保证每个选中势力至少2张
+                    var groups = {};
+                    selectedNations.forEach(function (n) { groups[n] = []; });
+                    filteredList.forEach(function (name) {
+                        var char = lib.character[name];
+                        if (!char) return;
+                        var g = char[1];
+                        if (groups[g]) groups[g].push(name);
+                        else if (g === 'ye') {
+                            if (!groups._ye) groups._ye = [];
+                            groups._ye.push(name);
+                        }
+                    });
+                    var resultList = [];
+                    // 每个势力至少取2张
+                    selectedNations.forEach(function (n) {
+                        var pool = groups[n] || [];
+                        if (pool.length >= 2) {
+                            var shuffledPool = pool.slice().sort(function () { return Math.random() - 0.5; });
+                            resultList = resultList.concat(shuffledPool.slice(0, 2));
+                        } else {
+                            resultList = resultList.concat(pool); // 理论上不会少于2
+                        }
+                    });
+                    // 剩余牌补足
+                    var remainingPool = filteredList.filter(function (name) { return resultList.indexOf(name) === -1; });
+                    var shuffledRemaining = remainingPool.slice().sort(function () { return Math.random() - 0.5; });
+                    var needed = num - resultList.length;
+                    if (needed > 0) {
+                        resultList = resultList.concat(shuffledRemaining.slice(0, needed));
+                    }
+                    // 随机排序后返回
+                    return resultList.slice().sort(function () { return Math.random() - 0.5; });
+                };
+            }
             //全局技能写在这上面
         },
         precontent: function () {
@@ -1573,6 +1664,96 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 return jianrjinji;
             });
             lib.translate['jianrjinji_character_config'] = '舰R武将';
+            // ========== 手动注册舰R国战武将包（兼容所有版本） ==========
+            (function () {
+                var packName = 'mode_extension_jianrguozhan'; // 自定义包名，用于国战过滤器
+
+                // 1. 确保数据结构存在
+                if (!lib.characterPack) lib.characterPack = {};
+                if (!lib.characterPack[packName]) lib.characterPack[packName] = {};
+
+                // 存储需要异步探测的武将 ID
+                var needAsyncProbe = [];
+
+                // 2. 复制武将到扩展专用包，同时写入 lib.character（身份模式也能用）
+                for (var id in jianrguozhan.character) {
+                    var charData = jianrguozhan.character[id];
+                    // 确保 [4] 数组存在
+                    if (!Array.isArray(charData[4])) charData[4] = [];
+
+                    // 尝试同步获取立绘标签（Electron 下有效）
+                    var syncTag = getJianRCharacterImageTagSync(id);
+                    if (syncTag) {
+                        // 已有同步标签，直接使用
+                        charData[4].push(syncTag);
+                    } else {
+                        // 回退：先用默认 jpg 占位，稍后异步探测真实扩展名
+                        var defaultTag = 'ext:' + '舰R牌将' + '/image/character/' + id + '.jpg';
+                        charData[4].push(defaultTag);
+                        needAsyncProbe.push(id);
+                    }
+
+                    // 写入 lib.character 和 lib.characterPack[packName]
+                    lib.characterPack[packName][id] = charData;
+                    lib.character[id] = charData; // 双重保险
+                }
+
+                // 3. 将包名加入国战过滤器（onlyguozhan 开启时生效）
+                if (!lib.characterGuozhanFilter) lib.characterGuozhanFilter = [];
+                if (!lib.characterGuozhanFilter.includes(packName)) {
+                    lib.characterGuozhanFilter.push(packName);
+                }
+
+                // 4. 合并翻译
+                for (var key in jianrguozhan.translate) {
+                    if (!lib.translate[key]) lib.translate[key] = jianrguozhan.translate[key];
+                }
+
+                // 5. 合并 characterSort（使武将出现在自定义分类中）
+                if (jianrguozhan.characterSort && jianrguozhan.characterSort.mode_guozhan) {
+                    if (!lib.characterSort) lib.characterSort = {};
+                    if (!lib.characterSort.mode_guozhan) lib.characterSort.mode_guozhan = {};
+                    for (var cat in jianrguozhan.characterSort.mode_guozhan) {
+                        if (!lib.characterSort.mode_guozhan[cat]) {
+                            lib.characterSort.mode_guozhan[cat] = [];
+                        }
+                        lib.characterSort.mode_guozhan[cat] = lib.characterSort.mode_guozhan[cat].concat(
+                            jianrguozhan.characterSort.mode_guozhan[cat]
+                        );
+                    }
+                }
+
+                // 6. 可选：为包添加显示名称（在扩展管理界面可见）
+                lib.translate[packName + '_character_config'] = '舰R国战';
+
+                // 7. 异步探测未成功同步获取立绘的武将（纯浏览器环境）
+                if (needAsyncProbe.length > 0 && Array.isArray(lib.onload)) {
+                    lib.onload.push(function () {
+                        needAsyncProbe.forEach(function (id) {
+                            getJianRCharacterImageTag(id).then(function (tag) {
+                                if (!tag) return;
+                                // 更新 lib.character 中的标签
+                                var charData = lib.character[id];
+                                if (charData && Array.isArray(charData[4])) {
+                                    // 移除旧的默认 jpg 标签（以 'ext:舰R牌将/image/character/' + id 开头的）
+                                    charData[4] = charData[4].filter(function (t) {
+                                        return !(typeof t === 'string' && t.indexOf('ext:舰R牌将/image/character/' + id) === 0);
+                                    });
+                                    if (!charData[4].includes(tag)) charData[4].push(tag);
+                                }
+                                // 同步更新 lib.characterPack[packName] 中的标签
+                                var packData = lib.characterPack[packName] && lib.characterPack[packName][id];
+                                if (packData && Array.isArray(packData[4])) {
+                                    packData[4] = packData[4].filter(function (t) {
+                                        return !(typeof t === 'string' && t.indexOf('ext:舰R牌将/image/character/' + id) === 0);
+                                    });
+                                    if (!packData[4].includes(tag)) packData[4].push(tag);
+                                }
+                            });
+                        });
+                    });
+                }
+            })();
 
             // ╔══════════════════════════════════════════════════════════════╗
             // ║ D. 卡牌包注册（jianrjinjibao）                                ║
