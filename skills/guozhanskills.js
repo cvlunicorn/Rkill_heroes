@@ -119,7 +119,9 @@ const guozhanskills = {
             })
             ) {
                 if (!(player.hasSkill("gz_longgu_basic") || player.hasSkill("gz_longgu_trick"))) {
-                    return player.group == "ROCN";
+                    return game.hasPlayer(function (current) {
+                        return current.hasSkill("gz_longgu") && current.group == player.group;
+                    });
                 }
             }
         },
@@ -129,6 +131,7 @@ const guozhanskills = {
         content: function () {
             'step 0'
             player.skip('phaseDraw');
+            if (!player.isMajor()) player.draw();
             var str = get.translation(trigger.player);
             player.chooseControl().set('choiceList', [
                 '不能成为基本牌的目标',
@@ -612,6 +615,207 @@ const guozhanskills = {
             },
         },
         "_priority": 0,
+    },
+    // ===== 舰R国战专用改造技能 =====
+    gz_sawohaizhan: {
+        audio: 'ext:舰R牌将/audio/skill:true',
+        group: ['gz_sawohaizhan_thunder', 'gz_sawohaizhan_zhiji', 'gz_sawohaizhan_directhit'],
+    },
+    gz_sawohaizhan_thunder: {
+        enable: 'chooseToUse', usable: 1, position: 'hes',
+        filterCard: card => get.color(card) == 'black',
+        viewAs: { name: 'sha', nature: 'thunder' },
+        viewAsFilter: player => player.countCards('hes', { color: 'black' }) > 0,
+        prompt: '将一张黑色牌当【雷杀】使用',
+    },
+    gz_sawohaizhan_directhit: {
+        trigger: { player: 'useCardToPlayered' }, forced: true, popup: false,
+        filter(event) { return event.card.name == 'sha' && event.card.nature == 'thunder' && event.target.isUnseen(2); },
+        content() { trigger.directHit.add(trigger.target); },
+    },
+    gz_sawohaizhan_zhiji: {
+        enable: 'phaseUse', usable: 1, position: 'hes',
+        filterCard: { color: 'red' }, viewAs: { name: 'zhiji' },
+        viewAsFilter: player => player.countCards('hes', { color: 'red' }) > 0,
+        prompt: '将一张红色牌当【知己知彼】使用',
+    },
+    gz_tiaobangzuozhan: {
+        enable: 'chooseToUse', usable: 1, position: 'h', filterCard: true, selectCard: 1,
+        viewAs: { name: 'juedou', isCard: false },
+        group: ['gz_tiaobangzuozhan_damage', 'gz_tiaobangzuozhan_self'],
+        subSkill: {
+            damage: { trigger: { source: 'damageSource' }, forced: true, popup: false,
+                filter(event, player) { var evt = event.getParent(); return evt.skill == 'gz_tiaobangzuozhan' && evt.player == player; },
+                content() { player.gainPlayerCard(trigger.player, 'hej', true, 'visible'); } },
+            self: { trigger: { player: 'damageBegin2' }, forced: true, popup: false,
+                filter(event, player) { var evt = event.getParent(); return evt.skill == 'gz_tiaobangzuozhan' && evt.player == player && trigger.source && !trigger.source.isUnseen(0) && !trigger.source.isUnseen(1); },
+                content() {
+                    'step 0'
+                    event.target = trigger.source;
+                    player.chooseControl('主将', '副将').set('prompt', '跳帮作战：令' + get.translation(event.target) + '暗置一张武将牌，防止此伤害').set('filterControl', control => control == '主将' ? !event.target.isUnseen(0) : !event.target.isUnseen(1));
+                    'step 1'
+                    event.target.hideCharacter(result.control == '主将' ? 0 : 1);
+                    trigger.cancel();
+                },
+            },
+        },
+    },
+    gz_qingyeqingyeqing: {
+        trigger: { target: 'useCardToTarget' },
+        filter(event, player) { return event.player != player && event.targets && event.targets.length == 1; },
+        content() {
+            'step 0'
+            player.chooseTarget('青叶青叶青：选择一名其他角色', (card, player, target) => target != player).set('ai', target => get.attitude(target, player));
+            'step 1'
+            if (!result.bool) return event.finish(); event.target = result.targets[0];
+            if (event.target.isUnseen && !event.target.isUnseen() && event.target.group != player.group) player.chooseToDiscard('he', 1, true);
+            else event.goto(3);
+            'step 2'
+            if (!result.bool) return event.finish();
+            'step 3'
+            event.target.chooseToDiscard('he', '弃置一张非基本牌，令此牌对' + get.translation(player) + '无效', card => get.type(card) != 'basic');
+            'step 4'
+            if (result.bool) { trigger.targets.length = 0; trigger.getParent().triggeredTargets2.length = 0; trigger.cancel(); }
+        },
+    },
+    gz_qianxingtuxi: {
+        mod: { attackFrom() { return 1; } }, trigger: { source: 'damageSource' }, forced: true,
+        filter(event, player) { return !player.isPhaseUsing(); },
+        content() { player.addTempSkill('dajiaoduguibi', 'roundStart'); trigger.player.addTempSkill('gz_qianxingtuxi_debuff', { player: 'phaseEnd' }); },
+    },
+    gz_qianxingtuxi_debuff: {
+        usable: 1, trigger: { source: 'damageBegin1' }, forced: true,
+        content() {
+            'step 0'
+            player.judge(card => get.suit(card) == 'spade' ? 1 : 0);
+            'step 1'
+            if (result.suit != 'spade') return;
+            if (player.isUnseen && player.isUnseen(2)) player.addTempSkill('gz_qianxingtuxi_nohand', 'phaseEnd');
+            else trigger.num--;
+        },
+    },
+    gz_qianxingtuxi_nohand: { charlotte: true, mod: { cardEnabled2() { return false; }, cardRespondable() { return false; } } },
+    gz_guishen: {
+        trigger: { player: 'phaseUseBegin' }, forced: true,
+        content() { game.filterPlayer(current => current != player && current.isUnseen && current.isUnseen(2)).forEach(current => current.addTempSkill('gz_guishen_fengyin', 'phaseUseEnd')); },
+    },
+    gz_guishen_fengyin: { charlotte: true, ai: { nomingzhi: true }, init(player, skill) { player.addSkillBlocker(skill); }, onremove(player, skill) { player.removeSkillBlocker(skill); }, skillBlocker(skill) { return !lib.skill[skill].charlotte; } },
+    gz_sidajingang: {
+        trigger: { source: 'damageSource' }, direct: true,
+        filter(event, player) { return event.card && event.card.name == 'sha' && event.player.countCards('h') && player.countCards('h'); },
+        content() {
+            'step 0'
+            player.chooseToPindian(trigger.player, '四大金刚：是否与其拼点？');
+            'step 1'
+            if (result.bool && result.winner == player) { player.gainPlayerCard(trigger.player, 'he', true); if (!player.isMajor()) player.gainPlayerCard(trigger.player, 'h', true); }
+        },
+    },
+    gz_kelaosaiweici_R_lunzhan: {
+        trigger: { player: 'phaseZhunbeiBegin' }, direct: true,
+        content() {
+            'step 0'
+            event.num = game.countPlayer(current => current.group == player.group); if (event.num == 1) event.num *= 2;
+            player.chooseControl('hand', 'damage').set('choiceList', ['观看并排列牌堆顶四张牌，本回合手牌上限+' + event.num, '本回合使用【杀】造成的伤害+1']);
+            'step 1'
+            if (result.control == 'damage') { player.addTempSkill('gz_kelaosaiweici_R_lunzhan_damage', 'phaseAfter'); return; }
+            player.addTempSkill('gz_kelaosaiweici_R_lunzhan_hand', 'phaseAfter'); player.addMark('gz_kelaosaiweici_R_lunzhan_hand', event.num, false); player.chooseToGuanxing(4);
+        },
+    },
+    gz_kelaosaiweici_R_lunzhan_hand: { charlotte: true, mark: true, intro: { content: '手牌上限+#' }, mod: { maxHandcard(player, num) { return num + player.countMark('gz_kelaosaiweici_R_lunzhan_hand'); } } },
+    gz_kelaosaiweici_R_lunzhan_damage: { charlotte: true, trigger: { source: 'damageBegin1' }, forced: true, filter(event) { return event.card && event.card.name == 'sha'; }, content() { trigger.num++; } },
+    gz_diwuzhandui: {
+        trigger: { player: 'phaseZhunbeiBegin' }, direct: true,
+        content() {
+            'step 0'
+            event.num = Math.min(3, game.countPlayer(current => current.group == player.group));
+            if (!player.isMajor()) event.num++;
+            event.cards = get.cards(event.num);
+            game.cardsGotoOrdering(event.cards);
+            player.chooseButton(['第五战队', event.cards], false).set('filterButton', button => player.hasUseTarget(button.link));
+            'step 1'
+            if (result.bool) player.chooseUseTarget(result.links[0], true);
+        },
+    },
+    gz_bigseven: {
+        trigger: { player: 'useCardToPlayered' }, direct: true,
+        filter(event) { return event.targets.length == 1 && (get.type(event.card) == 'basic' || get.type(event.card) == 'trick'); },
+        content() {
+            'step 0'
+            event.cardtype = get.type(trigger.card);
+            player.judge(card => get.type(card) == event.cardtype ? 1 : 0);
+            'step 1'
+            if (result.judge <= 0) return event.finish();
+            event.max = player.isMajor() ? 3 : 2;
+            player.chooseTarget([0, event.max - 1], '为' + get.translation(trigger.card) + '增加目标', (card, player, target) => !trigger.targets.includes(target) && lib.filter.targetEnabled2(trigger.card, trigger.player, target));
+            'step 2'
+            if (result.bool) trigger.targets.addArray(result.targets);
+            if (!player.isMajor()) trigger.getParent().baseDamage = (trigger.getParent().baseDamage || 1) + 1;
+        },
+    },
+    gz_lizhengshangyou: { trigger: { player: 'phaseDrawBegin2' }, forced: true, filter(event) { return !event.numFixed; }, content() { trigger.num += game.countPlayer(current => current.group == player.group) * 2; } },
+    gz_nanshagonchen: { trigger: { player: 'useCardToTargeted' }, direct: true, filter(event) { return event.card && (event.card.name == 'sha' || event.card.name == 'sheji9'); }, content() { var num = game.countPlayer(current => current.group == player.group); if (num >= 2) player.draw(); if (num >= 3) { trigger.target.addTempSkill('qinggang2'); trigger.target.storage.qinggang2.add(trigger.card); } if (num >= 4) trigger.getParent().baseDamage = (trigger.getParent().baseDamage || 1) + 1; } },
+    gz_yuleizhantujin: {
+        enable: 'phaseUse', usable: 1,
+        filter(event, player) { return game.filterPlayer(current => current.group == player.group && current.hasSkill('quzhudd')).reduce((sum, current) => sum + current.countCards('e'), 0) > 0; },
+        content() {
+            'step 0'
+            event.num = game.filterPlayer(current => current.group == player.group && current.hasSkill('quzhudd')).reduce((sum, current) => sum + current.countCards('e'), 0);
+            event.cards = get.cards(event.num);
+            game.cardsGotoOrdering(event.cards);
+            player.showCards(event.cards);
+            player.chooseTarget(true, '选择一名角色', (card, player, target) => target != player);
+            'step 1'
+            if (!result.bool) return event.finish();
+            event.target = result.targets[0];
+            event.cards.filter(card => get.type(card) == 'basic' && player.canUse(card, event.target, false)).forEach(card => player.useCard(card, event.target, false));
+            event.cards.filter(card => get.type(card) == 'trick' && get.type2(card) != 'delay' && event.target.canUse(card, player, false)).forEach(card => event.target.useCard(card, player, false));
+        },
+    },
+    gz_zhanxianfangyu: {
+        trigger: { global: 'useCardToTarget' }, direct: true,
+        filter(event, player) { return event.card.name == 'sha' && event.target != player && event.player != player && get.distance(player, event.target, 'pure') <= 1 && player.countCards('he'); },
+        content() {
+            'step 0'
+            player.chooseToDiscard('he', 1, '弃置一张牌，代替其成为此【杀】的目标');
+            'step 1'
+            if (result.bool) { trigger.getParent().targets.remove(trigger.target); trigger.getParent().targets.push(player); }
+        },
+        group: 'gz_zhanxianfangyu_black',
+    },
+    gz_zhanxianfangyu_black: { trigger: { target: 'shaBefore' }, forced: true, usable: 1, filter(event, player) { return get.color(event.card) == 'black' && game.hasPlayer(current => current.hasSkill('gz_zhanxianfangyu') && current.group == player.group); }, content() { trigger.cancel(); } },
+    gz_huhangyuanhu: {
+        trigger: { global: 'useCardToTargeted' }, direct: true,
+        filter(event, player) { return event.card.name == 'sha' && event.targets.length == 1 && event.target != player && event.target.group == player.group; },
+        content() {
+            'step 0'
+            player.draw();
+            player.chooseCard('he', true, '交给' + get.translation(trigger.target) + '一张牌');
+            'step 1'
+            player.give(result.cards, trigger.target);
+            if (get.distance(player, trigger.target, 'pure') <= 1) player.draw();
+            trigger.getParent().targets.remove(trigger.target);
+            trigger.getParent().targets.push(player);
+        },
+    },
+    gz_zhongbangtuxi: { limited: true, enable: 'phaseUse', selectCard: [1, Infinity], filterCard: { color: 'red' }, selectTarget() { return ui.selected.cards.length; }, filterTarget: true, multitarget: true, content() { player.awakenSkill('gz_zhongbangtuxi'); targets.forEach(target => target.damage(player.siege(target) ? 2 : 1, 'fire', player)); } },
+    gz_qiangxingzhencha: {
+        trigger: { global: 'phaseJieshuBegin' }, direct: true,
+        filter(event, player) { return event.player != player && event.player.countCards('h'); },
+        content() {
+            'step 0'
+            event.targets = player.sieged() ? game.filterPlayer(current => current.siege(player)) : [trigger.player];
+            event.targets.forEach(target => target.showHandcards());
+            event.index = 0;
+            'step 1'
+            if (event.index >= event.targets.length) return event.finish();
+            event.target = event.targets[event.index];
+            if (player.sieged()) player.gainPlayerCard(event.target, 'h', true);
+            'step 2'
+            event.target.chooseToUse('可以对' + get.translation(player) + '使用一张无距离限制的【杀】', { name: 'sha' }, player, -1).set('nodistance', true);
+            'step 3'
+            event.index++;
+            event.goto(1);
+        },
     },
 };
 
