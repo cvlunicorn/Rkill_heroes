@@ -1693,6 +1693,20 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 if (!lib.characterPack) lib.characterPack = {};
                 if (!lib.characterPack[packName]) lib.characterPack[packName] = {};
 
+                // 手动注册武将时也必须注册国战包的全部技能与翻译。
+                // 否则国战的 _mingzhisuodingji 遍历暗置武将技能并调用 get.is.locked()
+                // 时会取得 undefined，继而读取 undefined.locked 报错。
+                if (jianrguozhan.skill) {
+                    for (var skillId in jianrguozhan.skill) {
+                        if (!lib.skill[skillId]) lib.skill[skillId] = jianrguozhan.skill[skillId];
+                    }
+                }
+                if (jianrguozhan.translate) {
+                    for (var translateId in jianrguozhan.translate) {
+                        if (!lib.translate[translateId]) lib.translate[translateId] = jianrguozhan.translate[translateId];
+                    }
+                }
+
                 // 存储需要异步探测的武将 ID
                 var needAsyncProbe = [];
 
