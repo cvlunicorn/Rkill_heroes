@@ -426,7 +426,7 @@ const guozhanskills = {
         },
         "_priority": 0,
     },
-    //未知的命运 - G势力技，摸牌阶段结束时选择：锁定额外牌或弃牌
+    //未知的命运 - 摸牌阶段结束时选择：锁定额外牌或弃牌
     gz_weizhidemingyun: {
         audio: false,
         nobracket: true,
@@ -444,7 +444,7 @@ const guozhanskills = {
         trigger: { player: "phaseDrawEnd" },
         forced: true,
         filter: function (event, player) {
-            return player.group == 'KMS';
+            return true;
         },
         content: function () {
             "step 0"
@@ -522,7 +522,7 @@ const guozhanskills = {
         },
         "_priority": 0,
     },
-    //核试验旗舰 - 限定技，F势力技，弃5牌对全场造成伤害
+    //核试验旗舰 - 限定技，弃5牌对全场造成伤害
     gz_heshiyan: {
         audio: false,
         nobracket: true,
@@ -534,7 +534,6 @@ const guozhanskills = {
         animationColor: "fire",
         filter: function (event, player) {
             if (!player.hasSkill("gz_heshiyan")) return false;
-            if (player.group != 'MN') return false;
             return player.countCards("he") >= 5;
         },
         content: function () {
@@ -550,9 +549,9 @@ const guozhanskills = {
             player.awakenSkill("gz_heshiyan");
             event.baseDamage = 2;
             event.immunePlayers = [];
-            //询问其他F(MN)势力角色是否响应
+            //询问其他同势力角色是否响应
             event.mnPlayers = game.filterPlayer(function (current) {
-                return current != player && current.group == 'MN' && current.countCards('h') >= 2;
+                return current != player && current.group == player.group&& current.countCards('h') >= 2;
             });
             event.mnIndex = 0;
             "step 2"
