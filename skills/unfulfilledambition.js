@@ -4138,7 +4138,8 @@ const unfulfilledambition = {
                 if (!colors.includes(color)) colors.push(color);
             }
             event.num = colors.length;
-            player.chooseTarget("岛勋：令一名角色获得" + event.num + "点护甲，护甲值至多为5", function (card, player, target) {
+            player.chooseTarget("岛勋：令一名其他角色获得" + event.num + "点护甲，护甲值至多为5", function (card, player, target) {
+                if (player == target) return false;
                 if (player.storage.t23_daoxun && player.storage.t23_daoxun.includes(target)) return false;
                 return true;
             }, true).set("ai", function (target) {
