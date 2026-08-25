@@ -3885,6 +3885,7 @@ const others = {
         nobracket: true,
         filter: function (event, player) {
             if (event.type == "use") return false;
+            if (event.getParent("cardsDiscard")?.yanwuyanhu_yan) return false;
             if (!event.cards || event.cards.length == 0) return false;
             if (player == event.player) return false;
             for (var card of event.cards) {
@@ -3903,7 +3904,7 @@ const others = {
             }
             event.cards = cards;
             player.chooseButton(["烟雾掩护：是否将一张牌置于牌堆顶或角色武将牌上？", cards]).set("ai", function (button) {
-                return 1;
+                return get.attitude(player, trigger.player) > 0 ? 1 : 0;
             });
             "step 1"
             if (!result.bool || !result.links[0]) {
@@ -3973,7 +3974,8 @@ const others = {
                             player.markSkill("yanwuyanhu_yan");
                         }
                         player.$throw(card);
-                        game.cardsDiscard(card);
+                        var discardEvent = game.cardsDiscard(card);
+                        discardEvent.yanwuyanhu_yan = true;
                         trigger.cancel();
                     }
                 },
@@ -3983,7 +3985,8 @@ const others = {
                     onunmark: function (storage, player) {
                         if (storage && storage.length) {
                             player.$throw(storage, 1000);
-                            game.cardsDiscard(storage);
+                            var discardEvent = game.cardsDiscard(storage);
+                            discardEvent.yanwuyanhu_yan = true;
                             game.log(storage, "被置入了弃牌堆");
                             storage.length = 0;
                         }
