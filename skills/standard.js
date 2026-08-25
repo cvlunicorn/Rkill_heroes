@@ -3183,8 +3183,18 @@ const standard = {
             }
             return best;
         },
+        getConversionScore: function (card, player) {
+            var convertedValue = lib.skill.duomianshou.getBestUseValue(card, player);
+            if (convertedValue <= 0) return 0;
+
+            // A card that cannot produce value in the current phase should be a
+            // reasonable conversion cost. Retention value remains a soft penalty
+            // for defensive and delayed cards rather than a hard veto.
+            var directUseValue = player.getUseValue(card, false, false);
+            var retentionCost = get.value(card, player) * 0.35;
+            return convertedValue + 1 - Math.max(directUseValue, retentionCost);
+        },
         filterCard(card, player) {
-            var player = get.player();
             var numbers = [];
 
             if (player.storage.duomianshou.length) {
@@ -3216,9 +3226,7 @@ const standard = {
         usable: 3,
         check: function (card) {
             var player = get.player();
-            var bestUseValue = lib.skill.duomianshou.getBestUseValue(card, player);
-            if (bestUseValue <= 0) return 0;
-            return bestUseValue + 2 - get.value(card, player);
+            return lib.skill.duomianshou.getConversionScore(card, player);
         },
         content: function () {
             'step 0'
@@ -3294,7 +3302,17 @@ const standard = {
             },
         },
         ai: {
-            order: 10,
+            order: function (item, player) {
+                var best = 0;
+                for (var card of player.getCards('h')) {
+                    if (!lib.skill.duomianshou.filterCard(card, player)) continue;
+                    best = Math.max(best, lib.skill.duomianshou.getConversionScore(card, player));
+                }
+                if (best >= 8) return 10;
+                if (best >= 4) return 8;
+                if (best > 0) return 6;
+                return 1;
+            },
             result: {
                 player: 1,
             },
