@@ -1556,9 +1556,20 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             //   getJianRCharacterImageRelativePath : 异步版的内部步骤，先反查 fileList 再 fallback
             var jianrExtensionDirectoryName = '舰R牌将';
 
+            // 国战角色 ID 使用 gz_ 前缀，但立绘文件沿用本体角色名（如 gz_bismarck_R -> bismarck_R.png）。
+            // 仅在查找文件时移除该前缀，角色注册和技能仍使用完整的国战 ID。
+            var getJianRCharacterImageFileName = function (characterName) {
+                // 少数旧文件保留了与角色 ID 不同的大小写。
+                var imageFileNameAliases = {
+                };
+                if (imageFileNameAliases[characterName]) return imageFileNameAliases[characterName];
+                return characterName.indexOf('gz_') === 0 ? characterName.slice(3) : characterName;
+            };
+
             var getJianRCharacterImageRelativePath = async function (characterName) {
                 // 扩展若是从压缩包导入,`extensionInfo.file` 中会记录真实文件名。
                 // 这里优先按“角色名 -> 实际文件路径”反查,可以保留正确的后缀。
+                var imageFileName = getJianRCharacterImageFileName(characterName);
                 var extensionInfo = lib.config && lib.config.extensionInfo && lib.config.extensionInfo['舰R牌将'];
                 var importedFileList = extensionInfo && Array.isArray(extensionInfo.file) ? extensionInfo.file : [];
                 for (var index = 0; index < importedFileList.length; index++) {
@@ -1567,13 +1578,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     var fileName = filePath.slice('image/character/'.length);
                     var dotIndex = fileName.lastIndexOf('.');
                     if (dotIndex <= 0) continue;
-                    if (fileName.slice(0, dotIndex) === characterName) {
+                    if (fileName.slice(0, dotIndex) === imageFileName) {
                         return filePath;
                     }
                 }
-                // 目录模式下同步 fs 探测 png/jpg，兼容用户手动换成 png 的立绘。
-                var probedExt = await probeJianRAssetExt('image/character/' + characterName) || '.jpg';
-                return 'image/character/' + characterName + probedExt;
+                // 目录模式下探测 png/jpg，兼容用户手动换成 png 的立绘。
+                var probedExt = await probeJianRAssetExt('image/character/' + imageFileName) || '.jpg';
+                return 'image/character/' + imageFileName + probedExt;
             };
             var getJianRCharacterImageTag = function (characterName) {
                 return getJianRCharacterImageRelativePath(characterName).then(function (relativePath) {
@@ -1592,6 +1603,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 // 先按导入模式反查 extensionInfo.file
                 var extensionInfo = lib.config && lib.config.extensionInfo && lib.config.extensionInfo['舰R牌将'];
                 var importedFileList = extensionInfo && Array.isArray(extensionInfo.file) ? extensionInfo.file : [];
+                var imageFileName = getJianRCharacterImageFileName(characterName);
                 var matchedRelativePath = null;
                 for (var index = 0; index < importedFileList.length; index++) {
                     var filePath = importedFileList[index];
@@ -1599,19 +1611,19 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     var fileName = filePath.slice('image/character/'.length);
                     var dotIndex = fileName.lastIndexOf('.');
                     if (dotIndex <= 0) continue;
-                    if (fileName.slice(0, dotIndex) === characterName) {
+                    if (fileName.slice(0, dotIndex) === imageFileName) {
                         matchedRelativePath = filePath;
                         break;
                     }
                 }
                 if (matchedRelativePath === null) {
-                    // 回退到同步 fs 探测（仅 Electron 有效）
-                    var syncExt = probeJianRAssetExtSync('image/character/' + characterName);
+                    // 回退到同步 fs 探测（仅 Electron 有效）。国战角色使用去掉 gz_ 前缀的立绘文件名。
+                    var syncExt = probeJianRAssetExtSync('image/character/' + imageFileName);
                     // undefined（纯浏览器无 fs）/ null（fs 两个后缀都没找到，可能是 Windows 打包后
                     // cwd 不是游戏根目录导致 existsSync 全失败）都交给异步路径处理。
                     // 异步走 Image().src + lib.assetURL URL,不依赖 cwd,是更可靠的兜底。
                     if (!syncExt) return null;
-                    matchedRelativePath = 'image/character/' + characterName + syncExt;
+                    matchedRelativePath = 'image/character/' + imageFileName + syncExt;
                 }
                 if (_status.evaluatingExtension) {
                     return 'db:extension-' + jianrExtensionDirectoryName + ':' + matchedRelativePath;
@@ -1664,18 +1676,27 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 return jianrjinji;
             });
             lib.translate['jianrjinji_character_config'] = '舰R武将';
+
             // ========== 手动注册舰R国战武将包（兼容所有版本） ==========
             (function () {
                 var packName = 'mode_extension_jianrguozhan'; // 自定义包名，用于国战过滤器
+                // mode_extension_* 类型扩展包的开关不在 lib.config.characters，
+                // 而是扩展配置 extension_<扩展名>_characters_enable。
+                // 配置尚未初始化时与武将包菜单保持一致，默认视为启用。
+                var guozhanPackEnabled = !lib.config || lib.config.extension_舰R牌将_characters_enable !== false;
 
-                // 1. 确保数据结构存在
+                // 仅在国战且玩家启用该武将包时注册，避免身份等模式绕过武将包开关。
+                if (lib.config.mode !== 'guozhan' || !guozhanPackEnabled) {
+                    return;
+                }
+
                 if (!lib.characterPack) lib.characterPack = {};
                 if (!lib.characterPack[packName]) lib.characterPack[packName] = {};
 
                 // 存储需要异步探测的武将 ID
                 var needAsyncProbe = [];
 
-                // 2. 复制武将到扩展专用包，同时写入 lib.character（身份模式也能用）
+                // 2. 复制武将到扩展专用包，并仅在当前国战写入 lib.character
                 for (var id in jianrguozhan.character) {
                     var charData = jianrguozhan.character[id];
                     // 确保 [4] 数组存在
@@ -1687,8 +1708,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         // 已有同步标签，直接使用
                         charData[4].push(syncTag);
                     } else {
-                        // 回退：先用默认 jpg 占位，稍后异步探测真实扩展名
-                        var defaultTag = 'ext:' + '舰R牌将' + '/image/character/' + id + '.jpg';
+                        // 回退：先用默认 jpg 占位，稍后异步探测真实扩展名。
+                        // 国战角色的实际立绘文件名不含 gz_ 前缀。
+                        var imageFileName = getJianRCharacterImageFileName(id);
+                        var defaultTag = 'ext:' + '舰R牌将' + '/image/character/' + imageFileName + '.jpg';
                         charData[4].push(defaultTag);
                         needAsyncProbe.push(id);
                     }
@@ -1735,9 +1758,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 // 更新 lib.character 中的标签
                                 var charData = lib.character[id];
                                 if (charData && Array.isArray(charData[4])) {
-                                    // 移除旧的默认 jpg 标签（以 'ext:舰R牌将/image/character/' + id 开头的）
+                                    // 移除旧的默认 jpg 标签。国战角色的立绘文件名不含 gz_ 前缀。
+                                    var imageFileName = getJianRCharacterImageFileName(id);
                                     charData[4] = charData[4].filter(function (t) {
-                                        return !(typeof t === 'string' && t.indexOf('ext:舰R牌将/image/character/' + id) === 0);
+                                        return !(typeof t === 'string' && t.indexOf('ext:舰R牌将/image/character/' + imageFileName) === 0);
                                     });
                                     if (!charData[4].includes(tag)) charData[4].push(tag);
                                 }
@@ -1745,7 +1769,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                                 var packData = lib.characterPack[packName] && lib.characterPack[packName][id];
                                 if (packData && Array.isArray(packData[4])) {
                                     packData[4] = packData[4].filter(function (t) {
-                                        return !(typeof t === 'string' && t.indexOf('ext:舰R牌将/image/character/' + id) === 0);
+                                        return !(typeof t === 'string' && t.indexOf('ext:舰R牌将/image/character/' + getJianRCharacterImageFileName(id)) === 0);
                                     });
                                     if (!packData[4].includes(tag)) packData[4].push(tag);
                                 }
