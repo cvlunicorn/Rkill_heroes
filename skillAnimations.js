@@ -15,4 +15,8 @@ export var skillAnimations = {
     kaimuleiji: { image: "kaimuleiji.gif", duration: 2000, fullscreen: true, size: 0.85 },
     fanjiandaodan: { image: "yuanchengdaji.gif", duration: 1200, fullscreen: true, size: 0.85 },
     yuanchengdaji: { image: "yuanchengdaji.gif", duration: 1200, fullscreen: true, size: 0.85 },
+    // 程序渲染：拦阻射击与防空2共用防空炮火动画，不需要图片素材。
+    lanzusheji9: { procedural: "antiAirFire", duration: 1800, fullscreen: false },
+    // 程序渲染：从武将牌右下向左上扇形发射的防空炮火，不需要图片素材。
+    fangkong2: { procedural: "antiAirFire", duration: 2000, fullscreen: false },
 };

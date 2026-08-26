@@ -57,6 +57,7 @@ import { weightedRandom } from "./utils.js";
 import { skillAnimations } from "./skillAnimations.js";
 import { skinRegistry } from "./skinSystem.js";
 import { initLimitedBanner } from "./limitedBanner.js";
+import { statusEffects } from "./statusEffects.js";
 import { jianrguozhan } from "./jianrguozhan.js";
 
 // —— 扩展名缓存与探测 ——
@@ -507,11 +508,113 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 callback(fallback); // 普通图片维持配置时长
             }
 
+            // 程序化局部特效：防空炮火从牌面右下方向左上方扇形区域发射。
+            function showAntiAirFireEffect(player, options) {
+                if (!isAnimationEnabled()) {
+                    console.warn("[舰R动画调试][牌将] 程序动画开关已关闭", options);
+                    return;
+                }
+                if (!player) {
+                    console.warn("[舰R动画调试][牌将] 程序动画没有有效目标", options);
+                    return;
+                }
+                if (lib.config && lib.config.low_performance) {
+                    console.warn("[舰R动画调试][牌将] 低性能模式跳过程序动画", options);
+                    return;
+                }
+                console.log("[舰R动画调试][牌将] 渲染防空炮火程序动画", {
+                    player: player.name || player.playerid || "player",
+                    duration: options.duration || 2000,
+                });
+                var duration = options.duration || 2000;
+                // player 还包含当前玩家的底部操作区；必须锚定到实际武将牌头像。
+                var anchor = (player.node && player.node.avatar) || player;
+                var anchorRect = anchor.getBoundingClientRect();
+                var canvas = document.createElement("canvas");
+                canvas.className = "jianr-battle-animation jianr-animation-local";
+                // 固定到窗口并使用视口坐标，避免继承当前玩家手牌区的布局。
+                canvas.style.position = "fixed";
+                canvas.style.top = anchorRect.top + anchorRect.height / 2 + "px";
+                canvas.style.left = anchorRect.left + anchorRect.width / 2 + "px";
+                canvas.style.width = anchorRect.width * 2 + "px";
+                canvas.style.height = anchorRect.height * 2 + "px";
+                canvas.style.transform = "translate(-50%, -50%)";
+                canvas.style.opacity = String(getAnimationOpacity());
+                canvas.style.zIndex = "11";
+                canvas.style.pointerEvents = "none";
+                canvas.style.display = "block";
+                ui.window.appendChild(canvas);
+
+                var width = Math.max(2, anchorRect.width * 2);
+                var height = Math.max(2, anchorRect.height * 2);
+                var scale = window.devicePixelRatio || 1;
+                canvas.width = Math.max(1, Math.round(width * scale));
+                canvas.height = Math.max(1, Math.round(height * scale));
+                var context = canvas.getContext("2d");
+                if (!context) {
+                    if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
+                    return;
+                }
+                context.scale(scale, scale);
+                var originX = width * 0.62;
+                var originY = height * 0.62;
+                var particles = [];
+                for (var i = 0; i < 52; i++) {
+                    // -135° 左上为中心，左右展开 58°，保证火力扇面稳定指向左上。
+                    var angle = (-135 + (Math.random() - 0.5) * 58) * Math.PI / 180;
+                    particles.push({
+                        delay: Math.random() * duration * 0.7,
+                        life: 480 + Math.random() * 260,
+                        speed: Math.min(width, height) * (0.34 + Math.random() * 0.28),
+                        angle: angle,
+                        length: 7 + Math.random() * 7,
+                        radius: 1.25 + Math.random() * 0.85,
+                    });
+                }
+
+                var startedAt = performance.now();
+                function frame(now) {
+                    var elapsed = now - startedAt;
+                    context.clearRect(0, 0, width, height);
+                    particles.forEach(function (particle) {
+                        var age = elapsed - particle.delay;
+                        if (age < 0 || age > particle.life) return;
+                        var progress = age / particle.life;
+                        var distance = particle.speed * progress;
+                        var x = originX + Math.cos(particle.angle) * distance;
+                        var y = originY + Math.sin(particle.angle) * distance;
+                        var alpha = Math.sin(progress * Math.PI) * 0.95;
+                        context.save();
+                        context.translate(x, y);
+                        context.rotate(particle.angle);
+                        context.shadowBlur = 5;
+                        context.shadowColor = "rgba(255, 170, 35," + alpha + ")";
+                        context.fillStyle = "rgba(255, 195, 54," + alpha + ")";
+                        context.beginPath();
+                        context.ellipse(0, 0, particle.length, particle.radius, 0, 0, Math.PI * 2);
+                        context.fill();
+                        context.restore();
+                    });
+                    if (elapsed < duration) requestAnimationFrame(frame);
+                    else if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
+                }
+                requestAnimationFrame(frame);
+            }
+
             // 动画显示核心函数
             function showBattleEffect(player, fileName, options) {
-                if (!isAnimationEnabled()) return;
-                if (!player) return;
-                if (lib.config && lib.config.low_performance) return;
+                if (!isAnimationEnabled()) {
+                    console.warn("[舰R动画调试][牌将] 动画开关已关闭", fileName);
+                    return;
+                }
+                if (!player) {
+                    console.warn("[舰R动画调试][牌将] 没有有效动画目标", fileName);
+                    return;
+                }
+                if (lib.config && lib.config.low_performance) {
+                    console.warn("[舰R动画调试][牌将] 低性能模式跳过动画", fileName);
+                    return;
+                }
 
                 var node = ui.create.div(".jianr-battle-animation");
                 if (options.fullscreen) {
@@ -527,8 +630,17 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     }
                     ui.window.appendChild(node);
                 } else {
+                    // 局部动画统一锚定实际武将头像，避免当前玩家的手牌区扩大 player 容器。
+                    var anchor = (player.node && player.node.avatar) || player;
+                    var anchorRect = anchor.getBoundingClientRect();
                     node.classList.add("jianr-animation-local");
-                    player.appendChild(node);
+                    node.style.position = "fixed";
+                    node.style.top = anchorRect.top + anchorRect.height / 2 + "px";
+                    node.style.left = anchorRect.left + anchorRect.width / 2 + "px";
+                    node.style.width = anchorRect.width * 2 + "px";
+                    node.style.height = anchorRect.height * 2 + "px";
+                    node.style.transform = "translate(-50%, -50%)";
+                    ui.window.appendChild(node);
                 }
                 node.style.setProperty("--jianr-animation-opacity", getAnimationOpacity());
 
@@ -562,7 +674,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         video.style.objectFit = "contain";
                         video.style.zIndex = "-1";
                         video.onloadeddata = function () { onReady(true); };
-                        video.onerror = function () { onReady(false); };
+                        video.onerror = function () {
+                            console.error("[舰R动画调试][牌将] 视频资源加载失败", fileName, url);
+                            onReady(false);
+                        };
                         video.src = url;
                         node.appendChild(video);
                     } else {
@@ -572,12 +687,21 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             ui.refresh(node);
                             onReady(true);
                         };
-                        img.onerror = function () { onReady(false); };
+                        img.onerror = function () {
+                            console.error("[舰R动画调试][牌将] 图片/GIF资源加载失败", fileName, url);
+                            onReady(false);
+                        };
                         img.src = url;
                     }
                 }
 
+                console.log("[舰R动画调试][牌将] 开始解析动画资源", {
+                    fileName: fileName,
+                    mediaType: mediaType,
+                    player: player && (player.name || player.playerid || "player"),
+                });
                 resolveAnimationImageUrl(fileName, function (url) {
+                    console.log("[舰R动画调试][牌将] 动画资源地址", fileName, url || "<empty>");
                     if (cleaned || !node.parentNode) return;
                     getMediaDuration(url, mediaType, fallbackDuration, function (duration) {
                         if (cleaned || !node.parentNode) return;
@@ -604,8 +728,18 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             if (!lib.animate.skill) lib.animate.skill = {};
             for (var skillId in skillAnimations) {
                 (function (id, cfg) {
+                    console.log("[舰R动画调试][牌将] 注册动画接口", id, cfg);
                     lib.animate.skill[id] = function (skillName) {
-                        showBattleEffect(this, cfg.image, cfg);
+                        console.log("[舰R动画调试][牌将] 执行动画接口", id, {
+                            skillName: skillName,
+                            player: this && (this.name || this.playerid || "player"),
+                            config: cfg,
+                        });
+                        if (cfg.procedural === "antiAirFire") {
+                             showAntiAirFireEffect(this, cfg);
+                         } else {
+                             showBattleEffect(this, cfg.image, cfg);
+                         }
                     };
                 })(skillId, skillAnimations[skillId]);
             }
@@ -618,7 +752,157 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
             // Sueyuki DEV 扩展专用alert对话框（允许自定义样式）
             //2026.2.12豆包修改样式
-            game.jianRAlert = (str, options = {}) => {
+            // 状态特效渲染在牌面容器内：小图标位于左下角，覆盖层保持较低透明度。
+             if (!document.getElementById("jianr-status-effect-style")) {
+                 var statusStyle = document.createElement("style");
+                 statusStyle.id = "jianr-status-effect-style";
+                 statusStyle.textContent = ".jianr-status-effects{position:absolute;inset:0;z-index:7;pointer-events:none;overflow:hidden;}" +
+                     ".jianr-status-icon{position:absolute;bottom:3%;width:19%;aspect-ratio:1;max-width:28px;background-repeat:no-repeat;background-position:center;background-size:contain;z-index:30;}" +
+                     ".jianr-status-icon-fire{left:3%;}.jianr-status-icon-flood{left:23%;}.jianr-status-icon-damaged{left:43%;}" +
+                     ".jianr-status-overlay{position:absolute;inset:0;background-repeat:no-repeat;background-position:center;background-size:contain;z-index:10;}" +
+                     ".jianr-status-overlay-reticle{inset:4%;opacity:.78;}.jianr-status-overlay-radar{inset:3% 3% auto auto;width:19%;aspect-ratio:1;max-width:28px;opacity:.86;z-index:30;}" +
+                     ".jianr-status-overlay-stripes{inset:0 0 auto;height:27%;opacity:.46;background-size:100% 100%;-webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 16%,transparent 100%);mask-image:linear-gradient(to bottom,#000 0%,#000 16%,transparent 100%);}" +
+                     ".jianr-status-overlay-stripes-bottom{top:auto;bottom:0;-webkit-mask-image:linear-gradient(to top,#000 0%,#000 16%,transparent 100%);mask-image:linear-gradient(to top,#000 0%,#000 16%,transparent 100%);}";
+                 document.head.appendChild(statusStyle);
+             }
+             // 状态徽标/覆盖层均用 Canvas 绘制，避免依赖素材文件。
+              function drawJianRStatusCanvas(container, type) {
+                  var canvas = document.createElement("canvas");
+                  canvas.style.width = "100%"; canvas.style.height = "100%"; canvas.style.display = "block";
+                  container.appendChild(canvas);
+                  var rect = container.getBoundingClientRect();
+                  var size = Math.max(1, Math.min(rect.width, rect.height));
+                  var scale = window.devicePixelRatio || 1;
+                  canvas.width = Math.ceil(rect.width * scale); canvas.height = Math.ceil(rect.height * scale);
+                  var ctx = canvas.getContext("2d"); if (!ctx) return;
+                  ctx.scale(scale, scale);
+                  var w = rect.width, h = rect.height, cx = w / 2, cy = h / 2, r = size * 0.39;
+                  ctx.lineCap = "round"; ctx.lineJoin = "round";
+                  if (type === "fire") {
+                      ctx.strokeStyle = "#ff5a1f"; ctx.fillStyle = "rgba(255,119,31,.86)"; ctx.lineWidth = size * .075;
+                      ctx.beginPath(); ctx.moveTo(cx, cy-r); ctx.lineTo(cx-r*.94, cy+r*.73); ctx.lineTo(cx+r*.94, cy+r*.73); ctx.closePath(); ctx.stroke();
+                      ctx.beginPath(); ctx.moveTo(cx, cy+r*.48); ctx.bezierCurveTo(cx-r*.42, cy+r*.05, cx-r*.12, cy-r*.18, cx, cy-r*.52); ctx.bezierCurveTo(cx+r*.13, cy-r*.12, cx+r*.43, cy+r*.05, cx, cy+r*.48); ctx.fill();
+                  } else if (type === "flood") {
+                      ctx.strokeStyle = "#38a9ff"; ctx.lineWidth = size * .075;
+                      ctx.beginPath(); ctx.moveTo(cx-r, cy-r*.7); ctx.lineTo(cx+r, cy-r*.7); ctx.lineTo(cx, cy+r*.84); ctx.closePath(); ctx.stroke();
+                      ctx.strokeStyle = "#77d4ff"; ctx.lineWidth = size * .065;
+                      for (var wave = 0; wave < 2; wave++) { var y = cy-r*.1+wave*r*.45; ctx.beginPath(); for (var x = -r*.58; x <= r*.6; x += r*.12) { var py = y + Math.sin((x/r)*Math.PI*2)*r*.1; if (x === -r*.58) ctx.moveTo(cx+x,py); else ctx.lineTo(cx+x,py); } ctx.stroke(); }
+                  } else if (type === "propeller") {
+                      ctx.strokeStyle = "#ffd32e"; ctx.fillStyle = "rgba(255,211,46,.9)"; ctx.lineWidth = size * .06;
+                      for (var blade = 0; blade < 3; blade++) { ctx.save(); ctx.translate(cx,cy); ctx.rotate(blade*Math.PI*2/3); ctx.beginPath(); ctx.ellipse(0,-r*.43,r*.2,r*.48,0,0,Math.PI*2); ctx.fill(); ctx.restore(); }
+                      ctx.beginPath(); ctx.arc(cx,cy,r*.17,0,Math.PI*2); ctx.fill();
+                      ctx.save(); ctx.globalCompositeOperation = "destination-out"; ctx.lineWidth = size*.14; ctx.beginPath(); ctx.moveTo(cx-r*.82,cy+r*.78); ctx.lineTo(cx+r*.82,cy-r*.78); ctx.stroke(); ctx.restore();
+                      ctx.strokeStyle = "#ffd32e"; ctx.lineWidth = size*.045; ctx.beginPath(); ctx.moveTo(cx-r*.82,cy+r*.78); ctx.lineTo(cx+r*.82,cy-r*.78); ctx.stroke();
+                  } else if (type === "reticle") {
+                      // 深绿底边隔离复杂背景，薄荷绿主线与浅绿辉光提高可见度。
+                       ctx.shadowBlur = size * .055; ctx.shadowColor = "rgba(101,255,170,.72)";
+                       ctx.strokeStyle = "rgba(0,38,24,.92)"; ctx.lineWidth = size*.068; ctx.beginPath(); ctx.arc(cx,cy,r*.62,0,Math.PI*2); ctx.stroke(); ctx.beginPath(); ctx.moveTo(cx-r,cy);ctx.lineTo(cx+r,cy);ctx.moveTo(cx,cy-r);ctx.lineTo(cx,cy+r);ctx.stroke();
+                       ctx.strokeStyle = "rgba(106,255,174,.98)"; ctx.lineWidth = size*.032; ctx.beginPath(); ctx.arc(cx,cy,r*.62,0,Math.PI*2); ctx.stroke(); ctx.beginPath(); ctx.moveTo(cx-r,cy);ctx.lineTo(cx+r,cy);ctx.moveTo(cx,cy-r);ctx.lineTo(cx,cy+r);ctx.stroke();
+                       ctx.shadowBlur = 0; ctx.fillStyle="rgba(0,43,27,.96)";ctx.beginPath();ctx.arc(cx,cy,size*.058,0,Math.PI*2);ctx.fill();ctx.fillStyle="#8affbd";ctx.beginPath();ctx.arc(cx,cy,size*.027,0,Math.PI*2);ctx.fill();
+                  } else if (type === "radar") {
+                      var gradient = ctx.createRadialGradient(cx,cy,0,cx,cy,r); gradient.addColorStop(0,"rgba(83,255,157,.46)"); gradient.addColorStop(.58,"rgba(24,190,105,.24)"); gradient.addColorStop(1,"rgba(0,50,31,.12)"); ctx.fillStyle=gradient;ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill();
+                       ctx.shadowBlur=size*.045;ctx.shadowColor="rgba(101,255,170,.62)";ctx.strokeStyle="rgba(0,42,26,.86)";ctx.lineWidth=size*.045;ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
+                      ctx.strokeStyle="rgba(118,255,183,.82)";ctx.lineWidth=size*.022; for(var ring=1;ring<=3;ring++){ctx.beginPath();ctx.arc(cx,cy,r*ring/3,0,Math.PI*2);ctx.stroke();} for(var line=0;line<8;line++){var a=line*Math.PI/4;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r);ctx.stroke();}
+                      ctx.strokeStyle="rgba(174,255,211,.96)";ctx.lineWidth=size*.026;ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();ctx.shadowBlur=0;
+                  }
+              }
+
+              var _jianrTacticalSkillEffects = {
+                 zhaomingdanjiaozheng: { skills: ["zhaomingdanjiaozheng", "zhaomingdan_jiaozheng", "zhaomingdanjiaozheng9", "照明弹矫正"], procedural: "reticle", className: "jianr-status-overlay-reticle" },
+                 duikongyujing: { skills: ["duikongyujing", "duikongyujing9", "对空预警"], procedural: "radar", className: "jianr-status-overlay-radar" },
+                 lanzuosheji: { skills: ["lanzuosheji", "lanzuosheji9", "lanzusheji9", "拦阻射击", "拦阻设计"], programmaticStripes: true, className: "jianr-status-overlay-stripes" },
+             };
+             function refreshJianRStatusEffects(player) {
+                 if (!player) return;
+                 var anchor = (player.node && player.node.avatar) || player;
+                 var layer = player.node && player.node.jianrStatusEffects;
+                 if (!layer || layer.parentNode !== anchor) {
+                     if (layer && layer.parentNode) layer.parentNode.removeChild(layer);
+                     layer = ui.create.div(".jianr-status-effects", anchor);
+                     player.node.jianrStatusEffects = layer;
+                 }
+                 layer.innerHTML = "";
+                 // 显式状态由战术包维护；技能扫描结果只参与本次刷新，避免技能移除后残留。
+                 var tacticalEffects = {};
+                 var explicitEffects = player._jianrTacticalStatusEffects || {};
+                 Object.keys(explicitEffects).forEach(function (key) { tacticalEffects[key] = explicitEffects[key]; });
+                 Object.keys(_jianrTacticalSkillEffects).forEach(function (key) {
+                     var cfg = _jianrTacticalSkillEffects[key];
+                     if (!tacticalEffects[key] && cfg.skills.some(function (skill) { return player.hasSkill(skill); })) {
+                         tacticalEffects[key] = cfg;
+                     }
+                 });
+                 Object.keys(statusEffects).forEach(function (statusKey) {
+                     var cfg = statusEffects[statusKey];
+                     var active = cfg.skills.some(function (skill) { return player.hasSkill(skill); });
+                     if (statusKey === "ranshao") active = player.hasMark("_wulidebuff_ranshao");
+                     if (statusKey === "jinshui") active = player.hasMark("_wulidebuff_jinshui");
+                     if (statusKey === "jiansu") active = player.hasMark("_wulidebuff_jiansu");
+                     if (!active) return;
+                     var effect = ui.create.div("." + cfg.className, layer);
+                     effect.classList.add("jianr-status-icon");
+                     drawJianRStatusCanvas(effect, cfg.procedural);
+                 });
+                 Object.keys(tacticalEffects).forEach(function (key) {
+                     var cfg = tacticalEffects[key] || {};
+                     var effect = ui.create.div("." + (cfg.className || "jianr-status-overlay"), layer);
+                     effect.classList.add("jianr-status-overlay");
+                     if (cfg.procedural === "reticle" || cfg.procedural === "radar") {
+                          drawJianRStatusCanvas(effect, cfg.procedural);
+                      } else if (cfg.programmaticStripes) {
+                         effect.classList.add("jianr-status-overlay-stripes", "jianr-status-overlay-stripes-programmatic");
+                         effect.style.backgroundImage = "repeating-linear-gradient(135deg, #f5d328 0 8px, #202020 8px 16px)";
+                         var bottom = effect.cloneNode(false);
+                         bottom.classList.add("jianr-status-overlay-stripes-bottom");
+                         layer.appendChild(bottom);
+                     } else if (cfg.path) {
+                         effect.style.backgroundImage = 'url("' + cfg.path + '")';
+                     }
+                 });
+             }
+             // 供舰R战术包调用：战术包只需在持续效果获得/移除时调用这两个方法。
+             function normalizeJianRTacticalEffectKey(key) {
+                 if (["lanzuosheji", "lanzuosheji9", "lanzusheji9", "拦阻射击", "拦阻设计"].includes(key)) return "lanzuosheji";
+                 if (["zhaomingdanjiaozheng", "zhaomingdan_jiaozheng", "zhaomingdanjiaozheng9", "照明弹矫正"].includes(key)) return "zhaomingdanjiaozheng";
+                 if (["duikongyujing", "duikongyujing9", "对空预警"].includes(key)) return "duikongyujing";
+                 return key;
+             }
+             lib.element.Player.prototype.setJianRTacticalEffect = function (key, active, options) {
+                 if (!this._jianrTacticalStatusEffects) this._jianrTacticalStatusEffects = {};
+                 var normalizedKey = normalizeJianRTacticalEffectKey(key);
+                 if (active) {
+                     var defaults = _jianrTacticalSkillEffects[normalizedKey] || {};
+                     this._jianrTacticalStatusEffects[normalizedKey] = Object.assign({}, defaults, options || {});
+                 } else {
+                     delete this._jianrTacticalStatusEffects[normalizedKey];
+                 }
+                 refreshJianRStatusEffects(this);
+             };
+             lib.element.Player.prototype.clearJianRTacticalEffect = function (key) {
+                 this.setJianRTacticalEffect(key, false);
+             };
+             lib.element.Player.prototype.refreshJianRTacticalEffects = function () {
+                 refreshJianRStatusEffects(this);
+             };
+             game.jianrSetTacticalEffect = function (player, key, active, options) {
+                 if (!player) return;
+                 if (typeof player.setJianRTacticalEffect === "function") {
+                     player.setJianRTacticalEffect(key, active, options);
+                 }
+             };
+             game.jianrClearTacticalEffect = function (player, key) {
+                 if (!player) return;
+                 if (typeof player.clearJianRTacticalEffect === "function") {
+                     player.clearJianRTacticalEffect(key);
+                 }
+             };
+
+             var _jianrOriginalRemoveSkill = lib.element.Player.prototype.removeSkill;
+             lib.element.Player.prototype.removeSkill = function () { var result = _jianrOriginalRemoveSkill.apply(this, arguments); refreshJianRStatusEffects(this); return result; };
+             var _jianrOriginalUpdateMarks = lib.element.Player.prototype.updateMarks;
+             lib.element.Player.prototype.updateMarks = function () { var result = _jianrOriginalUpdateMarks.apply(this, arguments); refreshJianRStatusEffects(this); return result; };
+
+             game.jianRAlert = (str, options = {}) => {
                 const {
                     containerStyle = {},
                     dialogStyle = {},
@@ -1436,8 +1720,11 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
             // 钩子：玩家获得技能时刷新徽章
             var originalAddSkill = lib.element.Player.prototype.addSkill;
+             // 状态特效层由 addSkill/removeSkill/updateMarks 共同驱动。
+             // 状态特效层由 addSkill/removeSkill/updateMarks 共同驱动。
             lib.element.Player.prototype.addSkill = function () {
                 var result = originalAddSkill.apply(this, arguments);
+                 refreshJianRStatusEffects(this);
                 if (this.showShipBadge) {
                     this.showShipBadge();
                 }
