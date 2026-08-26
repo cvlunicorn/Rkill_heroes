@@ -786,10 +786,10 @@ const guozhanskills = {
         },
         group: 'gz_zhanxianfangyu_black',
     },
-    gz_zhanxianfangyu_black: { trigger: { target: 'shaBefore' }, forced: true, usable: 1, filter(event, player) { return get.color(event.card) == 'black' && game.hasPlayer(current => current.hasSkill('gz_zhanxianfangyu') && current.group == player.group); }, content() { trigger.cancel(); } },
+    gz_zhanxianfangyu_black: { trigger: { target: 'shaBefore' }, forced: true, usable: 1, filter(event, player) { return get.color(event.card) == 'black' && game.hasPlayer(current => current.hasSkill('gz_zhanxianfangyu') && current.inline(player)); }, content() { trigger.cancel(); } },
     gz_huhangyuanhu: {
         trigger: { global: 'useCardToTargeted' }, direct: true,
-        filter(event, player) { return event.card.name == 'sha' && event.targets.length == 1 && event.target != player && event.target.group == player.group; },
+        filter(event, player) { return event.card.name == 'sha' && event.targets.length == 1 && event.target != player && event.target.inline(player); },
         content() {
             'step 0'
             player.draw();
