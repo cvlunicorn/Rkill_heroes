@@ -627,37 +627,41 @@ const guozhanskills = {
         viewAs: { name: 'sha', nature: 'thunder' },
         viewAsFilter: player => player.countCards('hes', { color: 'black' }) > 0,
         prompt: '将一张黑色牌当【雷杀】使用',
+        check: card => 4 - get.value(card),
+        hiddenCard(player, name) { return name == 'sha' && player.countCards('hs', { color: 'black' }) > 0; },
     },
     gz_sawohaizhan_directhit: {
         trigger: { player: 'useCardToPlayered' }, forced: true, popup: false,
-        filter(event) { return event.card.name == 'sha' && event.card.nature == 'thunder' && event.target.isUnseen(2); },
+        filter(event) { return event.skill == 'gz_sawohaizhan_thunder' && event.target.isUnseen(2); },
         content() { trigger.directHit.add(trigger.target); },
     },
     gz_sawohaizhan_zhiji: {
         enable: 'phaseUse', usable: 1, position: 'hes',
-        filterCard: { color: 'red' }, viewAs: { name: 'zhiji' },
+        filterCard: { color: 'red' }, viewAs: { name: 'zhibi' },
         viewAsFilter: player => player.countCards('hes', { color: 'red' }) > 0,
         prompt: '将一张红色牌当【知己知彼】使用',
+        check: card => 8 - get.value(card),
     },
     gz_tiaobangzuozhan: {
         enable: 'chooseToUse', usable: 1, position: 'h', filterCard: true, selectCard: 1,
         viewAs: { name: 'juedou', isCard: false },
         group: ['gz_tiaobangzuozhan_damage', 'gz_tiaobangzuozhan_self'],
-        subSkill: {
-            damage: { trigger: { source: 'damageSource' }, forced: true, popup: false,
-                filter(event, player) { var evt = event.getParent(); return evt.skill == 'gz_tiaobangzuozhan' && evt.player == player; },
-                content() { player.gainPlayerCard(trigger.player, 'hej', true, 'visible'); } },
-            self: { trigger: { player: 'damageBegin2' }, forced: true, popup: false,
-                filter(event, player) { var evt = event.getParent(); return evt.skill == 'gz_tiaobangzuozhan' && evt.player == player && trigger.source && !trigger.source.isUnseen(0) && !trigger.source.isUnseen(1); },
-                content() {
-                    'step 0'
-                    event.target = trigger.source;
-                    player.chooseControl('主将', '副将').set('prompt', '跳帮作战：令' + get.translation(event.target) + '暗置一张武将牌，防止此伤害').set('filterControl', control => control == '主将' ? !event.target.isUnseen(0) : !event.target.isUnseen(1));
-                    'step 1'
-                    event.target.hideCharacter(result.control == '主将' ? 0 : 1);
-                    trigger.cancel();
-                },
-            },
+    },
+    gz_tiaobangzuozhan_damage: {
+        trigger: { source: 'damageSource' }, forced: true, popup: false,
+        filter(event, player) { var evt = event.getParent(); return evt.skill == 'gz_tiaobangzuozhan' && evt.player == player; },
+        content() { player.gainPlayerCard(trigger.player, 'hej', true, 'visible'); },
+    },
+    gz_tiaobangzuozhan_self: {
+        trigger: { player: 'damageBegin2' }, forced: true, popup: false,
+        filter(event, player) { var evt = event.getParent(); return evt.skill == 'gz_tiaobangzuozhan' && evt.player == player && event.source && !event.source.isUnseen(0) && !event.source.isUnseen(1); },
+        content() {
+            'step 0'
+            event.target = trigger.source;
+            player.chooseControl('主将', '副将').set('prompt', '跳帮作战：令' + get.translation(event.target) + '暗置一张武将牌，防止此伤害').set('filterControl', control => control == '主将' ? !event.target.isUnseen(0) : !event.target.isUnseen(1));
+            'step 1'
+            event.target.hideCharacter(result.control == '主将' ? 0 : 1);
+            trigger.cancel();
         },
     },
     gz_qingyeqingyeqing: {
