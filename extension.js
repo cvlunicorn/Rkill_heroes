@@ -522,10 +522,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     console.warn("[舰R动画调试][牌将] 低性能模式跳过程序动画", options);
                     return;
                 }
-                console.log("[舰R动画调试][牌将] 渲染防空炮火程序动画", {
+                /*console.log("[舰R动画调试][牌将] 渲染防空炮火程序动画", {
                     player: player.name || player.playerid || "player",
                     duration: options.duration || 2000,
-                });
+                });*/
                 var duration = options.duration || 2000;
                 // player 还包含当前玩家的底部操作区；必须锚定到实际武将牌头像。
                 var anchor = (player.node && player.node.avatar) || player;
@@ -695,13 +695,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     }
                 }
 
-                console.log("[舰R动画调试][牌将] 开始解析动画资源", {
+                /*console.log("[舰R动画调试][牌将] 开始解析动画资源", {
                     fileName: fileName,
                     mediaType: mediaType,
                     player: player && (player.name || player.playerid || "player"),
-                });
+                });*/
                 resolveAnimationImageUrl(fileName, function (url) {
-                    console.log("[舰R动画调试][牌将] 动画资源地址", fileName, url || "<empty>");
+                    //console.log("[舰R动画调试][牌将] 动画资源地址", fileName, url || "<empty>");
                     if (cleaned || !node.parentNode) return;
                     getMediaDuration(url, mediaType, fallbackDuration, function (duration) {
                         if (cleaned || !node.parentNode) return;
@@ -728,13 +728,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             if (!lib.animate.skill) lib.animate.skill = {};
             for (var skillId in skillAnimations) {
                 (function (id, cfg) {
-                    console.log("[舰R动画调试][牌将] 注册动画接口", id, cfg);
+                    //console.log("[舰R动画调试][牌将] 注册动画接口", id, cfg);
                     lib.animate.skill[id] = function (skillName) {
-                        console.log("[舰R动画调试][牌将] 执行动画接口", id, {
+                        /*console.log("[舰R动画调试][牌将] 执行动画接口", id, {
                             skillName: skillName,
                             player: this && (this.name || this.playerid || "player"),
                             config: cfg,
-                        });
+                        });*/
                         if (cfg.procedural === "antiAirFire") {
                              showAntiAirFireEffect(this, cfg);
                          } else {
