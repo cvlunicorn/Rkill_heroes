@@ -2731,47 +2731,60 @@ const unfulfilledambition = {
         "_priority": 0,
     },
     //======= 德格拉斯 =======
-    //遥远的希望（1级）- 锁定技，多摸X张（X=轮数/2向下取整，最低1），血量不满变势力G
+    //遥远的希望 - 限定技，出牌阶段摸当前轮数张牌；势力变更后重置
     yaoyuandexiwang: {
         audio: false,
-        locked: true,
-        forced: true,
         nobracket: true,
-        trigger: { player: "phaseDrawBegin2" },
-        derivation: "yaoyuandexiwang2",
+        limited: true,
+        enable: "phaseUse",
         filter: function (event, player) {
-            return !event.numFixed;
+            return player.storage.yaoyuandexiwang !== true;
         },
         content: function () {
-            var x = Math.max(1, Math.floor(game.roundNumber / 2));
-            trigger.num += x;
-            player.storage.xiwang_extra = x;
-            player.storage.xiwang_handBefore = player.getCards('h').map(function (c) { return c.cardid; });
-            if (player.hp < player.maxHp && !player.storage.shuguang_done) {
-                if (player.group != 'KMS') player.changeGroup('KMS');
-            }
+            player.awakenSkill("yaoyuandexiwang");
+            player.draw(game.roundNumber || 1);
+        },
+        group: ["yaoyuandexiwang_changegroup", "yaoyuandexiwang_groupchange"],
+        subSkill: {
+            changegroup: {
+                audio: false,
+                locked: true,
+                forced: true,
+                popup: false,
+                trigger: { player: "phaseDrawBegin2" },
+                filter: function (event, player) {
+                    return player.hp < player.maxHp && player.group != "KMS";
+                },
+                content: function () {
+                    player.changeGroup("KMS");
+                },
+                sub: true,
+            },
+            groupchange: {
+                audio: false,
+                locked: true,
+                forced: true,
+                popup: false,
+                trigger: { player: "changeGroupAfter" },
+                filter: function (event, player) {
+                    return event.originGroup != player.group;
+                },
+                content: function () {
+                    player.restoreSkill("yaoyuandexiwang");
+                },
+                sub: true,
+            },
         },
         ai: {
+            order: 7,
+            result: {
+                player: function (player) {
+                    var x = game.roundNumber || 1;
+                    if (player.countCards("h") < 2 || player.hp <= 1) return 1 + x / 2;
+                    return x >= 3 ? 1 : 0.5;
+                },
+            },
             threaten: 1.7,
-        },
-        "_priority": 0,
-    },
-    //遥远的希望（2级）- 锁定技，多摸X张（X=轮数/2向上取整）
-    yaoyuandexiwang2: {
-        audio: false,
-        locked: true,
-        forced: true,
-        nobracket: true,
-        trigger: { player: "phaseDrawBegin2" },
-        filter: function (event, player) {
-            return !event.numFixed;
-        },
-        content: function () {
-            var x = Math.ceil(game.roundNumber / 2);
-            trigger.num += x;
-        },
-        ai: {
-            threaten: 2.0,
         },
         "_priority": 0,
     },
@@ -2835,7 +2848,7 @@ const unfulfilledambition = {
         unique: true,
         juexingji: true,
         nobracket: true,
-        derivation: ["yaoyuandexiwang2", "heshiyan"],
+        derivation: "heshiyan",
         trigger: { player: "changeHp" },
         forced: true,
         direct: true,
@@ -2856,8 +2869,6 @@ const unfulfilledambition = {
                 if (player.group != 'MN') player.changeGroup('MN');
                 //升级防空（+1技能等级）
                 player.addMark("jinengup", 1);
-                //升级遥远的希望
-                player.changeSkills(["yaoyuandexiwang2"], ["yaoyuandexiwang"]);
                 //获得核试验旗舰
                 player.addSkill("heshiyan");
             }

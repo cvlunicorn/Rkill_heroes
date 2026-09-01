@@ -522,10 +522,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     console.warn("[舰R动画调试][牌将] 低性能模式跳过程序动画", options);
                     return;
                 }
-                /*console.log("[舰R动画调试][牌将] 渲染防空炮火程序动画", {
+                console.log("[舰R动画调试][牌将] 渲染防空炮火程序动画", {
                     player: player.name || player.playerid || "player",
                     duration: options.duration || 2000,
-                });*/
+                });
                 var duration = options.duration || 2000;
                 // player 还包含当前玩家的底部操作区；必须锚定到实际武将牌头像。
                 var anchor = (player.node && player.node.avatar) || player;
@@ -695,13 +695,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     }
                 }
 
-                /*console.log("[舰R动画调试][牌将] 开始解析动画资源", {
+                console.log("[舰R动画调试][牌将] 开始解析动画资源", {
                     fileName: fileName,
                     mediaType: mediaType,
                     player: player && (player.name || player.playerid || "player"),
-                });*/
+                });
                 resolveAnimationImageUrl(fileName, function (url) {
-                    //console.log("[舰R动画调试][牌将] 动画资源地址", fileName, url || "<empty>");
+                    console.log("[舰R动画调试][牌将] 动画资源地址", fileName, url || "<empty>");
                     if (cleaned || !node.parentNode) return;
                     getMediaDuration(url, mediaType, fallbackDuration, function (duration) {
                         if (cleaned || !node.parentNode) return;
@@ -728,13 +728,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             if (!lib.animate.skill) lib.animate.skill = {};
             for (var skillId in skillAnimations) {
                 (function (id, cfg) {
-                    //console.log("[舰R动画调试][牌将] 注册动画接口", id, cfg);
+                    console.log("[舰R动画调试][牌将] 注册动画接口", id, cfg);
                     lib.animate.skill[id] = function (skillName) {
-                        /*console.log("[舰R动画调试][牌将] 执行动画接口", id, {
+                        console.log("[舰R动画调试][牌将] 执行动画接口", id, {
                             skillName: skillName,
                             player: this && (this.name || this.playerid || "player"),
                             config: cfg,
-                        });*/
+                        });
                         if (cfg.procedural === "antiAirFire") {
                              showAntiAirFireEffect(this, cfg);
                          } else {
@@ -989,6 +989,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             "<p style='margin: 0; padding: 0; margin-bottom: 12px;'>开启军争篇卡牌包或舰R美化包战术包时装备栏共有五个,分别是：武器、防具、+1马、-1马、宝物。</p>" +
                             "<p style='margin: 0; padding: 0; margin-bottom: 12px;'>皮肤系统：可以在武将编辑界面左键单击，或对局中左键双击武将立绘呼出武将详情，点击详情立绘下滑选择、点击切换皮肤</p>" +
                             "<p style='margin: 0; padding: 0; margin-bottom: 12px;'>舰种标识：点击武将左上角舰种标识可以在舰种、国籍、苍青舰队之间切换显示</p>" +
+                            "<p style='margin: 0; padding: 0; margin-bottom: 12px;'>舰种技能：每个舰种拥有各自独特的舰种技能，双将模式下按主将舰种拥有舰种技能</p>" +
                             "<p style='margin: 0; padding: 0; margin-bottom: 12px;'>所有全局技能均可在扩展详情中查看说明和配置开关,以下是默认开启的全局技能</p>" +
                             "<p style='margin: 0; padding: 0; margin-bottom: 10px; text-indent: -3em; padding-left: 3em;'><b>远航：</b>你受伤时手牌上限+1,挑战模式不屈时手牌上限+1；<br>每轮限1/2/3次,失去手牌后,若手牌数少于一半,你可以摸一张牌。<br>当你进入濒死状态时,若你的体力上限大于2,你可以减少一点体力上限,摸两张牌,否则摸一张牌；<br>你死亡后,若你为忠臣,你可以令主公摸一张牌。</p>" +
                             "<p style='margin: 0; padding: 0; margin-bottom: 10px; text-indent: -3em; padding-left: 3em;'><b>建造：</b>若你进行了至少一次强化：出牌阶段你可以弃置3张不同花色的牌,提升一点血量上限,解锁强化二级效果。</p>" +
@@ -1556,6 +1557,28 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 'wu': '#32CD32',
                 'qun': '#FFD700',
                 'jin': '#9370DB'
+            };
+
+            // 双将模式中，舰种只由主将提供。只过滤副将独有的舰种技能，
+            // 以避免主副将同舰种时误删主将保留的舰种。
+            var _jianrShipTypeSkills = Object.keys(_jianrShipTypeMap);
+            var _jianrOriginalPlayerInit = lib.element.Player.prototype.init;
+            lib.element.Player.prototype.init = function (character, character2) {
+                var result = _jianrOriginalPlayerInit.apply(this, arguments);
+                if ((get.mode() === 'identity' || get.mode() === 'guozhan') && this.name2) {
+                    var mainInfo = lib.character[this.name1];
+                    var deputyInfo = lib.character[this.name2];
+                    var mainSkills = mainInfo && mainInfo[3] || [];
+                    var deputySkills = deputyInfo && deputyInfo[3] || [];
+                    for (var typeIndex = 0; typeIndex < _jianrShipTypeSkills.length; typeIndex++) {
+                        var shipTypeSkill = _jianrShipTypeSkills[typeIndex];
+                        if (deputySkills.includes(shipTypeSkill) && !mainSkills.includes(shipTypeSkill)) {
+                            this.removeSkill(shipTypeSkill);
+                        }
+                    }
+                    if (this.showShipBadge) this.showShipBadge();
+                }
+                return result;
             };
 
             // 玩家对象扩展方法：显示/刷新徽章
