@@ -2753,7 +2753,7 @@ const unfulfilledambition = {
                 return;
             }
             player.logSkill("weizhidemingyun");
-            event.x = Math.max(1, Math.floor(game.roundNumber / 2));
+            event.x = Math.max(1,game.roundNumber);
             player.chooseControl("选项一", "选项二").set("prompt", "未知的命运：选择一项").set("choiceList", [
                 '本回合以此法获得的牌无法使用或打出且不计入手牌上限',
                 "弃置" + event.x + "张牌"
@@ -2812,7 +2812,7 @@ const unfulfilledambition = {
             result: {
                 player: function (player) {
                     var x = game.roundNumber || 1;
-                    if (player.countCards("h") < 2 || player.hp <= 1) return 1 + x / 2;
+                    if (player.countCards("h") < 2 || player.hp <= 1) return 1 + x;
                     return x >= 3 ? 1 : 0;
                 },
             },
@@ -2837,15 +2837,6 @@ const unfulfilledambition = {
         },
         onremove: function (player) {
             player.removeGaintag("weizhidemingyun");
-        },
-        subSkill: {
-            clear: {
-                charlotte: true,
-                onremove: function (player) {
-                    player.removeGaintag("weizhidemingyun");
-                },
-                sub: true,
-            },
         },
         "_priority": 0,
     },
@@ -2872,6 +2863,7 @@ const unfulfilledambition = {
                 player.logSkill("ruyuandeshuguang");
                 player.storage.shuguang_done = true;
                 player.awakenSkill("ruyuandeshuguang");
+                player.removeSkill("weizhidemingyun");
                 //变更势力为F(MN)
                 if (player.group != 'MN') player.changeGroup('MN');
                 //升级防空（+1技能等级）

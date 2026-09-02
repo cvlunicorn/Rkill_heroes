@@ -410,7 +410,7 @@ const guozhanskills = {
                 return;
             }
             player.logSkill("gz_weizhidemingyun");
-            event.x = Math.max(1, Math.floor(game.roundNumber / 2));
+            event.x = Math.max(1,game.roundNumber);
             player.chooseControl("选项一", "选项二").set("prompt", "未知的命运：选择一项").set("choiceList", [
                 '本回合以此法获得的牌无法使用或打出且不计入手牌上限',
                 "弃置" + event.x + "张牌"
@@ -438,7 +438,7 @@ const guozhanskills = {
             result: {
                 player: function (player) {
                     var x = game.roundNumber || 1;
-                    if (player.countCards("h") < 2 || player.hp <= 1) return 1 + x / 2;
+                    if (player.countCards("h") < 2 || player.hp <= 1) return 1 + x;
                     return x >= 3 ? 1 : 0;
                 },
             },
@@ -464,15 +464,6 @@ const guozhanskills = {
         onremove: function (player) {
             player.removeGaintag("gz_weizhidemingyun");
         },
-        subSkill: {
-            clear: {
-                charlotte: true,
-                onremove: function (player) {
-                    player.removeGaintag("gz_weizhidemingyun");
-                },
-                sub: true,
-            },
-        },
         "_priority": 0,
     },
     //如愿的曙光 - 觉醒技，体力变化累计超过4点后觉醒
@@ -494,10 +485,11 @@ const guozhanskills = {
             player.storage.gz_shuguang_count += Math.abs(trigger.num);
             player.markSkill("gz_ruyuandeshuguang");
             "step 1"
-            if (player.storage.gz_shuguang_count > 6) {
+            if (player.storage.gz_shuguang_count > 4) {
                 player.logSkill("gz_ruyuandeshuguang");
                 player.storage.gz_shuguang_done = true;
                 player.awakenSkill("gz_ruyuandeshuguang");
+                player.removeSkill("weizhidemingyun");
                 //升级防空（+1技能等级）
                 player.addMark("jinengup", 1);
                 //重置遥远的希望

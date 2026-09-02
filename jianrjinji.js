@@ -903,7 +903,7 @@ var jianrjinji = {
         yaoyuandexiwang: "遥远希望",
         yaoyuandexiwang_info: '限定技，出牌阶段，你可以摸X张牌（X为当前轮数）。当你变更势力后，重置此技能。锁定技，"如愿曙光"觉醒前，摸牌阶段开始时，若你的体力不为上限，你变更势力为G。',
         weizhidemingyun: "未知命运",
-        weizhidemingyun_info: 'G势力技，当你发动"遥远的希望"摸牌后，你选择一项：1、本回合以此法获得的牌无法使用或打出且不计入手牌上限；2、弃置X张牌（X为当前轮数/2，向下取整且最低为1）。',
+        weizhidemingyun_info: 'G势力技，当你发动"遥远的希望"摸牌后，你选择一项：1、本回合以此法获得的牌无法使用或打出且不计入手牌上限；2、弃置X张牌（X为当前轮数）。',
         ruyuandeshuguang: "如愿曙光",
         ruyuandeshuguang_info: '觉醒技，当你的体力值变化累计超过4点后，你变更势力为F，你升级"防空"并获得"核试验旗舰"。',
         heshiyan: "核试验",
