@@ -2797,9 +2797,9 @@ const unfulfilledambition = {
                 locked: true,
                 forced: true,
                 popup: false,
-                trigger: { player: "changeGroupAfter" },
+                trigger: { global: "changeGroupAfter" },
                 filter: function (event, player) {
-                    return event.originGroup != player.group;
+                    return event.player == player && event.originGroup != player.group;
                 },
                 content: function () {
                     player.restoreSkill("yaoyuandexiwang");
@@ -2838,6 +2838,15 @@ const unfulfilledambition = {
         onremove: function (player) {
             player.removeGaintag("weizhidemingyun");
         },
+        subSkill: {
+            clear: {
+                charlotte: true,
+                onremove: function (player) {
+                    player.removeGaintag("weizhidemingyun");
+                },
+                sub: true,
+            },
+        },
         "_priority": 0,
     },
     //如愿的曙光 - 觉醒技，体力变化累计超过4点后觉醒
@@ -2863,7 +2872,9 @@ const unfulfilledambition = {
                 player.logSkill("ruyuandeshuguang");
                 player.storage.shuguang_done = true;
                 player.awakenSkill("ruyuandeshuguang");
-                player.removeSkill("weizhidemingyun");
+                //觉醒后解除未知命运对本回合新牌的限制
+                player.removeGaintag("weizhidemingyun");
+                if (player.hasSkill("weizhidemingyun_clear")) player.removeSkill("weizhidemingyun_clear");
                 //变更势力为F(MN)
                 if (player.group != 'MN') player.changeGroup('MN');
                 //升级防空（+1技能等级）
