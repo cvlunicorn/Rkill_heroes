@@ -2741,8 +2741,40 @@ const unfulfilledambition = {
             return player.storage.yaoyuandexiwang !== true;
         },
         content: function () {
+            "step 0"
             player.awakenSkill("yaoyuandexiwang");
             player.draw(game.roundNumber || 1);
+            "step 1"
+            event.hopeCards = get.itemtype(result) == "cards" ? result.filter(function (card) {
+                return player.getCards("h").includes(card);
+            }) : [];
+            if (player.group != "KMS" || !player.hasSkill("weizhidemingyun")) {
+                event.finish();
+                return;
+            }
+            player.logSkill("weizhidemingyun");
+            event.x = Math.max(1, Math.floor(game.roundNumber / 2));
+            player.chooseControl("选项一", "选项二").set("prompt", "未知的命运：选择一项").set("choiceList", [
+                '本回合以此法获得的牌无法使用或打出且不计入手牌上限',
+                "弃置" + event.x + "张牌"
+            ]).set("ai", function () {
+                var player = _status.event.player;
+                var x = _status.event.getParent().x;
+                var lowValueCards = player.getCards("he").filter(function (card) {
+                    return get.value(card) < 5;
+                });
+                if (player.countCards("he") >= x && lowValueCards.length >= x) return "选项二";
+                return "选项一";
+            });
+            "step 2"
+            if (result.index == 0 || player.countCards("he") < event.x) {
+                if (event.hopeCards.length) {
+                    player.addGaintag(event.hopeCards, "weizhidemingyun");
+                    player.addTempSkill("weizhidemingyun_clear", "phaseAfter");
+                }
+            } else {
+                player.chooseToDiscard(event.x, true, "he");
+            }
         },
         group: ["yaoyuandexiwang_changegroup", "yaoyuandexiwang_groupchange"],
         subSkill: {
@@ -2753,7 +2785,7 @@ const unfulfilledambition = {
                 popup: false,
                 trigger: { player: "phaseDrawBegin2" },
                 filter: function (event, player) {
-                    return player.hp < player.maxHp && player.group != "KMS";
+                    return !player.storage.shuguang_done && player.hp < player.maxHp && player.group != "KMS";
                 },
                 content: function () {
                     player.changeGroup("KMS");
@@ -2781,65 +2813,40 @@ const unfulfilledambition = {
                 player: function (player) {
                     var x = game.roundNumber || 1;
                     if (player.countCards("h") < 2 || player.hp <= 1) return 1 + x / 2;
-                    return x >= 3 ? 1 : 0.5;
+                    return x >= 3 ? 1 : 0;
                 },
             },
             threaten: 1.7,
         },
         "_priority": 0,
     },
-    //未知的命运 - G势力技，摸牌阶段结束时选择：锁定额外牌或弃牌
+    //未知的命运 - G势力技，遥远的希望结算后选择：本回合锁定新牌或弃牌
     weizhidemingyun: {
         audio: false,
         nobracket: true,
         mod: {
             cardEnabled2: function (card, player) {
-                if (get.itemtype(card) == 'card' && card.hasGaintag('weizhidemingyun')) return false;
+                if (get.itemtype(card) == "card" && card.hasGaintag("weizhidemingyun")) return false;
+            },
+            cardRespondable: function (card, player) {
+                if (get.itemtype(card) == "card" && card.hasGaintag("weizhidemingyun")) return false;
             },
             ignoredHandcard: function (card, player) {
                 if (card.hasGaintag('weizhidemingyun')) return true;
             },
         },
         onremove: function (player) {
-            player.removeGaintag('rexiahui');
+            player.removeGaintag("weizhidemingyun");
         },
-        trigger: { player: "phaseDrawEnd" },
-        forced: true,
-        filter: function (event, player) {
-            return player.group == 'KMS';
+        subSkill: {
+            clear: {
+                charlotte: true,
+                onremove: function (player) {
+                    player.removeGaintag("weizhidemingyun");
+                },
+                sub: true,
+            },
         },
-        content: function () {
-            "step 0"
-            var x = player.storage.xiwang_extra || Math.max(1, Math.floor(game.roundNumber / 2));
-            event.x = x;
-            var beforeIds = player.storage.xiwang_handBefore || [];
-            var newCards = player.getCards('h').filter(function (c) { return !beforeIds.includes(c.cardid); });
-            event.lockCards = newCards.slice(-x);
-            delete player.storage.xiwang_extra;
-            delete player.storage.xiwang_handBefore;
-            player.chooseControl("选项一", "选项二").set("prompt", "未知的命运：选择一项").set("choiceList", [
-                '本回合依靠"遥远的希望"获得的牌无法使用且不计入手牌上限直到此技能不生效',
-                "弃置" + x + "张牌"
-            ]).set("ai", function () {
-                var player = _status.event.player;
-                var x = _status.event.getParent().x;
-                var lowValueCards = player.getCards('he').filter(function (c) { return get.value(c) < 5; });
-                if (lowValueCards.length >= x) return "选项二";
-                return "选项一";
-            });
-            "step 1"
-            if (result.index == 0) {
-                //选项一：锁定牌（无法使用但不计入手牌上限）
-                if (event.lockCards.length > 0) {
-                    player.addGaintag(event.lockCards, 'weizhidemingyun');
-                    game.log(player, "锁定了", event.lockCards.length, "张牌");
-                }
-            } else {
-                //选项二：弃牌
-                player.chooseToDiscard(event.x, true, "he");
-            }
-        },
-
         "_priority": 0,
     },
     //如愿的曙光 - 觉醒技，体力变化累计超过4点后觉醒
