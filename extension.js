@@ -1809,7 +1809,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         }
                     });
                     var resultList = [];
-                    // 每个势力至少取2张
+                    // 每个势力至少取2张；野心家以 1/4 概率混入主将池（仅 1 个名额）
                     selectedNations.forEach(function (n) {
                         var pool = groups[n] || [];
                         if (pool.length >= 2) {
@@ -1819,8 +1819,19 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             resultList = resultList.concat(pool); // 理论上不会少于2
                         }
                     });
-                    // 剩余牌补足
-                    var remainingPool = filteredList.filter(function (name) { return resultList.indexOf(name) === -1; });
+                    // 野心家有 1/4 概率占用 1 个主将名额（仅在结果未达到 num 时补充）
+                    if (resultList.length < num && Array.isArray(groups._ye) && groups._ye.length > 0 && Math.random() < 0.25) {
+                        var yeShuffled = groups._ye.slice().sort(function () { return Math.random() - 0.5; });
+                        var yeCandidate = yeShuffled.find(function (name) { return resultList.indexOf(name) === -1; });
+                        if (yeCandidate) resultList.push(yeCandidate);
+                    }
+                    // 剩余牌补足：野心家不出现在补充池
+                    var remainingPool = filteredList.filter(function (name) {
+                        if (resultList.indexOf(name) !== -1) return false;
+                        var ch = lib.character[name];
+                        if (ch && ch[1] === 'ye') return false;
+                        return true;
+                    });
                     var shuffledRemaining = remainingPool.slice().sort(function () { return Math.random() - 0.5; });
                     var needed = num - resultList.length;
                     if (needed > 0) {
