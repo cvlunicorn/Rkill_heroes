@@ -3308,6 +3308,224 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             lib.translate['jianrjinjibao_card_config'] = '舰R卡牌';
             lib.config.all.cards.push('jianrjinjibao');
 
+            // ╔══════════════════════════════════════════════════════════════╗
+            // ║ H. 国战暗将时清理全局 trigger（防止暴露身份）                  ║
+            // ╚══════════════════════════════════════════════════════════════╝
+            // 背景：无名杀国战 hideCharacter 仅把技能从 player.skills 移到
+            //       player.hiddenSkills，但 lib.hook[playerid + "_global_" + evt]
+            //       仍保留该技能的 trigger，因此暗将时的全局 trigger（如扫把星）
+            //       仍会被自动遍历触发，暴露暗将身份。
+            //
+            //       亮将时 player.$showCharacter -> addSkill 会走 addSkillTrigger，
+            //       但 addSkillTrigger 检测到 initedSkills 已包含该技能就会跳过重新注册，
+            //       所以这里需要同步把 initedSkills 中的全局 trigger 技能也清掉，
+            //       让亮将时能重新注册。
+            //
+            // 暗将时 getModableSkills/getSkills 已自动跳过 hiddenSkills，不会在 AI
+            // 目标选择/技能筛选中暴露。亮将后重新 addSkill，trigger.player.phaseBegin
+            // 移除逻辑正常工作，无需额外修复。
+            //
+            // 方案：劫持 lib.element.content.hideCharacter（mode/guozhan.js 注入），
+            // 在原 content 执行完毕后，清理刚被暗置玩家的全局 trigger hook。
+            // 由于 mode 是异步加载的，我们延迟到第一次 setContent("hideCharacter") 时再劫持。
+            (function setupJianRGuozhanUnseenTriggerPatch() {
+                if (typeof lib == "undefined" || typeof game == "undefined") return;
+
+                var cleanupHiddenGlobalTriggers = function (player, characterName) {
+                    if (!player || !characterName) return;
+                    var charInfo = lib.character[characterName];
+                    if (!charInfo || !Array.isArray(charInfo[3])) return;
+                    var skills = charInfo[3];
+                    for (var i = 0; i < skills.length; i++) {
+                        var skillName = skills[i];
+                        var info = lib.skill[skillName];
+                        if (!info || !info.trigger || !info.trigger.global) continue;
+                        if (typeof player.removeSkillTrigger === "function") {
+                            // triggeronly=true 表示仅清理 lib.hook 与 initedSkills，
+                            // 不调用 info.init/info.onremove，从而保留暗将再亮将时
+                            // 技能 init 状态正确。
+                            try {
+                                player.removeSkillTrigger(skillName, true);
+                            } catch (e) {
+                                console.warn("[舰R牌将] removeSkillTrigger 失败", skillName, e);
+                            }
+                        }
+                    }
+                };
+
+                // 劫持 lib.element.content.hideCharacter（一次性）。
+                // 必须等 mode/guozhan.js 加载并完成 parsex 之后再替换，
+                // 否则我们的 wrapper 会被 setContent 再次 parsex 出错。
+                // 最稳的时机：监听 setContent，第一次看到 hideCharacter 时再劫持。
+                var tryPatchHideCharacter = function () {
+                    if (!lib.element || !lib.element.content) return false;
+                    var target = lib.element.content.hideCharacter;
+                    if (!target) return false;
+                    if (target._jianrGuozhanUnseenTriggerPatched) return true;
+                    // 必须等原版被 parsex 过（带 _parsed 标记），避免被 setContent 二次 parsex 包装函数。
+                    if (!target._parsed && typeof target === "function") {
+                        // 还没 parsex，延后到下次 setContent 时再尝试
+                        return false;
+                    }
+                    var originalHideCharacter = target;
+                    // 使用普通 function：被 setContent 赋值到 this.content 时不再 parsex（因为 _parsed 已经标记了原版）。
+                    // 注意：我们的 wrapper 是普通 function，不是 GeneratorFunction，所以即使后续别人 setContent("hideCharacter")，
+                    //       因为 target === lib.element.content.hideCharacter && target._parsed 已设，setContent 不会再 parsex。
+                    var wrappedHideCharacter = function (
+                        event, step, source, player, target2, targets,
+                        card, cards, skill, forced, num, trigger,
+                        result, _status, lib2, game2, ui, get2, ai
+                    ) {
+                        var args = arguments;
+                        var ret = originalHideCharacter.apply(this, args);
+                        try {
+                            if (get2 && typeof get2.mode === "function" && get2.mode() === "guozhan") {
+                                var toHide = event && event.toHide;
+                                if (toHide && player) {
+                                    cleanupHiddenGlobalTriggers(player, toHide);
+                                }
+                            }
+                        } catch (e) {
+                            console.warn("[舰R牌将] 清理暗将全局 trigger 失败", e);
+                        }
+                        return ret;
+                    };
+                    // 标记 _parsed，让 setContent 不再二次 parsex 这个 wrapper
+                    wrappedHideCharacter._parsed = true;
+                    wrappedHideCharacter._jianrGuozhanUnseenTriggerPatched = true;
+                    lib.element.content.hideCharacter = wrappedHideCharacter;
+                    return true;
+                };
+
+                // 劫持 setContent 以等待 hideCharacter 第一次被使用
+                if (!game.createEvent._jianrSetContentPatched) {
+                    var origCreateEvent = game.createEvent;
+                    game.createEvent = function () {
+                        var next = origCreateEvent.apply(this, arguments);
+                        var name = arguments[0];
+                        if (name === "hideCharacter") {
+                            tryPatchHideCharacter();
+                        }
+                        return next;
+                    };
+                    game.createEvent._jianrSetContentPatched = true;
+                }
+
+                // 同时立即尝试一次（如果 mode 已加载且 hideCharacter 已存在）
+                tryPatchHideCharacter();
+            })();
+
+            // ╔══════════════════════════════════════════════════════════════╗
+            // ║ I. 国战暗将触发 direct 触发技能后自动亮将                     ║
+            // ╚══════════════════════════════════════════════════════════════╝
+            // 背景：
+            //   1. 国战 mode/guozhan.js:21466 _mingzhi2 通过监听 triggerHidden
+            //      询问玩家「是否明置 X 以发动【Y】？」来实现暗将技能亮将。
+            //   2. 但 direct: true 的 trigger 技能会被跳过——见
+            //      noname/library/element/content.js:2591：
+            //        if (!info.direct && typeof info.cost !== "function")
+            //            event.trigger("triggerHidden");
+            //        else event.skillHidden = true;
+            //   3. content.js:2729 仍会把 event.skillHidden 传给 content event，
+            //      表示「该技能是从暗将状态触发」。
+            //
+            // 后果：direct trigger 技能在国战暗将状态下可被悄悄发动，玩家
+            //      弃牌/打伤害/改状态但身份不暴露。例如「远程打击」可在 game start
+            //      弃四牌打两点伤害而不亮将。
+            //
+            // 修复方案：
+            //   收集所有舰R牌将 direct trigger 技能，劫持 GameEvent.setContent，
+            //   给这些技能的 content event 的 after 队列 push 一个清理事件。
+            //   清理事件检查 event.skillHidden（content event 从 parent 继承），
+            //   若是暗将触发，亮对应主/副将。
+            (function setupJianRDirectTriggerUnseenReveal() {
+                if (typeof lib === "undefined" || typeof game === "undefined") return;
+                if (typeof lib.element === "undefined" || !lib.element.GameEvent) return;
+
+                // 收集所有舰R牌将 direct trigger 技能 key
+                var directTriggerSkills = Object.create(null);
+                var markDirectTriggers = function (skillPack) {
+                    if (!skillPack) return;
+                    for (var k in skillPack) {
+                        var info = skillPack[k];
+                        if (!info || typeof info !== "object") continue;
+                        if (info.direct !== true) continue;
+                        if (!info.trigger || typeof info.trigger !== "object") continue;
+                        // 仅限 trigger + direct；enable/chooseToUse 类技能不进入此补丁。
+                        // 它们通过 addSkill 路径自动亮将，不需要兜底。
+                        directTriggerSkills[k] = true;
+                    }
+                };
+                markDirectTriggers(jianrguozhan && jianrguozhan.skill);
+                markDirectTriggers(jianrjinji && jianrjinji.skill);
+
+                if (!Object.keys(directTriggerSkills).length) return;
+
+                // 构造 cleanup event：判断玩家是否暗将 + 技能归属，亮对应主/副将。
+                var cleanupContent = function () {
+                    // event 即 cleanup event 自己；父 event 是 content event
+                    var parent = event.parent;
+                    if (!parent || !parent.skillHidden) {
+                        event.finish();
+                        return;
+                    }
+                    if (typeof get === "undefined" || typeof get.mode !== "function" || get.mode() !== "guozhan") {
+                        event.finish();
+                        return;
+                    }
+                    var p = parent.player;
+                    if (!p) {
+                        event.finish();
+                        return;
+                    }
+                    var skillName = parent.name;
+                    if (!skillName) {
+                        event.finish();
+                        return;
+                    }
+                    try {
+                        var name1Skills = (lib.character[p.name1] && lib.character[p.name1][3]) || [];
+                        var name2Skills = (lib.character[p.name2] && lib.character[p.name2][3]) || [];
+                        if (name1Skills.includes(skillName) && p.isUnseen(0)) {
+                            p.showCharacter(0);
+                        } else if (name2Skills.includes(skillName) && p.isUnseen(1)) {
+                            p.showCharacter(1);
+                        }
+                    } catch (e) {
+                        console.warn("[舰R牌将] 暗将亮将清理失败", skillName, e);
+                    }
+                    event.finish();
+                };
+
+                // 劫持 GameEvent.prototype.setContent
+                var proto = lib.element.GameEvent.prototype;
+                if (!proto || proto._jianrDirectTriggerPatched) return;
+                var originalSetContent = proto.setContent;
+                var wrappedSetContent = function (item) {
+                    originalSetContent.apply(this, arguments);
+                    // 仅对舰R牌将 direct trigger 技能注入 cleanup event
+                    if (this.name && directTriggerSkills[this.name]) {
+                        try {
+                            var cleanup = game.createEvent(this.name + "_unseenReveal", false);
+                            // 关键：继承 player 和 skillHidden
+                            cleanup.player = this.player;
+                            cleanup.skillHidden = this.skillHidden;
+                            cleanup.parent = this;
+                            cleanup._args = Array.prototype.slice.call(arguments);
+                            cleanup.setContent(cleanupContent);
+                            // 防重入：cleanup 自身进入 setContent 时也会被劫持，
+                            // 但 this.name 以 "_unseenReveal" 结尾不在技能集合里，
+                            // 所以不会无限递归。
+                            if (Array.isArray(this.after)) this.after.push(cleanup);
+                        } catch (e) {
+                            console.warn("[舰R牌将] 注入暗将亮将 cleanup 失败", e);
+                        }
+                    }
+                };
+                wrappedSetContent._jianrDirectTriggerPatched = true;
+                proto.setContent = wrappedSetContent;
+            })();
+
         }, help: {}, config: {//config就是配置文件,类似于minecraft的模组设置文本。无名将其可视化了....。当你进行了至少一次强化后<br>1.出牌阶段<br>你可以弃置3张不同花色的牌,提升一点血量上限。<br>2.当你濒死时,<br>你可以弃置4张不同花色的牌,回复一点体力。<br>（未开启强化,则无需强化即可使用建造。未开启建造,则强化上限仅为1级。）火杀：令目标回合结束后,受到一点火焰伤害,摸两张牌。</br>冰杀：护甲加1伤；减少对手1点防御距离。</br>雷杀：自动判断是否流失对手体力；减少对手1点手牌上限；。</br>此角色回合结束后移除所有的进水、减速、燃烧。
             jianrjinji: { "name": "禁用舰R联机武将/可自定义角色技能", "intro": "在游戏运行时,扩展通过运行一个技能,将联机武将添加至游戏内,<br>启用此技能,才能禁用联机武将。<br>禁用后,单机武将不会被联机部分覆盖。<br>进入修改武将的界面：点击上方的编辑扩展-武将。", "init": false },
             _yuanhang: { "name": "远航-用一张牌摸一张牌,濒死可摸牌", "intro": "开启后,所有玩家受伤时手牌上限+1；挑战模式不屈时手牌上限+1<br>每轮限1/2/3次,当失去手牌后,且手牌数<手牌上限的一半时,你摸一张牌。<br>当你进入濒死状态时,你可以摸一张牌,体力上限>2时需减少一点体力上限,额外摸一张牌；死亡后,若你为忠臣,你可以令主公摸一张牌。", "init": true },
