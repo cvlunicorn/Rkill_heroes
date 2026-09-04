@@ -2367,6 +2367,7 @@ const others = {
         ai: {
             order: 9,
             result: { player: 1 },
+             threaten: 1.3,
         },
         "_priority": 0,
     },
