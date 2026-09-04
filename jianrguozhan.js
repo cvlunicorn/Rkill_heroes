@@ -192,7 +192,7 @@ var jianrguozhan = {
         "gz_haerfude_R": ["female", "USN", 3, ["zhiqiu", "zhiqiu2", "shuiji1", "huidang"], ["des:哈尔福德(DD-480)是弗莱彻级驱逐舰一艘，在战争中期，哈尔福德在内的数艘弗莱彻级驱逐舰进行了舰载机搭载测试，执行航空辅助任务，由于驱逐舰过小，实际上不太适合航空设施。之后哈尔福德也拆除了航空设施，作为普通驱逐舰服役。"]],
 
         gz_guandao_R: ["female", "USN", "3/4", ["zhanliebb", "zhuangjiafh", "fangyusan", "jianduifangyu"], ["des:大型巡洋舰阿拉斯加级2号舰，与姊妹舰阿拉斯加号一同参与了太平洋战场后半段战役，主要作为航母编队护航舰和火力支援舰。因为造价高昂加之大舰巨炮时代的终结，只建造了两艘后停止建造，建成的两艘也很快退役。"]],
-        gz_miluyunshu_R: ["female", "OTHER", 3, ["buji", "junfu", "mitu"], ["doublegroup:OTHER:USN:IJN:KMS:RN:MN:RM:PLAN:ΒΜΦCCCP","des:人类偏爱之物。据不完全统计，她们受损率甚至高于遍布各地的潜艇。无法解释为何人类对她们情有独钟。"]],
+        gz_miluyunshu_R: ["female", "OTHER", 3, ["buji", "junfu", "mitu"], ["doublegroup:OTHER:USN:IJN:KMS:RN:MN:RM:PLAN:ΒΜΦCCCP","forbidai","des:人类偏爱之物。据不完全统计，她们受损率甚至高于遍布各地的潜艇。无法解释为何人类对她们情有独钟。"]],
         gz_huoaier_R: ["female", "USN", 3, ["quzhudd", "dajiaoduguibi", "yanwuyanhu"], ["des:弗莱彻级霍埃尔也同约翰斯顿，罗伯茨一样同属塔菲3编队，在萨马岛的上午遭遇日军主力舰队，霍埃尔的雷击虽然没有命中，但是吸引了其他军舰的注意力，遭到集火，为其他驱逐舰创造了机会。霍埃尔遭到大和155副炮命中而牺牲。"]],
         gz_samuierluobaici_R: ["female", "USN", 3, ["quzhudd", "dajiaoduguibi", "toushiji"], ["des:塞缪尔·罗伯茨本身是护航驱逐舰，这种护航驱逐舰并不作为一线驱逐舰使用，但是在萨马岛，她在内的塔菲3编队遭遇了栗田主力舰队。为了掩护撤退，包括她在内的驱逐舰朝着远超自己的舰队猛攻过去。她超速达到28节以上朝敌方雷击，并命中鸟海一发鱼雷。之后在近距离遭遇了筑摩，塞缪尔的127毫米主炮一直在持续开火，击伤了筑摩的主炮塔（只剩1名炮手情况下35分钟发射了325发炮弹，这也是美军五寸炮连续射击记录，炮手牺牲时还在尝试发射第326发）。塞缪尔·罗伯茨最终力战而沉。"]],
         gz_sp_47gongcheng_R: ["female", "ΒΜΦCCCP", 3, ["quzhudd", "dajiaoduguibi", "zhashidetiechui"], ["des:海军计划的一级大型驱逐舰，与传统驱逐舰不同的是她设计有装甲带与舰载机，由于工业不足与设计指标过高，47工程修改设计后才具备可行性，但战争爆发打断了建造。战后47工程修改了设计，并且延续到41型驱逐舰不惧号上。"]],
