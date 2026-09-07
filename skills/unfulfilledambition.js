@@ -3986,15 +3986,20 @@ const unfulfilledambition = {
                 if (current == player) return;
                 var currentHand = current == swappedTarget ? player.countCards("h") : current.countCards("h");
                 if (currentHand <= handAfterSwap) return;
-                if (!player.canUse({ name: "sha", isCard: true }, current)) return;
-                best = Math.max(best, get.effect(current, { name: "sha", isCard: true }, player, player));
+                if (!player.canUse({ name: "sha" }, current)) return;
+                best = Math.max(best, get.effect(current, { name: "sha" }, player, player));
             });
             return best;
         },
         getPlayerValue: function (player, target) {
-            var myHand = player.countCards("h");
             var targetHand = target.countCards("h");
-            return targetHand - myHand + lib.skill.pojiaoxiji.getFollowupValue(player, target, targetHand);
+            var handCost = player.getCards("h").reduce(function (sum, card) {
+                return sum + Math.max(0, get.value(card, player)) / 4;
+            }, 0);
+            // Unknown hands use an average value; do not inspect other players' cards.
+            // effect includes attitude, while result.player is weighted again.
+            var followup = lib.skill.pojiaoxiji.getFollowupValue(player, target, targetHand);
+            return targetHand - handCost + followup / Math.max(1, Math.abs(get.attitude(player, player)));
         },
         filterTarget: function (card, player, target) {
             return target != player && target.countCards("h") <= player.countCards("h");
@@ -4020,15 +4025,22 @@ const unfulfilledambition = {
             }
         },
         ai: {
-            order: 8,
+            order: function (item, player) {
+                var hand = player.countCards("h");
+                // Spend useful cards first unless this removes every swap target.
+                return game.hasPlayer(function (current) {
+                    return current != player && current.countCards("h") < hand;
+                }) ? 2 : 8;
+            },
             result: {
                 player: function (player, target) {
                     return lib.skill.pojiaoxiji.getPlayerValue(player, target);
                 },
                 target: function (player, target) {
-                    var hs1 = player.countCards("h");
-                    var hs2 = target.countCards("h");
-                    return (hs1 - hs2) * 0.8;
+                    var receivedValue = player.getCards("h").reduce(function (sum, card) {
+                        return sum + Math.max(0, get.value(card, target)) / 4;
+                    }, 0);
+                    return (receivedValue - target.countCards("h")) * 0.8;
                 },
             },
         },
