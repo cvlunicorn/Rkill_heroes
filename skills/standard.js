@@ -2449,9 +2449,7 @@ const standard = {
                 player.discard(result.cards);
                 trigger.num--;
             }
-            if (!player.isUnseen() && !game.hasPlayer(function (current) {
-                return current != player && current.isFriendOf(player);
-            })) {
+            if (!player.isUnseen()) {
                 if (!logged) player.logSkill('shizhibuyu');
                 player.judge(function (card) {
                     if (get.color(card) == 'red') return 1;
