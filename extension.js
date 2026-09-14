@@ -2000,14 +2000,25 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
             // ========== 手动注册舰R国战武将包（兼容所有版本） ==========
             (function () {
-                var packName = 'mode_extension_jianrguozhan'; // 自定义包名，用于国战过滤器
-                // mode_extension_* 类型扩展包的开关不在 lib.config.characters，
-                // 而是扩展配置 extension_<扩展名>_characters_enable。
-                // 配置尚未初始化时与武将包菜单保持一致，默认视为启用。
-                var guozhanPackEnabled = !lib.config || lib.config.extension_舰R牌将_characters_enable !== false;
+                // 菜单将 mode_extension_ 后缀作为真实扩展名校验并保存开关。
+                var packName = 'mode_extension_舰R牌将';
+                var guozhanPackEnabled = function () {
+                    return lib.config.extension_舰R牌将_characters_enable !== false;
+                };
 
-                // 仅在国战且玩家启用该武将包时注册，避免身份等模式绕过武将包开关。
-                if (lib.config.mode !== 'guozhan' || !guozhanPackEnabled) {
+                // 自由选将和随机选将都通过 characterFilter 判断模式可用性。
+                // 在模式判断前注册，拦住其他加载路径带入角色表的国战角色。
+                if (!lib.characterFilter) lib.characterFilter = {};
+                Object.keys(jianrguozhan.character).forEach(function (id) {
+                    var previousFilter = lib.characterFilter[id];
+                    lib.characterFilter[id] = function (mode) {
+                        return mode === 'guozhan' && guozhanPackEnabled() && (!previousFilter || previousFilter.apply(this, arguments));
+                    };
+                });
+
+                // 国战中始终保留包和菜单入口，禁用时由上面的过滤器排除选将。
+                // 否则关闭后重启会失去重新开启该包的入口。
+                if (lib.config.mode !== 'guozhan') {
                     return;
                 }
 
@@ -3321,6 +3332,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             //       所以这里需要同步把 initedSkills 中的全局 trigger 技能也清掉，
             //       让亮将时能重新注册。
             //
+            // 贝亚恩技能「待机」(daiji) 是 mod.targetEnabled 而非 trigger.global，
             // 暗将时 getModableSkills/getSkills 已自动跳过 hiddenSkills，不会在 AI
             // 目标选择/技能筛选中暴露。亮将后重新 addSkill，trigger.player.phaseBegin
             // 移除逻辑正常工作，无需额外修复。
