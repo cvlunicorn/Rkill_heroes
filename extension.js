@@ -59,6 +59,7 @@ import { skinRegistry } from "./skinSystem.js";
 import { initLimitedBanner } from "./limitedBanner.js";
 import { statusEffects } from "./statusEffects.js";
 import { jianrguozhan } from "./jianrguozhan.js";
+import { installJianROnlineSelection } from "./onlineSelection.js";
 
 // —— 扩展名缓存与探测 ——
 // 目录模式下启动时探测每张立绘真实扩展名：先试 .png，404 再试 .jpg。
@@ -201,43 +202,43 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
 
             lib.groupnature.PLAN = 'PLAN';
             //将势力添加到势力库中 并指定势力的中文名称
-            lib.group.push('PLAN');
+            lib.group.add('PLAN');
             lib.translate['PLAN'] = 'C';
 
             lib.groupnature.KMS = 'KMS';
-            lib.group.push('KMS');
+            lib.group.add('KMS');
             lib.translate['KMS'] = 'G';
 
             lib.groupnature.USN = 'USN';
-            lib.group.push('USN');
+            lib.group.add('USN');
             lib.translate['USN'] = 'U';
 
             lib.groupnature.ΒΜΦCCCP = 'ΒΜΦCCCP';
-            lib.group.push('ΒΜΦCCCP');
+            lib.group.add('ΒΜΦCCCP');
             lib.translate['ΒΜΦCCCP'] = 'S';
 
             lib.groupnature.IJN = 'IJN';
-            lib.group.push('IJN');
+            lib.group.add('IJN');
             lib.translate['IJN'] = 'J';
 
             lib.groupnature.MN = 'MN';
-            lib.group.push('MN');
+            lib.group.add('MN');
             lib.translate['MN'] = 'F';
 
             lib.groupnature.RN = 'RN';
-            lib.group.push('RN');
+            lib.group.add('RN');
             lib.translate['RN'] = 'E';
 
             lib.groupnature.RM = 'RM';
-            lib.group.push('RM');
+            lib.group.add('RM');
             lib.translate['RM'] = 'I';
 
             lib.groupnature.ROCN = 'ROCN';
-            lib.group.push('ROCN');
+            lib.group.add('ROCN');
             lib.translate['ROCN'] = 'C';
 
             lib.groupnature.OTHER = 'OTHER';
-            lib.group.push('OTHER');
+            lib.group.add('OTHER');
             lib.translate['OTHER'] = 'OTHER';
 
             var style2 = document.createElement('style');
@@ -1743,6 +1744,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             if (get.mode() === 'guozhan') {
                 var originalGetCharacterChoice = game.getCharacterChoice;
                 game.getCharacterChoice = function (list, num) {
+                    // 联机由原版模式的 onlineSelection 适配分配并消耗共享候选池。
+                    // 本地展示策略会返回新数组，不能在联机里重复给不同座位分配。
+                    if (_status.connectMode) return originalGetCharacterChoice.call(this, list, num);
                     // 1. 统计所有常规势力（非士兵、非野心家）的主势力武将数量
                     var nationCount = {};
                     list.forEach(function (name) {
@@ -1844,6 +1848,15 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             //全局技能写在这上面
         },
         precontent: function () {
+            // connect 初始化不会执行 content，势力元数据必须与武将一同预注册。
+            var jianrGroups = { PLAN: 'C', KMS: 'G', USN: 'U', 'ΒΜΦCCCP': 'S',
+                IJN: 'J', MN: 'F', RN: 'E', RM: 'I', ROCN: 'C', OTHER: 'OTHER' };
+            Object.keys(jianrGroups).forEach(function (group) {
+                if (!lib.group.includes(group)) lib.group.push(group);
+                lib.groupnature[group] = group;
+                lib.translate[group] = jianrGroups[group];
+            });
+
             // onload 修正尚未合并的卡包源对象；arenaReady 在合并完成后兜底。
             // 两者都覆盖联机，而无头模式也会执行 onload 队列。
             var patchScheduled = false;
@@ -2016,9 +2029,9 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     };
                 });
 
-                // 国战中始终保留包和菜单入口，禁用时由上面的过滤器排除选将。
-                // 否则关闭后重启会失去重新开启该包的入口。
-                if (lib.config.mode !== 'guozhan') {
+                // connect 大厅必须预先准备国战资源，房主切模式/客机加入不会重跑 precontent。
+                // 角色的身份隔离仍由上面的过滤器保证；禁用时保留资源和菜单入口。
+                if (lib.config.mode !== 'guozhan' && lib.config.mode !== 'connect') {
                     return;
                 }
 
@@ -2091,6 +2104,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         );
                     }
                 }
+
+                // 原版联机国战只读 mode_guozhan，接入模式加载、房主选将和客机重连。
+                installJianROnlineSelection({ lib, game, get, _status,
+                    characterIds: Object.keys(jianrguozhan.character), packName: packName });
 
                 // 6. 可选：为包添加显示名称（在扩展管理界面可见）
                 lib.translate[packName + '_character_config'] = '舰R国战';
