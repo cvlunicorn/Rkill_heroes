@@ -1530,18 +1530,29 @@ const fallendemon = {
                 return;
             }
             "step 1"
-            if (result.bool) {
+            // 是否为要塞群濒死发动的修筑：仅自己回血、不摸牌
+            var fromYaosaiqun = event.getParent("savoy_R_yaosaiqun", true);
+            // 拼点正常结算时才有 result.player/result.target（拼点取消时二者皆无）
+            if (result && result.bool && result.player && result.target) {
+                // 拼点获胜：封锁对方该颜色的牌；出牌阶段发动的修筑额外摸1张（进攻资源补偿）
                 var color = get.color(result.target, false);
                 target.addTempSkill("savoy_R_xiuzhu_block", { global: "phaseEnd", });
                 target.markAuto("savoy_R_xiuzhu_block", color);
-            } else {
+                if (!fromYaosaiqun) {
+                    player.draw(1);
+                }
+            } else if (result && result.player) {
+                // 拼点失败：封锁自己该颜色的牌
                 var color = get.color(result.player, false);
                 player.addTempSkill("savoy_R_xiuzhu_block", { global: "phaseEnd", });
                 player.markAuto("savoy_R_xiuzhu_block", color);
             }
-            if (get.number(result.player) + get.number(result.target) > 13) {
+            // 拼点正常结算且点数之和大于13：回复体力（要塞群发动的修筑仅自己回复）
+            if (result && result.player && result.target && get.number(result.player) + get.number(result.target) > 13) {
                 player.recover();
-                target.recover();
+                if (!fromYaosaiqun) {
+                    target.recover();
+                }
             }
         },
         ai: {
@@ -1716,9 +1727,27 @@ const fallendemon = {
     savoy_R_yaosaiqun: {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
+        round: 1,
         trigger: { player: ['dying'] },
-        content() {
-            player.useSkill("savoy_R_xiuzhu");
+        content: function () {
+            "step 0";
+            // 若不存在合法拼点目标则直接结束
+            if (!game.hasPlayer(function (current) {
+                return player.canCompare(current);
+            })) {
+                event.finish();
+                return;
+            }
+            player.chooseTarget(true, "是否对一名角色发动【修筑】？", function (card, player, target) {
+                return player.canCompare(target);
+            }).set("ai", function (target) {
+                return -get.attitude(player, target);
+            });
+            "step 1";
+            if (result.bool) {
+                // 明确指定目标发动修筑；addCount=false 不占用出牌阶段限一次的次数
+                player.useSkill("savoy_R_xiuzhu", [result.targets[0]], false);
+            }
         },
     },
     cassone_R_yibing: {

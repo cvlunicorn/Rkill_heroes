@@ -1803,21 +1803,23 @@ const unfulfilledambition = {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
         enable: "phaseUse",
-        usable: 1,
+        round: 1,
         filter: function (event, player) {
-            return player.countCards('h') > 0;
+            return player.countCards('h') >= 2 && game.hasPlayer(function (target) {
+                return target != player && target.countCards('h') >= player.countCards('h');
+            });
         },
         content: function () {
             'step 0';
-            player.chooseCard('h', [1, Infinity], get.prompt('jing_shu')).set('ai', function (card) {
+            player.chooseCard('h', 2, get.prompt('jing_shu')).set('ai', function (card) {
                 return 6 - get.value(card);
             });
             'step 1';
             if (result.bool) {
                 event.cards = result.cards;
                 player.showCards(event.cards, get.translation(player) + '发动了【惊鼠】');
-                player.chooseTarget('令一名其他角色选择', true, function (card, player, target) {
-                    return target != player;
+                player.chooseTarget('令一名手牌数不少于你的其他角色选择', true, function (card, player, target) {
+                    return target != player && target.countCards('h') >= player.countCards('h');
                 }).set('ai', function (target) {
                     var player = get.player();
                     var att = get.attitude(player, target);
@@ -1868,9 +1870,10 @@ const unfulfilledambition = {
             if (result.index == 0) {
                 event.target.turnOver();
                 event.target.gain(event.cards, player, 'giveAuto');
+                event.finish();
             } else {
                 player.discard(event.cards);
-                event.target.chooseCard('h', event.num, '交给' + get.translation(player) + event.num + '张牌', true).set('ai', function (card) {
+                event.target.chooseCard('h', Math.min(event.num, event.target.countCards('h')), '交给' + get.translation(player) + event.num + '张牌（不足则全部）', true).set('ai', function (card) {
                     return -get.value(card);
                 });
                 event.goto(4);
@@ -1896,17 +1899,18 @@ const unfulfilledambition = {
         filter: function (event, player) {
             return true;
         },
-        check: function (event, player) {
-            var cards = player.getCards('h');
-            return cards.length > 0 && cards.every(function (card) { return get.type(card) != 'trick'; });
+        check: function () {
+            return true;
         },
         content: function () {
+            'step 0';
             var cards = player.getCards('h');
-            player.showCards(cards, get.translation(player) + '展示了所有手牌');
+            if (cards.length) player.showCards(cards, get.translation(player) + '展示了所有手牌');
             if (cards.some(function (card) { return get.type(card) == 'trick'; })) {
+                player.draw();
+                event.finish();
                 return;
             }
-            'step 0';
             player.chooseControl('摸两张牌', '伤害+1').set('choiceList', [
                 '摸两张牌',
                 '本回合你造成的伤害+1'
@@ -3377,10 +3381,22 @@ const unfulfilledambition = {
         check: function (card) {
             return 9 - get.value(card);
         },
+        discard: false,
+        lose: false,
+        delay: false,
         content: function () {
-            target.gain(cards, player, "giveAuto");
-            if (target.isDamaged()) target.useCard({ name: "tao" }, target, false);
-            if (get.color(cards[0]) == "red" && (get.number(cards[0]) == 9 || get.number(cards[0]) == 11)) {
+            "step 0"
+            if (!target.isDamaged()) event._result = { control: '输送' };
+            else player.chooseControl('输送', '修复').set('prompt', '舰队防御：交牌并摸一张，或弃牌令目标回复1点体力').set('target', target).set('ai', function () {
+                var target = _status.event.target;
+                return target.hp <= 2 || target.getDamagedHp() > 1 ? '修复' : '输送';
+            });
+            "step 1"
+            if (result.control == '修复') {
+                player.discard(cards);
+                target.recover();
+            } else {
+                player.give(cards, target);
                 player.draw();
             }
         },
@@ -3389,7 +3405,7 @@ const unfulfilledambition = {
             result: {
                 target: function (player, target) {
                     if (target.hp < target.maxHp) return 2;
-                    return 0;
+                    return 1;
                 },
             },
         },
@@ -3780,8 +3796,9 @@ const unfulfilledambition = {
             add: {
                 audio: false,
                 enable: "phaseUse",
+                usable: 1,
                 filterCard: function (card) {
-                    return get.subtype(card) == "equip1";
+                    return get.type(card) == "equip";
                 },
                 position: "he",
                 filterTarget: function (card, player, target) {
@@ -3797,6 +3814,7 @@ const unfulfilledambition = {
                     event.targets[0].addMark("sanbayi_jinggao_effect2", 1);
                     event.targets[0].addSkill("sanbayi_jinggao_effect2")
                     event.targets[0].addSkill("sanbayi_jinggao_effect1");
+                    player.draw();
                 },
                 ai: {
                     order: 8,
@@ -3820,7 +3838,11 @@ const unfulfilledambition = {
                 onremove: true,
                 trigger: { player: "dyingBegin" },
                 forced: true,
+                filter(event, player) {
+                    return !player.storage.sanbayi_jinggao_saved;
+                },
                 content: function () {
+                    player.storage.sanbayi_jinggao_saved = true;
                     player.removeMark("sanbayi_jinggao_effect2", player.countMark("sanbayi_jinggao_effect2"));
                     player.removeSkill("sanbayi_jinggao_effect1");
                     player.removeSkill("sanbayi_jinggao_effect2");
@@ -3829,7 +3851,9 @@ const unfulfilledambition = {
                 mark: true,
                 marktext: "警",
                 intro: {
-                    content: "使用点数为3、8、1的牌时不可被响应；进入濒死状态时失去此标记并将体力恢复至一点",
+                    content(storage, player) {
+                        return '使用点数为3、8、1的牌时不可被响应；' + (player.storage.sanbayi_jinggao_saved ? '本局保命次数已用尽，再次获得标记仅保留进攻效果' : '首次因本标记进入濒死时失去标记并将体力回复至1（每名角色整局限一次）');
+                    },
                 },
             },
         },
@@ -4402,7 +4426,7 @@ const unfulfilledambition = {
             "step 1"
             if (!result.bool) {
                 player.discardPlayerCard(target, "he", true);
-                player.damage(target);
+                target.damage(1, player);
             }
         },
         group: "gaosuqingdan_damage",
@@ -4419,9 +4443,10 @@ const unfulfilledambition = {
                 trigger: { player: "damageEnd" },
                 direct: true,
                 filter: function (event, player) {
-                    if (_status.currentPhase != player) return false;
-                    if (event.source && event.source.countCards("he") > 0) return true;
-                    return false;
+                    var phase = event.getParent('phaseUse');
+                    return phase && phase.player == player && game.hasPlayer(function (target) {
+                        return player.canUse({ name: 'juedou' }, target);
+                    });
                 },
                 content: function () {
                     "step 0"

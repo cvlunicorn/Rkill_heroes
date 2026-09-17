@@ -3,151 +3,109 @@ const cangqinghuanying = {
     shuqinzhiyin: {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
+        enable: "phaseUse",
         usable: 1,
-        trigger: {
-            global: ["useSkillAfter", "logSkill"],
-        },
-        filter: function (event, player) {
-            return event.type == "player" && event.player != player && player.countCards("h") >= 1;
-        },
-        check(event, player) {
-            var target = event.player;
-            var skills = target.getOriginalSkills();
+        position: "he",
+        filterCard: true,
+        //可重置候选：已使用的普通限次技能、已发动的觉醒/限定技；排除自身、使命技、隐藏技；
+        //同一目标的同一技能整局至多被重置一次（标记存在目标上，多个独角兽也不能互刷）。
+        getResettable(target) {
+            var skills = target.getStockSkills(true, true);
+            game.expandSkills(skills);
             var list = [];
-            for (var i = 0; i < skills.length; i++) {
-                var skillKey = skills[i];
-                if (!skillKey || typeof skillKey !== "string") {
-                    continue;
-                }
-                var info = get.info(skills[i]);
-                if (!info || typeof info !== "object") {
+            var reset = target.storage.shuqinzhiyin_reset || {};
+            for (var skill of skills) {
+                if (!skill || typeof skill !== "string" || skill == "shuqinzhiyin") continue;
+                var info = get.info(skill);
+                if (!info || typeof info !== "object" || info.dutySkill || info.charlotte) continue;
+                if (reset[skill]) continue;
+                if (target.awakenedSkills.includes(skill) || (info.limited && target.storage[skill] === true)) {
+                    list.add(skill);
                     continue;
                 }
                 if (typeof info.usable == "number") {
-                    if (target.hasSkill("counttrigger") && target.storage.counttrigger[skills[i]] && target.storage.counttrigger[skills[i]] >= 1) {
-                        list.push(skills[i]);
-                    }
-                    if (typeof get.skillCount(skills[i]) == "number" && get.skillCount(skills[i]) >= 1) {
-                        list.push(skills[i]);
-                    }
-                }
-                if (info.round && target.storage[skills[i] + "_roundcount"]) {
-                    list.push(skills[i]);
-                }
-                if (target.storage[`temp_ban_${skills[i]}`]) {
-                    list.push(skills[i]);
-                }
-                if (target.awakenedSkills.includes(skills[i])) {
-                    list.push(skills[i]);
+                    var stat = target.getStat("skill");
+                    if (stat && stat[skill] >= 1) list.add(skill);
+                    else if (target.hasSkill("counttrigger") && target.storage.counttrigger && target.storage.counttrigger[skill] >= 1) list.add(skill);
                 }
             }
-            //game.log(list);
-            if (target.isDamaged() || list.length >= 1) {
-                return get.attitude(player, target);
-            }
-            return 0;
+            return list;
+        },
+        filterTarget(card, player, target) {
+            return target != player && (target.isDamaged() || lib.skill.shuqinzhiyin.getResettable(target).length > 0);
+        },
+        check(card) {
+            return 8 - get.value(card);
         },
         content() {
-            "step 0";
-            player
-                .chooseToDiscard(1, "hes", get.prompt("shuqinzhiyin"))
-                .set("target", trigger.player)
-                .set("ai", function (card) {
-                    var target = trigger.player;
-                    if (get.attitude(player, target) <= 0) { return 0; }
-                    if (target.isDamaged() && target.hp < 3) return 9 - get.value(card);
-                    var skills = target.getOriginalSkills();
-                    for (var i = 0; i < skills.length; i++) {
-                        var skillKey = skills[i];
-                        if (!skillKey || typeof skillKey !== "string") {
-                            continue;
-                        }
-                        var info = get.info(skills[i]);
-                        if (!info || typeof info !== "object") {
-                            continue;
-                        }
-                        if (typeof info.usable == "number") {
-                            if (target.hasSkill("counttrigger") && target.storage.counttrigger[skills[i]] && target.storage.counttrigger[skills[i]] >= 1 && !target.isDamaged()) {
-                                return 5 - get.value(card);
-                            }
-                            if (typeof get.skillCount(skills[i]) == "number" && get.skillCount(skills[i]) >= 1 && !target.isDamaged()) {
-                                return 5 - get.value(card);
-                            }
-                        }
-                        if (info.round && target.storage[skills[i] + "_roundcount"]) {
-                            return 7.5 - get.value(card);
-                        }
-                        if (target.storage[`temp_ban_${skills[i]}`]) {
-                            return 7 - get.value(card);
-                        }
-                        if (target.awakenedSkills.includes(skills[i])) {
-                            return 9 - get.value(card);
-                        }
-                    }
-                    return 7 - get.value(card);
+            "step 0"
+            event.list = lib.skill.shuqinzhiyin.getResettable(target);
+            if (event.list.length && target.isDamaged()) {
+                player.chooseControl('重置技能', '回复体力').set('prompt', '竖琴之音：重置' + get.translation(target) + '的一个技能，或令其回复1点体力；然后你摸一张牌').set('ai', function () {
+                    var target = _status.event.getParent().target;
+                    return target.hp <= 2 ? '回复体力' : '重置技能';
                 });
-            "step 1";
-            if (result.bool) {
-                var skills = trigger.player.getStockSkills(true, true);
-                game.expandSkills(skills);
-                //game.log(skills);
-                var resetSkills = [];
-                var suffixs = ["used", "round", "block", "blocker"];
-                for (var skill of skills) {
-                    //game.log(skill);
-                    var skillKey = skill;
-                    if (!skillKey || typeof skillKey !== "string") {
-                        continue;
-                    }
-                    var info = get.info(skill);
-                    if (!info || typeof info !== "object") {
-                        continue;
-                    }
-                    if (typeof info.usable == "number") {
-                        if (trigger.player.hasSkill("counttrigger") && trigger.player.storage.counttrigger[skill] && trigger.player.storage.counttrigger[skill] >= 1) {
-                            delete trigger.player.storage.counttrigger[skill];
-                            resetSkills.add(skill);
-                        }
-                        if (typeof get.skillCount(skill) == "number" && get.skillCount(skill) >= 1) {
-                            delete trigger.player.getStat("skill")[skill];
-                            resetSkills.add(skill);
-                        }
-                    }
-                    if (info.round && trigger.player.storage[skill + "_roundcount"]) {
-                        delete trigger.player.storage[skill + "_roundcount"];
-                        resetSkills.add(skill);
-                    }
-                    if (trigger.player.storage[`temp_ban_${skill}`]) {
-                        delete trigger.player.storage[`temp_ban_${skill}`];
-                    }
-                    if (trigger.player.awakenedSkills.includes(skill)) {
-                        trigger.player.restoreSkill(skill);
-                        resetSkills.add(skill);
-                    }
-                    for (var suffix of suffixs) {
-                        if (trigger.player.hasSkill(skill + "_" + suffix)) {
-                            trigger.player.removeSkill(skill + "_" + suffix);
-                            resetSkills.add(skill);
-                        }
-                    }
-                }
-                if (resetSkills.length) {
-                    var str = "";
-                    for (var i of resetSkills) {
-                        str += "【" + get.translation(i) + "】、";
-                    }
-                    game.log(trigger.player, "重置了技能", "#g" + str.slice(0, -1));
-                }
-                if (trigger.player.isDamaged()) {
-                    trigger.player.recover(1);
-                }
+            } else if (event.list.length) {
+                event._result = { control: '重置技能' };
             } else {
-                delete player.storage["shuqinzhiyin_roundcount"];
+                event._result = { control: '回复体力' };
             }
+            "step 1"
+            if (result.control == '回复体力') {
+                target.recover();
+                player.draw();
+                event.finish();
+                return;
+            }
+            if (event.list.length == 1) {
+                event._result = { control: event.list[0] };
+            } else {
+                var map = {};
+                var choices = [];
+                for (var s of event.list) {
+                    var name = get.translation(s);
+                    if (map[name]) name = name + '(' + s + ')';
+                    map[name] = s;
+                    choices.push(name);
+                }
+                event.skillMap = map;
+                player.chooseControl(choices).set('prompt', '竖琴之音：选择重置' + get.translation(target) + '的一个技能').set('choiceList', choices.map(function (s) {
+                    return '重置【' + s + '】';
+                }));
+            }
+            "step 2"
+            var skill = event.skillMap ? event.skillMap[result.control] : result.control;
+            if (!skill || !event.list.includes(skill)) {
+                event.finish();
+                return;
+            }
+            if (target.awakenedSkills.includes(skill)) {
+                target.restoreSkill(skill);
+            } else if (target.storage[skill] === true) {
+                target.storage[skill] = false;
+            }
+            var stat = target.getStat("skill");
+            if (stat && stat[skill]) delete stat[skill];
+            if (target.hasSkill("counttrigger") && target.storage.counttrigger && target.storage.counttrigger[skill]) {
+                delete target.storage.counttrigger[skill];
+            }
+            for (var suffix of ["used", "round", "block", "blocker"]) {
+                if (target.hasSkill(skill + "_" + suffix)) target.removeSkill(skill + "_" + suffix);
+            }
+            if (!target.storage.shuqinzhiyin_reset) target.storage.shuqinzhiyin_reset = {};
+            target.storage.shuqinzhiyin_reset[skill] = true;
+            game.log(target, '的【' + get.translation(skill) + '】被重置了');
+            player.draw();
         },
-        "_priority": 0,
-
-
+        ai: {
+            order: 8,
+            result: {
+                target(player, target) {
+                    if (target.isDamaged() && target.hp <= 2) return 3;
+                    return lib.skill.shuqinzhiyin.getResettable(target).length ? 2 : 0.5;
+                },
+            },
+        },
     },
     yixinyiyi: {
         nobracket: true,

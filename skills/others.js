@@ -1936,6 +1936,7 @@ const others = {
                     player: ["loseAfter"],
                     global: ["equipAfter", "addJudgeAfter", "gainAfter", "loseAsyncAfter", "addToExpansionAfter"],
                 },
+                round: 1,
                 filter: function (event, player) {
                     //满血不触发（回复无意义）
                     if (player.isHealthy()) return false;
@@ -1987,8 +1988,8 @@ const others = {
         content: function () {
             "step 0"
             player.chooseTarget(get.prompt2('butaihegedehuwei'), true, function (card, player, target) {
-            return target != player;
-        }).set("ai", function (target) {
+                return target != player;
+            }).set("ai", function (target) {
                 return lib.skill.butaihegedehuwei.getTargetValue(_status.event.player, target);
             });
             "step 1"
@@ -2367,7 +2368,6 @@ const others = {
         ai: {
             order: 9,
             result: { player: 1 },
-             threaten: 1.3,
         },
         "_priority": 0,
     },
@@ -2480,8 +2480,8 @@ const others = {
             return target != player && target.hp == player.hp;
         },
         check(event, player) {
-            var num = game.countPlayer(function (current) { return player!=current&&get.attitude(player, current) < 0 && (current.isLinked()||current.hp==player.hp) });
-            return num >= game.countPlayer(function (current) { return get.attitude(player, current) < 0 })/2+1;
+            var num = game.countPlayer(function (current) { return player != current && get.attitude(player, current) < 0 && (current.isLinked() || current.hp == player.hp) });
+            return num >= game.countPlayer(function (current) { return get.attitude(player, current) < 0 }) / 2 + 1;
         },
 
         selectTarget: [0, 4],
@@ -3272,16 +3272,16 @@ const others = {
     //========== 祥凤&瑞凤 ==========
     //直卫1级 - 锁定技，出牌阶段内使用的第二张牌指定目标后，弃置所有目标角色各一张牌
     zhiwei: {
-        mod:{
-					aiOrder:function(player,card,num){
-						if(player!=_status.currentPhase||player.getHistory('useCard').length>1||!game.hasPlayer(function(current){
-							return current!=player&&(get.realAttitude||get.attitude)(current,player)<0&&current.hasSkill('ciwei')&&current.countCards('he')>0;
-						})) return;
-						if(['basic','trick'].includes(get.type(card))) return num+10;
-						
-						return num;
-					},
-				},
+        mod: {
+            aiOrder: function (player, card, num) {
+                if (player != _status.currentPhase || player.getHistory('useCard').length > 1 || !game.hasPlayer(function (current) {
+                    return current != player && (get.realAttitude || get.attitude)(current, player) < 0 && current.hasSkill('ciwei') && current.countCards('he') > 0;
+                })) return;
+                if (['basic', 'trick'].includes(get.type(card))) return num + 10;
+
+                return num;
+            },
+        },
         audio: false,
         locked: true,
         forced: true,
@@ -3300,7 +3300,7 @@ const others = {
             player.addTempSkill("zhiwei_active", "phaseEnd");
             player.discardPlayerCard(trigger.target, "he", true);
         },
-        ai: { 
+        ai: {
             threaten: 1.5,
 
         },

@@ -670,9 +670,15 @@ const tebiechuanwu = {
         trigger: { global: 'phaseBefore', player: "enterGame" },
         forced: true,
         nobracket: true,
-
+        // 描述为“游戏开始时”结算：phaseBefore 是每名角色每回合开始时的事件，
+        // 无 filter 会令本技能每回合反复发动并反复改选目标。用标记限定每局一次。
+        filter: function (event, player) {
+            if (player.storage.xianquzhe_once) return false;
+            return true;
+        },
         content: function () {
             "step 0"
+            player.storage.xianquzhe_once = true;
             player.addSkill("xianquzhe_range");
             player.chooseTarget("先驱者：令一名角色攻击范围-2").set("ai", function (target) {
                 var player = _status.event.player;
@@ -680,9 +686,12 @@ const tebiechuanwu = {
             });
             "step 1"
             if (result.bool && result.targets && result.targets[0]) {
+                event.target1 = result.targets[0];
                 result.targets[0].addSkill("xianquzhe_range_minus");
             }
-            player.chooseTarget("先驱者：令一名角色攻击范围+1").set("ai", function (target) {
+            player.chooseTarget("先驱者：令另一名角色攻击范围+1", function (card, player, target) {
+                return target != _status.event.getParent().target1;
+            }).set("ai", function (target) {
                 var player = _status.event.player;
                 return get.attitude(player, target);
             });
@@ -752,9 +761,14 @@ const tebiechuanwu = {
                         if (get.suit(card) == "diamond") return 3;
                     });
                     "step 1"
+                    // countCards 返回数字（方块在手牌中的张数），不能用 .length。
+                    // 时机：目标已弃任意张手牌后，若其手牌中仍有方块，此牌伤害基数+1。
                     var diamonds = trigger.target.countCards("h", { suit: "diamond" });
                     var evt = trigger.getParent();
-                    if (evt.baseDamage) evt.baseDamage += diamonds.length ? 1 : 0;
+                    if (diamonds > 0) {
+                        if (typeof evt.baseDamage != "number") evt.baseDamage = 1;
+                        evt.baseDamage++;
+                    }
                 },
                 ai: {
                     threaten: 1.2
