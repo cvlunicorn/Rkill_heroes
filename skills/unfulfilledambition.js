@@ -2757,7 +2757,7 @@ const unfulfilledambition = {
                 return;
             }
             player.logSkill("weizhidemingyun");
-            event.x = Math.max(1,game.roundNumber);
+            event.x = Math.max(1, game.roundNumber);
             player.chooseControl("选项一", "选项二").set("prompt", "未知的命运：选择一项").set("choiceList", [
                 '本回合以此法获得的牌无法使用或打出且不计入手牌上限',
                 "弃置" + event.x + "张牌"
@@ -4399,6 +4399,7 @@ const unfulfilledambition = {
     },
     //高速轻弹
     gaosuqingdan: {
+        usable: 1,
         audio: false,
         enable: "phaseUse",
         getTargetValue: function (player, target) {
