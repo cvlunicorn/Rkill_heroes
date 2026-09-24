@@ -767,7 +767,7 @@ const others = {
     },
     jianduixunlian: {
         nobracket: true,
-        audio: "ext:舰R牌将/audio/skill:true",
+        audio: false,
         enable: "phaseUse",
         usable: 1,
         filter: function (event, player) {
