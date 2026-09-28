@@ -1971,7 +1971,6 @@ const unfulfilledambition = {
         // 把手牌寄存在友军武将牌上，作为其本回合外的可调用资源；
         // 只要对方真的把这张”护航”牌用出去，你就摸一张牌回补。
         enable: "phaseUse",
-        usable: 1,
         position: "h",
         filterCard: true,
         filterTarget: function (card, player, target) {
