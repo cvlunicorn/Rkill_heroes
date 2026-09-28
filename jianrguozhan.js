@@ -27,12 +27,13 @@ var jianrguozhan = {
             others: ["gz_boerzhanuo_R", "gz_dafeng_R", "gz_dajingbeishang_R", "gz_jialifuniya_R", "gz_ninghai_R", "gz_nvzaoshen_R", "gz_jiate_R", "gz_rangbaer_R", "gz_wugelini_R", "gz_yaergushuishou_R", "gz_yi25_R", "gz_yiahua_R", "gz_samuierluobaici_R", "gz_huoaier_R", "gz_luobaici_abeikelongbi_R", "gz_kaersilue_R", "gz_xingdengbao_R", "gz_skilltest"],
             shuileizhandui: ["gz_jiagu_R", "gz_buzhihuo_R", "gz_chuannei_R", "gz_chuxue_R", "gz_dian_R", "gz_lei_R", "gz_fubo_R", "gz_shenxue_R", "gz_wushiling_R", "gz_xiangqu_R", "gz_baixue_R", "gz_xiao_R", "gz_yangyan_R"],
 
-            shixinrumoR_tan: ["gz_bismarck_R", "gz_tirpitz_R", "gz_akagiksaga_R"],
-            shixinrumoR_chen: ["gz_401_R", "gz_chaoyamato_R", "gz_yamato_R"],
-            shixinrumoR_chi: ["gz_southdakota_R", "gz_pachina_R", "gz_loki_R"],
-            shixinrumoR_man: ["gz_sukhbaatar_R", "gz_odin_R", "gz_vestal_R"],
-            shixinrumoR_yi: ["gz_savoy_R", "gz_cassone_R", "gz_Xfliegerkorps_R"],
+            shixinrumoR_tan: [],
+            shixinrumoR_chen: [],
+            shixinrumoR_chi: [],
+            shixinrumoR_man: [],
+            shixinrumoR_yi: [],
             tebiechuanwu: ["gz_saiwasituoboer_R", "gz_yingtan_R", "gz_jinan_R", "gz_sanwuyi_R", "gz_buju_R", "gz_xufulun_R", "gz_geluozini_R", "gz_anshan_R"],
+            yexinjie: ["gz_bismarck_R", "gz_tirpitz_R", "gz_akagikaga_R", "gz_southdakota_R", "gz_pachina_R", "gz_loki_R", "gz_sukhbaatar_R", "gz_odin_R", "gz_vestal_R", "gz_savoy_R", "gz_cassone_R", "gz_Xfliegerkorps_R", "gz_401_R", "gz_chaoyamato_R"],
 
         },
     },

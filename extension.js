@@ -61,6 +61,11 @@ import { statusEffects } from "./statusEffects.js";
 import { jianrguozhan } from "./jianrguozhan.js";
 import { installJianROnlineSelection } from "./onlineSelection.js";
 
+// 国战野心家开关在 content() 与 precontent() 之间共享，避免运行时引用未定义。
+var guozhanYexinjiePackEnabled = function () {
+    return lib.config.extension_舰R牌将_yexinjie_enable !== false;
+};
+
 // —— 扩展名缓存与探测 ——
 // 目录模式下启动时探测每张立绘真实扩展名：先试 .png，404 再试 .jpg。
 // 结果存入 skinAssetCache，后续调用全部同步查表。
@@ -1765,11 +1770,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                     var chooseCount = Math.min(viableNations.length, Math.floor(Math.random() * 3) + 2);
                     var shuffled = viableNations.slice().sort(function () { return Math.random() - 0.5; });
                     var selectedNations = shuffled.slice(0, chooseCount);
-                    // 构建筛选池：属于选中势力的武将 + 野心家
+                    // 野心家是否可用
+                    var yeAllowed = guozhanYexinjiePackEnabled();
+                    // 构建筛选池：属于选中势力的武将 + 野心家（若启用）
                     var filteredList = list.filter(function (name) {
                         var char = lib.character[name];
                         if (!char) return false;
-                        if (char[1] === 'ye') return true;
+                        if (char[1] === 'ye') return yeAllowed;
                         if (selectedNations.indexOf(char[1]) !== -1) return true;
                         // 双势力兼容（若有）
                         var double = char.doublegroup;
@@ -1786,7 +1793,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         filteredList = list.filter(function (name) {
                             var char = lib.character[name];
                             if (!char) return false;
-                            if (char[1] === 'ye') return true;
+                            if (char[1] === 'ye') return yeAllowed;
                             if (selectedNations.indexOf(char[1]) !== -1) return true;
                             var double = char.doublegroup;
                             if (Array.isArray(double) && double.some(function (g) { return selectedNations.indexOf(g) !== -1; })) {
@@ -1823,8 +1830,8 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                             resultList = resultList.concat(pool); // 理论上不会少于2
                         }
                     });
-                    // 野心家有 1/4 概率占用 1 个主将名额（仅在结果未达到 num 时补充）
-                    if (resultList.length < num && Array.isArray(groups._ye) && groups._ye.length > 0 && Math.random() < 0.25) {
+                    // 野心家有 1/4 概率占用 1 个主将名额（仅在野心家开关启用且结果未达到 num 时补充）
+                    if (resultList.length < num && yeAllowed && Array.isArray(groups._ye) && groups._ye.length > 0 && Math.random() < 0.25) {
                         var yeShuffled = groups._ye.slice().sort(function () { return Math.random() - 0.5; });
                         var yeCandidate = yeShuffled.find(function (name) { return resultList.indexOf(name) === -1; });
                         if (yeCandidate) resultList.push(yeCandidate);
@@ -2024,8 +2031,13 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 if (!lib.characterFilter) lib.characterFilter = {};
                 Object.keys(jianrguozhan.character).forEach(function (id) {
                     var previousFilter = lib.characterFilter[id];
+                    var charInfo = jianrguozhan.character[id];
+                    var isYe = charInfo && charInfo[1] === 'ye';
                     lib.characterFilter[id] = function (mode) {
-                        return mode === 'guozhan' && guozhanPackEnabled() && (!previousFilter || previousFilter.apply(this, arguments));
+                        if (mode !== 'guozhan') return false;
+                        if (!guozhanPackEnabled()) return false;
+                        if (isYe && !guozhanYexinjiePackEnabled()) return false;
+                        return !previousFilter || previousFilter.apply(this, arguments);
                     };
                 });
 
@@ -2055,9 +2067,14 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                 // 存储需要异步探测的武将 ID
                 var needAsyncProbe = [];
 
-                // 2. 复制武将到扩展专用包，并仅在当前国战写入 lib.character
+                // 2. 复制武将到扩展专用包和原版国战包（联机选将只读 mode_guozhan）
+                // 先确保原版国战包存在
+                if (!lib.characterPack.mode_guozhan) lib.characterPack.mode_guozhan = {};
+
                 for (var id in jianrguozhan.character) {
                     var charData = jianrguozhan.character[id];
+                    // 野心家单独开关：禁用时不注册到包和 character
+                    if (charData[1] === 'ye' && !guozhanYexinjiePackEnabled()) continue;
                     // 确保 [4] 数组存在
                     if (!Array.isArray(charData[4])) charData[4] = [];
 
@@ -2075,9 +2092,10 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
                         needAsyncProbe.push(id);
                     }
 
-                    // 写入 lib.character 和 lib.characterPack[packName]
+                    // 写入扩展专用包、原版国战包和 lib.character
                     lib.characterPack[packName][id] = charData;
-                    lib.character[id] = charData; // 双重保险
+                    lib.characterPack.mode_guozhan[id] = charData; // 联机选将必须从这里读取
+                    lib.character[id] = charData;
                 }
 
                 // 3. 将包名加入国战过滤器（onlyguozhan 开启时生效）
@@ -3569,6 +3587,7 @@ game.import("extension", function (lib, game, ui, get, ai, _status) {
             tiaozhanbiaojiang: { "name": "挑战模式全员国战不屈", "intro": "开启后,所有玩家获得技能【挑战技能】：<br>开局流失体力到剩余1血,根据流失的体力数多摸等量的牌；<br>全员获得国战不屈,唤醒界标武将的力量。<br>暂缺一个扶起负数血队友的技能", "init": true },
             enable_effects: { "name": "启用战斗特效动画", "intro": "触发舰R技能时显示对应战斗动画（GIF）。<br>GIF 素材请放在 extension/舰R牌将/image/animation/ 目录下。", "init": true },
             effect_opacity: { "name": "动画不透明度", "intro": "调节战斗特效动画的不透明度。", "init": "opacity100", "item": { "opacity100": "100%", "opacity80": "80%", "opacity60": "60%", "opacity40": "40%" } },
+            extension_舰R牌将_yexinjie_enable: { "name": "舰R国战野心家", "intro": "开启后，舰R国战模式中允许野心家（深海/野猫等）参与选将。<br>关闭后，野心家不出现在国战选将池中。<br>独立于「舰R国战」开关，可单独控制。", "init": true },
         }, package: {
             character: {
                 character: {//单机部分,在联机框架开启时,联机武将会覆盖同名武将应该不生效。
