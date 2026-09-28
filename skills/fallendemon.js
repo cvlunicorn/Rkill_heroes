@@ -1075,7 +1075,7 @@ const fallendemon = {
         },
         filter: function (event, player) {
             if (player.hasSkill("bismarck_R_chajin_tempBan")) return false;
-            var skipEventList = ["phaseDraw", "_yuanhang_mopai", "_yuanhang_bingsimopai", "bahu"];
+            var skipEventList = ["phaseDraw", "_yuanhang_mopai", "_yuanhang_bingsimopai"];
             if (skipEventList.includes(event.getParent().name)) return false;
             return event.player != player;
         },
@@ -1085,7 +1085,14 @@ const fallendemon = {
             suits.push('cancel2');
             player.chooseControl(suits)
                 .set("ai", function () {
-                    var suits = lib.suit.slice();
+                    var target = _status.event.getTrigger().player;
+                    var known = target.getKnownCards(get.player());
+                    var counts = lib.suit.map(suit => ({
+                        suit,
+                        count: known.filter(card => get.suit(card, target) == suit).length,
+                    }));
+                    counts.sort((a, b) => b.count - a.count);
+                    if (counts[0] && counts[0].count > 0) return counts[0].suit;
                     return suits.randomGet();
                 })
                 .set("prompt", get.prompt2("bismarck_R_chajin", trigger.player));
@@ -1094,27 +1101,26 @@ const fallendemon = {
             event.suit = result.control;
             game.log(get.translation(player) + "声明了" + get.translation(result.control));
             player.chat("声明了" + get.translation(result.control));
-            trigger.player.chooseCard('h', [0, Infinity], '交给' + get.translation(player) + '任意张手牌').set("ai", function (card) {
+            trigger.player.chooseCard('h', [0, Infinity], '弃置任意张手牌').set("ai", function (card) {
                 var evt = _status.event.getParent();
-                var player = get.player();
-                var att = get.attitude(evt.player, player);
-                if (att > 2 && evt.player.isDamaged() && get.tag(card, "recover")) return 10;
-                if (att > 0) return 0;
-                if (att <= 0 && player.countCards("h", function (card) { return get.suit(card) == event.suit; }) <= 0) { return 0 };
-                if (att <= 0 && get.suit(card) == event.suit && ui.selected.cards.length < 2 && Math.random() > 0.6) { return 8.5 - get.value(card); }
-                if (att <= 0 && get.suit(card) == event.suit && ui.selected.cards.length >= 2) { return 7 - get.value(card); }
+                var target = get.player();
+                var owner = evt.player;
+                var att = get.attitude(target, owner);
+                if (att >= 0) return 0;
+                if (get.suit(card, target) == evt.suit) return 8 - get.value(card, target);
                 return 0;
             });
             "step 2";
-            if (result.cards) { trigger.player.give(result.cards, player); }
+            if (result.cards && result.cards.length) trigger.player.discard(result.cards);
             player.chooseControl(["doubts", "noDoubts"]).set("ai", function () {
-                var player = get.player();
-                var evt = _status.event.getTrigger();
-                var att = get.attitude(player, evt.player);
-                if (att >= 0) { return "noDoubts"; }
-                if (player.hp < 2) { return "noDoubts"; }
-                if (Math.random() < 0.4) { return "noDoubts"; }
-                return "doubts";
+                var owner = get.player();
+                var target = _status.event.getTrigger().player;
+                var att = get.attitude(owner, target);
+                if (att >= 0 || owner.hp <= 1) return "noDoubts";
+                var known = target.getKnownCards(owner);
+                if (known.some(card => get.suit(card, target) == event.suit)) return "doubts";
+                if (!target.countCards("h")) return "noDoubts";
+                return owner.hp > 2 && att < -2 ? "doubts" : "noDoubts";
             });
             "step 3";
             if (result.control && result.control == "doubts") {

@@ -1436,7 +1436,7 @@ const unfulfilledambition = {
                 content() {
                     "step 0";
                     var cards = player.getExpansions("zhanxian");
-                    if (cards.length) player.discard(cards);//player.gain(cards, "gain2");
+                    if (cards.length) player.discard(cards.slice(0, 1));
                 },
                 sub: true,
                 "_priority": 0,
