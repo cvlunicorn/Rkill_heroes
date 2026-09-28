@@ -358,7 +358,7 @@ const tebiechuanwu = {
     //南沙功臣
     nanshagonchen: {
         nobracket: true,
-        audio: false,
+        audio: "ext:舰R牌将/audio/skill:true",
         trigger: { player: "useCardToTargeted" },
         filter: function (event, player) {
             return event.card && event.card.name == "sha" || event.card.name == "sheji9";
@@ -540,7 +540,7 @@ const tebiechuanwu = {
     //海鹰巡弋
     haiyingxunyi: {
         nobracket: true,
-        audio: false,
+        audio: "ext:舰R牌将/audio/skill:true",
         global: "haiyingxunyi_qinggang_skill",
         trigger: { global: "useCardAfter" },
         direct: true,
@@ -618,7 +618,7 @@ const tebiechuanwu = {
 
     //大洋鹰击
     dayangyingji: {
-        audio: false,
+        audio: "ext:舰R牌将/audio/skill:true",
         global: ["dayangyingji_qinggang_skill"],
         forced: false,
         round: 1,
@@ -778,7 +778,7 @@ const tebiechuanwu = {
     },
     //三坐标定位
     sanzuobiaodingwei: {
-        audio: false,
+        audio: "ext:舰R牌将/audio/skill:true",
         enable: "phaseUse",
         usable: 1,
         nobracket: true,
@@ -827,6 +827,8 @@ const tebiechuanwu = {
     },
     //威严召唤
     weiyanzhaohuan: {
+
+        audio: "ext:舰R牌将/audio/skill:true",
         nobracket: true,
         group: ["weiyanzhaohuan_use", "weiyanzhaohuan_respond"],
         subSkill: {
@@ -939,7 +941,7 @@ const tebiechuanwu = {
     //光荣舰队normal
     guangrongjianduinormal: {
         nobracket: true,
-        audio: false,
+        audio: "ext:舰R牌将/audio/skill:true",
         trigger: { player: "useCardToTargeted" },
         forced: false,
         filter: function (event, player) {
@@ -964,7 +966,7 @@ const tebiechuanwu = {
     //力争上游
     lizhengshangyou: {
         nobracket: true,
-        audio: false,
+        audio: "ext:舰R牌将/audio/skill:true",
         trigger: {
             global: "phaseBeforeEnd",
             player: ["phaseDrawBegin2"]

@@ -69,6 +69,7 @@ const guozhanskills = {
     },
     gz_yongbuchenmo: {
         nobracket: true,
+        audio: "ext:舰R牌将/audio/skill:true",
         unique: true,
         usable: 1,
         trigger: {
@@ -390,7 +391,7 @@ const guozhanskills = {
         },
     },
     gz_yaoyuandexiwang: {
-        audio: false,
+        audio: "ext:舰R牌将/audio/skill:true",
         nobracket: true,
         limited: true,
         enable: "phaseUse",
@@ -648,6 +649,7 @@ const guozhanskills = {
         },
     },
     gz_qingyeqingyeqing: {
+        audio: "ext:舰R牌将/audio/skill:true",
         trigger: { target: 'useCardToTarget' },
         filter(event, player) { return event.player != player && event.targets && event.targets.length == 1; },
         content() {
@@ -699,6 +701,7 @@ const guozhanskills = {
     },
     gz_kelaosaiweici_R_lunzhan: {
         trigger: { player: 'phaseZhunbeiBegin' }, direct: true,
+        audio: "ext:舰R牌将/audio/skill:true",
         content() {
             'step 0'
             event.num = game.countPlayer(current => current.group == player.group); if (event.num == 1) event.num *= 2;
@@ -724,7 +727,7 @@ const guozhanskills = {
         },
     },
     gz_bigseven: {
-        trigger: { player: 'useCardToPlayered' }, direct: true,
+        trigger: { player: 'useCardToPlayered' }, direct: true, audio: "ext:舰R牌将/audio/skill:true",
         filter(event) { return event.targets.length == 1 && (get.type(event.card) == 'basic' || get.type(event.card) == 'trick'); },
         content() {
             'step 0'
@@ -739,8 +742,8 @@ const guozhanskills = {
             if (!player.isMajor()) trigger.getParent().baseDamage = (trigger.getParent().baseDamage || 1) + 1;
         },
     },
-    gz_lizhengshangyou: { trigger: { player: 'phaseDrawBegin2' }, forced: true, filter(event) { return !event.numFixed; }, content() { trigger.num += game.countPlayer(current => current.group == player.group) * 2; } },
-    gz_nanshagonchen: { trigger: { player: 'useCardToTargeted' }, direct: true, filter(event) { return event.card && (event.card.name == 'sha' || event.card.name == 'sheji9'); }, content() { var num = game.countPlayer(current => current.group == player.group); if (num >= 2) player.draw(); if (num >= 3) { trigger.target.addTempSkill('qinggang2'); trigger.target.storage.qinggang2.add(trigger.card); } if (num >= 4) trigger.getParent().baseDamage = (trigger.getParent().baseDamage || 1) + 1; } },
+    gz_lizhengshangyou: { trigger: { player: 'phaseDrawBegin2' }, forced: true, audio: "ext:舰R牌将/audio/skill:true", filter(event) { return !event.numFixed; }, content() { trigger.num += game.countPlayer(current => current.group == player.group) * 2; } },
+    gz_nanshagonchen: { trigger: { player: 'useCardToTargeted' }, direct: true, audio: "ext:舰R牌将/audio/skill:true", filter(event) { return event.card && (event.card.name == 'sha' || event.card.name == 'sheji9'); }, content() { var num = game.countPlayer(current => current.group == player.group); if (num >= 2) player.draw(); if (num >= 3) { trigger.target.addTempSkill('qinggang2'); trigger.target.storage.qinggang2.add(trigger.card); } if (num >= 4) trigger.getParent().baseDamage = (trigger.getParent().baseDamage || 1) + 1; } },
     gz_yuleizhantujin: {
         enable: 'phaseUse', usable: 1,
         filter(event, player) { return game.filterPlayer(current => current.group == player.group && current.hasSkill('quzhudd')).reduce((sum, current) => sum + current.countCards('e'), 0) > 0; },
@@ -784,7 +787,7 @@ const guozhanskills = {
             trigger.getParent().targets.push(player);
         },
     },
-    gz_zhongbangtuxi: { limited: true, enable: 'phaseUse', selectCard: [1, Infinity], filterCard: { color: 'red' }, selectTarget() { return ui.selected.cards.length; }, filterTarget: true, multitarget: true, content() { player.awakenSkill('gz_zhongbangtuxi'); targets.forEach(target => target.damage(player.siege(target) ? 2 : 1, 'fire', player)); } },
+    gz_zhongbangtuxi: { limited: true, enable: 'phaseUse', audio: "ext:舰R牌将/audio/skill:true", selectCard: [1, Infinity], filterCard: { color: 'red' }, selectTarget() { return ui.selected.cards.length; }, filterTarget: true, multitarget: true, content() { player.awakenSkill('gz_zhongbangtuxi'); targets.forEach(target => target.damage(player.siege(target) ? 2 : 1, 'fire', player)); } },
     gz_qiangxingzhencha: {
         trigger: { global: 'phaseJieshuBegin' }, direct: true,
         filter(event, player) { return event.player != player && event.player.countCards('h'); },

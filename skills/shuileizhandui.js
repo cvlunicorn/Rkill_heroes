@@ -521,6 +521,8 @@ const shuileizhandui = {
         },
     },
     shuileiqiangxi: {
+
+        audio: "ext:舰R牌将/audio/skill:true",
         // 水雷强袭：
         // 把全部手牌压成一张超规格【雷杀】，伤害更高、需要更多【闪】响应；
         // 但打完这一轮总攻后，自己的出牌阶段也会立刻结束。
@@ -786,6 +788,8 @@ const shuileizhandui = {
         },
     },
     duomianxunlianjian: {
+
+        audio: "ext:舰R牌将/audio/skill:true",
         // 多面训练舰：
         // 自己失去牌后，若场上此时存在"手牌唯一最少"的角色，
         // 则可以令其摸一张牌，体现她偏向训练与后勤支援的定位。
@@ -828,6 +832,8 @@ const shuileizhandui = {
         },
     },
     baixue_jiban: {
+
+        audio: "ext:舰R牌将/audio/skill:true",
         // 羁绊：
         // 白雪可以替任意驱逐舰“垫牌保人”，
         // 把一张手牌压回牌堆顶，抵消一次【杀】或【决斗】造成的伤害。

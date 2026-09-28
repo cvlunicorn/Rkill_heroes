@@ -1964,6 +1964,7 @@ const historybattles = {
     },
     yongbuchenmo: {
         nobracket: true,
+        audio: "ext:舰R牌将/audio/skill:true",
         unique: true,
         zhuSkill: true,
         usable: 1,

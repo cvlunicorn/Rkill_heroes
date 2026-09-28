@@ -267,6 +267,7 @@ const standard = {
     },
     dumuchenglin: {
         nobracket: true,
+        audio: "ext:舰R牌将/audio/skill:true",
         trigger: {
             player: "phaseZhunbeiBegin",
         },
@@ -3385,6 +3386,7 @@ const standard = {
     },
     changge: {
         nobracket: true,
+        audio: "ext:舰R牌将/audio/skill:true",
         forced: true,
         trigger: {
             player: "useCardToPlayered",

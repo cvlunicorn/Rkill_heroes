@@ -147,6 +147,7 @@ const unfulfilledambition = {
     },
     jifu_R_yuanqin: {
         nobracket: true,
+        audio: "ext:舰R牌将/audio/skill:true",
         trigger: {
             target: "taoBegin",
         },
@@ -1602,6 +1603,7 @@ const unfulfilledambition = {
         // 用【杀】后可先摸一张；若摸到基本牌,则可再弃掉它,
         // 把这张【杀】从本回合使用次数里“退款”,为连续进攻续航。
         nobracket: true,
+        audio: "ext:舰R牌将/audio/skill:true",
         usable: 1,
         trigger: {
             player: "useCard",
@@ -1664,6 +1666,7 @@ const unfulfilledambition = {
         // 论战：
         // 准备阶段在“控顶保资源”和“本回合杀伤强化”之间二选一。
         nobracket: true,
+        audio: "ext:舰R牌将/audio/skill:true",
         trigger: {
             player: "phaseZhunbeiBegin",
         },
@@ -2237,7 +2240,7 @@ const unfulfilledambition = {
     //========== 奥古斯塔 ==========
     //孤立 - 锁定技，多目标锦囊牌指定你为目标时，取消之
     guli: {
-        audio: false,
+        audio: "ext:舰R牌将/audio/skill:true",
         trigger: { target: "useCardToPlayered" },
         forced: true,
         locked: true,
@@ -2265,7 +2268,7 @@ const unfulfilledambition = {
     },
     //转变 - 限定技，失去孤立获得外交，横置，选角色横置并摸牌
     zhuanbian: {
-        audio: false,
+        audio: "ext:舰R牌将/audio/skill:true",
         enable: "phaseUse",
         limited: true,
         skillAnimation: true,
@@ -2413,7 +2416,7 @@ const unfulfilledambition = {
     //===================================
     //日德兰 - 限定技，受伤时将任意张手牌当闪使用或打出，若数量>发动次数则恢复
     ridelan: {
-        audio: false,
+        audio: "ext:舰R牌将/audio/skill:true",
         nobracket: true,
         enable: ["chooseToRespond", "chooseToUse"],
         filter: function (event, player) {
@@ -2473,7 +2476,7 @@ const unfulfilledambition = {
     },
     //纳尔维克 - 限定技，视为使用万箭齐发，摸X张牌（X=对驱逐舰造成的伤害）
     naerweike: {
-        audio: false,
+        audio: "ext:舰R牌将/audio/skill:true",
         nobracket: true,
         limited: true,
         enable: "phaseUse",
@@ -2526,7 +2529,7 @@ const unfulfilledambition = {
     },
     //马塔潘角 - 限定技，横置任意名角色，其中一名回血翻面，全巡洋舰则摸牌
     matapanjiao: {
-        audio: false,
+        audio: "ext:舰R牌将/audio/skill:true",
         nobracket: true,
         limited: true,
         enable: "phaseUse",
@@ -2599,7 +2602,7 @@ const unfulfilledambition = {
     },
     //远射记录 - 限定技，视为使用不可响应无距离限制的火杀，伤害+1
     yuanshejilu: {
-        audio: false,
+        audio: "ext:舰R牌将/audio/skill:true",
         limited: true,
         enable: "phaseUse",
         filter: function (event, player) {
@@ -2682,7 +2685,7 @@ const unfulfilledambition = {
     },
     //最后的挣扎 - 锁定技，死亡时手牌按任意顺序置入牌堆顶和牌堆底
     zuihoudezhengzha: {
-        audio: false,
+        audio: "ext:舰R牌将/audio/skill:true",
         nobracket: true,
         locked: true,
         trigger: { player: "dieBegin" },
@@ -2737,7 +2740,7 @@ const unfulfilledambition = {
     //======= 德格拉斯 =======
     //遥远的希望 - 限定技，出牌阶段摸当前轮数张牌；势力变更后重置
     yaoyuandexiwang: {
-        audio: false,
+        audio: "ext:舰R牌将/audio/skill:true",
         nobracket: true,
         limited: true,
         enable: "phaseUse",
@@ -2826,7 +2829,7 @@ const unfulfilledambition = {
     },
     //未知的命运 - G势力技，遥远的希望结算后选择：本回合锁定新牌或弃牌
     weizhidemingyun: {
-        audio: false,
+        audio: "ext:舰R牌将/audio/skill:true",
         nobracket: true,
         mod: {
             cardEnabled2: function (card, player) {
@@ -3766,7 +3769,7 @@ const unfulfilledambition = {
     //381警告
     sanbayi_jinggao: {
         nobracket: true,
-        audio: false,
+        audio: "ext:舰R牌将/audio/skill:true",
         trigger: { player: "phaseBegin" },
         init: function (player, skill) {
             if (!player.storage.sanbayi_jinggao) player.storage.sanbayi_jinggao = false;
@@ -3927,7 +3930,7 @@ const unfulfilledambition = {
 
     //刺玫
     cimei: {
-        audio: false,
+        audio: "ext:舰R牌将/audio/skill:true",
         trigger: { global: "roundStart" },
         direct: true,
         init: function (player) {
@@ -4400,7 +4403,7 @@ const unfulfilledambition = {
     //高速轻弹
     gaosuqingdan: {
         usable: 1,
-        audio: false,
+        audio: "ext:舰R牌将/audio/skill:true",
         enable: "phaseUse",
         getTargetValue: function (player, target) {
             if (get.attitude(player, target) >= 0) return 0;
@@ -4617,7 +4620,7 @@ const unfulfilledambition = {
                 return Math.max(2, acount - 2 * icount);
             },
         },
-        audio: false,
+        audio: "ext:舰R牌将/audio/skill:true",
         trigger: { player: "phaseBegin" },
         nobracket: true,
         check: function (event, player) {
@@ -4697,7 +4700,7 @@ const unfulfilledambition = {
     },
     //特混攻击
     tehungongji: {
-        audio: false,
+        audio: "ext:舰R牌将/audio/skill:true",
         trigger: { player: "phaseBegin" },
         direct: true,
         content: function () {
@@ -4749,7 +4752,7 @@ const unfulfilledambition = {
     },
     //航空曙光
     hangkongshuguang: {
-        audio: false,
+        audio: "ext:舰R牌将/audio/skill:true",
         trigger: { player: "phaseUseEnd" },
         direct: true,
         filter: function (event, player) {
