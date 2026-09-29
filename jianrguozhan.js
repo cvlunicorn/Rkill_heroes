@@ -136,7 +136,7 @@ var jianrguozhan = {
         gz_bismarck_R: ["female", "ye", 4, ["zhuangjiafh", "zhanliebb", "bismarck_R_chajin", "bismarck_R_fanji"], ["des:表里不一的“野猫”虽然一直说着带攻击性的话,但意外是个很单纯的人。长期相处,应该就能听懂她真正的意思。"]],
         gz_tirpitz_R: ["female", "ye", 4, ["zhuangjiafh", "zhanliebb", "tirpitz_R_jinshu", "tirpitz_R_chuanyue", "tirpitz_R_nvwangfugui"], ["des:无表情的“人偶”总是盯着手里的东西,对其他的事情缺乏兴趣。但却喜欢为他人解说姐姐说的话,这一点上,很有趣。"]],
         gz_akagikaga_R: ["female", "ye", 4, ["hangmucv", "kaimuhangkong", "shuangzi", "akagikaga_R_zongyu"], ["des:对某些人类非常执着。每次回来,都是遍体鳞伤。而且,一直躺着会对素体产生影响。"]],
-        gz_savoy_R: ["female", "ye", "2/4/1", ["yaosaibiaoshi", "yaosai", "savoy_R_xiuzhu", "savoy_R_wangong"], ["des:自称“吸血鬼”，坚称自己是人类幻想文学中的一员。在月圆之夜喜欢看着月亮发呆。一直随身带着石榴汁……？"]],
+        gz_savoy_R: ["female", "ye",4, ["yaosaibiaoshi", "yaosai", "savoy_R_xiuzhu", "savoy_R_wangong"], ["des:自称“吸血鬼”，坚称自己是人类幻想文学中的一员。在月圆之夜喜欢看着月亮发呆。一直随身带着石榴汁……？"]],
         gz_cassone_R: ["female", "ye", 4, ["zhuangjiafh", "zhanliebb", "cassone_R_yibing", "cassone_R_weizhuangqixi"], ["des:深海版战列巡洋舰卡萨诺方案。"]],
         gz_Xfliegerkorps_R: ["female", "ye", 4, ["yaosaibiaoshi", "yaosai", "Xfliegerkorps_R_piaobodeying"], ["des:漂泊的“鹰”，戴着奇怪的帽子,不喜欢与其他人交流。但,实力很强。"]],
         "gz_401_R": ["female", "ye", 4, ["buji","junfu", "shujuzaisheng"], ["des:401的诞生是由于获得yamato_R智能模块的一半。后为了拯救暴走的芙蕾雅Cyou-yamato_R而把自己的智能模块捐献出来,捐献模块后消失。不过因为S113在之前留下了yamato_R的数据备份而复活。"]],
