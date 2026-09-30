@@ -788,6 +788,32 @@ const guozhanskills = {
         },
     },
     gz_zhongbangtuxi: { limited: true, enable: 'phaseUse', audio: "ext:舰R牌将/audio/skill:true", selectCard: [1, Infinity], filterCard: { color: 'red' }, selectTarget() { return ui.selected.cards.length; }, filterTarget: true, multitarget: true, content() { player.awakenSkill('gz_zhongbangtuxi'); targets.forEach(target => target.damage(player.siege(target) ? 2 : 1, 'fire', player)); } },
+    //国战运输 - 出牌阶段限一次，你可以将两张手牌当作【补给】使用
+    gz_yunshu: {
+        audio: false,
+        enable: "phaseUse",
+        usable: 1,
+        viewAs: { name: "ewaibuji9" },
+        filterCard: true,
+        selectCard: 2,
+        position: "h",
+        filter: function (event, player) {
+            if (!lib.card.ewaibuji9) return false;
+            return player.countCards("h") >= 2;
+        },
+        viewAsFilter: function (player) {
+            return lib.card.ewaibuji9 && player.countCards("h") >= 2;
+        },
+        prompt: "将两张手牌当作【补给】使用",
+        check: function (card) {
+            return 6 - get.value(card);
+        },
+        ai: {
+            order: 8,
+            result: { player: 1 },
+        },
+        "_priority": 0,
+    },
     gz_qiangxingzhencha: {
         trigger: { global: 'phaseJieshuBegin' }, direct: true,
         filter(event, player) { return event.player != player && event.player.countCards('h'); },
