@@ -3,9 +3,23 @@ export function installJianROnlineSelection({ lib, game, get, _status, character
     if (lib.jianrOnlineSelection) return lib.jianrOnlineSelection;
     const ids = new Set(characterIds);
     const enabled = () => lib.config.extension_舰R牌将_characters_enable !== false;
+    const yeEnabled = () => lib.config.extension_舰R牌将_yexinjie_enable !== false;
+    const isYe = id => {
+        const info = lib.character[id];
+        return Boolean(info && (info[1] === 'ye' || (Array.isArray(info[4]) && info[4].some(tag => typeof tag === 'string' && tag.startsWith('doublegroup:') && tag.split(':').includes('ye')))));
+    };
     const merge = (target, allow, eligibleIds) => {
         const eligible = eligibleIds && new Set(eligibleIds);
+        if (yeEnabled() === false) {
+            for (const id of Object.keys(target)) {
+                if (isYe(id)) delete target[id];
+            }
+        }
         for (const id of ids) {
+            if (yeEnabled() === false && isYe(id)) {
+                delete target[id];
+                continue;
+            }
             if (allow && (!eligible || eligible.has(id)) && lib.character[id]) target[id] = lib.character[id];
             else delete target[id];
         }
@@ -59,7 +73,7 @@ export function installJianROnlineSelection({ lib, game, get, _status, character
             const allow = enabled();
             const eligibleIds = allow ? [...ids].filter(id => {
                 const info = lib.character[id];
-                if (!info || lib.filter.characterDisabled(id)) return false;
+                if (!info || (!yeEnabled() && isYe(id)) || lib.filter.characterDisabled(id)) return false;
                 const hpParts = String(info[2]).split('/');
                 const hp = info.hp ?? Number(hpParts[0]);
                 const maxHp = info.maxHp ?? Number(hpParts[hpParts.length - 1]);
