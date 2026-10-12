@@ -222,7 +222,7 @@ var jianrjinji = {
         mist_edu_R: ["female", "MN", 3, ["qingxuncl", "fangkong2","chuanchengzhiwu", "miaoyi"], ["fleet4", "des:提督～初次见面，我是驱逐舰恶毒。做自我介绍的时候别靠那么近吗？诶？被小孩子抱着有什么不好的吗？不是这种问题吗？喵噫，恶毒可不管哦。"]],//恶毒注册
 
         //新武将写在这行上面
-        skilltest: ["male", "OTHER", 9, ["guanxing", "jujianmengxiang", "huodezhuangbei", "huodeyanshi", "paoxiao", "guankanpaidui"], 【"forbidai", "des:测试用"]],
+        skilltest: ["male", "OTHER", 9, ["guanxing", "jujianmengxiang", "huodezhuangbei", "huodeyanshi", "paoxiao", "guankanpaidui"], ["forbidai", "des:测试用"]],
     },
     skill: {
         ...globalskills,
