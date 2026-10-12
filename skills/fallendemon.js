@@ -2104,10 +2104,19 @@ const fallendemon = {
                     "step 0"
                     player.chooseToCompare(target);
                     "step 1"
+                    // 鹰标记计数存在技能名 storage（数字），来源武将另存在 markplayer。
+                    // addSkill 的 init 只在首次获得时跑一次，且 addMark 会覆盖技能名 storage，
+                    // 所以来源列表必须在 push 前自行保证是数组。
+                    var ensureSource = function (role) {
+                        if (!Array.isArray(role.storage.Xfliegerkorps_R_piaobodeying_markplayer)) {
+                            role.storage.Xfliegerkorps_R_piaobodeying_markplayer = [];
+                        }
+                    };
                     if (result.bool) {
                         if (!player.hasSkill("Xfliegerkorps_R_piaobodeying_mark")) {
                             player.addSkill("Xfliegerkorps_R_piaobodeying_mark");
                         }
+                        ensureSource(player);
                         player.storage.Xfliegerkorps_R_piaobodeying_markplayer.push(player);
                         player.addMark("Xfliegerkorps_R_piaobodeying_mark", 1);
                         var count = 0;
@@ -2118,7 +2127,7 @@ const fallendemon = {
                     } else {
                         for (var i of game.filterPlayer()) {
                             if (i.countMark("Xfliegerkorps_R_piaobodeying_mark") > 0) {
-                                i.removeMark(i.countMark("Xfliegerkorps_R_piaobodeying_mark"));
+                                i.removeMark("Xfliegerkorps_R_piaobodeying_mark", i.countMark("Xfliegerkorps_R_piaobodeying_mark"));
                             }
                             if (i.hasSkill("Xfliegerkorps_R_piaobodeying_mark")) {
                                 i.storage.Xfliegerkorps_R_piaobodeying_markplayer = [];
@@ -2128,6 +2137,7 @@ const fallendemon = {
                         if (!target.hasSkill("Xfliegerkorps_R_piaobodeying_mark")) {
                             target.addSkill("Xfliegerkorps_R_piaobodeying_mark");
                         }
+                        ensureSource(target);
                         target.storage.Xfliegerkorps_R_piaobodeying_markplayer.push(player);
                         target.addMark("Xfliegerkorps_R_piaobodeying_mark", 1);
                     }
@@ -2241,7 +2251,7 @@ const fallendemon = {
                 forceDie: true,
                 content: function () {
                     for (var i of game.filterPlayer()) {
-                        if (i.countMark("Xfliegerkorps_R_piaobodeying_mark") > 0) i.removeMark(i.countMark("Xfliegerkorps_R_piaobodeying_mark"));
+                        if (i.countMark("Xfliegerkorps_R_piaobodeying_mark") > 0) i.removeMark("Xfliegerkorps_R_piaobodeying_mark", i.countMark("Xfliegerkorps_R_piaobodeying_mark"));
                         if (i.hasSkill("Xfliegerkorps_R_piaobodeying_mark")) {
                             i.storage.Xfliegerkorps_R_piaobodeying_markplayer = [];
                             i.removeSkill("Xfliegerkorps_R_piaobodeying_mark");
@@ -2263,7 +2273,9 @@ const fallendemon = {
             content: function (storage, player) {
                 if (player.hasSkill("Xfliegerkorps_R_piaobodeying")) { return "拥有" + player.countMark("Xfliegerkorps_R_piaobodeying_mark") + "枚鹰标记"; }
                 if (player.hasSkill("kaimuhangkong")) { return "拥有" + player.countMark("Xfliegerkorps_R_piaobodeying_mark") + "枚鹰标记,摸牌阶段摸牌数+1"; }
-                return "拥有与" + get.translation(player.storage.Xfliegerkorps_R_piaobodeying_markplayer[0]) + "相同等级的航母";
+                var source = player.storage.Xfliegerkorps_R_piaobodeying_markplayer;
+                var sourceName = Array.isArray(source) && source[0] ? get.translation(source[0]) : "未知来源";
+                return "拥有与" + sourceName + "相同等级的航母";
             },
         },
         group: ["Xfliegerkorps_R_piaobodeying_mark_hangmucv", "Xfliegerkorps_R_piaobodeying_mark_yingzi"],
@@ -2271,12 +2283,14 @@ const fallendemon = {
             hangmucv: {
                 trigger: { player: "phaseUseBegin" },
                 filter: function (event, player) {
-                    return player.getStorage("player.storage.Xfliegerkorps_R_piaobodeying_markplayer").includes(player) && !player.hasSkill("kaimuhangkong") && player.countCards('h') > 0;
+                    // 来源列表存的是施放者，不是自己；旧写法把整段 "player.storage.xxx" 当 storage 键，永远读不到。
+                    var source = player.storage.Xfliegerkorps_R_piaobodeying_markplayer;
+                    return Array.isArray(source) && source.length > 0 && !source.includes(player) && !player.hasSkill("kaimuhangkong") && player.countCards('h') > 0;
                 },
                 frequent: true,
                 content: function () {
                     "step 0"
-                    var sourcePlayer = player.getStorage("player.storage.Xfliegerkorps_R_piaobodeying_markplayer");
+                    var sourcePlayer = player.storage.Xfliegerkorps_R_piaobodeying_markplayer || [];
                     if (sourcePlayer[0] && sourcePlayer[0].isAlive) {
                         var level = sourcePlayer[0].countMark('jinengup');
                     } else {
@@ -2449,7 +2463,8 @@ const fallendemon = {
                 preHidden: true,
                 frequent: true,
                 filter: function (event, player) {
-                    return player.getStorage("player.storage.Xfliegerkorps_R_piaobodeying_markplayer").includes(player) && player.hasSkill("kaimuhangkong") && !event.numFixed;
+                    var source = player.storage.Xfliegerkorps_R_piaobodeying_markplayer;
+                    return Array.isArray(source) && source.includes(player) && player.hasSkill("kaimuhangkong") && !event.numFixed;
                 },
                 content: function () {
                     trigger.num++;
