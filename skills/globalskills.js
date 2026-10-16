@@ -1,4 +1,15 @@
 import { lib, game, get, ui, _status } from "../../../noname.js";
+import * as qh from "./qianghuaAI.js";
+
+// 强化装备/建造 AI 决策统一走 qianghuaAI 模块（纯逻辑、env 注入、可 mock 单测）。
+const _qhEnv = { get, game, lib, ui, _status };
+const _qh = {
+    skillResult: player => qh.skillResult(_qhEnv, player),
+    cardCheck: (player, card, event) => qh.cardCheck(_qhEnv, player, card, event),
+    buttonScore: (player, link, event) => qh.buttonScore(_qhEnv, player, link, event),
+    jianzaoCardCheck: (player, card) => qh.jianzaoCardCheck(_qhEnv, player, card),
+    jianzaoResult: player => qh.jianzaoResult(_qhEnv, player),
+};
 const globalskills = {
     _yuanhang: {
         name: "远航", "prompt2": "当你有摸牌标记时,你失去手牌后能摸1张牌,然后失去1个摸牌标记,自己回合暂时+1标记上限并回满标记,标记上限x个,可在强化中提升X值。", intro: { marktext: "摸牌", content: function (player, mark) { ; var a = player.countMark('_yuanhang_mopai'); return '手牌较少时,失去手牌可以摸一张牌,还可以摸' + a + '次,其他角色回合开始时会回复一个标记'; }, },
@@ -157,11 +168,10 @@ const globalskills = {
             return true;
         },
         check: function (card) {
-            var player = get.player();
-            var event = _status.event;
-            var huifu = player.countCards('h', 'jiu') + player.countCards('h', 'tao');
-
-            // 优先弃置价值较低的牌
+            // 统一走付款方案评价：判定区牌优先弃、溢出位更愿弃、保留最后闪桃。
+            // 技能回调经引擎重编译后不能访问本文件模块闭包，改为从 lib.skill 取回评价器。
+            var skillDef = lib.skill && lib.skill._jianzaochuan;
+            if (skillDef && skillDef.cardCheck) return skillDef.cardCheck(get.player(), card);
             return 6 - get.value(card);
         },
         content: function () {
@@ -188,41 +198,14 @@ const globalskills = {
             order: 2,
             result: {
                 player: function (player) {
-                    // 检查是否有进行过强化
-                    var totalLevels = 0;
-                    var keys = ['mopaiup', 'jinengup', 'wuqiup', 'useshaup', 'jidongup', 'shoupaiup'];
-                    for (var i = 0; i < keys.length; i++) {
-                        totalLevels += player.countMark(keys[i]);
+                    // 统一走付款方案评价：上限/血量收益 - 三张不同花色付款风险成本。
+                    // 技能回调经引擎重编译后不能访问本文件模块闭包，改为从 lib.skill 取回评价器。
+                    var skillDef = lib.skill && lib.skill._jianzaochuan;
+                    if (skillDef && skillDef.plan) {
+                        var plan = skillDef.plan(player);
+                        return plan ? plan.score : 0;
                     }
-
-                    // 没有强化过,则AI不会发动建造
-                    if (totalLevels === 0) return 0;
-
-                    // 检查是否有足够的牌
-                    if (player.countCards('hejs') < 3) return 0;
-
-                    // 计算收益
-                    var benefit = 0;
-
-                    // 血量上限提升的收益
-                    if (player.hp < player.maxHp) benefit += 1.5;
-
-                    // 强化上限提升的收益
-                    var currentBuildLevel = player.countMark('_jianzaochuan') || 0;
-                    if (currentBuildLevel === 0) benefit += 2.0; // 第一次建造收益最高
-
-                    // 根据手牌质量调整
-                    var cardValues = 0;
-                    var handcards = player.getCards('h');
-                    for (var i = 0; i < Math.min(handcards.length, 3); i++) {
-                        cardValues += get.value(handcards[i]);
-                    }
-
-                    // 如果手牌质量较高,则发动意愿降低
-                    if (cardValues > 15) benefit -= 0.5;
-                    else if (cardValues < 10) benefit += 0.5;
-
-                    return benefit;
+                    return 0;
                 }
             }
         },
@@ -232,6 +215,9 @@ const globalskills = {
                 return '已建造提升体力上限';
             }
         },
+        /* AI 决策只读接口：plan(player) → {score} 建造净收益评估 */
+        plan: function (player) { return qh.jianzaoPlan(_qhEnv, player); },
+        cardCheck: function (player, card) { return qh.jianzaoCardCheck(_qhEnv, player, card); },
     },
     /* _jianzaochuan: {
         name: "建造",
@@ -360,6 +346,33 @@ const globalskills = {
                 _jianzaochuan: player.countMark('_jianzaochuan') || 0
             };
         },
+        /* ===== AI 决策只读接口（测试可包装采样，不改行为） =====
+         * plan(player)        → 完整付款方案 {net,k,pay[],points,used,leftover,upgrades[],overflowBefore}
+         * getPlan(player)     → plan 的 JSON 化快照（去 Card 引用，可序列化）
+         * paymentScore(player,mark,payCards?,event?) → 单项升级在付款集下的净收益
+         * 以上均由 qianghuaAI.js 提供，仅读、不改规则。 */
+        plan: function (player) { return qh.skillPlan(_qhEnv, player); },
+        getPlan: function (player) { return qh.planSnapshot(_qhEnv, player); },
+        paymentScore: function (player, mark, payCards, event) {
+            return qh.paymentScore(_qhEnv, player, mark, payCards, event);
+        },
+        resolvePayCards: function (event) { return qh.resolvePayCards(event); },
+        cardCheck: function (player, card, event) { return qh.cardCheck(_qhEnv, player, card, event); },
+        /**
+         * 复杂评估的统一入口（测试/调试用）：
+         *  evaluate(player, {payCards?, event?, mode:'plan'|'button'|'skill'}) → 方案/按钮净收益/发动意愿
+         *  resetCache()  → 清空 shared WeakMap（跨局测试隔离用）
+         */
+        _qianghuazhuang_evaluate: function (player, opts) {
+            opts = opts || {};
+            const ev = opts.event || _status.event;
+            switch (opts.mode) {
+                case 'button': return qh.buttonScore(_qhEnv, player, opts.mark, ev);
+                case 'skill': return qh.skillResult(_qhEnv, player, ev);
+                default: return qh.skillPlan(_qhEnv, player);
+            }
+        },
+        _qianghuazhuang_resetCache: function () { qh._resetSharedCache(); },
         filter: function (event, player) {
             if (lib.config.extension_舰R牌将__qianghuazhuang === false) return false;
             if (player.hasSkill("guzhuyizhi2")) return false;
@@ -395,8 +408,10 @@ const globalskills = {
             return [minCards, maxCards];
         },
         check: function (card) {
-            var player = get.player();
-            if (player.countCards("h") > player.maxHandcard) return 8.5 - get.value(card);
+            // 统一走付款方案评价：方案内牌按付款顺序给正分，方案外/关键牌给负分。
+            // 技能回调经引擎重编译后不能访问本文件模块闭包，改为从 lib.skill 取回评价器。
+            var skillDef = lib.skill && lib.skill._qianghuazhuang;
+            if (skillDef && skillDef.cardCheck) return skillDef.cardCheck(get.player(), card, _status.event);
             return 6 - get.value(card);
         },
         content: function () {
@@ -554,312 +569,13 @@ const globalskills = {
                 return false;
 
             }).set('ai', function (button) {
-                var choice = button.link;
-                var player = _status.event.player;
-
-                // 仅存储选项默认最低优先级
-                if (choice === 'store_only') return 0.1;
-
-                // === 第一步：评估当前风险分（生存威胁） ===
-                var riskScore = 0;
-                var hp = player.hp;
-                var maxHp = player.maxHp;
-                var handCards = player.countCards('h');
-                var shanCount = player.countCards('h', 'shan');
-
-                // 血量风险
-                if (hp <= 1) riskScore += 0.6;
-                else if (hp <= 2) riskScore += 0.3;
-                else if (hp <= maxHp / 2) riskScore += 0.15;
-
-                // 敌方集火压力
-                var enemiesInRange = game.countPlayer(function (current) {
-                    return current != player && get.attitude(player, current) < 0 && current.inRange(player);
-                });
-                riskScore += Math.min(0.3, enemiesInRange * 0.1);
-
-                // 缺少防御牌
-                if (shanCount === 0 && hp <= 2) riskScore += 0.2;
-
-                // === 第二步：评估各选项的基础收益 ===
-                var baseScore = 0;
-                var currentLv = player.countMark(choice);
-
-                switch (choice) {
-                    case 'mopaiup':
-                        // 后勤保障：手牌紧缺时价值高
-                        baseScore = 3.5;
-                        if (handCards <= player.getHandcardLimit() / 2) baseScore += 1.5;
-                        if (handCards <= 2) baseScore += 1.0;
-                        break;
-
-                    case 'jinengup':
-                        // 技能升级：按实际新增可用牌和当前局势动态加分
-                        baseScore = 2.0;
-                        var nextLv = currentLv + 1;
-                        var addNewCardScore = function (newCards, weight) {
-                            if (newCards > 0) baseScore += Math.min(3.5, newCards * weight);
-                        };
-                        var getEnemyEffectInfo = function (card, nature, ignoreRange) {
-                            var info = { total: 0, best: 0, weak: 0 };
-                            for (var i = 0; i < game.players.length; i++) {
-                                var target = game.players[i];
-                                if (target == player || get.attitude(player, target) >= 0) continue;
-                                if (!ignoreRange && player.canUse && !player.canUse(card, target, false)) continue;
-                                var effect = nature ? get.damageEffect(target, player, player, nature) : get.effect(target, card, player, player);
-                                if (effect > 0) {
-                                    info.total += effect;
-                                    info.best = Math.max(info.best, effect);
-                                    if (target.hp <= 1 || target.countCards('h') == 0) info.weak++;
-                                }
-                            }
-                            return info;
-                        };
-                        var addEffectScore = function (info, cap) {
-                            if (info.total > 0) baseScore += Math.min(cap, info.best + info.total * 0.25 + info.weak * 0.5);
-                        };
-
-                        if (player.hasSkill('kaimuhangkong')) {
-                            var hangkongCard = function (card, lv) {
-                                if (lv <= 0) return get.color(card) == 'black';
-                                if (lv == 1) return get.color(card) == 'black' || get.suit(card) == 'heart';
-                                return true;
-                            };
-                            var beforeUpgrade = player.countCards('h', function (card) {
-                                return hangkongCard(card, currentLv);
-                            });
-                            var afterUpgrade = player.countCards('h', function (card) {
-                                return hangkongCard(card, nextLv);
-                            });
-                            var newCards = afterUpgrade - beforeUpgrade;
-                            addNewCardScore(newCards, 1.2);
-                            if (afterUpgrade > 0) {
-                                addEffectScore(getEnemyEffectInfo({ name: 'wanjian' }, null, false), 3);
-                            }
-                        }
-
-                        if (player.hasSkill('fanjiandaodan')) {
-                            var daodanCard = function (card, lv) {
-                                if (lv <= 0) return get.subtype(card) == 'equip1';
-                                if (lv == 1) return get.type(card) == 'equip';
-                                return get.type(card) != 'basic';
-                            };
-                            var beforeUpgrade = player.countCards('he', function (card) {
-                                return daodanCard(card, currentLv);
-                            });
-                            var afterUpgrade = player.countCards('he', function (card) {
-                                return daodanCard(card, nextLv);
-                            });
-                            var newCards = afterUpgrade - beforeUpgrade;
-                            addNewCardScore(newCards, 1.5);
-                            if (afterUpgrade > 0) {
-                                var missileInfo = { total: 0, best: 0, weak: 0 };
-                                for (var i = 0; i < game.players.length; i++) {
-                                    var target = game.players[i];
-                                    if (target == player || get.attitude(player, target) >= 0) continue;
-                                    var effect = lib.card["yuanchengdaodan9"] ? get.effect(target, { name: "yuanchengdaodan9", isCard: true }, player, player) : get.damageEffect(target, player, player);
-                                    if (effect > 0) {
-                                        missileInfo.total += effect;
-                                        missileInfo.best = Math.max(missileInfo.best, effect);
-                                        if (target.hp <= 1 || target.countCards('h') == 0) missileInfo.weak++;
-                                    }
-                                }
-                                addEffectScore(missileInfo, 3);
-                                var currentRange = player.getAttackRange ? player.getAttackRange() : 0;
-                                var newRange = currentRange + 2;
-                                var newTargets = game.countPlayer(function (current) {
-                                    if (current == player || get.attitude(player, current) >= 0) return false;
-                                    var distance = get.distance(player, current);
-                                    return distance > currentRange && distance <= newRange;
-                                });
-                                if (newTargets > 0) baseScore += Math.min(2.4, newTargets * 1.2);
-                            }
-                        }
-
-                        if (player.hasSkill('kaimuleiji')) {
-                            var leijiCard = function (card, lv) {
-                                var suit = get.suit(card);
-                                if (lv <= 0) return suit == 'heart' || suit == 'spade';
-                                if (lv == 1) return suit == 'heart' || suit == 'spade' || suit == 'diamond';
-                                return true;
-                            };
-                            var beforeUpgrade = player.countCards('h', function (card) {
-                                return leijiCard(card, currentLv);
-                            });
-                            var afterUpgrade = player.countCards('h', function (card) {
-                                return leijiCard(card, nextLv);
-                            });
-                            var newCards = afterUpgrade - beforeUpgrade;
-                            addNewCardScore(newCards, 1.2);
-                            if (afterUpgrade > 0 && player.getHistory("sourceDamage").length == 0) {
-                                addEffectScore(getEnemyEffectInfo({ name: 'sha', nature: 'thunder', isCard: true }, 'thunder', true), 3);
-                            }
-                        }
-
-                        if (player.hasSkill('fangkongdaodan')) {
-                            var storedMissiles = player.getExpansions('daodan').length + player.getCards('s', function (card) { return card.hasGaintag('daodan') }).length;
-                            var currentSlots = Math.max(0, 1 + currentLv - storedMissiles);
-                            var nextSlots = Math.max(0, 1 + nextLv - storedMissiles);
-                            var newSlots = Math.min(handCards, nextSlots) - Math.min(handCards, currentSlots);
-                            if (newSlots > 0) {
-                                var trickPressure = game.countPlayer(function (current) {
-                                    return current != player && get.attitude(player, current) < 0 && current.countCards('h', function (card) {
-                                        return get.type(card) == 'trick';
-                                    }) > 0;
-                                });
-                                baseScore += Math.min(3, newSlots * 1.2 + trickPressure * 0.4);
-                            }
-                        }
-
-                        if (player.hasSkill('junfu')) {
-                            var storedSupport = player.getExpansions('junfu').length + player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length;
-                            var currentSupportSlots = Math.max(0, 1 + currentLv - storedSupport);
-                            var nextSupportSlots = Math.max(0, 1 + nextLv - storedSupport);
-                            var newSupportSlots = Math.min(handCards, nextSupportSlots) - Math.min(handCards, currentSupportSlots);
-                            if (newSupportSlots > 0) {
-                                var supportNeed = game.countPlayer(function (current) {
-                                    return current != player && get.attitude(player, current) > 0 && (current.hp <= 2 || current.countCards('h') <= current.hp);
-                                });
-                                baseScore += Math.min(3, newSupportSlots * 1.2 + supportNeed * 0.4);
-                            }
-                        }
-
-                        if (player.hasSkill('fangkong2')) {
-                            var beforeRange = player.hasSkill('duikongfangyu') ? 5 : 1 + 2 * currentLv;
-                            var afterRange = player.hasSkill('duikongfangyu') ? 5 : 1 + 2 * nextLv;
-                            var newProtected = game.countPlayer(function (current) {
-                                return current != player && get.attitude(player, current) > 0 && get.distance(player, current) > beforeRange && get.distance(player, current) <= afterRange;
-                            });
-                            if (newProtected > 0 && player.countCards('he') > 0) {
-                                baseScore += Math.min(2.5, newProtected * 0.8 + riskScore);
-                            }
-                        }
-
-                        if (player.hasSkill('zhuangjiafh')) {
-                            var armorPressure = game.countPlayer(function (current) {
-                                return current != player && get.attitude(player, current) < 0 && current.countCards('h', function (card) {
-                                    if (currentLv <= 0) return get.nature(card) == 'fire';
-                                    if (currentLv == 1) return get.nature(card) && get.nature(card) != 'fire';
-                                    return false;
-                                }) > 0;
-                            });
-                            if (armorPressure > 0) baseScore += Math.min(2, armorPressure * 0.6 + riskScore);
-                        }
-
-                        if (player.hasSkill('quzhudd')) {
-                            var dodgePressure = enemiesInRange + (shanCount == 0 && hp <= 2 ? 1 : 0);
-                            if (dodgePressure > 0) baseScore += Math.min(2, dodgePressure * 0.4 + riskScore);
-                        }
-
-                        if (player.hasSkill('yaosai')) {
-                            var yaosaiUsed = player.storage.yaosai || 0;
-                            if (yaosaiUsed >= currentLv && yaosaiUsed < nextLv) {
-                                var recoverScore = 2;
-                                if (hp <= 1) recoverScore += 2;
-                                else if (hp <= 2) recoverScore += 1;
-                                if (hp < maxHp) recoverScore += 1;
-                                baseScore += Math.min(4, recoverScore);
-                            } else if (yaosaiUsed < nextLv && hp < maxHp) {
-                                baseScore += 1.5;
-                            }
-                        }
-                        if (player.hasSkill('yuanchengdaji') || player.hasSkill('bm_huanxing')) {
-                            baseScore = 0;
-                        }
-                        break;
-
-                    case 'wuqiup':
-                        // 射程升级：打不到人时价值高
-                        baseScore = 2.5;
-                        var unreachableEnemies = game.countPlayer(function (current) {
-                            return current != player && get.attitude(player, current) < 0 && !player.inRange(current);
-                        });
-                        if (unreachableEnemies > 0) baseScore += unreachableEnemies * 0.8;
-                        break;
-
-                    case 'useshaup':
-                        // 速射炮管：有多张杀时价值高
-                        baseScore = 2.0;
-                        var shaCount = player.countCards('h', 'sha');
-                        if (shaCount > 1) baseScore += shaCount * 0.5;
-
-                        // 输出型武将优先级更高
-                        if (player.hasSkill('kaimuhangkong') || player.hasSkill('zhongxunca') ||
-                            player.hasSkill('fanjiandaodan') || player.hasSkill('kaimuleiji')) {
-                            baseScore += 1.0;
-                        }
-                        break;
-
-                    case 'jidongup':
-                        // 改良推进器：被贴脸时价值高
-                        baseScore = 2.0;
-                        if (enemiesInRange > 0) baseScore += enemiesInRange * 0.6;
-
-                        // 脆皮输出更需要防御距离
-                        if ((player.hasSkill('kaimuhangkong') || player.hasSkill('zhongxunca') ||
-                            player.hasSkill('fanjiandaodan') || player.hasSkill('kaimuleiji')) && hp <= 2) {
-                            baseScore += 1.5;
-                        }
-                        break;
-
-                    case 'shoupaiup':
-                        // 物流运输：手牌溢出时价值高
-                        baseScore = 1.5;
-                        var handcardLimit = player.getHandcardLimit();
-                        if (handCards >= handcardLimit) baseScore += 2.0; // 溢出，急需
-                        else if (handCards >= handcardLimit - 1) baseScore += 1.0;
-                        break;
-                }
-
-                // === 第三步：根据风险分调整优先级 ===
-                var finalScore = baseScore;
-
-                if (riskScore > 0.5) {
-                    // 高风险：优先防御选项
-                    if (['jidongup', 'shoupaiup'].includes(choice)) {
-                        finalScore += 2.0;
-                    }
-                    // 要塞技能在残血时优先级拉满
-                    if (choice === 'jinengup' && player.hasSkill('yaosai') && hp <= 2) {
-                        finalScore += 3.0;
-                    }
-                    // 降低纯输出选项优先级
-                    if (['wuqiup', 'useshaup'].includes(choice)) {
-                        finalScore -= 1.5;
-                    }
-                } else {
-                    // 低风险：突出特长
-                    // 质变技能优先级拉满
-                    if (choice === 'jinengup' && currentLv === 0) {
-                        finalScore += 2.0;
-                    }
-                    // 输出选项适当提升
-                    if (['wuqiup', 'useshaup'].includes(choice)) {
-                        finalScore += 0.5;
-                    }
-                }
-
-                // === 第四步：团队需求调整 ===
-                var teamHasDamage = game.hasPlayer(function (current) {
-                    return current != player && get.attitude(player, current) > 0 &&
-                        (current.hasSkill('kaimuhangkong') || current.hasSkill('zhongxunca') ||
-                            current.hasSkill('fanjiandaodan') || current.hasSkill('kaimuleiji'));
-                });
-
-                // 防御型武将，但团队缺输出
-                if ((player.hasSkill('zhanliebb') || player.hasSkill('yaosai')) && !teamHasDamage) {
-                    if (['wuqiup', 'useshaup'].includes(choice)) {
-                        finalScore += 1.5; // 弥补短板
-                    }
-                }
-
-                // === 第五步：避免重复升级已满级的选项 ===
-                var buildLevel = player.countMark('_jianzaochuan') + 1;
-                if (currentLv >= buildLevel || currentLv >= 2) {
-                    return 0; // 已满级，不可选
-                }
-
-                return finalScore;
+                // 统一走付款方案评价：按「付款后局面」评估升级的净增收益
+                // （边际收益 - 费用×经验机会成本）；付款牌取自此事件的 skill 链 event.cards，
+                // 牌在确认选择前尚未弃置，Expup 标记已含本次付款点数。
+                // 注意：技能函数会被引擎 parsex 重编译，不能引用本文件模块闭包，必须经 lib.skill 取回评价器。
+                var skillDef = lib.skill && lib.skill._qianghuazhuang;
+                if (skillDef && skillDef.paymentScore) return skillDef.paymentScore(_status.event.player, button.link, undefined, _status.event);
+                return button.link === 'store_only' ? 0.01 : 0;
             }).set('selectButton', [0, maxSelectable]);
 
             'step 1'
@@ -924,21 +640,12 @@ const globalskills = {
             order: 3,
             result: {
                 player: function (player) {
-                    var currentExp = player.countMark('Expup');
-                    var handcards = player.countCards('h');
-                    var maxCards = Math.min(handcards, 4);
-
-                    if (currentExp + maxCards >= 2) {
-                        var buildLevel = player.countMark('_jianzaochuan') + 1;
-                        var keys = ['mopaiup', 'jinengup', 'wuqiup', 'useshaup', 'jidongup', 'shoupaiup'];
-                        for (var i = 0; i < keys.length; i++) {
-                            var key = keys[i];
-                            var currentLv = player.countMark(key);
-                            if (currentLv < 2 && currentLv < buildLevel) {
-                                return 1.5;
-                            }
-                        }
-                        return 0.3;
+                    // 统一走付款方案评价：最优付款方案的升级净增收益，
+                    // 保留生存/行动底线；允许不强化，纯存经验仅在手牌溢出时发动。
+                    // 技能回调经引擎重编译后不能访问本文件模块闭包，改为从 lib.skill 取回评价器。
+                    var skillDef = lib.skill && lib.skill._qianghuazhuang;
+                    if (skillDef && skillDef._qianghuazhuang_evaluate) {
+                        return skillDef._qianghuazhuang_evaluate(player, { mode: 'skill' });
                     }
                     return 0;
                 }

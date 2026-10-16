@@ -1878,16 +1878,83 @@ const shiptypeskills = {
                         return get.distance(player, target) <= (1 + 2 * player.countMark('jinengup'));
                     }
                 },//选择事件包含的目标,同trigger的目标。有其他同技能的角色时,ai不要重复选择目标。
-                ai1: function (card) {
-                    return 7 - get.useful(card);
-                },//建议卡牌以7为标准就行,怕ai不救队友,所以调高了。同时ai顺次选择卡牌时不要选太多卡牌,要形成持续的牵制。
-                ai2: function (target) {
-                    var player = get.player(); var trigger = _status.event.getTrigger();
-                    //game.log(get.translation(_status.event.player)); 
-                    if (!target.hasSkill("fangkong2_aibiexuan")) {
-                        return -get.effect(target, trigger.card, trigger.player, _status.event.player);
+                //构建/刷新本选择事件的净收益计划。缓存在 _status.event 上,ai1/ai2 共享,
+                //仅同一 chooseCardTarget 事件内复用,不跨 trigger 事件缓存。
+                _fangkong2Plan: function () {
+                    var event = _status.event, player = event.player, trigger = event.getTrigger();
+                    //静态指纹:手牌数+可弃牌数+可保护目标数+aibiexuan标记数。任一变化则计划失效重建。
+                    var protectedCount = 0, markedCount = 0;
+                    for (var i = 0; i < trigger.targets.length; i++) {
+                        var t = trigger.targets[i];
+                        if (t.hasSkill('fangkong2_aibiexuan')) { markedCount++; continue; }
+                        if (player.hasSkill('duikongfangyu')) {
+                            if (get.distance(player, t) <= 5) protectedCount++;
+                        } else if (get.distance(player, t) <= (1 + 2 * player.countMark('jinengup'))) protectedCount++;
                     }
-                    return 0;
+                    var fp = player.countCards('hejs') + '|' + protectedCount + '|' + markedCount + '|' + (player.hasSkill('duikongfangyu') || player.hasSkill('fangkongdanmu9_skill') ? 1 : 2);
+                    var plan = event._fangkong2PlanCache;
+                    //静态指纹一致则复用(选牌推进不影响静态集合,费用按ui.selected.cards实时另算)
+                    if (plan && plan.fp === fp) return plan;
+                    //重建计划:可保护集合+各目标不拦截的负效应
+                    var needCards = (player.hasSkill('duikongfangyu') || player.hasSkill('fangkongdanmu9_skill')) ? 1 : 2;
+                    var range = player.hasSkill('duikongfangyu') ? 5 : (1 + 2 * player.countMark('jinengup'));
+                    var protectable = [];//[{t, gain}] 仅含收益>0者
+                    var totalGain = 0;
+                    for (var i = 0; i < trigger.targets.length; i++) {
+                        var t = trigger.targets[i];
+                        if (t.hasSkill('fangkong2_aibiexuan')) continue;
+                        if (get.distance(player, t) > range) continue;
+                        //不拦截该目标时它承受的负效应(正值=对player方有害,拦截收益)
+                        var harm = -get.effect(t, trigger.card, trigger.player, player);
+                        if (harm <= 0) continue;
+                        //优先救低血/无防御队友:hp越低加成越高;无闪无防御加成
+                        var urgent = 0;
+                        if (t.hp <= 1) urgent += 4; else if (t.hp <= 2) urgent += 2;
+                        if (!t.countCards('h', 'shan') && !t.hujia) urgent += 2;
+                        var g = harm + urgent;
+                        protectable.push({ t: t, gain: g });
+                        totalGain += g;
+                    }
+                    plan = event._fangkong2PlanCache = {
+                        fp: fp, needCards: needCards,
+                        protectable: protectable, totalGain: totalGain
+                    };
+                    return plan;
+                },
+                ai1: function (card) {
+                    var event = _status.event, player = event.player;
+                    var plan = event._fangkong2Plan();
+                    //净收益 = 最优保护集合总收益 - 累计弃牌费用(已选+本张)
+                    var costSoFar = 0;
+                    for (var i = 0; i < ui.selected.cards.length; i++) costSoFar += get.value(ui.selected.cards[i]);
+                    var cardV = get.value(card);
+                    var totalCost = costSoFar + cardV;
+                    //防"桃/闪等高价值保命牌导致空手":弃完将空手且本张为关键保命牌时,按更高门槛要求收益
+                    var emptyHand = (ui.selected.cards.length + 1 >= plan.needCards) && (player.countCards('hejs') <= plan.needCards);
+                    var isSaveCard = (card.name == 'tao' || card.name == 'shan' || card.name == 'jiu' || card.name == 'wuxie' || card.name == 'taoyuan');
+                    var threshold = emptyHand && isSaveCard ? 1.8 : 1.15;
+                    //还需凑够 needCards 张:若本张选完仍不够,允许继续;但只当总收益足以覆盖"需弃满额"的费用时才给正分
+                    var benefit = plan.totalGain;
+                    //收益须明显超过费用:满额费用≈需弃牌数×本张价值近似(用当前最便宜的候选近似)
+                    var fullCost = costSoFar + cardV * Math.max(1, plan.needCards - ui.selected.cards.length);
+                    if (benefit > totalCost * threshold && benefit > fullCost * 0.9) {
+                        //给正分,价值越低的牌越优先被弃(净收益高)
+                        return benefit - totalCost;
+                    }
+                    return -1;
+                },//按净收益评估:只当拦截总收益明显超过弃牌费用才给正分,优先弃低价值牌。
+                ai2: function (target) {
+                    var event = _status.event, player = event.player;
+                    var plan = event._fangkong2Plan();
+                    var trigger = event.getTrigger();
+                    if (target.hasSkill('fangkong2_aibiexuan')) return 0;
+                    //该目标不拦截的负效应+紧急加权,与plan口径一致
+                    var harm = -get.effect(target, trigger.card, trigger.player, player);
+                    if (harm <= 0) return -1;
+                    var urgent = 0;
+                    if (target.hp <= 1) urgent += 4; else if (target.hp <= 2) urgent += 2;
+                    if (!target.countCards('h', 'shan') && !target.hujia) urgent += 2;
+                    return harm + urgent;
                 }, targets: trigger.targets,//这个代码不能照搬到content以外的地方。贯石斧、朱雀羽扇有类似代码。还有recover版的。
             });//技能还没扩起来,括起来。
             'step 1'
