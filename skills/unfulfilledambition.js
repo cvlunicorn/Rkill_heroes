@@ -848,6 +848,15 @@ const unfulfilledambition = {
             expose: 0.3,
             threaten: 1.2,
             result: {
+                // 翻面技：对己无收益(0)，由 result.target 对敌/翻面友方评分。
+                // 入门口径：存在值得翻面的目标（未翻面的敌将）。
+                player: function (player, target) {
+                    if (!player) return 0;
+                    return game.hasPlayer(function (t) {
+                        return t != player && !t.hasSkillTag("noturn") &&
+                            !t.isTurnedOver() && get.attitude(player, t) < 0;
+                    }) ? 0.5 : 0;
+                },
                 target: function (player, target) {
                     if (target.hasSkillTag("noturn")) return 0;
                     if (target.isTurnedOver()) return 2;
@@ -981,19 +990,25 @@ const unfulfilledambition = {
             order: 4,
             expose: 0.2,
             result: {
-                target: -1,
+                // 弃置敌将手牌：对己无直接收益(0)，收益由 result.target 对敌评分体现。
+                // 入门口径：存在有手牌、距离>1的敌将才发动（filterTarget 同口径）。
                 player: function (player, target) {
-                    if (target.countCards('h') == 0) return 0;
-                    if (target.countCards('h') == 1) return -0.1;
-                    return -0.5;
+                    if (!player) return 0;
+                    // effect_use 探针 target=null 时只判是否有可弃的敌将
+                    return game.hasPlayer(function (t) {
+                        return t != player && t.countCards('h') > 0 &&
+                            get.distance(player, t, "attack") > 1 && get.attitude(player, t) < 0;
+                    }) ? 0.5 : 0;
                 },
-                target: function (card, player, target) {
-                    if (get.type(card) == "equip" && player == target) {
-                        var distance = get.info(card).distance;
-                        if (distance) {
-                            if (distance.attackFrom < 0 || distance.globalFrom < 0) return 0;
-                        }
-                    }
+                // 对候选敌将：弃牌收益（弃牌类对敌负收益，乘敌对态度为正）。
+                // 修复：原写法把 target 写成 -1 且第二个 target 函数签名错位(card,player,target)。
+                target: function (player, target) {
+                    if (!target || target.countCards('h') == 0) return 0;
+                    var att = get.attitude(player, target);
+                    if (att >= 0) return 0;
+                    // 目标手牌越多，弃中好牌期望越高
+                    var h = target.countCards('h');
+                    return -(Math.min(h, 3) + 1);
                 }
             },
         },
@@ -1249,30 +1264,37 @@ const unfulfilledambition = {
     huofu: {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
-        count: function () {
+        count: function (player) {
             var num = 0;
-            game.countPlayer2(function (current) {
-                current.getHistory('lose', function (evt) {
-                    if (evt.position == ui.discardPile) {
-                        for (var i = 0; i < evt.cards.length; i++) {
-                            if (get.color(evt.cards[i]) == 'red' && get.type(evt.cards[i]) == 'basic') num++;
-                        }
-                    }
-                })
+            if (!player) return num;
+            player.getHistory('lose', function (evt) {
+                if (evt.position != ui.discardPile) return;
+                // 祸福的条件是“你于本回合内弃置”，不能读取全场历史。
+                var phase = evt;
+                var seen = [];
+                while (phase && !seen.includes(phase) && seen.length < 20) {
+                    seen.push(phase);
+                    if (phase.name == 'phase') break;
+                    phase = phase.getParent ? phase.getParent() : phase.parent;
+                }
+                if (!phase || phase.player != player) return;
+                for (var i = 0; i < (evt.cards || []).length; i++) {
+                    if (get.color(evt.cards[i]) == 'red' && get.type(evt.cards[i]) == 'basic') num++;
+                }
             });
             return num;
         },
         direct: true,
         forced: true,
         filter: function (event, player) {
-            return lib.skill.huofu.count() > 0;
+            return lib.skill.huofu.count(player) > 0;
 
         },
         trigger: {
             player: "phaseJieshuBegin",
         },
         content: function () {
-            if (lib.skill.huofu.count() > 0) player.addTempSkill("huofu_mianyi", { player: 'phaseBegin' })
+            if (lib.skill.huofu.count(player) > 0) player.addTempSkill("huofu_mianyi", { player: 'phaseBegin' })
         },
         group: "huofu_mianyi",
         subSkill: {

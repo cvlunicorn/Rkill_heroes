@@ -296,6 +296,38 @@ const others = {
             target.addTempSkill("hangkongyazhi_fengyin", "roundStart");
 
         },
+        // 发动意愿：对敌将（破甲+封技能收益为正）；对友方/己身无意义。
+        // 代价是失去 kaimuhangkong，故仅当目标收益足够高才发动。
+        ai: {
+            order: 9,
+            result: {
+                // 入口：场上有值得压制的敌将才发动（高护甲或多技能敌将）。
+                player(player) {
+                    if (!player || player.storage.hangkongyazhi) return 0;
+                    return game.hasPlayer(function (t) {
+                        if (t == player || get.attitude(player, t) >= 0) return false;
+                        // 敌将护甲>0 或持有可被封的非charlotte技能，才有压制价值
+                        return t.hujia > 0 || t.getSkills(null, false, false).some(function (s) {
+                            return !lib.skill[s]?.charlotte;
+                        });
+                    }) ? 1 : 0;
+                },
+                // 对候选敌将：破甲+封技能的收益（负值，乘敌对态度为正）。
+                target(player, target) {
+                    if (!target || get.attitude(player, target) >= 0) return 0;
+                    var profit = 0;
+                    // 破甲收益：目标护甲越多收益越高
+                    profit += (target.hujia || 0) * 2;
+                    // 封技能收益：目标非charlotte技能越多收益越高
+                    profit += target.getSkills(null, false, false).filter(function (s) {
+                        return !lib.skill[s]?.charlotte;
+                    }).length;
+                    // 高威胁目标加成
+                    profit += Math.max(0, get.threaten(target));
+                    return -(profit + 1); // 负值：对敌使用
+                },
+            },
+        },
         intro: {
             content: "limited",
         },

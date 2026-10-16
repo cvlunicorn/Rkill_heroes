@@ -581,17 +581,30 @@ const cangqinghuanying = {
         },
         round: 1,//每轮限一次
         filter(event, player) {//过滤器
-            // 检查：使用的是闪 && 用来响应杀
-            return event.card && event.getParent(2) && event.getParent(2).player && event.getParent(2).player.isIn() && ['shan', 'huibi9'].includes(event.card.name) //用的是不是闪
-                &&//且
-                ['sha', 'sheji9'].includes(event.getParent(2).name) && player.countCards("h") > 0;//响应的是不是射击
+            // 不依赖固定的 getParent(2)：响应链中可能插入无懈、伤害和转化事件。
+            if (!event.card || !['shan', 'huibi9'].includes(event.card.name) || player.countCards('h') <= 0) return false;
+            var parent = event;
+            var seen = [];
+            while (parent && !seen.includes(parent) && seen.length < 12) {
+                seen.push(parent);
+                if (parent.name && ['sha', 'sheji9'].includes(parent.name) && parent.player && parent.player.isIn()) return true;
+                parent = typeof parent.getParent === 'function' ? parent.getParent() : parent.parent;
+            }
+            return false;
         },
 
         content() {
             'step 0'//第一步
-            event.source = trigger.getParent(2).player; // 获取出杀的角色
+            var sourceEvent = trigger;
+            var seen = [];
+            while (sourceEvent && !seen.includes(sourceEvent) && seen.length < 12) {
+                seen.push(sourceEvent);
+                if (sourceEvent.name && ['sha', 'sheji9'].includes(sourceEvent.name) && sourceEvent.player) break;
+                sourceEvent = typeof sourceEvent.getParent === 'function' ? sourceEvent.getParent() : sourceEvent.parent;
+            }
+            event.source = sourceEvent && sourceEvent.player; // 获取出杀的角色
             player.chooseCard('h', '是否将一张手牌当【射击】对' +//h手牌
-                get.translation(source) + '使用？')
+                get.translation(event.source) + '使用？')
                 .set('ai', function (card) {//关于判断。不打队友，不用7以上价值的牌，优先使用低权重牌
                     var att = get.attitude(player, source);//计算态度
                     if (att > 0)  // 如果是队友，不打

@@ -1,4 +1,5 @@
 import { lib, game, ui, get, ai, _status } from '../../../noname.js';
+
 const standard = {
     manchangzhanyi: {
         nobracket: true,
@@ -1243,62 +1244,54 @@ const standard = {
         ai: {
             expose: 0.2,
             order: 8,
+            // 技能用 content.chooseTarget 自选目标、无 filterTarget，
+            // 故引擎永不以真实目标调 result.target（target 恒 null）。
+            // 发动意愿全部集中在 result.player：内部枚举最优敌将算期望收益。
             result: {
-                target(player, target) {
-                    if (!player || !target) return 0;
-
+                player(player) {
+                    if (!player) return 0;
                     var hs = player.getCards("h");
                     if (hs.length < 2) return 0;
 
-                    var att = get.attitude(player, target);
-                    if (att >= 0) return 0;
-
-                    // 找最大点数牌（价值<8的）
+                    // 找最大点数且价值<8的拼点牌
                     var maxNum = 0;
-                    var bestCard = null;
                     for (var i = 0; i < hs.length; i++) {
                         if (hs[i].number > maxNum && get.value(hs[i]) < 8) {
                             maxNum = hs[i].number;
-                            bestCard = hs[i];
                         }
                     }
+                    // 至少要8点以上才考虑（拼点失败惩罚=跳过出牌+弃牌阶段）
+                    if (maxNum < 8) return 0;
 
-                    // 至少要8点以上才考虑（拼点失败惩罚太重）
-                    if (!bestCard || maxNum < 8) return 0;
-
-                    var targetHs = target.countCards('h');
-                    if (targetHs == 0) return 0;
+                    // 拼赢要能接杀才有意义
+                    var shaCount = player.countCards('h', 'sha');
+                    if (shaCount == 0) return 0;
 
                     // 估算胜率（简化：假设对方平均7点）
                     var winRate = Math.min(0.9, (maxNum - 7) / 6);
-                    if (winRate < 0.4) return 0; // 胜率太低不冒险
+                    if (winRate < 0.4) return 0;
 
-                    // 评估拼赢后的收益
-                    var shaCount = player.countCards('h', 'sha');
-                    if (shaCount == 0) return 0; // 没杀就没意义
-
-                    // 能否打死目标
-                    var targetHp = target.hp;
-                    var canKill = (targetHp <= shaCount + 1); // +1是拼点伤害加成
-
-                    // 收益计算：能击杀>高威胁>普通敌人
-                    var benefit = -1;
-                    if (canKill) {
-                        benefit = -4; // 能击杀，高收益
-                    } else if (targetHp <= 2) {
-                        benefit = -3; // 残血目标，中高收益
-                    } else if (att < -3) {
-                        benefit = -2.5; // 高威胁目标
-                    } else {
-                        benefit = -2; // 普通敌人
-                    }
-
-                    // 考虑失败风险（失败=跳过出牌+弃牌阶段）
-                    var failPenalty = 2; // 失败惩罚权重
-                    var expectedValue = benefit * winRate - failPenalty * (1 - winRate);
-
-                    // 只在期望收益为正时才使用
-                    return expectedValue > 0 ? expectedValue : 0;
+                    // 枚举最优敌将的期望收益；对任何敌将都不划算则不发动
+                    var best = 0;
+                    var self = this;
+                    game.countPlayer(function (target) {
+                        if (target == player) return;
+                        if (!player.canCompare(target)) return;
+                        if (target.countCards('h') == 0) return;
+                        var att = get.attitude(player, target);
+                        if (att >= 0) return;
+                        var targetHp = target.hp;
+                        var canKill = (targetHp <= shaCount + 1); // +1拼点伤害加成
+                        var benefit;
+                        if (canKill) benefit = 4;
+                        else if (targetHp <= 2) benefit = 3;
+                        else if (att < -3) benefit = 2.5;
+                        else benefit = 2;
+                        var failPenalty = 2;
+                        var ev = benefit * winRate - failPenalty * (1 - winRate);
+                        if (ev > best) best = ev;
+                    });
+                    return best > 0 ? Math.min(3, best) : 0;
                 },
             },
         },
@@ -2670,26 +2663,67 @@ const standard = {
             player.storage.jujianmengxiang = [];
             player.storage.jujianmengxiang_error = false;
         },
+        useEvent(event) {
+            if (event?.name === 'chooseToUse') return event;
+            const parent = event?.getParent?.('chooseToUse');
+            return parent?.name === 'chooseToUse' ? parent : event;
+        },
+        // getUseValue 按合法目标和次数限制估价；无目标牌只计算使用者收益。
+        cardValue(player, name) {
+            const card = { name, isCard: true };
+            const value = get.info(card)?.notarget
+                ? get.effect(undefined, card, player, player)
+                : player.getUseValue(card, true, true);
+            return Number.isFinite(value) ? value : 0;
+        },
+        hpValue(player) {
+            // 代价先于虚拟牌结算；最后一点体力无法安全支付，不能把未确认的救援算作收益。
+            // 这不是旧版 hp<3 门槛：两点体力及以上仍完全按真实净收益决策。
+            if (player.hp <= 1) return Infinity;
+            // 体力流失用现成的 losehp 伪牌接口估价（card/standard.js 定义 ai.result.target=-1.5），
+            // 与伤害分开、不受护甲/伤害免疫折减；直接用真实 effect 值，不做下限夹紧，
+            // 避免满血固定成本与伤后 recoverCost 之间的跳变。
+            const lossEffect = get.effect(player, { name: 'losehp', isCard: true }, player, player);
+            return Number.isFinite(lossEffect) ? -lossEffect : 0;
+        },
+        // 入口、按钮与总AI共用父 chooseToUse 的合法性口径：lib.filter.filterCard 内含
+        // cardEnabled+cardUsable+目标存在性，与 cardValue 的 getUseValue(card,true,true)
+        // （canUse 走 targetEnabledx 含 cardUsable/_backup.filterCard）判定一致。
+        availableNames(event, player) {
+            const useEvent = lib.skill.jujianmengxiang.useEvent(event);
+            const filterCard = (useEvent && useEvent.name === 'chooseToUse')
+                ? (useEvent._backup?.filterCard || useEvent.filterCard || lib.filter.filterCard)
+                : lib.filter.filterCard;
+            return lib.inpile.filter(name => {
+                const type = get.type(name);
+                const card = { name, isCard: true };
+                return (type === 'trick' || type === 'basic') &&
+                    !player.getStorage('jujianmengxiang').includes(name) &&
+                    filterCard.call(useEvent, card, player, useEvent);
+            });
+        },
+        // 总 AI 与按钮共用：最高牌收益 - 失去体力代价
+        bestScore(event, player) {
+            const info = lib.skill.jujianmengxiang;
+            const names = info.availableNames(event, player);
+            if (!names.length) return -1;
+            let best = 0;
+            for (const name of names) best = Math.max(best, info.cardValue(player, name));
+            return best - info.hpValue(player);
+        },
         audio: "ext:舰R牌将/audio/skill:true",
         enable: "phaseUse",
         //prompt: "失去一点体力并视为使用一张基本牌或非延时类锦囊牌（每回合每种牌名限一次）。",
         filter(event, player) {
-            for (var i of lib.inpile) {
-                if ((get.type(i) == "trick" || get.type(i) == "basic") && event.filterCard({ name: i, isCard: true }, player, event)) return true;
-            }
-            return false;
+            return lib.skill.jujianmengxiang.availableNames(event, player).length > 0;
         },
         chooseButton: {
             dialog(event, player) {
+                var names = lib.skill.jujianmengxiang.availableNames(event, player);
                 var list = [];
-                for (var i = 0; i < lib.inpile.length; i++) {
-                    var name = lib.inpile[i];
-                    var type = get.type(name);
-                    if (type == 'trick' || type == 'basic') {
-                        if (lib.filter.cardEnabled({ name: name }, player) && !player.getStorage('jujianmengxiang').includes(name)) {
-                            list.push([get.translation(type), '', name]);
-                        }
-                    }
+                for (var i = 0; i < names.length; i++) {
+                    var name = names[i];
+                    list.push([get.translation(get.type(name)), '', name]);
                 }
                 game.log("巨舰梦想列表已生成");
                 if (list.length == 0) {
@@ -2701,68 +2735,23 @@ const standard = {
                 return ui.create.dialog('巨舰梦想', [list, "vcard"]);
 
             },
+            filter(button, player) {
+                return lib.skill.jujianmengxiang.availableNames(_status.event, player).includes(button?.link?.[2]);
+            },
             check(button) {
                 const player = get.player();
-                if ((lib.inpile.includes("juedouba9") && lib.inpile.includes("manchangyiyi9") && lib.inpile.includes("jingjixiuli9") && lib.inpile.includes("ewaibuji9"))) {
-                    var recover = 0, lose = 1, players = game.filterPlayer();
-                    //game.log("s" + player.storage.jujianmengxiang);
-                    for (var i = 0; i < players.length; i++) {
-                        if (!player.getStorage('jujianmengxiang').includes('juedouba9') && players[i].hp == 1 && get.damageEffect(players[i], player, player) > 0 && !players[i].hasSha()) {
-                            //game.log('juedouba9' + (button.link[2] == 'juedouba9'));
-                            return (button.link[2] == 'juedouba9') ? 2 : -1;
-                        }
-                        if (!players[i].isOut()) {
-                            if (players[i].hp < players[i].maxHp) {
-                                if (get.attitude(player, players[i]) > 0) {
-                                    if (players[i].hp < 2) {
-                                        lose--;
-                                        recover += 0.5;
-                                    }
-                                    lose--;
-                                    recover++;
-                                }
-                                else if (get.attitude(player, players[i]) < 0) {
-                                    if (players[i].hp < 2) {
-                                        lose++;
-                                        recover -= 0.5;
-                                    }
-                                    lose++;
-                                    recover--;
-                                }
-                            }
-                            else {
-                                if (get.attitude(player, players[i]) > 0) {
-                                    lose--;
-                                }
-                                else if (get.attitude(player, players[i]) < 0) {
-                                    lose++;
-                                }
-                            }
-                        }
-                    }
-                    if (!player.getStorage('jujianmengxiang').includes('manchangyiyi9') && lose > recover && lose > 0) {
-                        //game.log('manchangyiyi9' + (button.link[2] == 'manchangyiyi9'));
-                        return (button.link[2] == 'manchangyiyi9') ? 1 : -1;
-                    }
-                    else if (!player.getStorage('jujianmengxiang').includes('jingjixiuli9') && lose < recover && recover > 0) {
-                        //game.log('jingjixiuli9' + (button.link[2] == 'jingjixiuli9'));
-                        return (button.link[2] == 'jingjixiuli9') ? 1 : -1;
-                    }
-                    else {
-                        //game.log('ewaibuji9' + (button.link[2] == 'ewaibuji9'));
-                        return (button.link[2] == 'ewaibuji9') ? 1 : -1;
-                    }
-                } else {
-                    game.log("AI没有可用的牌了！</br>也许您没有正确安装并启用‘舰r美化’卡牌包？");
-                    player.storage.jujianmengxiang_error = true;
-                }
+                const name = button?.link?.[2];
+                const info = lib.skill.jujianmengxiang;
+                if (!name || !info.availableNames(_status.event, player).includes(name)) return -1;
+                return info.cardValue(player, name) - info.hpValue(player);
             },
             backup(links, player) {
                 return {
                     viewAs: {
                         name: links[0][2],
                         isCard: true,
-
+                        // 美化牌使用时可能改名（如快修→桃），保留选中的原牌名用于次数限制。
+                        storage: { jujianmengxiangName: links[0][2] },
                     },
                     filterCard: () => false,
                     selectCard: -1,
@@ -2780,8 +2769,9 @@ const standard = {
                                 player.storage.jujianmengxiang_error = false;
                             });
                         }
-                        player.markAuto('jujianmengxiang', [result.card.name]);
-                        player.loseHp(1);
+                        player.markAuto('jujianmengxiang', [result.card.storage?.jujianmengxiangName || result.card.name]);
+                        // 显式记录代价来源；onuse产生的事件不一定挂在useCard父事件下。
+                        player.loseHp(1).set('skill', 'jujianmengxiang');
                     },
                 };
             },
@@ -2795,10 +2785,8 @@ const standard = {
                 player: function (player) {
                     if (!player.storage.jujianmengxiang) { player.storage.jujianmengxiang = []; }
                     if (player.storage.jujianmengxiang_error == true) return -1;
-                    if (player.countCards('h') >= player.hp - 1) return -1;
-                    if (player.hp < 3) return -1;
-                    if (player.storage.jujianmengxiang.includes('ewaibuji9')) return -1;
-                    return 1;
+                    // 与按钮评分共用同一判定：最优合法牌收益 - 失去1体力代价；正收益才发动。
+                    return lib.skill.jujianmengxiang.bestScore(_status.event, player);
                 },
             },
         },

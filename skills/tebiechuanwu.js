@@ -1057,12 +1057,18 @@ const tebiechuanwu = {
         trigger: { player: "useCardToTargeted" },
         direct: true,
         filter: function (event, player) {
-            return event.card && event.card.name == "sha" && event.target && event.target.countCards("h") > 0;
+            return event.card && event.card.name == "sha" && event.target && event.target != player &&
+                event.target.isIn() && event.target.countCards("h") > 0 && get.attitude(player, event.target) < 0;
         },
         content: function () {
             "step 0"
             player.chooseToCompare(trigger.target).set("ai", function (card) {
-                return get.number(card);
+                var target = trigger.target;
+                var value = get.number(card);
+                // 拼点必须先最大化胜率，再在同点数时偏好低价值牌。
+                value = value * 10 + (get.value(card) < 5 ? 2 : 0);
+                value += (get.attitude(player, target) < 0 ? 1 : -100);
+                return value;
             });
             "step 1"
             if (result.bool) {
