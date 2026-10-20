@@ -2968,14 +2968,44 @@ const standard = {
             }
 
         },
+        // 净收益口径与巨舰梦想一致：入口只比较「对目标伤害收益 − 流失体力代价」。
+        // 旧实现无论有没有桃/酒都返回 -8~-14，被对自己的正态度放大后入口恒负，
+        // 目标侧收益再高也加不回来。
+        hpCost(player) {
+            // 失去全部体力：最后 1 点不可安全支付；其余按 losehp 伪牌真实 effect 逐点计，
+            // 与伤害分开、不受护甲减免。
+            if (player.hp <= 1) return Infinity;
+            const loss = get.effect(player, { name: 'losehp', isCard: true }, player, player);
+            return Number.isFinite(loss) ? -loss * player.hp : 0;
+        },
+        // 手里有桃/酒（含舰R美化别名）时，流失后的体力可以自己救回，代价按可回复量折减。
+        saveValue(player) {
+            let saves = 0;
+            player.countCards('hs', function (card) {
+                if (['tao', 'jiu', 'kuaixiu9', 'zziqi9'].includes(get.name(card, player))) saves++;
+                return false;
+            });
+            if (!saves) return 0;
+            const recover = get.effect(player, { name: 'recover', isCard: true }, player, player);
+            return (Number.isFinite(recover) ? recover : 0) * Math.min(saves, player.hp);
+        },
+        bestScore(player) {
+            const info = lib.skill.wuweizhuangji;
+            const cost = info.hpCost(player);
+            if (!Number.isFinite(cost)) return -1;
+            let best = 0;
+            game.countPlayer(function (target) {
+                if (get.attitude(player, target) >= 0) return;
+                const dealt = get.damageEffect(target, player, player) * player.maxHp;
+                if (Number.isFinite(dealt)) best = Math.max(best, -dealt);
+            });
+            return best - cost + info.saveValue(player);
+        },
         ai: {
             order: 1,
             result: {
                 player: function (player) {
-                    var hasSave = player.countCards('hs', function (card) {
-                        return ['tao', 'jiu', 'kuaixiu9', 'zziqi9'].includes(get.name(card, player));
-                    }) > 0;
-                    return hasSave ? -8 - player.hp : -14 - player.hp;
+                    return lib.skill.wuweizhuangji.bestScore(player);
                 },
                 target: function (player, target) {
                     // 无畏装击：失去所有体力对目标造成等同于体力上限的伤害

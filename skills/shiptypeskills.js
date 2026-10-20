@@ -1838,13 +1838,14 @@ const shiptypeskills = {
     "fangkong2": {
         name: "防空", //audio: "ext:舰R牌将/audio/skill:1", audioname: ["yixian_R", "reganning", "sunce", "re_sunben", "re_sunce", "ol_sunjian"],
         unique: true, nodelay: true, lastDo: true,
+        group: ['fangkong2_roundreset'],
         trigger: { global: "useCardToPlayered", },
         filter: function (event, player) {
             if (event.getParent().triggeredTargets3.length > 1) return false;//万箭要作用七个目标,而你不想跟着遍历七次技能。
+            if (player.countMark('fangkong2_used_round') >= Math.min(3, player.countMark('jinengup') + 1)) return false;
             if (get.type(event.card) != 'trick') return false;
-            if (get.info(event.card).multitarget) return false;
-            if (!player.countCards('he')) return false;
-            if (event.targets.length < 2) return false;
+            var level = Math.min(3, player.countMark('jinengup') + 1);
+            if (player.countCards('he') < level || event.targets.length < level) return false;
             for (var i = 0; i < event.targets.length; i++) {
                 if (!event.targets[i].hasSkill("fangkong2_aibiexuan")) return true;
             } return false;
@@ -1855,29 +1856,24 @@ const shiptypeskills = {
             'step 0'
             var next = player.chooseCardTarget({
                 prompt: get.prompt('防空保护对象'),
-                prompt2: ('当一名角色使用的锦囊牌指定了至少两名角色为目标时,<br>你可弃置两张牌（拥有对空防御则改为一张）令此牌对距离你' + (player.countMark('jinengup') + 1) + '内的任意名角色无效。'),
-                position: 'hejs',//hej代指牌的位置,加个s即可用木流流马的牌。
+                prompt2: ('弃置' + Math.min(3, player.countMark('jinengup') + 1) + '张牌,令此牌对等量目标无效。'),
+                position: 'he',
                 selectCard: function () {
-                    var player = get.player();/*if(ui.selected.targets)return [1,Math.min(trigger.targets.length,Math.floor(player.countCards('he')))];*///取消弃牌数与选择目标数相等改为固定弃置两张牌2023.8.7
-                    if (player.hasSkill('duikongfangyu') || player.hasSkill("fangkongdanmu9_skill")) {
-                        return 1;//对空防御的技能效果。若玩家拥有对空防御,则弃牌1。&&防空弹幕的装备效果,若玩家拥有防空弹幕则弃牌1。
-                    }
-                    return 2;
-                },//要气质的卡牌,可以return[1,3]if(ui.selected.cards)return [ui.selected.cards.length,ui.selected.cards.length+player.countMark('jinengup')];return 1;-player.countMark('jinengup')
+                    var player = get.player();
+                    var limit = Math.min(3, player.countMark('jinengup') + 1);
+                    return [limit, limit];
+                },
                 selectTarget: function () {
-                    var player = get.player();/*if(ui.selected.cards)return [ui.selected.cards.length,ui.selected.cards.length];*/return [1, 7];
-                },//要选择的目标,同上,目标上限跟着手牌数走,怕报错跟个判定。
+                    var player = get.player();
+                    var limit = Math.min(3, player.countMark('jinengup') + 1);
+                    return [limit, limit];
+                },
                 filterCard: function (card, player) {
                     return lib.filter.cardDiscardable(card, player);
-                },//气质能气质掉的卡牌。
+                },
                 filterTarget: function (card, player, target) {
-                    if (_status.event.targets.includes(target) && !target.hasSkill('fangkong2_aibiexuan')) {
-                        if (player.hasSkill('duikongfangyu')) {
-                            return get.distance(player, target) <= 5;//对空防御的技能效果。若玩家拥有对空防御,则视为满级强化。
-                        }
-                        return get.distance(player, target) <= (1 + 2 * player.countMark('jinengup'));
-                    }
-                },//选择事件包含的目标,同trigger的目标。有其他同技能的角色时,ai不要重复选择目标。
+                    return _status.event.targets.includes(target) && !target.hasSkill('fangkong2_aibiexuan');
+                },
                 //构建/刷新本选择事件的净收益计划。缓存在 _status.event 上,ai1/ai2 共享,
                 //仅同一 chooseCardTarget 事件内复用,不跨 trigger 事件缓存。
                 _fangkong2Plan: function () {
@@ -1887,17 +1883,16 @@ const shiptypeskills = {
                     for (var i = 0; i < trigger.targets.length; i++) {
                         var t = trigger.targets[i];
                         if (t.hasSkill('fangkong2_aibiexuan')) { markedCount++; continue; }
-                        if (player.hasSkill('duikongfangyu')) {
-                            if (get.distance(player, t) <= 5) protectedCount++;
-                        } else if (get.distance(player, t) <= (1 + 2 * player.countMark('jinengup'))) protectedCount++;
+                        protectedCount++;
                     }
-                    var fp = player.countCards('hejs') + '|' + protectedCount + '|' + markedCount + '|' + (player.hasSkill('duikongfangyu') || player.hasSkill('fangkongdanmu9_skill') ? 1 : 2);
+                    var level = Math.min(3, player.countMark('jinengup') + 1);
+                    var fp = player.countCards('he') + '|' + protectedCount + '|' + markedCount + '|' + level;
                     var plan = event._fangkong2PlanCache;
                     //静态指纹一致则复用(选牌推进不影响静态集合,费用按ui.selected.cards实时另算)
                     if (plan && plan.fp === fp) return plan;
                     //重建计划:可保护集合+各目标不拦截的负效应
-                    var needCards = (player.hasSkill('duikongfangyu') || player.hasSkill('fangkongdanmu9_skill')) ? 1 : 2;
-                    var range = player.hasSkill('duikongfangyu') ? 5 : (1 + 2 * player.countMark('jinengup'));
+                    var needCards = Math.min(3, player.countMark('jinengup') + 1);
+                    var range = Infinity;
                     var protectable = [];//[{t, gain}] 仅含收益>0者
                     var totalGain = 0;
                     for (var i = 0; i < trigger.targets.length; i++) {
@@ -1962,6 +1957,7 @@ const shiptypeskills = {
                 player.discard(result.cards);//前面有卡牌card,可以返回card,不同于仁德主动技能直接写card。
                 event.target = result.targets;//前面有目标target,可以返回target。
                 if (event.target && event.target.length > 0) {
+                    player.addMark('fangkong2_used_round', 1, false);
                     for (var i = 0; i < trigger.targets.length; i += 1) {
                         if (event.target.includes(trigger.targets[i])) {
                             trigger.getParent().excluded.add(trigger.targets[i]);
@@ -1976,6 +1972,16 @@ const shiptypeskills = {
             }//让技能发语音,发历史记录。
         },
         subSkill: {
+            roundreset: {
+                trigger: { global: 'roundStart' },
+                forced: true,
+                popup: false,
+                content: function () {
+                    if (player.countMark('fangkong2_used_round')) {
+                        player.removeMark('fangkong2_used_round', player.countMark('fangkong2_used_round'));
+                    }
+                },
+            },
             aibiexuan: {
                 trigger: {
                     global: "useCardEnd",
@@ -2129,12 +2135,12 @@ const shiptypeskills = {
         trigger: { global: "phaseBefore", player: "enterGame" },
         direct: true,
         filter: function (event, player) {
-            return (event.name != 'phase' || game.phaseNumber == 0) && player.countCards("he") >= 4;
+            return (event.name != 'phase' || game.phaseNumber == 0) && player.countCards("he") >= 2;
         },
         popup: false,
         content: function () {
             "step 0"
-            player.chooseToDiscard("he", 4, "远程打击：是否弃置四张牌对一至两名其他角色造成共计两点伤害？").set("ai", function (card) {
+            player.chooseToDiscard("he", 2, "远程打击：是否弃置两张牌对一至两名其他角色造成共计两点伤害？").set("ai", function (card) {
                 return 8 - get.value(card);
             });
             "step 1"

@@ -248,8 +248,14 @@ const unfulfilledambition = {
         filter: function (event, player) {
             return player.countCards('h') > 0;
         },
-        check: function (card) {
-            return 17 - get.value(card);
+        // 原实现 check(card) 把 trigger 事件当成卡牌传给 get.value，必然抛
+        // TypeError: Cannot read properties of undefined (reading 'ai')（国战实测 2/20 局崩）。
+        // 触发技的 check 签名是 (event, player)，这里改为判断「有两张黑色手牌且万箭有正收益目标」。
+        check: function (event, player) {
+            if (player.countCards('h', function (card) { return get.color(card) == 'black'; }) < 2) return false;
+            return game.hasPlayer(function (current) {
+                return player.canUse({ name: 'wanjian' }, current) && get.effect(current, { name: 'wanjian' }, player, player) > 0;
+            });
         },
         frequent: true,
         content: function () {//hangmucv
@@ -1152,7 +1158,7 @@ const unfulfilledambition = {
             player: ["damageBegin4"],
         },
         filter(event, player, name) {
-            return event.num > 0;
+            return event.num > 0 && event.nature;
         },
         check: function (event, player) {
             return true;
@@ -1163,8 +1169,13 @@ const unfulfilledambition = {
                 return get.color(result) == "red" ? 2 : -2;
             });
             "step 1"
-            if (result.bool == true)
+            if (result.bool == true) {
                 trigger.cancel();
+                var card = get.cardPile(function (card) {
+                    return get.type(card) == "trick" && get.tag(card, "damage");
+                });
+                if (card) player.gain(card, "gain2");
+            }
         },
         ai: {
             effect: {
@@ -1233,6 +1244,14 @@ const unfulfilledambition = {
             if (player.maxHp >= 5 && !player.hasSkill("xianjinkongguan")) {
                 player.recover();
                 player.turnOver();
+                var tricks = [];
+                for (var i = 0; i < 3; i++) {
+                    var trick = get.cardPile(function (card) {
+                        return get.type(card) == "trick" && !tricks.includes(card);
+                    });
+                    if (trick) tricks.push(trick);
+                }
+                if (tricks.length) player.gain(tricks, "gain2");
                 player.addSkill("xianjinkongguan");
             }
         },
@@ -1257,7 +1276,7 @@ const unfulfilledambition = {
             return !get.tag(event.card, 'norepeat') && get.value(event.cards) + player.hp * 2 - 14 > 0;
         },
         content: function () {
-            player.damage("noSource");
+            player.loseHp();
             trigger.effectCount++;
         },
     },

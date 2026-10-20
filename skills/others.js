@@ -3,19 +3,10 @@ import { lib, game, ui, get, ai, _status } from '../../../noname.js';
 const others = {
     tebiekongxi: {
         nobracket: true,
-        init: function (player) {
-            //game.log("特别空袭初始化检查");
-            //game.log(typeof player.storage.gaosusheji);
-            if (typeof player.storage.tebiekongxi === 'undefined') player.storage.tebiekongxi = false;
-        },
         audio: "ext:舰R牌将/audio/skill:true",
-        zhuanhuanji: true,
-        mark: true,
-        marktext: "☯",
         intro: {
             content: function (storage, player, skill) {
-                if (player.storage.tebiekongxi) return '你的回合内,当你因使用打出或弃置而一次性失去两张或更多牌时,你可以将其中一张牌置于武将牌上,称为“战”(至多三张)。';
-                return '你的回合外,当你因使用打出或弃置而一次性失去两张或更多牌时,你可以将其中一张牌置于武将牌上,称为“战”(至多三张)。';
+                return '你的回合内,当你一次性失去两张或更多牌时,你可以摸一张牌；你的回合外,当你失去一张牌时,你可以将其置于武将牌上,称为“战”(至多三张),“战”可以当作无懈可击使用。';
             },
         },
         trigger: {
@@ -24,48 +15,35 @@ const others = {
         },
         frequent: true,
         filter: function (event, player) {
-            //var evtx = event.getParent('phaseUse');
-            //if (!evtx || evtx.player != player) return false;
-            //game.log("特别空袭初始化检查");
-            if (typeof player.storage.tebiekongxi === 'undefined') player.storage.tebiekongxi = false;
             var evt = event.getl(player);
-            if (evt.cards2.length <= 1) { return false; }
-            var zhandouji = player.getExpansions('zhandouji').length + player.getCards('s', function (card) { return card.hasGaintag('zhandouji') }).length;
-            if (zhandouji >= 3) { return false; }
-            if (player.storage.tebiekongxi) {
-                //game.log("阳");
-                return _status.currentPhase == player;
-            } else {
-                //game.log("阴");
-                return _status.currentPhase != player;
-
+            if (!evt) return false;
+            if (_status.currentPhase == player) {
+                return evt.cards2.length >= 2;
             }
-
+            if (evt.cards2.length < 1) return false;
+            var zhandouji = player.getExpansions('zhandouji').length + player.getCards('s', function (card) { return card.hasGaintag('zhandouji') }).length;
+            return zhandouji < 3;
         },
         check(event, player) {
             return true;
         },
         content: function () {
             'step 0'
-            if (typeof player.storage.tebiekongxi === 'undefined') { player.storage.tebiekongxi = false; }
-            //game.log("1:" + player.storage.tebiekongxi);
-            player.storage.tebiekongxi = (!player.storage.tebiekongxi);
-            //player.changeZhuanhuanji('gaosusheji');
-            //game.log("2:" + player.storage.tebiekongxi);
+            if (_status.currentPhase == player) {
+                player.draw();
+                event.finish();
+                return;
+            }
             var zhandouji = player.getExpansions('zhandouji').length + player.getCards('s', function (card) { return card.hasGaintag('zhandouji') }).length;
             if (zhandouji < 3) {
-                //game.log(trigger.getl(player).cards2);
                 player.chooseCardButton('将一张牌置于你的武将牌上,称为“战”,<br>至多为三<br>这些牌可以当作无懈可击使用', true, trigger.getl(player).cards2).set('ai', function (card) {
-                    var player = get.player();
                     return true;
                 });
             }
             else { event.finish(); }
             'step 1'
-            //game.log(result.links);
             if (result.bool) {
-                // player.addToExpansion(result.cards,player,'giveAuto').gaintag.add('junfu');player.update();
-                player.loseToSpecial(result.links, 'zhandouji', player).visible = true;
+                player.addToExpansion(result.links, player, 'giveAuto').gaintag.add('zhandouji');
             }
         },
         /*  onremove: function (player, skill) {

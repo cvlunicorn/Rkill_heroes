@@ -694,7 +694,9 @@ const guozhanskills = {
         filter(event, player) { return event.card && event.card.name == 'sha' && event.player.countCards('h') && player.countCards('h'); },
         content() {
             'step 0'
-            player.chooseToPindian(trigger.player, '四大金刚：是否与其拼点？');
+            // 引擎没有 chooseToPindian；拼点 API 是 chooseToCompare(target, ai)。
+            // 该技为 direct 触发（无玩家询问），第二参不能传提示字符串，否则会被当成 AI 函数。
+            player.chooseToCompare(trigger.player);
             'step 1'
             if (result.bool && result.winner == player) { player.gainPlayerCard(trigger.player, 'he', true); if (!player.isMajor()) player.gainPlayerCard(trigger.player, 'h', true); }
         },

@@ -471,17 +471,51 @@ const shuileizhandui = {
                 await target.damage(damage, player);
             }
         },
+        // 净收益口径：入口比较「对目标 floor(体力/2) 点伤害收益 − 流失 1 点体力代价」。
+        // 旧实现用 damageEffect(自己,自己,自己) 当代价，恒负且与目标收益没有比较，
+        // 入口分被锁死；实际结算是 loseHp，不走伤害、不受护甲减免。
+        hpCost(player) {
+            if (player.hp <= 1) return Infinity;
+            const loss = get.effect(player, { name: 'losehp', isCard: true }, player, player);
+            return Number.isFinite(loss) ? -loss : 0;
+        },
+        saveValue(player) {
+            let saves = 0;
+            player.countCards('hs', function (card) {
+                if (['tao', 'jiu', 'kuaixiu9', 'zziqi9'].includes(get.name(card, player))) saves++;
+                return false;
+            });
+            if (!saves) return 0;
+            const recover = get.effect(player, { name: 'recover', isCard: true }, player, player);
+            return Number.isFinite(recover) ? recover : 0;
+        },
+        targetScore(player, target) {
+            if (!target || target == player || get.attitude(player, target) >= 0) return 0;
+            const damage = Math.floor(Math.max(target.getHp(), 0) / 2);
+            if (damage <= 0) return 0;
+            const dealt = get.damageEffect(target, player, player) * damage;
+            return Number.isFinite(dealt) ? -dealt : 0;
+        },
+        bestScore(player) {
+            const info = lib.skill.wuyizhuangji;
+            const cost = info.hpCost(player);
+            if (!Number.isFinite(cost)) return -1;
+            let best = 0;
+            game.countPlayer(function (target) {
+                best = Math.max(best, info.targetScore(player, target));
+            });
+            return best - cost + info.saveValue(player);
+        },
         ai: {
             order: 7,
             result: {
-                player: function (player, target) {
-                    if (player.hp <= 1) return -20;
-                    return get.damageEffect(player, player, player);
+                player: function (player) {
+                    return lib.skill.wuyizhuangji.bestScore(player);
                 },
                 target: function (player, target) {
-                    var damage = Math.floor(Math.max(target.getHp(), 0) / 2);
-                    if (damage <= 0) return 0;
-                    return get.damageEffect(target, player, player) * damage;
+                    // 目标侧只报伤害收益；代价已在 result.player 扣除，避免被态度系数重复计算。
+                    const score = lib.skill.wuyizhuangji.targetScore(player, target);
+                    return score > 0 ? -score : 0;
                 },
             },
         },

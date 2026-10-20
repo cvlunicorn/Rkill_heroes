@@ -1409,6 +1409,27 @@ const fallendemon = {
         mark: true,
         marktext: "☯",
         frequent: true,
+        group: ["shuangzi_choose"],
+        subSkill: {
+            choose: {
+                charlotte: true,
+                trigger: { global: "gameStart" },
+                direct: true,
+                filter: function (event, player) {
+                    return player.isAlive();
+                },
+                content: function () {
+                    "step 0"
+                    player.chooseControl("阳", "阴", "cancel2").set("prompt", "双子：游戏开始时，你可以选择阴阳状态").set("ai", function () {
+                        return "阳";
+                    });
+                    "step 1"
+                    if (result.control == "阳") player.storage.shuangzi = false;
+                    else if (result.control == "阴") player.storage.shuangzi = true;
+                },
+                sub: true,
+            },
+        },
         intro: {
             content: function (storage, player, skill) {
                 if (storage) return '你使用或打出锦囊牌时摸一张牌';
@@ -1440,7 +1461,7 @@ const fallendemon = {
         },
     },
     akagikaga_R_zongyu: {
-        global: "akagikaga_R_zongyu_turnOver",
+        global: ["akagikaga_R_zongyu_turnOver", "akagikaga_R_zongyu_turnOver1"],
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
         forced: true,
@@ -1476,7 +1497,7 @@ const fallendemon = {
             }
         },
     },
-    zongyu_turnOver: {
+    akagikaga_R_zongyu_turnOver: {
         trigger: { target: 'useCardToTargeted', },
         popup: false,
         onremove: true,
@@ -1490,7 +1511,7 @@ const fallendemon = {
         charlotte: true,
         content() {
             "step 0"
-            player.storage.akagikaga_R_zongyu_turnOver += 1;
+            player.storage.akagikaga_R_zongyu_turnOver = (player.storage.akagikaga_R_zongyu_turnOver || 0) + 1;
             "step 1"
             if (player.storage.akagikaga_R_zongyu_turnOver >= player.hp) {
                 player.turnOver();
