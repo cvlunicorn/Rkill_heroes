@@ -715,6 +715,20 @@ const unfulfilledambition = {
             },
             result: {
                 player(player, target) {
+                    // 万箭齐发为全场 AOE：先按全场净收益（未出闪的敌方 - 未出闪的友方）评估，
+                    // 净收益≥2 即发动；否则回落到下方“单目标濒死补刀”逻辑。
+                    if (!player._wanjian_temp && !player.hasSkillTag("jueqing", false, target)) {
+                        let netHits = 0;
+                        game.countPlayer(function (current) {
+                            if (current == player || !current.isIn()) return;
+                            if (current.countCards("h", "shan") > 0) return;
+                            // 与 yangwangxingkong.doCook 同口径：伤害收益由 damageEffect 决定（身份未知时 attitude 失真）
+                            let dmg = get.damageEffect(current, player, player);
+                            if (dmg > 0) netHits++;
+                            else if (dmg < 0) netHits--;
+                        });
+                        if (netHits >= 2) return 1;
+                    }
                     if (player._wanjian_temp || player.hasSkillTag("jueqing", false, target))
                         return 0;
                     player._wanjian_temp = true;

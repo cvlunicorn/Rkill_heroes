@@ -1491,6 +1491,8 @@ const others = {
         enable: "phaseUse",
         filter: function (event, player) {
             if (player.storage.kuanhuankaimu) return false;
+            // 本出牌阶段内已取消过选牌（代价未付）则不再提供，避免 AI 反复选目标→取消的无成本循环。
+            if (player.hasSkill('kuanhuankaimu_skip')) return false;
             return player.countCards('h') > 0 && game.hasPlayer(function (t) { return t.isLinked(); });
         },
         check: function (event, player) {
@@ -1502,37 +1504,63 @@ const others = {
                     && get.attitude(player, target) + 1 > lowestCardValue;
             });
         },
+        // 评分（原缺失 → get.result 返回 {}，效果恒为 0，永不被选）：
+        // 弃 1 手牌（代价）换“令横置角色重置并摸1张”。重置对友方有利（正值），对敌方不利（0，不主动帮敌方解除横置）。
+        ai: {
+            order: 2,
+            result: {
+                // 仅当场上存在横置友方时才有收益（否则只会帮敌方解除横置，或白白弃牌）
+                player: function (player) {
+                    return game.hasPlayer(function (t) {
+                        return t.isLinked() && get.attitude(player, t) > 0;
+                    }) ? 0.5 : 0;
+                },
+                // 技能层面评估时引擎不传入目标（已验证：10/10 次为 noTarget），目标选择由 chooseTarget 的 ai 按态度决定；
+                // 有目标时：横置友方为 1，其他为 0。
+                target: function (player, target) {
+                    return target && target.isLinked() && get.attitude(player, target) > 0 ? 1 : 0;
+                },
+            },
+        },
         content: function () {
             "step 0"
-            player.changeZhuanhuanji('kuanhuankaimu');
+            // 先选目标、再付代价、最后结算并切换阴阳面：任何一步取消都不会留下“付了代价却没切换”的状态（否则会无限循环发动）。
+            // 必选（true）：若可取消，AI 选了目标后又拒绝出牌会反复重选，形成无成本循环（已实测 202 次/局）
+            player.chooseTarget('狂欢开幕：选择一名横置的角色，令其重置并摸1张牌', function (card, player, target) {
+                return target.isLinked();//只能选横置的角色
+            }, true).set('ai', function (target) {
+                //AI：优先解除友方横置（态度>0则解除，<0则帮助敌人失去横置护盾）
+                return get.attitude(get.player(), target);
+            });
+            "step 1"
+            if (!result.bool || !result.targets || !result.targets.length) {
+                event.finish(); return;
+            }
+            event.target = result.targets[0];
             //玩家选择弃置1张手牌（代价）
+            // 弃牌可取消（false）：取消则直接结束，不弃牌、不切换阴阳面、不执行后续效果。
             player.chooseCard('h', get.prompt('kuanhuankaimu'), '弃置一张手牌，令一名横置角色重置并摸1张牌', false)
                 .set('ai', function (card) {
                     return 6 - get.value(card);//AI：优先弃价值低的牌
                 });
-            "step 1"
+            "step 2"
             if (!result.bool || !result.cards || !result.cards.length) {
+                player.addTempSkill('kuanhuankaimu_skip', 'phaseUseAfter');//取消：本阶段不再提供，阶段结束后恢复
                 event.finish(); return;//玩家取消
             }
             player.discard(result.cards);//弃置所选手牌
-            player.logSkill('kuanhuankaimu');//记录技能发动日志
-            //选择目标：一名横置（连环状态）的角色
-            player.chooseTarget('狂欢开幕：选择一名横置的角色，令其重置并摸1张牌', function (card, player, target) {
-                return target.isLinked();//只能选横置的角色
-            }).set('ai', function (target) {
-                //AI：优先解除友方横置（态度>0则解除，<0则帮助敌人失去横置护盾）
-                return get.attitude(get.player(), target);
-            });
-            "step 2"
-            if (!result.bool || !result.targets || !result.targets.length) {
-                event.finish(); return;
-            }
-            var t = result.targets[0];
-            t.link();//重置：link()切换状态，从横置变为正常（因已横置，再link()则恢复）
-            t.draw(1);//该角色摸1张牌
+            player.logSkill('kuanhuankaimu');//记录技能发动日志（代价已付、目标已定，真正结算）
+            player.changeZhuanhuanji('kuanhuankaimu');//切换阴阳面
+            event.target.link();//重置：link()切换状态，从横置变为正常（因已横置，再link()则恢复）
+            event.target.draw(1);//该角色摸1张牌
 
         },
+
+
     },
+
+    // 狂欢开幕阴面取消标记：仅作为本出牌阶段的临时标记，无内容。
+    kuanhuankaimu_skip: {},
 
     // ============================================
     // ⑦ 提尔比茨 - 牵制
@@ -4095,6 +4123,18 @@ const others = {
             fireAttack: true,
             thunderAttack: true,
             threaten: 1.05,
+            // 评分：viewAs 为属性杀，需存在可用且有正收益的目标才有价值（否则 get.result 为 {}，永不被选）。
+            order: function (card, player) {
+                return get.order({ name: "sha", nature: "fire" }, player) || 3;
+            },
+            result: {
+                player: function (player) {
+                    return game.hasPlayer(function (target) {
+                        return target != player && player.canUse({ name: "sha" }, target) &&
+                            get.effect(target, { name: "sha" }, player, player) > 0;
+                    }) ? 1 : 0;
+                },
+            },
         },
     },
     //近援

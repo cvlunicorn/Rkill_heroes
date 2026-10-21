@@ -30,11 +30,13 @@ const historybattles = {
         },
         ai: {
             result: {
+                // 结算效果：目标被其他角色计算距离为1（暴露）。负值=对目标有害；
+                // effect_use 中 final = result2·att(player,target)：敌方得正收益，盟友得负收益。
                 target: function (player, target) {
                     if (ui.selected.cards.length && ui.selected.cards[0].name == 'du') {
-                        return -1;
+                        return -2;
                     }
-                    return 1;
+                    return -1;
                 },
             },
             order: 1,
