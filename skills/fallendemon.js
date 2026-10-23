@@ -1976,7 +1976,13 @@ const fallendemon = {
             return player.countCards("h") > 0 && game.hasPlayer(current => player.canCompare(current));
         },
         check: function (event, player) {
-            return player.countCards("h") > 1;
+            if (player.hp <= 1) return false;
+            var cards = player.getCards("h");
+            if (cards.length == 0) return false;
+            var best = Math.max.apply(null, cards.map(function (card) {
+                return get.number(card, player);
+            }));
+            return best >= 8 || (best >= 6 && cards.length >= 3);
         },
         direct: true,
         log: false,
@@ -1986,22 +1992,36 @@ const fallendemon = {
                 return player.canCompare(target);
             }).set('ai', target => {
                 var player = _status.event.player;
-                return -get.attitude(player, target);
+                var mine = player.getCards('h').map(card => get.number(card, player));
+                var theirs = target.getCards('h').map(card => get.number(card, target));
+                if (!mine.length || !theirs.length) return 0;
+                var wins = 0, total = 0;
+                for (var i = 0; i < mine.length; i++) {
+                    for (var j = 0; j < theirs.length; j++) {
+                        total++;
+                        if (mine[i] > theirs[j]) wins++;
+                    }
+                }
+                var chance = total ? wins / total : 0;
+                var attitude = get.attitude(player, target);
+                var expected = chance * (attitude < 0 ? 2.5 : 0.5) + (1 - chance) * (attitude > 0 ? 1.5 : -2.5);
+                return expected;
             });
             "step 1"
             if (result.bool) {
-                player.chooseToCompare(result.targets[0]);
+                event.compareTarget = result.targets[0];
+                player.chooseToCompare(event.compareTarget);
             }
-            "step 1"
+            "step 2"
             if (result.bool) {
                 player.addTempSkill("cassone_R_weizhuangqixi_win");
                 player.addTempSkill("cassone_R_weizhuangqixi_remove");
-                player.markAuto("cassone_R_weizhuangqixi_win", target);
+                player.markAuto("cassone_R_weizhuangqixi_win", event.compareTarget);
             } else {
                 player.loseHp(1);
                 player.addTempSkill("cassone_R_weizhuangqixi_lose");
                 player.addTempSkill("cassone_R_weizhuangqixi_remove");
-                player.markAuto("cassone_R_weizhuangqixi_lose", target);
+                player.markAuto("cassone_R_weizhuangqixi_lose", event.compareTarget);
             }
         },
         ai: {
@@ -2878,7 +2898,12 @@ const fallendemon = {
             return player.countCards("hes") > 1 && lib.skill.yamato_R_dikai.getList(player, event).length > 0;
         },
         hiddenCard: function (player, name) {
-            return name == "sha" && player.countCards("hes") > 1;
+            if (name != "sha" || player.countCards("hes") < 2) return false;
+            var event = _status.event;
+            return !!(event && typeof event.filterCard == "function" &&
+                lib.skill.yamato_R_dikai.getList(player, event).some(function (card) {
+                    return card[2] == name;
+                }));
         },
         chooseButton: {
             dialog: function (event, player) {
@@ -2913,7 +2938,7 @@ const fallendemon = {
                     selectCard: 2,
                     position: "hes",
                     check: function (card) {
-                        return 6 - get.value(card);
+                        return 8 - get.value(card);
                     },
                     viewAs: { name: links[0][2], nature: links[0][3] },
                     popname: true,
@@ -2925,8 +2950,13 @@ const fallendemon = {
         },
         ai: {
             respondSha: true,
-            skillTagFilter: function (player) {
-                return player.countCards("hes") > 1;
+            skillTagFilter: function (player, tag) {
+                if (tag != "respondSha" || player.countCards("hes") < 2) return false;
+                var event = _status.event;
+                return !!(event && typeof event.filterCard == "function" &&
+                    lib.skill.yamato_R_dikai.getList(player, event).some(function (card) {
+                        return card[2] == "sha";
+                    }));
             },
             order: 3.1,
             result: { player: 1 },
@@ -2961,9 +2991,12 @@ const fallendemon = {
         },
         hiddenCard: function (player, name) {
             if (player.countCards("hes") < 2) return false;
-            if (name == "sha" || name == "shan" || name == "jiu") return true;
-            if (name == "tao") return !player.getStat("skill").yamato_R_dikai2_tao;
-            return false;
+            var event = _status.event;
+            if (!event || typeof event.filterCard != "function") return false;
+            if (name == "tao" && player.getStat("skill").yamato_R_dikai2_tao) return false;
+            return lib.skill.yamato_R_dikai2.getList(player, event).some(function (card) {
+                return card[2] == name;
+            });
         },
         chooseButton: {
             dialog: function (event, player) {
@@ -3009,7 +3042,7 @@ const fallendemon = {
                     selectCard: 2,
                     position: "hes",
                     check: function (card) {
-                        return 6 - get.value(card);
+                        return 8 - get.value(card);
                     },
                     viewAs: { name: links[0][2], nature: links[0][3] },
                     popname: true,
@@ -3035,8 +3068,13 @@ const fallendemon = {
             save: true,
             skillTagFilter: function (player, tag) {
                 if (player.countCards("hes") < 2) return false;
-                if (tag == "save") return !player.getStat("skill").yamato_R_dikai2_tao;
-                return true;
+                var event = _status.event;
+                if (!event || typeof event.filterCard != "function") return false;
+                var list = lib.skill.yamato_R_dikai2.getList(player, event);
+                if (tag == "respondSha") return list.some(function (card) { return card[2] == "sha"; });
+                if (tag == "respondShan") return list.some(function (card) { return card[2] == "shan"; });
+                if (tag == "save") return list.some(function (card) { return card[2] == "tao"; });
+                return false;
             },
             order: 3.1,
             result: { player: 1 },

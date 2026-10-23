@@ -463,7 +463,7 @@ const standard = {
         },
         content() {
             "step 0"
-            event.cards = get.cards(trigger.targets.length);
+            event.cards = get.cards(Math.min(trigger.targets.length, 4));
             game.cardsGotoOrdering(event.cards);
             event.videoId = lib.status.videoId++;
             game.broadcastAll(function (player, id, cards) {
@@ -481,9 +481,13 @@ const standard = {
             game.addVideo('showCards', player, ['航空战术先驱', get.cardsInfo(event.cards)]);
             game.addVideo('delay', null, 2);
             "step 1"
-            var list = [];
-            for (var i of event.cards) list.add(get.suit(i, false));
-            var next = player.chooseButton(list.length, true);
+            var suits = [];
+            for (var i of event.cards) {
+                var suit = get.suit(i, false);
+                if (!suits.includes(suit)) suits.push(suit);
+            }
+            var selectCount = Math.min(event.cards.length, suits.length);
+            var next = player.chooseButton(selectCount, true);
             next.set('dialog', event.videoId);
             next.set('filterButton', function (button) {
                 for (var i = 0; i < ui.selected.buttons.length; i++) {

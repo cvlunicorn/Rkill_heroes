@@ -66,21 +66,30 @@ const others = {
                 viewAs: {
                     name: "wuxie",
                 },
-                filter: function (event, player, name) {
-                    return player.getCards('s', function (card) { return card.hasGaintag('zhandouji') }).length > 0;
+                filter: function (event, player) {
+                    return player.getCards('s', function (card) { return card.hasGaintag('zhandouji') }).length > 0 && event.filterCard({ name: "wuxie", isCard: true }, player, event);
                 },
                 viewAsFilter(player) {
                     return player.getCards('s', function (card) { return card.hasGaintag('zhandouji') }).length > 0;
                 },
-                prompt: "将一张武将牌上的牌当无懈可击使用",
-                sub: true,
                 ai: {
+                    order: 4,
+                    check: function (card) {
+                        return 8 - get.value(card);
+                    },
                     basic: {
                         useful: [6, 4, 3],
                         value: [6, 4, 3],
                     },
                     result: {
-                        player: 1,
+                        player: function (player) {
+                            var trigger = _status.event.getTrigger && _status.event.getTrigger();
+                            if (!trigger || !trigger.card) return 0;
+                            var targets = trigger.targets && trigger.targets.length ? trigger.targets : trigger.target ? [trigger.target] : [];
+                            return targets.reduce(function (sum, target) {
+                                return sum - get.effect(target, trigger.card, trigger.player, player);
+                            }, 0);
+                        },
                     },
                     expose: 0.2,
                 },
@@ -432,7 +441,7 @@ const others = {
             return true;
         },
         prompt: "将一张红色牌当雷杀使用",
-        check(card) { return 4 - get.value(card) },
+        check(card) { return 5.5 - get.value(card) },
         ai: {
             yingbian: function (card, player, targets, viewer) {
                 return lib.card.sha.ai.yingbian(card, player, targets, viewer);
@@ -2468,15 +2477,21 @@ const others = {
                 viewAsFilter: function (player) {
                     return player.getCards('s').length > 0;
                 },
-                prompt: "将一张武将牌上的牌当无懈可击使用或打出",
-                sub: true,
                 ai: {
+                    order: 4,
                     basic: {
                         useful: [6, 4, 3],
                         value: [6, 4, 3],
                     },
                     result: {
-                        player: 1,
+                        player: function (player) {
+                            var trigger = _status.event.getTrigger && _status.event.getTrigger();
+                            if (!trigger || !trigger.card) return 0;
+                            var targets = trigger.targets && trigger.targets.length ? trigger.targets : trigger.target ? [trigger.target] : [];
+                            return targets.reduce(function (sum, target) {
+                                return sum - get.effect(target, trigger.card, trigger.player, player);
+                            }, 0);
+                        },
                     },
                     expose: 0.2,
                 },
@@ -2779,8 +2794,8 @@ const others = {
                 event.finish();
             }
             "step 4"
-            //使用获得的装备牌，若不能使用则留在手牌
-            if (event.gainedCard && player.getCards("h").includes(event.gainedCard) && player.canUse(event.gainedCard, player)) {
+            //栏位已废除或无法装备时留在手牌，不能把牌用掉后静默消失
+            if (event.gainedCard && player.getCards("h").includes(event.gainedCard) && player.canEquip(event.gainedCard, true) && player.canUse(event.gainedCard, player)) {
                 player.useCard(event.gainedCard, player);
             }
         },
@@ -2795,9 +2810,9 @@ const others = {
         enable: "phaseUse",
         usable: 1,
         filterCard: function (card) {
-            return get.type(card) == "equip";
+            return get.type(card) == "equip" && !card.classList.contains("feichu");
         },
-        position: "h",
+        position: "he",
         filterTarget: function (card, player, target) {
             return !target.isDisabled("equip1");
         },
@@ -2886,6 +2901,16 @@ const others = {
         audio: false,
         nobracket: true,
         enable: ["chooseToUse", "chooseToRespond"],
+        filter: function (event, player) {
+            return player.countCards("hs", function (card) {
+                return card.name == "sha" || card.name == "sheji9";
+            }) > 0 && event.filterCard({ name: "wuxie", isCard: true }, player, event);
+        },
+        viewAsFilter: function (player) {
+            return player.countCards("hs", function (card) {
+                return card.name == "sha" || card.name == "sheji9";
+            }) > 0;
+        },
         filterCard: function (card) {
             return card.name == "sha" || card.name == "sheji9";
         },
@@ -2893,16 +2918,26 @@ const others = {
         viewAs: { name: "wuxie" },
         prompt: "将一张杀当制空权使用",
         check: function (card) {
-            return 6 - get.value(card);
+            var trigger = _status.event.getTrigger();
+            if (trigger && trigger.card && trigger.card.name == "chiling") return -1;
+            return 8 - get.value(card);
         },
         hiddenCard: function (player, name) {
-            if (name == "wuxie") return player.countCards("hs", "sha") > 0;
+            if (name == "wuxie") return player.countCards("hs", function (card) {
+                return card.name == "sha" || card.name == "sheji9";
+            }) > 0;
         },
         ai: {
-            order: 1,
-            respondWuxie: true,
+            order: 4,
+            respondwuxie: true,
             skillTagFilter: function (player, tag) {
-                if (tag == "respondWuxie") return player.countCards("hs", "sha") > 0;
+                if (tag == "respondwuxie") return player.countCards("hs", function (card) {
+                    return card.name == "sha" || card.name == "sheji9";
+                }) > 0;
+            },
+            basic: {
+                useful: [6, 4, 3],
+                value: [6, 4, 3],
             },
             result: { player: 1 },
         },

@@ -587,14 +587,20 @@ const guozhanskills = {
             order: 1,
             result: {
                 player: function (player) {
-                    var enemies = 0, allies = 0;
+                    if (player.hp <= 2 || player.countCards("he") < 5) return 0;
+                    var score = 0;
                     game.countPlayer(function (current) {
-                        if (current == player) return;
-                        if (get.attitude(player, current) < 0) enemies++;
-                        else if (get.attitude(player, current) > 0) allies++;
+                        score += get.damageEffect(current, player, player, "fire") * 2;
                     });
-                    if (enemies > allies + 1 && player.hp > 3) return 1;
-                    return 0;
+                    var costs = player.getCards("he").map(function (card) {
+                        return get.value(card, player);
+                    }).sort(function (a, b) {
+                        return a - b;
+                    }).slice(0, 5);
+                    var discardCost = costs.reduce(function (sum, value) {
+                        return sum + Math.max(0, value - 2) * 0.35;
+                    }, 0);
+                    return score - discardCost;
                 },
             },
         },
@@ -789,7 +795,41 @@ const guozhanskills = {
             trigger.getParent().targets.push(player);
         },
     },
-    gz_zhongbangtuxi: { limited: true, enable: 'phaseUse', audio: "ext:舰R牌将/audio/skill:true", selectCard: [1, Infinity], filterCard: { color: 'red' }, selectTarget() { return ui.selected.cards.length; }, filterTarget: true, multitarget: true, content() { player.awakenSkill('gz_zhongbangtuxi'); targets.forEach(target => target.damage(player.siege(target) ? 2 : 1, 'fire', player)); } },
+    gz_zhongbangtuxi: {
+        limited: true,
+        enable: 'phaseUse',
+        audio: "ext:舰R牌将/audio/skill:true",
+        selectCard: [1, Infinity],
+        filterCard: { color: 'red' },
+        selectTarget() { return ui.selected.cards.length; },
+        filterTarget(card, player, target) {
+            return target != player && get.attitude(player, target) < 0;
+        },
+        multitarget: true,
+        content() {
+            player.awakenSkill('gz_zhongbangtuxi');
+            targets.forEach(target => target.damage(player.siege(target) ? 2 : 1, 'fire', player));
+        },
+        ai: {
+            order: 7,
+            result: {
+                player(player) {
+                    if (!player.countCards('h', { color: 'red' })) return 0;
+                    const enemies = game.countPlayer(target =>
+                        target != player && target.isIn() && get.attitude(player, target) < 0
+                    );
+                    return enemies > 0 ? 1 : 0;
+                },
+                target(player, target) {
+                    if (target == player || get.attitude(player, target) >= 0) return 0;
+                    return -get.damageEffect(target, player, player, 'fire');
+                },
+            },
+            check(card) {
+                return 6 - get.value(card);
+            },
+        },
+    },
     //国战运输 - 出牌阶段限一次，你可以将两张手牌当作【补给】使用
     gz_yunshu: {
         audio: false,

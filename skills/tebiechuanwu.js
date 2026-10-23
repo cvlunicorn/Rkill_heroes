@@ -957,6 +957,9 @@ const tebiechuanwu = {
             var evt = trigger.getParent();
             if (evt.baseDamage) evt.baseDamage++;
         },
+        check: function (event, player) {
+            return event.target && get.attitude(player, event.target) < 0;
+        },
         ai: {
             presha: true,
             pretao: true,
