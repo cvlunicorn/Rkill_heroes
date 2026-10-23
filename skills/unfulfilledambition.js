@@ -348,15 +348,18 @@ const unfulfilledambition = {
         nobracket: true,
         enable: "chooseToUse",
         hiddenCard: function (player, name) {
-            if (name == "wuxie") return player.countMark('shenfeng') >= 1;
+            if (name == "wuxie") return !player.hasSkill('buju_wuxie_disable') && player.countMark('shenfeng') >= 1;
             return false;
         },
         viewAs: {
             name: "wuxie",
             isCard: false,
         },
+        filter: function (event, player) {
+            return !player.hasSkill('buju_wuxie_disable') && player.countMark('shenfeng') >= 1 && event.filterCard({ name: "wuxie", isCard: true }, player, event);
+        },
         viewAsFilter: function (player) {
-            return (!player.hasSkill('buju_wuxie_disable')) && player.countMark('shenfeng') >= 1;
+            return !player.hasSkill('buju_wuxie_disable') && player.countMark('shenfeng') >= 1;
         },
         filterCard: () => true,
         prompt: "将一张牌当作【无懈可击】",
@@ -371,12 +374,33 @@ const unfulfilledambition = {
         },
         ai: {
             order: 4,
+            check: function (card) {
+                var trigger = _status.event.getTrigger();
+                if (trigger && trigger.card && trigger.card.name == 'chiling') return -1;
+                return 8 - get.value(card);
+            },
             basic: {
                 useful: [6, 4, 3],
                 value: [6, 4, 3],
             },
             result: {
-                player: 1,
+                player: function (player) {
+                    var response = _status.event;
+                    var trigger = response && response.getTrigger ? response.getTrigger() : null;
+                    if (!trigger || !trigger.card) return 0;
+                    var wuxieEvent = response.getParent && response.getParent('_wuxie');
+                    var state = wuxieEvent && wuxieEvent.state < 0 ? -1 : 1;
+                    var targets = trigger.targets && trigger.targets.length ? trigger.targets : trigger.target ? [trigger.target] : [];
+                    var score = 0;
+                    for (var i = 0; i < targets.length; i++) {
+                        score -= get.effect(targets[i], trigger.card, trigger.player, player) * state;
+                    }
+                    if (trigger.card.ai && trigger.card.ai.wuxie && targets.length) {
+                        var custom = trigger.card.ai.wuxie(targets[0], trigger.card, trigger.player, player, state);
+                        if (typeof custom == 'number') score = custom;
+                    }
+                    return score;
+                },
             },
             expose: 0.2,
         },
@@ -3035,14 +3059,15 @@ const unfulfilledambition = {
             order: 1,
             result: {
                 player: function (player) {
+                    if (player.hp <= 2 || player.countCards("he") < 5) return 0;
                     var enemies = 0, allies = 0;
                     game.countPlayer(function (current) {
                         if (current == player) return;
-                        if (get.attitude(player, current) < 0) enemies++;
-                        else if (get.attitude(player, current) > 0) allies++;
+                        var attitude = get.attitude(player, current);
+                        if (attitude < 0) enemies++;
+                        else if (attitude > 0) allies++;
                     });
-                    if (enemies > allies + 1 && player.hp > 3) return 1;
-                    return 0;
+                    return enemies > allies ? enemies - allies : 0;
                 },
             },
         },
@@ -3139,47 +3164,30 @@ const unfulfilledambition = {
             },
             result: {
                 player: function (player) {
-                    //失去1点体力的代价
-                    var hpCost = -7;
-                    if (player.hp == 1) return -20; //濒死不用
-                    if (player.hp == 2) hpCost = -10; //低血更谨慎
+                    var response = _status.event;
+                    var wuxieEvent = response && response.getParent ? response.getParent("_wuxie") : null;
+                    var trigger = response && response.getTrigger ? response.getTrigger() : null;
+                    var trick = trigger && trigger.card;
+                    var cost = player.hp <= 1 ? 20 : player.hp == 2 ? 10 : 7;
+                    if (!trick) return -cost;
 
-                    //评估无懈的价值
-                    var event = _status.event.getParent();
-                    if (!event || !event.card) return hpCost;
-
-                    //如果是针对自己的负面锦囊，价值较高
-                    if (event.targets && event.targets.includes(player)) {
-                        if (get.tag(event.card, "damage")) return 10 + hpCost; //伤害锦囊
-                        if (get.tag(event.card, "loseCard")) return 5 + hpCost; //弃牌锦囊
-                        return 3 + hpCost; //其他负面效果
+                    // 与原版无懈 AI 一致，依据被响应牌对目标的实际收益决定是否支付体力。
+                    var state = wuxieEvent && wuxieEvent.state < 0 ? -1 : 1;
+                    var targets = trigger.targets && trigger.targets.length ? trigger.targets : trigger.target ? [trigger.target] : [];
+                    var value = 0;
+                    for (var i = 0; i < targets.length; i++) {
+                        var target = targets[i];
+                        var effect = get.effect(target, trick, trigger.player, player);
+                        value += -effect * state;
                     }
-
-                    //如果是针对队友的负面锦囊
-                    if (event.targets) {
-                        for (var i = 0; i < event.targets.length; i++) {
-                            var target = event.targets[i];
-                            if (get.attitude(player, target) > 0) {
-                                if (get.tag(event.card, "damage")) return 6 + hpCost;
-                                if (get.tag(event.card, "loseCard")) return 3 + hpCost;
-                                return 1 + hpCost;
-                            }
-                        }
+                    if (!targets.length && trigger.player) {
+                        value = -get.attitude(player, trigger.player) * state;
                     }
-
-                    //无懈别人的无懈（保护敌人的锦囊）
-                    if (event.card.name == "wuxie") {
-                        var parent = event.getParent(2);
-                        if (parent && parent.targets) {
-                            for (var i = 0; i < parent.targets.length; i++) {
-                                if (get.attitude(player, parent.targets[i]) < 0) {
-                                    return 4 + hpCost; //保护对敌人的锦囊
-                                }
-                            }
-                        }
+                    if (trick.ai && trick.ai.wuxie) {
+                        var custom = trick.ai.wuxie(targets[0] || trigger.player, trick, trigger.player, player, state);
+                        if (typeof custom == "number") value = custom;
                     }
-
-                    return hpCost; //默认不值得
+                    return value * 3 - cost;
                 },
             },
         },
@@ -3232,7 +3240,7 @@ const unfulfilledambition = {
             }
             return false;//不能使用则不能发动
         },
-        hiddencard: function (player, name) {//隐藏牌技能标签（还没完全理解）
+        hiddenCard: function (player, name) {//隐藏牌技能标签（引擎识别 hiddenCard，原拼写 hiddencard 无效）
             if (name == 'wuxie' || name == 'tao')//如果是无懈可击或桃
                 return true;//隐藏牌面
         },
@@ -3270,6 +3278,13 @@ const unfulfilledambition = {
             },
         },
         ai: {
+            order: 8,//出牌候选排序：濒死救人优先，否则靠收益打分
+            result: {
+                player: function (player) {
+                    if (player.hp <= 1) return 10;//濒死：桃的收益最高
+                    return -1;//非濒死：不主动消耗每轮一次的水机（保护回档前置条件）
+                },
+            },
             tag: {
                 order: 10,//救人优先级
                 result: { player: 1 },//对自己有利
@@ -3336,7 +3351,7 @@ const unfulfilledambition = {
         check: function (event, player) {
             if (player.hasSkill('shuiji1_used')) {
                 if (player.hp < 2) return true;
-                if (player.countCards("j", { name: "lebu" }).length > 0 && player.countCards("h", { name: wuxie }).length <= 0) return true;
+                if (player.countCards("j", { name: "lebu" }).length > 0 && player.countCards("h", { name: "wuxie" }).length <= 0) return true;
             }
             if (game.roundNumber > 1) {
                 var enemiesCount = game.countPlayer(function (current) {
