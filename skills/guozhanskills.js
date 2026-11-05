@@ -587,20 +587,14 @@ const guozhanskills = {
             order: 1,
             result: {
                 player: function (player) {
-                    if (player.hp <= 2 || player.countCards("he") < 5) return 0;
-                    var score = 0;
+                    var enemies = 0, allies = 0;
                     game.countPlayer(function (current) {
-                        score += get.damageEffect(current, player, player, "fire") * 2;
+                        if (current == player) return;
+                        if (get.attitude(player, current) < 0) enemies++;
+                        else if (get.attitude(player, current) > 0) allies++;
                     });
-                    var costs = player.getCards("he").map(function (card) {
-                        return get.value(card, player);
-                    }).sort(function (a, b) {
-                        return a - b;
-                    }).slice(0, 5);
-                    var discardCost = costs.reduce(function (sum, value) {
-                        return sum + Math.max(0, value - 2) * 0.35;
-                    }, 0);
-                    return score - discardCost;
+                    if (enemies > allies + 1 && player.hp > 3) return 1;
+                    return 0;
                 },
             },
         },
