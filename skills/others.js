@@ -66,30 +66,21 @@ const others = {
                 viewAs: {
                     name: "wuxie",
                 },
-                filter: function (event, player) {
-                    return player.getCards('s', function (card) { return card.hasGaintag('zhandouji') }).length > 0 && event.filterCard({ name: "wuxie", isCard: true }, player, event);
+                filter: function (event, player, name) {
+                    return player.getCards('s', function (card) { return card.hasGaintag('zhandouji') }).length > 0;
                 },
                 viewAsFilter(player) {
                     return player.getCards('s', function (card) { return card.hasGaintag('zhandouji') }).length > 0;
                 },
+                prompt: "将一张武将牌上的牌当无懈可击使用",
+                sub: true,
                 ai: {
-                    order: 4,
-                    check: function (card) {
-                        return 8 - get.value(card);
-                    },
                     basic: {
                         useful: [6, 4, 3],
                         value: [6, 4, 3],
                     },
                     result: {
-                        player: function (player) {
-                            var trigger = _status.event.getTrigger && _status.event.getTrigger();
-                            if (!trigger || !trigger.card) return 0;
-                            var targets = trigger.targets && trigger.targets.length ? trigger.targets : trigger.target ? [trigger.target] : [];
-                            return targets.reduce(function (sum, target) {
-                                return sum - get.effect(target, trigger.card, trigger.player, player);
-                            }, 0);
-                        },
+                        player: 1,
                     },
                     expose: 0.2,
                 },
@@ -441,7 +432,7 @@ const others = {
             return true;
         },
         prompt: "将一张红色牌当雷杀使用",
-        check(card) { return 5.5 - get.value(card) },
+        check(card) { return 4 - get.value(card) },
         ai: {
             yingbian: function (card, player, targets, viewer) {
                 return lib.card.sha.ai.yingbian(card, player, targets, viewer);
@@ -2477,21 +2468,15 @@ const others = {
                 viewAsFilter: function (player) {
                     return player.getCards('s').length > 0;
                 },
+                prompt: "将一张武将牌上的牌当无懈可击使用或打出",
+                sub: true,
                 ai: {
-                    order: 4,
                     basic: {
                         useful: [6, 4, 3],
                         value: [6, 4, 3],
                     },
                     result: {
-                        player: function (player) {
-                            var trigger = _status.event.getTrigger && _status.event.getTrigger();
-                            if (!trigger || !trigger.card) return 0;
-                            var targets = trigger.targets && trigger.targets.length ? trigger.targets : trigger.target ? [trigger.target] : [];
-                            return targets.reduce(function (sum, target) {
-                                return sum - get.effect(target, trigger.card, trigger.player, player);
-                            }, 0);
-                        },
+                        player: 1,
                     },
                     expose: 0.2,
                 },
@@ -2901,16 +2886,6 @@ const others = {
         audio: false,
         nobracket: true,
         enable: ["chooseToUse", "chooseToRespond"],
-        filter: function (event, player) {
-            return player.countCards("hs", function (card) {
-                return card.name == "sha" || card.name == "sheji9";
-            }) > 0 && event.filterCard({ name: "wuxie", isCard: true }, player, event);
-        },
-        viewAsFilter: function (player) {
-            return player.countCards("hs", function (card) {
-                return card.name == "sha" || card.name == "sheji9";
-            }) > 0;
-        },
         filterCard: function (card) {
             return card.name == "sha" || card.name == "sheji9";
         },
@@ -2918,26 +2893,16 @@ const others = {
         viewAs: { name: "wuxie" },
         prompt: "将一张杀当制空权使用",
         check: function (card) {
-            var trigger = _status.event.getTrigger();
-            if (trigger && trigger.card && trigger.card.name == "chiling") return -1;
-            return 8 - get.value(card);
+            return 6 - get.value(card);
         },
         hiddenCard: function (player, name) {
-            if (name == "wuxie") return player.countCards("hs", function (card) {
-                return card.name == "sha" || card.name == "sheji9";
-            }) > 0;
+            if (name == "wuxie") return player.countCards("hs", "sha") > 0;
         },
         ai: {
-            order: 4,
-            respondwuxie: true,
+            order: 1,
+            respondWuxie: true,
             skillTagFilter: function (player, tag) {
-                if (tag == "respondwuxie") return player.countCards("hs", function (card) {
-                    return card.name == "sha" || card.name == "sheji9";
-                }) > 0;
-            },
-            basic: {
-                useful: [6, 4, 3],
-                value: [6, 4, 3],
+                if (tag == "respondWuxie") return player.countCards("hs", "sha") > 0;
             },
             result: { player: 1 },
         },
@@ -3093,12 +3058,12 @@ const others = {
         intro: {
             content: function (storage, player) {
                 if (player.storage.nizaiwanhuo) return '阴：你成为【杀】或【决斗】的唯一目标时，你将手牌弃至一张，令此牌无效，然后其本回合内不能对你使用【杀】或【决斗】。';
-                return '阳：你使用【杀】或【决斗】指定唯一目标时，你将你和目标的手牌调整至上限，然后此牌伤害+1。';
+                return '阳：你使用【杀】或【决斗】指定唯一目标时，你将你和目标的手牌调整至上限。';
             },
         },
         group: ["nizaiwanhuo_yang", "nizaiwanhuo_yin"],
         subSkill: {
-            //阳：使用杀/决斗指定唯一目标时，调整双方手牌至上限，伤害+1
+            //阳：使用杀/决斗指定唯一目标时，调整双方手牌至上限
             yang: {
                 audio: false,
                 trigger: { player: "useCardToPlayered" },
@@ -3111,7 +3076,7 @@ const others = {
                 },
                 logTarget: "target",
                 prompt2: function (event, player) {
-                    return "将你和" + get.translation(event.target) + "的手牌调整至手牌上限，然后此牌伤害+1";
+                    return "将你和" + get.translation(event.target) + "的手牌调整至手牌上限";
                 },
                 content: function () {
                     "step 0"
@@ -3147,9 +3112,6 @@ const others = {
                             return 5 - get.value(card);
                         });
                     }
-                    "step 3"
-                    //添加伤害+1的临时技能
-                    player.addTempSkill("nizaiwanhuo_bonus", "useCardAfter");
                 },
                 sub: true,
                 "_priority": 0,
@@ -3198,19 +3160,6 @@ const others = {
                     if (!player.storage.nizaiwanhuo_ban) player.storage.nizaiwanhuo_ban = [];
                     player.storage.nizaiwanhuo_ban.add(source.playerid);
                     player.addTempSkill("nizaiwanhuo_ban", "phaseEnd");
-                },
-                sub: true,
-                "_priority": 0,
-            },
-            //伤害+1临时技能
-            bonus: {
-                charlotte: true,
-                trigger: { source: "damageBegin3" },
-                forced: true,
-                silent: true,
-                popup: false,
-                content: function () {
-                    trigger.num++;
                 },
                 sub: true,
                 "_priority": 0,

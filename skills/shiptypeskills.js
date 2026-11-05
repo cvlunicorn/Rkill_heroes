@@ -2156,7 +2156,7 @@ const shiptypeskills = {
             }
             "step 2"
             if (result.bool && result.targets && result.targets.length > 0) {
-                player.logSkill("yuanchnegdaji");
+                player.logSkill("yuanchengdaji");
                 event.targets = result.targets;
                 if (event.targets.length == 1) {
                     event.targets[0].damage(2, player);

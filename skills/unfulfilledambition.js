@@ -1,4 +1,59 @@
 import { lib, game, ui, get, ai, _status } from '../../../noname.js';
+
+// AI只使用本人的手牌、已知手牌和公开区域。
+function knownHandCards(viewer, target) {
+    if (viewer === target || viewer.hasSkillTag('viewHandcard', null, target, true)) return target.getCards('h');
+    return typeof target.getKnownCards === 'function' ? target.getKnownCards(viewer) : [];
+}
+function isAttack(card, player) {
+    return ['sha', 'sheji9'].includes(get.name(card, player));
+}
+function exchangeCost(card, target) {
+    if (get.position(card) === 'j') return get.effect(target, { name: card.name }, target, target) * 2;
+    return Math.max(0, get.value(card, target));
+}
+function exchangeFireCost(source, target, amount) {
+    if (amount <= 0) return 0;
+    const effect = get.damageEffect(target, source, target, 'fire');
+    if (effect >= 0) return -effect * amount;
+    const lethal = amount >= target.hp + (target.hujia || 0);
+    return Math.max(7, -effect * 3) * amount + (lethal ? 100 : 0);
+}
+// 动态规划求恰好指定花色数的最佳交换，允许多交低价值牌以避免火伤。
+function exchangePlan(source, target, offered, available) {
+    const suitCount = new Set(offered.map(card => get.suit(card))).size;
+    if (!suitCount || !available.length) return null;
+    const suits = [...new Set(available.map(card => get.suit(card)))];
+    const bits = new Map(suits.map((suit, index) => [suit, 1 << index]));
+    const bitCount = mask => {
+        let count = 0;
+        for (; mask; mask &= mask - 1) count++;
+        return count;
+    };
+    let states = new Map([['0:0', { mask: 0, count: 0, cost: 0, cards: [] }]]);
+    for (const card of available) {
+        const next = new Map(states);
+        for (const state of states.values()) {
+            const mask = state.mask | bits.get(get.suit(card));
+            if (bitCount(mask) > suitCount) continue;
+            const count = state.count + 1;
+            const cost = state.cost + exchangeCost(card, target);
+            const key = mask + ':' + count;
+            if (!next.has(key) || next.get(key).cost > cost) next.set(key, { mask, count, cost, cards: state.cards.concat(card) });
+        }
+        states = next;
+    }
+    let best = null;
+    const incoming = offered.reduce((sum, card) => sum + Math.max(0, get.value(card, target)), 0);
+    for (const state of states.values()) {
+        if (bitCount(state.mask) !== suitCount) continue;
+        const damage = Math.max(0, offered.length - state.count);
+        const score = incoming - state.cost - exchangeFireCost(source, target, damage);
+        if (!best || score > best.score) best = { cards: state.cards, score, damage };
+    }
+    return best;
+}
+
 const unfulfilledambition = {
     jifu_R_weicheng: {
         audio: "ext:舰R牌将/audio/skill:true",
@@ -348,18 +403,15 @@ const unfulfilledambition = {
         nobracket: true,
         enable: "chooseToUse",
         hiddenCard: function (player, name) {
-            if (name == "wuxie") return !player.hasSkill('buju_wuxie_disable') && player.countMark('shenfeng') >= 1;
+            if (name == "wuxie") return player.countMark('shenfeng') >= 1;
             return false;
         },
         viewAs: {
             name: "wuxie",
             isCard: false,
         },
-        filter: function (event, player) {
-            return !player.hasSkill('buju_wuxie_disable') && player.countMark('shenfeng') >= 1 && event.filterCard({ name: "wuxie", isCard: true }, player, event);
-        },
         viewAsFilter: function (player) {
-            return !player.hasSkill('buju_wuxie_disable') && player.countMark('shenfeng') >= 1;
+            return (!player.hasSkill('buju_wuxie_disable')) && player.countMark('shenfeng') >= 1;
         },
         filterCard: () => true,
         prompt: "将一张牌当作【无懈可击】",
@@ -374,33 +426,12 @@ const unfulfilledambition = {
         },
         ai: {
             order: 4,
-            check: function (card) {
-                var trigger = _status.event.getTrigger();
-                if (trigger && trigger.card && trigger.card.name == 'chiling') return -1;
-                return 8 - get.value(card);
-            },
             basic: {
                 useful: [6, 4, 3],
                 value: [6, 4, 3],
             },
             result: {
-                player: function (player) {
-                    var response = _status.event;
-                    var trigger = response && response.getTrigger ? response.getTrigger() : null;
-                    if (!trigger || !trigger.card) return 0;
-                    var wuxieEvent = response.getParent && response.getParent('_wuxie');
-                    var state = wuxieEvent && wuxieEvent.state < 0 ? -1 : 1;
-                    var targets = trigger.targets && trigger.targets.length ? trigger.targets : trigger.target ? [trigger.target] : [];
-                    var score = 0;
-                    for (var i = 0; i < targets.length; i++) {
-                        score -= get.effect(targets[i], trigger.card, trigger.player, player) * state;
-                    }
-                    if (trigger.card.ai && trigger.card.ai.wuxie && targets.length) {
-                        var custom = trigger.card.ai.wuxie(targets[0], trigger.card, trigger.player, player, state);
-                        if (typeof custom == 'number') score = custom;
-                    }
-                    return score;
-                },
+                player: 1,
             },
             expose: 0.2,
         },
@@ -910,6 +941,48 @@ const unfulfilledambition = {
         },
     },
     liehuoji: {
+        getExchangePlan(source, target, offered, available) {
+            return exchangePlan(source, target, offered, available);
+        },
+        // 返回使用者视角的交换收益。未知手牌不参与精确花色/牌值计算。
+        targetScore(player, target, offered) {
+            if (player === target || !offered.length) return -Infinity;
+            const attitude = get.attitude(player, target);
+            if (!attitude) return 0;
+            const suitCount = new Set(offered.map(card => get.suit(card))).size;
+            const total = target.countCards('hej');
+            if (total < suitCount) return -Infinity;
+            // 即使交出全部区域牌也不足等量交换时，火伤下限由公开牌数确定。
+            if (attitude < 0 && offered.length > total) {
+                const damage = offered.length - total;
+                const effect = get.damageEffect(target, player, player, 'fire');
+                const gifted = offered.reduce((sum, card) => sum + Math.max(0, get.value(card, target)), 0);
+                return effect * damage * 3 - gifted * 0.3 + (effect > 0 && damage >= target.hp + (target.hujia || 0) ? 20 : 0);
+            }
+            const visible = target.getCards('ej').concat(knownHandCards(player, target));
+            const plan = exchangePlan(player, target, offered, visible);
+            if (!plan) {
+                // 每张一种花色时，满足技能合法性便可至少等量交换，不会产生火伤。
+                if (attitude > 0 && suitCount === offered.length && target.countCards('hej') >= suitCount) {
+                    return offered.reduce((sum, card) => sum + get.value(card, target) - 4.5, 0);
+                }
+                return 0;
+            }
+            if (attitude > 0) {
+                if (plan.damage > 0 && get.damageEffect(target, player, target, 'fire') < 0) return -100;
+                return plan.score;
+            }
+            // 对敌人只在其手牌完全已知时使用精确最佳响应；否则不假设其缺乏安全交牌。
+            if (knownHandCards(player, target).length < target.countCards('h')) return 0;
+            return -plan.score;
+        },
+        offerScore(player, offered) {
+            let best = 0;
+            for (const target of game.filterPlayer()) {
+                best = Math.max(best, lib.skill.liehuoji.targetScore(player, target, offered));
+            }
+            return best;
+        },
         audio: "ext:舰R牌将/audio/skill:true",
         nobracket: true,
         trigger: {
@@ -931,7 +1004,13 @@ const unfulfilledambition = {
                 if (evt.type == "discard" && evt.getParent("phaseDiscard") == trigger) cards.addArray(evt.cards2.filterInD("d"));
             });
             if (cards.length) {
-                player.chooseButton(["选择至多三张牌？", cards], [1, 3], true).set("ai", get.buttonValue);
+                player.chooseButton(["选择至多三张牌？", cards], [1, 3], true).set("ai", function (button) {
+                    const player = _status.event.player;
+                    const selected = ui.selected.buttons.map(item => item.link);
+                    const before = lib.skill.liehuoji.offerScore(player, selected);
+                    const after = lib.skill.liehuoji.offerScore(player, selected.concat(button.link));
+                    return after > before + 0.1 ? after - before : -1;
+                });
             } else event._result = { bool: false };
             "step 1"
             if (result.links && result.links.length) {
@@ -945,11 +1024,9 @@ const unfulfilledambition = {
                     var suits3 = cards1.map(card => get.suit(card));
                     var uniqueSuits3 = [...new Set(suits3)];
                     return uniqueSuits3.length >= event.suitNum;
-                }).ai = function (target) {
-                    var player = get.player();
-                    if (target.countCards("j") == 0 && target.countCards("h") < event.cards2.length) { return -get.attitude(player, target); }
-                    return get.attitude(player, target);
-                };
+                }).set('offeredCards', event.cards2).set('ai', function (target) {
+                    return lib.skill.liehuoji.targetScore(_status.event.player, target, _status.event.offeredCards);
+                });
             }
             "step 2"
             if (result.bool) {
@@ -959,18 +1036,15 @@ const unfulfilledambition = {
                 event.targets.chooseCardButton('选择区域内任意张花色数为' + event.suitNum + '的牌与' + get.translation(event.cards2) + '交换', targetCards, [1, Infinity], true, function (card, player) {
                     return true;
                 })
+                    .set('exchangePlan', lib.skill.liehuoji.getExchangePlan(player, event.targets, event.cards2, targetCards))
                     .set("ai", function (button) {
-                        //game.log(get.translation(button.link));
-                        //game.log(get.value(button.link));
-                        let player = get.player();
-                        if (ui.selected.buttons.length >= event.cards2.length) return 0;
-                        if (get.position(button.link) == 'j') { return 12; }
-                        if (player.hp < 3) return 7 - get.value(button.link, player);
-                        return 10 - get.value(button.link, player);
+                        const plan = _status.event.exchangePlan;
+                        return plan && plan.cards.includes(button.link) ? 20 - plan.cards.indexOf(button.link) * 0.01 : -1;
                     })
+                    .set('exchangeSuitCount', event.suitNum)
                     .set("filterButton", function (button) {
-                        var filtersuit = [...new Set(ui.selected.buttons.map(card => get.suit(card)))]
-                        if (filtersuit.length == event.suitNum && !filtersuit.includes(get.suit(button.link))) { return false; }
+                        var filtersuit = [...new Set(ui.selected.buttons.map(item => get.suit(item.link)))];
+                        if (filtersuit.length == _status.event.exchangeSuitCount && !filtersuit.includes(get.suit(button.link))) return false;
                         return true;
                     });
             }
@@ -2238,29 +2312,34 @@ const unfulfilledambition = {
             return true;
         },
         check: function (event, player) {
-            return player.countCards('h', function (card) {
-                return get.type(card, "trick") == "equip";
-            }) < 2;//AI
+            return player.countCards("h") > 0;
         },
         content: function () {
             "step 0"
-            //构建可选类型列表（基本牌+非延时锦囊）
             var vcards = [];
-            //基本牌
             for (var name of lib.inpile) {
-                if (get.type(name) == "basic") vcards.push(['基本', '', name]);
-                if (get.type(name) == 'trick') {
-                    vcards.push(['锦囊', '', name]);
+                var type = get.type(name);
+                if (type == "basic") vcards.push(["基本", "", name]);
+                else if (type == "trick") {
+                    var info = get.info(name);
+                    if (info && !info.delay) vcards.push(["锦囊", "", name]);
                 }
             }
-            player.chooseButton(['彗袭：选择本回合可视为使用的牌', [vcards, 'vcard']])
-                .set('ai', function (button) {
-                    var card = {
-                        name: button.link[2],
-                    };
-                    return (get.value(card) || 1);
-
-                }).set('selectButton', 1);
+            player.chooseButton(["彗袭：选择本回合可视为使用的牌", [vcards, "vcard"]])
+                .set("ai", function (button) {
+                    var player = _status.event.player;
+                    var name = button.link[2];
+                    var card = { name: name, isCard: true };
+                    var type = get.type(name, "trick");
+                    var score = 0;
+                    player.countCards("h", function (handcard) {
+                        var handType = get.type(handcard, "trick");
+                        if (handType == type) score += get.value(handcard, player);
+                        return false;
+                    });
+                    var canUse = player.hasUseTarget(card);
+                    return (get.value(card, player) || 0) + score * 0.35 + (canUse ? 4 : 0);
+                }).set("selectButton", 1);
             "step 1"
             if (!result.bool) { event.finish(); return; }//玩家取消则不发动
             var name = result.links[0][2];//选中的牌名（如'sha'）
@@ -2286,8 +2365,9 @@ const unfulfilledambition = {
         enable: 'chooseToUse',//出牌阶段可主动发动
         usable: 1,//本回合仅可使用1次（usable按回合重置，与addTempSkill配合实现精确1次限制）
         filter: function (event, player) {
-            //有存储的目标牌名，且手上有牌可消耗
-            return player.getStorage('huixi_viewas_name') && player.countCards('h') > 0;
+            var name = player.getStorage("huixi_viewas_name");
+            if (!name || !player.countCards("h")) return false;
+            return event.filterCard(get.autoViewAs({ name: name }, "unsure"), player, event);
         },
         filterCard: function (card, player) {
             return true;//任意手牌均可选为消耗
@@ -2298,9 +2378,19 @@ const unfulfilledambition = {
         },
         position: 'h',//从手牌中选择
         check: function (card) {
-            return 5 - get.value(card);//AI：优先消耗价值低的牌
+            return 6 - get.value(card);
         },
-        ai: { result: { player: 1 } },
+        ai: {
+            order: function (item, player) {
+                // AI 在部分候选评估路径中不会传入 player，此时直接给中性排序，避免访问 undefined。
+                if (!player && typeof _status !== "undefined" && _status.event) player = _status.event.player;
+                if (!player) return 1;
+                var name = player.getStorage("huixi_viewas_name");
+                if (!name) return 1;
+                return get.order({ name: name, isCard: true }, player) || 1;
+            },
+            result: { player: 1 },
+        },
     },
     huixi_lock: {//彗袭子技能：锁定类别，本回合只能使用同类别的牌
         charlotte: true,
@@ -3059,15 +3149,14 @@ const unfulfilledambition = {
             order: 1,
             result: {
                 player: function (player) {
-                    if (player.hp <= 2 || player.countCards("he") < 5) return 0;
                     var enemies = 0, allies = 0;
                     game.countPlayer(function (current) {
                         if (current == player) return;
-                        var attitude = get.attitude(player, current);
-                        if (attitude < 0) enemies++;
-                        else if (attitude > 0) allies++;
+                        if (get.attitude(player, current) < 0) enemies++;
+                        else if (get.attitude(player, current) > 0) allies++;
                     });
-                    return enemies > allies ? enemies - allies : 0;
+                    if (enemies > allies + 1 && player.hp > 3) return 1;
+                    return 0;
                 },
             },
         },
@@ -3164,30 +3253,47 @@ const unfulfilledambition = {
             },
             result: {
                 player: function (player) {
-                    var response = _status.event;
-                    var wuxieEvent = response && response.getParent ? response.getParent("_wuxie") : null;
-                    var trigger = response && response.getTrigger ? response.getTrigger() : null;
-                    var trick = trigger && trigger.card;
-                    var cost = player.hp <= 1 ? 20 : player.hp == 2 ? 10 : 7;
-                    if (!trick) return -cost;
+                    //失去1点体力的代价
+                    var hpCost = -7;
+                    if (player.hp == 1) return -20; //濒死不用
+                    if (player.hp == 2) hpCost = -10; //低血更谨慎
 
-                    // 与原版无懈 AI 一致，依据被响应牌对目标的实际收益决定是否支付体力。
-                    var state = wuxieEvent && wuxieEvent.state < 0 ? -1 : 1;
-                    var targets = trigger.targets && trigger.targets.length ? trigger.targets : trigger.target ? [trigger.target] : [];
-                    var value = 0;
-                    for (var i = 0; i < targets.length; i++) {
-                        var target = targets[i];
-                        var effect = get.effect(target, trick, trigger.player, player);
-                        value += -effect * state;
+                    //评估无懈的价值
+                    var event = _status.event.getParent();
+                    if (!event || !event.card) return hpCost;
+
+                    //如果是针对自己的负面锦囊，价值较高
+                    if (event.targets && event.targets.includes(player)) {
+                        if (get.tag(event.card, "damage")) return 10 + hpCost; //伤害锦囊
+                        if (get.tag(event.card, "loseCard")) return 5 + hpCost; //弃牌锦囊
+                        return 3 + hpCost; //其他负面效果
                     }
-                    if (!targets.length && trigger.player) {
-                        value = -get.attitude(player, trigger.player) * state;
+
+                    //如果是针对队友的负面锦囊
+                    if (event.targets) {
+                        for (var i = 0; i < event.targets.length; i++) {
+                            var target = event.targets[i];
+                            if (get.attitude(player, target) > 0) {
+                                if (get.tag(event.card, "damage")) return 6 + hpCost;
+                                if (get.tag(event.card, "loseCard")) return 3 + hpCost;
+                                return 1 + hpCost;
+                            }
+                        }
                     }
-                    if (trick.ai && trick.ai.wuxie) {
-                        var custom = trick.ai.wuxie(targets[0] || trigger.player, trick, trigger.player, player, state);
-                        if (typeof custom == "number") value = custom;
+
+                    //无懈别人的无懈（保护敌人的锦囊）
+                    if (event.card.name == "wuxie") {
+                        var parent = event.getParent(2);
+                        if (parent && parent.targets) {
+                            for (var i = 0; i < parent.targets.length; i++) {
+                                if (get.attitude(player, parent.targets[i]) < 0) {
+                                    return 4 + hpCost; //保护对敌人的锦囊
+                                }
+                            }
+                        }
                     }
-                    return value * 3 - cost;
+
+                    return hpCost; //默认不值得
                 },
             },
         },
@@ -3231,6 +3337,14 @@ const unfulfilledambition = {
         },
     },
     shuiji1: {//水机，视为使用桃或无懈可击。语音写了，ai有
+        dyingTarget() {
+            const seen = new Set();
+            for (let evt = _status.event; evt && !seen.has(evt); evt = evt.parent) {
+                seen.add(evt);
+                if (evt.dying) return evt.dying;
+            }
+            return Array.isArray(_status.dying) ? _status.dying[0] : _status.dying;
+        },
         audio: "ext:舰R牌将/audio/skill:true",//r杀的语音这样写，如果多个的话true写2
         enable: "chooseToUse",//主动技，技能触发阶段。这里指的出牌阶段。如果多个阶段可以使用数组写好几个
         filter: function (event, player) {//对技能能不能生效的检查。
@@ -3240,11 +3354,21 @@ const unfulfilledambition = {
             }
             return false;//不能使用则不能发动
         },
-        hiddenCard: function (player, name) {//隐藏牌技能标签（引擎识别 hiddenCard，原拼写 hiddencard 无效）
-            if (name == 'wuxie' || name == 'tao')//如果是无懈可击或桃
-                return true;//隐藏牌面
+        hiddenCard: function (player, name) {
+            return !player.hasSkill('shuiji1_used') && (name === 'wuxie' || name === 'tao');
         },
         chooseButton: {//选择按钮技能标签
+            check: function (button) {
+                const player = _status.event.player;
+                const name = button.link[2];
+                if (player.hasSkill('shuiji1_used')) return 0;
+                if (name === 'tao') {
+                    const dying = lib.skill.shuiji1.dyingTarget();
+                    if (dying) return get.attitude(player, dying) > 0 ? 8 : -10;
+                    return player.isDamaged() ? 8 : 0;
+                }
+                return name === 'wuxie' ? 6 : 0;
+            },
             dialog: function (event, player) {//选择按钮时的对话框
                 var vcards = [];//存放按钮的数组
                 for (var name of ['tao', 'wuxie']) {//检查【桃】和【无懈可击】
@@ -3278,20 +3402,18 @@ const unfulfilledambition = {
             },
         },
         ai: {
-            order: 8,//出牌候选排序：濒死救人优先，否则靠收益打分
+            order: 10,
+            save: true,
+            respondTao: true,
+            skillTagFilter: function (player) {
+                return !player.hasSkill('shuiji1_used');
+            },
             result: {
                 player: function (player) {
-                    if (player.hp <= 1) return 10;//濒死：桃的收益最高
-                    return -1;//非濒死：不主动消耗每轮一次的水机（保护回档前置条件）
+                    const dying = lib.skill.shuiji1.dyingTarget();
+                    if (dying) return get.attitude(player, dying) > 0 ? 1 : -10;
+                    return player.isDamaged() ? 1 : 0;
                 },
-            },
-            tag: {
-                order: 10,//救人优先级
-                result: { player: 1 },//对自己有利
-                save: 1,      // 标记：这个技能能救人
-                respond: 1,   // 标记：这个技能能响应（无懈）
-
-
             },
         },
 
@@ -3349,17 +3471,23 @@ const unfulfilledambition = {
             player: "phaseBegin"//准备阶段
         },
         check: function (event, player) {
-            if (player.hasSkill('shuiji1_used')) {
-                if (player.hp < 2) return true;
-                if (player.countCards("j", { name: "lebu" }).length > 0 && player.countCards("h", { name: "wuxie" }).length <= 0) return true;
-            }
-            if (game.roundNumber > 1) {
-                var enemiesCount = game.countPlayer(function (current) {
-                    return get.attitude(player, current) < 0 && (!player.inRange(current) || current.hasSkillTag("fireAttack", null, null, true) || current.hasSkillTag("thunderAttack", null, null, true))
-                });
-                return enemiesCount > 1;
-            }
-            return false;
+            const waterUsed = player.hasSkill('shuiji1_used');
+            // 未用水机时先保留免费救援；使用过且濒危时才以回档应急。
+            if (player.hp <= 1) return waterUsed;
+            if (game.roundNumber <= 1) return false;
+            const attacks = player.getCards('h', card => isAttack(card, player));
+            const red = attacks.filter(card => get.color(card, player) === 'red').length;
+            const black = attacks.filter(card => get.color(card, player) === 'black').length;
+            const delayed = player.getCards('j').some(card => ['lebu', 'leibusigang9'].includes(card.name));
+            const counter = player.countCards('h', card => ['wuxie', 'zhikongquan9'].includes(get.name(card, player))) > 0;
+            const lostTurn = player.isTurnedOver() || (delayed && !counter && waterUsed);
+            const enemies = game.filterPlayer(current => current !== player && get.attitude(player, current) < 0);
+            const distant = enemies.some(target => !player.inRange(target));
+            const upgrade = Math.max(0, red - 1) * 1.8 + (black && distant ? 1.5 : 0);
+            const pressure = enemies.some(target => player.canUse({ name: 'sha', isCard: true }, target) && get.effect(target, { name: 'sha' }, player, player) > 0);
+            // 回档会永久失去水机，还要等待下次行动才能输出，必须覆盖本轮机会成本。
+            const cost = (waterUsed ? 1 : 2.5) + (!lostTurn && pressure ? 2.5 : 0) + (player.hp >= 3 ? 1 : 0);
+            return upgrade + (player.isDamaged() ? 1.5 : 0) + (lostTurn ? 1.5 : 0) > cost;
         },
         //要加判定一下有没有要删的技能
         filter: function (event, player) {//对技能能不能生效的检查。
@@ -3683,12 +3811,26 @@ const unfulfilledambition = {
     sp_qingye_R_hongbaiouzhanxiang: {
         audio: false,
         trigger: { player: "phaseBegin" },
+        direct: true,
+        prompt: "是否发动【红白偶像战】？",
+        check: function (event, player) {
+            return player.countCards("he") > 0;
+        },
         content: function () {
             "step 0"
-            player.draw();
+            player.chooseBool(get.prompt("sp_qingye_R_hongbaiouzhanxiang"), "摸一张牌并弃置一张牌，根据牌的类别获得效果").set("ai", function () {
+                var player = _status.event.player;
+                return player.countCards("he") > 0;
+            });
             "step 1"
-            player.chooseToDiscard("he", true, "弃置一张牌");
+            if (!result.bool) {
+                event.finish();
+                return;
+            }
+            player.draw();
             "step 2"
+            player.chooseToDiscard("he", true, "弃置一张牌");
+            "step 3"
             if (result.bool && result.cards && result.cards[0]) {
                 var card = result.cards[0];
                 var type = get.type(card);
@@ -3703,7 +3845,7 @@ const unfulfilledambition = {
                     });
                 }
             }
-            "step 3"
+            "step 4"
             if (result.bool && result.targets && result.targets[0]) {
                 player.draw(2);
                 result.targets[0].draw();
@@ -4005,48 +4147,63 @@ const unfulfilledambition = {
         init: function (player) {
             player.storage.cimei_targets = 1;
             player.storage.cimei_discarded = [];
+            player.storage.cimei_selfDiscarded = false;
         },
         filter: function (event, player) {
-            var discarded = player.storage.cimei_discarded || [];
-            if (game.phaseNumber == 0) return false;
-            return game.hasPlayer(function (current) {
-                return current != player && !discarded.includes(current.playerid);
-            });
+            return game.phaseNumber != 0;
         },
         content: function () {
             "step 0"
             event.discarded = player.storage.cimei_discarded || [];
-            player.storage.cimei_discarded = [];
             event.num = player.storage.cimei_targets || 1;
+            event.canActivate = player.storage.cimei_selfDiscarded;
+            player.storage.cimei_discarded = [];
+            player.storage.cimei_selfDiscarded = false;
             player.storage.cimei_targets = 1;
-            player.chooseTarget(get.prompt("cimei"), "令至多" + event.num + "名上一轮中未于弃牌阶段弃置牌的其他角色失去一点体力", [1, event.num], function (card, player, target) {
-                return target != player && !_status.event.discarded.includes(target.playerid);
-            }).set("discarded", event.discarded).set("ai", function (target) {
-                var player = _status.event.player;
-                if (get.attitude(player, target) < 0) {
-                    return -get.attitude(player, target);
-                }
-                return 0;
-            });
-            "step 1"
-            if (!result.bool || !result.targets || !result.targets.length) {
+            if (!event.canActivate) {
                 event.finish();
                 return;
             }
-            player.logSkill("cimei", result.targets);
-            for (var i = 0; i < result.targets.length; i++) {
-                result.targets[i].loseHp();
+            event.uniqueMax = game.countPlayer(function (current) {
+                return current.isIn() && current.hp >= player.hp;
+            }) == 1;
+            if (!game.hasPlayer(function (current) {
+                return current != player && !event.discarded.includes(current.playerid);
+            })) {
+                event.goto(2);
+                return;
+            }
+            player.chooseTarget(get.prompt("cimei"), "令一名本轮中未于弃牌阶段弃置牌的其他角色失去一点体力", [1, event.num], function (card, player, target) {
+                return target != player && !_status.event.discarded.includes(target.playerid);
+            }).set("discarded", event.discarded).set("ai", function (target) {
+                var player = _status.event.player;
+                return get.attitude(player, target) < 0 ? -get.attitude(player, target) : 0;
+            });
+            "step 1"
+            if (result.bool && result.targets && result.targets.length) {
+                player.logSkill("cimei", result.targets);
+                result.targets.forEach(function (target) {
+                    target.loseHp();
+                });
             }
             "step 2"
-            var isMaxHp = true;
-            game.countPlayer(function (current) {
-                if (current.hp > player.hp) isMaxHp = false;
-            });
-            if (isMaxHp) {
-                player.storage.cimei_targets = 2;
+            if (event.uniqueMax) {
+                player.storage.cimei_targets = event.num + 1;
                 player.popup("刺玫+1");
                 game.log(player, "下一轮发动刺玫可指定的角色数+1");
             }
+        },
+        ai: {
+            threaten: 1.2,
+            effect: {
+                player: function (card, player) {
+                    if (!_status.event.isPhaseUsing || !_status.event.isPhaseUsing() || !player.hasSkill("cimei")) return;
+                    var hand = player.countCards("h");
+                    var limit = player.getHandcardLimit();
+                    // 手牌刚好只需留一张就能在弃牌阶段弃牌时，优先保留低价值牌。
+                    if (hand > limit && hand <= limit + 1 && get.value(card, player) < 7) return [1, -0.8];
+                },
+            },
         },
         subSkill: {
             record: {
@@ -4054,19 +4211,17 @@ const unfulfilledambition = {
                 forced: true,
                 popup: false,
                 filter: function (event, player) {
+                    if (event.player != player && !player.storage.cimei_discarded) return false;
                     var discarded = false;
                     event.player.getHistory("lose", function (loseEvt) {
-                        if (loseEvt.type == "discard" && loseEvt.getParent("phaseDiscard")) {
-                            discarded = true;
-                        }
+                        if (loseEvt.type == "discard" && loseEvt.getParent("phaseDiscard")) discarded = true;
                     });
                     return discarded;
                 },
                 content: function () {
-                    var discarded = player.storage.cimei_discarded;
-                    if (!discarded.includes(trigger.player.playerid)) {
-                        discarded.push(trigger.player.playerid);
-                    }
+                    var discarded = player.storage.cimei_discarded || (player.storage.cimei_discarded = []);
+                    if (!discarded.includes(trigger.player.playerid)) discarded.push(trigger.player.playerid);
+                    if (trigger.player == player) player.storage.cimei_selfDiscarded = true;
                 },
             },
         },
@@ -4215,6 +4370,22 @@ const unfulfilledambition = {
     //震撼我妈
     zhenhanwoma: {
         audio: false,
+        check: function (event, player) {
+            const previous = player.previous;
+            if (!previous || previous === player) return false;
+            const attitude = get.attitude(player, previous);
+            // 优先抢在敌人之前行动，不为微小距离收益打乱低血量队友的先手。
+            let score = attitude < 0 ? 2 : attitude > 0 ? -1.5 : 0;
+            if (attitude > 0 && previous.hp <= 2) score -= 2;
+            const attacks = player.getCards('h', card => isAttack(card, player));
+            if (attacks.length) {
+                const ahead = previous.previous;
+                const behind = player.next;
+                if (ahead && ahead !== player && get.attitude(player, ahead) < 0 && !player.inRange(ahead)) score += 1.5;
+                if (behind && behind !== previous && get.attitude(player, behind) < 0 && player.inRange(behind)) score -= 1;
+            }
+            return score > 0;
+        },
         trigger: { global: "roundStart" },
         filter: function (event, player) {
             return player.getSeatNum() > 1;
@@ -4227,21 +4398,19 @@ const unfulfilledambition = {
     },
     //一整年
     yizhengnian: {
+        drawCount(round, count) {
+            return Math.min(3, Math.max(1, (round || 0) % Math.max(1, count)));
+        },
         audio: false,
         firstDo: true,
         trigger: { global: "roundStart" },
         forced: true,
         content: function () {
-            if (!game.roundNumber) {
-                var drawnum = 1;
-            } else {
-                var drawnum = Math.max(1, game.roundNumber % game.countPlayer());
-            }
-            player.draw(drawnum);
+            player.draw(lib.skill.yizhengnian.drawCount(game.roundNumber, game.countPlayer()));
         },
         ai: {
             threaten(player, target) {
-                return 1 + 0.5 * game.roundNumber % game.countPlayer();
+                return 1 + 0.5 * lib.skill.yizhengnian.drawCount(game.roundNumber, game.countPlayer());
             },
         },
     },
@@ -5179,4 +5348,4 @@ const unfulfilledambition = {
 
 };
 
-export { unfulfilledambition };
+export { unfulfilledambition, knownHandCards, isAttack, exchangePlan };

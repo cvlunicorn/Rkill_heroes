@@ -1190,8 +1190,12 @@ const historybattles = {
             return player.countCards('h') > 0;
         },
         position: "h",
-        filterCard: true,
         selectCard: [1, 2],
+        filterCard: function (card, player) {
+            if (player.hp <= 1) return !['shan', 'tao', 'jiu', 'wuxie', 'huibi9'].includes(card.name);
+            if (player.hp <= 2) return !['shan', 'tao'].includes(card.name);
+            return true;
+        },
         filterTarget: true,
         selectTarget: function () {
             return ui.selected.cards.length;
@@ -2574,24 +2578,37 @@ const historybattles = {
     yuanyangpoxi: {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
-        mod: {
-            cardUsable: function (card, player, num) {
-                if (!player.storage.duanwan && card.name == "sha") return num - 1;
-            },
-        },
         trigger: {
             source: "damageBegin1",
         },
         filter(event, player) {
             return event.card && get.type(event.card) == "trick" && player.inRange(event.player) && event.notLink();
         },
-        forced: true,
+        direct: true,
         async content(event, trigger, player) {
+            const result = await player.chooseBool("是否发动【远洋破袭】，令此伤害+1，并于本回合不能使用【杀】？")
+                .set("ai", () => true)
+                .forResult();
+            if (!result.bool) return;
+            player.logSkill("yuanyangpoxi");
             trigger.num++;
+            player.addTempSkill("yuanyangpoxi_ban_sha", { player: "phaseAfter" });
         },
         ai: {
             damageBonus: true,
         },
+        "_priority": 0,
+    },
+    yuanyangpoxi_ban_sha: {
+        charlotte: true,
+        mod: {
+            cardEnabled(card) {
+                if (card.name == "sha") return false;
+            },
+        },
+        mark: true,
+        marktext: "禁杀",
+        intro: { content: "本回合不能使用【杀】" },
         "_priority": 0,
     },
     juejingfengsheng: {
@@ -3501,6 +3518,16 @@ const historybattles = {
         },
         ai: {
             threaten: 1.05,
+            effect: {
+                target: function (card, player, target) {
+                    if (!get.tag(card, "damage")) return;
+                    // 先辅会在 damageBegin4 把保护对象承受的伤害转给古鹰；
+                    // 告诉通用 AI 该目标实际不承伤，避免反复浪费攻击。
+                    if (game.hasPlayer(function (current) {
+                        return current != player && current.storage.zhanxianyuanhu2 && current.storage.zhanxianyuanhu2.includes(target);
+                    })) return 0;
+                },
+            },
         },
     },
 };

@@ -133,6 +133,8 @@ const standard = {
         lose: false,
         check: function (card) {
             var player = get.player();
+            // 防具和防御马优先保留，避免 AI 为摸雷杀交出关键防御装备。
+            if (['equip2', 'equip3'].includes(get.subtype(card))) return -100;
             var val = 5;
             if (player.needsToDiscard()) val = 15;
             return val - get.value(card) > 0;
@@ -211,6 +213,8 @@ const standard = {
                     return target != player && !target.hasMark("shuileizhandui_skill_1");
                 },//选择事件包含的目标,有其他同技能的角色时,ai不要重复选择目标。
                 ai1: function (card) {
+                    // 防具和防御马不作为自动支援牌交出。
+                    if (['equip2', 'equip3'].includes(get.subtype(card))) return -100;
                     return 12 - get.useful(card);
                 },//建议卡牌以7为标准就行,不要选太多卡牌,要形成持续的牵制。
                 ai2: function (target) {
@@ -463,7 +467,7 @@ const standard = {
         },
         content() {
             "step 0"
-            event.cards = get.cards(Math.min(trigger.targets.length, 4));
+            event.cards = get.cards(trigger.targets.length);
             game.cardsGotoOrdering(event.cards);
             event.videoId = lib.status.videoId++;
             game.broadcastAll(function (player, id, cards) {
@@ -481,13 +485,9 @@ const standard = {
             game.addVideo('showCards', player, ['航空战术先驱', get.cardsInfo(event.cards)]);
             game.addVideo('delay', null, 2);
             "step 1"
-            var suits = [];
-            for (var i of event.cards) {
-                var suit = get.suit(i, false);
-                if (!suits.includes(suit)) suits.push(suit);
-            }
-            var selectCount = Math.min(event.cards.length, suits.length);
-            var next = player.chooseButton(selectCount, true);
+            var list = [];
+            for (var i of event.cards) list.add(get.suit(i, false));
+            var next = player.chooseButton(list.length, true);
             next.set('dialog', event.videoId);
             next.set('filterButton', function (button) {
                 for (var i = 0; i < ui.selected.buttons.length; i++) {
@@ -2706,6 +2706,8 @@ const standard = {
                     filterCard.call(useEvent, card, player, useEvent);
             });
         },
+        // 只有明显超过失去1点体力的成本才发动，过滤低价值锦囊的边际收益。
+        activateThreshold: 0.6,
         // 总 AI 与按钮共用：最高牌收益 - 失去体力代价
         bestScore(event, player) {
             const info = lib.skill.jujianmengxiang;
@@ -2789,8 +2791,8 @@ const standard = {
                 player: function (player) {
                     if (!player.storage.jujianmengxiang) { player.storage.jujianmengxiang = []; }
                     if (player.storage.jujianmengxiang_error == true) return -1;
-                    // 与按钮评分共用同一判定：最优合法牌收益 - 失去1体力代价；正收益才发动。
-                    return lib.skill.jujianmengxiang.bestScore(_status.event, player);
+                    // 与按钮评分共用同一判定；需明显覆盖失去1点体力的成本才发动。
+                    return lib.skill.jujianmengxiang.bestScore(_status.event, player) - lib.skill.jujianmengxiang.activateThreshold;
                 },
             },
         },

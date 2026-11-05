@@ -1,4 +1,5 @@
 import { lib, game, ui, get, ai, _status } from '../../../noname.js';
+import { knownHandCards, isAttack } from './unfulfilledambition.js';
 const tebiechuanwu = {
 
     //光荣舰队SP
@@ -13,19 +14,17 @@ const tebiechuanwu = {
             var evt = _status.event.getParent("phase");
             if (!evt || !evt.player) return false;
 
-            // 检查本回合该角色是否造成过伤害
-            var phasePlayer = evt.player;
-            var dealtDamage = phasePlayer.getHistory('sourceDamage').length > 0;
-            if (dealtDamage) return false;
-
-            // 检查弃牌堆中该角色本回合弃置的牌
+            // 汇总本回合所有角色进入弃牌堆的牌，不再要求目标本回合未造成伤害。
             var list = [];
-            phasePlayer.getHistory("lose", function (loseEvt) {
-                if (loseEvt.type == "discard" && loseEvt.cards) {
-                    list.addArray(loseEvt.cards.filter(function (card) {
-                        return get.position(card) == "d";
-                    }));
-                }
+            var allPlayers = (game.players || []).concat(game.dead || []);
+            allPlayers.forEach(function (current) {
+                current.getHistory("lose", function (loseEvt) {
+                    if (loseEvt.type == "discard" && loseEvt.cards) {
+                        list.addArray(loseEvt.cards.filter(function (card) {
+                            return get.position(card) == "d";
+                        }));
+                    }
+                });
             });
             return list.length > 0;
         },
@@ -34,12 +33,15 @@ const tebiechuanwu = {
             var evt = _status.event.getParent("phase");
             if (evt && evt.player) {
                 var list = [];
-                evt.player.getHistory("lose", function (loseEvt) {
-                    if (loseEvt.type == "discard" && loseEvt.cards) {
-                        list.addArray(loseEvt.cards.filter(function (card) {
-                            return get.position(card) == "d";
-                        }));
-                    }
+                var allPlayers = (game.players || []).concat(game.dead || []);
+                allPlayers.forEach(function (current) {
+                    current.getHistory("lose", function (loseEvt) {
+                        if (loseEvt.type == "discard" && loseEvt.cards) {
+                            list.addArray(loseEvt.cards.filter(function (card) {
+                                return get.position(card) == "d";
+                            }));
+                        }
+                    });
                 });
                 if (list.length > 0) {
                     player.chooseButton(["光荣舰队：是否使用一张牌？", list]).set("ai", function (button) {
@@ -406,9 +408,19 @@ const tebiechuanwu = {
             }
         },
         ai: {
+            effect: {
+                player: function (card, player, target) {
+                    if (!target || !isAttack(card, player) || get.attitude(player, target) >= 0) return;
+                    const count = game.countPlayer(current => current.group === 'PLAN' || current.group === 'ROCN');
+                    if (!count) return;
+                    const sealed = Math.min(Math.max(0, player.hp), target.countCards('he'));
+                    return [1, sealed * 0.35 + (count >= 2 ? 0.65 : 0)];
+                },
+            },
             unequip_ai: true,
             directHit_ai: true,
             skillTagFilter: function (player, tag, arg) {
+                if (!arg || !arg.target) return false;
                 if (get.attitude(player, arg.target) > 0) return false;
                 if (tag == 'directHit_ai') return player.hp >= Math.max(1, arg.target.countCards('h') - 1);
                 if (arg && (arg.name == 'sha' || arg.name == 'sheji9') && arg.target.getEquip(2)) return true;
@@ -443,6 +455,17 @@ const tebiechuanwu = {
     },
     //四大金刚
     sidajinganglian: {
+        targetScore(player, target) {
+            const attitude = get.attitude(player, target);
+            if (attitude <= 0) return attitude;
+            let value = target.isTurnedOver() ? 0.3 : 1;
+            if (target.getCards('j').some(card => ['bingliang', 'lebu', 'leibusigang9'].includes(card.name))) value *= 0.6;
+            const attacks = knownHandCards(player, target).filter(card => isAttack(card, target));
+            const canAttack = game.hasPlayer(enemy => get.attitude(player, enemy) < 0 && target.canUse({ name: 'sha' }, enemy) && get.effect(enemy, { name: 'sha' }, target, player) > 0);
+            if (canAttack) value += 0.4 + Math.min(2, attacks.length) * 0.3;
+            if (target.countCards('h') <= 2) value += 0.25;
+            return attitude * value;
+        },
         nobracket: true,
         audio: false,
         trigger: { global: "roundStart" },
@@ -458,8 +481,7 @@ const tebiechuanwu = {
             player.chooseTarget([0, 2], "四大金刚：选择至多两名其他角色令其获得'联'", function (card, player, target) {
                 return target != player;
             }).set("ai", function (target) {
-                var player = _status.event.player;
-                return get.attitude(player, target);
+                return lib.skill.sidajinganglian.targetScore(_status.event.player, target);
             });
             "step 1"
             if (result.bool && result.targets && result.targets.length > 0) {
@@ -778,18 +800,76 @@ const tebiechuanwu = {
     },
     //三坐标定位
     sanzuobiaodingwei: {
+        init(player) {
+            if (!player.storage.sanzuobiaodingwei) player.storage.sanzuobiaodingwei = { current: [], previous: [] };
+        },
+        onremove: true,
+        startTurn(player) {
+            const state = player.storage.sanzuobiaodingwei || { current: [] };
+            player.storage.sanzuobiaodingwei = { current: [], previous: state.current || [] };
+            player.syncStorage('sanzuobiaodingwei');
+        },
+        recordTarget(player, target) {
+            if (!player.storage.sanzuobiaodingwei) lib.skill.sanzuobiaodingwei.init(player);
+            const current = player.storage.sanzuobiaodingwei.current;
+            if (!current.includes(target.playerid)) current.push(target.playerid);
+            player.syncStorage('sanzuobiaodingwei');
+        },
+        group: 'sanzuobiaodingwei_turn',
+        subSkill: {
+            turn: {
+                trigger: { player: 'phaseBefore' },
+                firstDo: true,
+                forced: true,
+                silent: true,
+                content: function () {
+                    lib.skill.sanzuobiaodingwei.startTurn(player);
+                },
+            },
+        },
+        typeScore(player, target, type) {
+            const known = knownHandCards(player, target);
+            const unknown = Math.max(0, target.countCards('h') - known.length);
+            if (!known.length && !unknown) return 0;
+            const prior = { basic: 0.5, trick: 0.32, equip: 0.18 };
+            const hit = known.some(card => get.type(card) === type) ? 1 : 1 - Math.pow(1 - prior[type], unknown);
+            const turnover = target.isTurnedOver() ? 3.5 : -3.5;
+            // 未命中时仍会弃置其他类型的牌；已知空手不产生控制收益。
+            const discard = -Math.min(2, target.countCards('h')) * 0.65;
+            return hit * turnover + (1 - hit) * discard;
+        },
+        bestType(player, target) {
+            const types = ['basic', 'trick', 'equip'];
+            const sign = Math.sign(get.attitude(player, target));
+            return types.reduce((best, type) => sign * lib.skill.sanzuobiaodingwei.typeScore(player, target, type) > sign * lib.skill.sanzuobiaodingwei.typeScore(player, target, best) ? type : best, types[0]);
+        },
         audio: "ext:舰R牌将/audio/skill:true",
         enable: "phaseUse",
         usable: 1,
         nobracket: true,
+        position: 'h',
+        selectCard: 1,
+        discard: true,
+        lose: true,
+        filter: function (event, player) {
+            return player.countCards('h', card => lib.filter.cardDiscardable(card, player, 'sanzuobiaodingwei')) > 0;
+        },
+        filterCard: function (card, player) {
+            return lib.filter.cardDiscardable(card, player, 'sanzuobiaodingwei');
+        },
+        check: function (card) {
+            return 6 - get.value(card, _status.event.player);
+        },
         filterTarget: function (card, player, target) {
-            return target != player;
+            const state = player.storage.sanzuobiaodingwei;
+            return target != player && (!state || !state.previous.includes(target.playerid));
         },
         content: function () {
             "step 0"
-            player.chooseControl("基本", "锦囊", "装备").set("prompt", "三坐标定位：选择一种牌的类型").set("ai", function () {
-                var list = ["基本", "锦囊", "装备"];
-                return list.randomGet();
+            lib.skill.sanzuobiaodingwei.recordTarget(player, target);
+            player.chooseControl("基本", "锦囊", "装备").set("prompt", "三坐标定位：选择一种牌的类型").set('aiTarget', target).set("ai", function () {
+                const type = lib.skill.sanzuobiaodingwei.bestType(_status.event.player, _status.event.aiTarget);
+                return { basic: '基本', trick: '锦囊', equip: '装备' }[type];
             });
             "step 1"
             event.cardType = result.control;
@@ -821,7 +901,15 @@ const tebiechuanwu = {
         ai: {
             order: 8,
             result: {
-                target: -1,
+                player: function (player) {
+                    const selected = ui.selected.cards || [];
+                    const costs = selected.length ? selected : player.getCards('h', card => lib.filter.cardDiscardable(card, player, 'sanzuobiaodingwei'));
+                    return costs.length ? -Math.max(0, Math.min(...costs.map(card => get.value(card, player)))) * 0.4 : -Infinity;
+                },
+                target: function (player, target) {
+                    const type = lib.skill.sanzuobiaodingwei.bestType(player, target);
+                    return lib.skill.sanzuobiaodingwei.typeScore(player, target, type);
+                },
             },
         },
     },

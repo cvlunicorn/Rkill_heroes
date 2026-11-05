@@ -1992,36 +1992,22 @@ const fallendemon = {
                 return player.canCompare(target);
             }).set('ai', target => {
                 var player = _status.event.player;
-                var mine = player.getCards('h').map(card => get.number(card, player));
-                var theirs = target.getCards('h').map(card => get.number(card, target));
-                if (!mine.length || !theirs.length) return 0;
-                var wins = 0, total = 0;
-                for (var i = 0; i < mine.length; i++) {
-                    for (var j = 0; j < theirs.length; j++) {
-                        total++;
-                        if (mine[i] > theirs[j]) wins++;
-                    }
-                }
-                var chance = total ? wins / total : 0;
-                var attitude = get.attitude(player, target);
-                var expected = chance * (attitude < 0 ? 2.5 : 0.5) + (1 - chance) * (attitude > 0 ? 1.5 : -2.5);
-                return expected;
+                return -get.attitude(player, target);
             });
             "step 1"
             if (result.bool) {
-                event.compareTarget = result.targets[0];
-                player.chooseToCompare(event.compareTarget);
+                player.chooseToCompare(result.targets[0]);
             }
-            "step 2"
+            "step 1"
             if (result.bool) {
                 player.addTempSkill("cassone_R_weizhuangqixi_win");
                 player.addTempSkill("cassone_R_weizhuangqixi_remove");
-                player.markAuto("cassone_R_weizhuangqixi_win", event.compareTarget);
+                player.markAuto("cassone_R_weizhuangqixi_win", target);
             } else {
                 player.loseHp(1);
                 player.addTempSkill("cassone_R_weizhuangqixi_lose");
                 player.addTempSkill("cassone_R_weizhuangqixi_remove");
-                player.markAuto("cassone_R_weizhuangqixi_lose", event.compareTarget);
+                player.markAuto("cassone_R_weizhuangqixi_lose", target);
             }
         },
         ai: {
@@ -2118,6 +2104,20 @@ const fallendemon = {
         },
     },
     Xfliegerkorps_R_piaobodeying: {
+        compareScore(player, target, card) {
+            const known = knownHandCards(player, target);
+            const unknown = Math.max(0, target.countCards('h') - known.length);
+            const friendly = get.attitude(player, target) > 0;
+            const marks = game.filterPlayer().reduce((sum, current) => sum + current.countMark('Xfliegerkorps_R_piaobodeying_mark'), 0);
+            const number = get.number(card, player) || 0;
+            const knownWin = known.every(other => get.number(other, target) < number);
+            const chance = knownWin ? Math.pow(Math.max(0, number - 1) / 13, unknown) : 0;
+            const reward = Math.min(3, marks + 1) * 1.5;
+            const transfer = friendly ? 1 : -1.5;
+            const loss = marks * 1.2 - transfer;
+            const cost = Math.max(0, get.value(card, player)) * 0.3;
+            return chance * reward - (1 - chance) * loss - cost;
+        },
         nobracket: true,
         group: ["Xfliegerkorps_R_piaobodeying_gethangmucv", "Xfliegerkorps_R_piaobodeying_campare"],
         subSkill: {
@@ -2143,7 +2143,14 @@ const fallendemon = {
                 },
                 content: function () {
                     "step 0"
-                    player.chooseToCompare(target);
+                    player.chooseToCompare(target).set('ai', function (card) {
+                        if (typeof card === 'string') return 0;
+                        const evt = _status.event.getParent('chooseToCompare');
+                        const owner = _status.event.player;
+                        if (owner === evt.player) return lib.skill.Xfliegerkorps_R_piaobodeying.compareScore(owner, evt.target, card);
+                        const sign = get.attitude(owner, evt.player) > 0 ? -1 : 1;
+                        return sign * get.number(card, owner) - Math.max(0, get.value(card, owner)) * 0.2;
+                    });
                     "step 1"
                     // 鹰标记计数存在技能名 storage（数字），来源武将另存在 markplayer。
                     // addSkill 的 init 只在首次获得时跑一次，且 addMark 会覆盖技能名 storage，
@@ -2187,99 +2194,12 @@ const fallendemon = {
                     order: 8,
                     result: {
                         target: function (player, target) {
-                            // 飘泊的鹰-拼点：赢了累积鹰标记并摸牌，输了清空所有鹰标记给对方
-
-                            var myCards = player.getCards('h');
-                            var targetCards = target.getCards('h');
-
-                            if (myCards.length == 0) return 0;
-
-                            // 计算当前鹰标记总数
-                            var currentMarks = 0;
-                            for (var i of game.filterPlayer()) {
-                                if (i.countMark("Xfliegerkorps_R_piaobodeying_mark") > 0) {
-                                    currentMarks += i.countMark("Xfliegerkorps_R_piaobodeying_mark");
-                                }
-                            }
-
-                            // 计算自己的平均点数和最大点数
-                            var myAvg = 0;
-                            var myMax = 0;
-                            for (var i = 0; i < myCards.length; i++) {
-                                var num = get.number(myCards[i]);
-                                myAvg += num;
-                                if (num > myMax) myMax = num;
-                            }
-                            myAvg = myAvg / myCards.length;
-
-                            // 估算对方平均点数
-                            var targetAvg = 7;
-                            if (targetCards.length > 0) {
-                                var sum = 0;
-                                for (var i = 0; i < targetCards.length; i++) {
-                                    sum += get.number(targetCards[i]);
-                                }
-                                targetAvg = sum / targetCards.length;
-                            }
-
-                            // 评估胜率
-                            var winChance = 0;
-                            if (myMax > targetAvg + 3) {
-                                winChance = 0.75;
-                            } else if (myMax > targetAvg + 2) {
-                                winChance = 0.65;
-                            } else if (myAvg > targetAvg + 1) {
-                                winChance = 0.6;
-                            } else if (myAvg > targetAvg) {
-                                winChance = 0.55;
-                            } else if (myAvg > targetAvg - 1) {
-                                winChance = 0.45;
-                            } else {
-                                winChance = 0.35;
-                            }
-
-                            // 评估收益和风险
-                            // 赢了的收益：+1鹰标记，摸牌数=min(3, 总标记数+1)
-                            var winReward = Math.min(3, currentMarks + 1);
-
-                            // 输了的损失：失去所有已有标记，对方获得1标记
-                            var loseRisk = currentMarks;
-
-                            // 如果没有标记，输了损失小，可以尝试
-                            if (currentMarks == 0) {
-                                if (winChance > 0.5) {
-                                    return -1; // 对敌人使用，收益中等
-                                } else if (winChance > 0.4) {
-                                    return -0.5;
-                                } else {
-                                    return 0; // 胜率太低不用
-                                }
-                            }
-
-                            // 如果已有标记，需要更谨慎
-                            if (currentMarks >= 2) {
-                                // 标记多，输了损失大
-                                if (winChance > 0.65) {
-                                    // 胜率高才值得冒险
-                                    return -2;
-                                } else if (winChance > 0.55) {
-                                    return -1;
-                                } else {
-                                    // 胜率不够，不建议使用
-                                    return 0;
-                                }
-                            }
-
-                            // 标记数为1的情况
-                            if (winChance > 0.6) {
-                                return -1.5;
-                            } else if (winChance > 0.5) {
-                                return -1;
-                            } else if (winChance > 0.45) {
-                                return -0.5;
-                            } else {
-                                return 0;
-                            }
+                            const cards = player.getCards('h');
+                            if (!cards.length) return 0;
+                            const friendly = get.attitude(player, target) > 0;
+                            const best = Math.max(...cards.map(card => lib.skill.Xfliegerkorps_R_piaobodeying.compareScore(player, target, card)));
+                            // 此处是目标视角分值，引擎还会乘敌我态度，不能直接返回使用者收益。
+                            return best > 0 ? (friendly ? best : -best) : 0;
                         },
                     },
                 },
@@ -2650,17 +2570,25 @@ const fallendemon = {
         },
     },
     yapogan: {
+        cardScore(player, target, card) {
+            const attitude = get.attitude(player, target);
+            const removal = -Math.sign(attitude) * Math.max(0, get.value(card, target)) * 0.35;
+            if (get.suit(card, player) !== 'spade') return removal + Math.max(0, get.value(card, player)) * 0.3;
+            const fire = { name: 'sha', nature: 'fire', isCard: true };
+            // 黑桃不能留在手中，火杀被免疫或会殃及队友时不能当作稳赚。
+            return removal + (player.canUse(fire, target, false) ? get.effect(target, fire, player, player) * 0.7 : 0);
+        },
         getTargetBaseScore(player, target) {
-            // 评估“从这名角色处获得一张牌”的基础收益。
-            if (target == player || target.countGainableCards(player, "he") <= 0) return -Infinity;
-            var score = get.effect(target, { name: "shunshou", isCard: true }, player, player);
-            if (get.attitude(player, target) >= 0) return score - 2;
-            if (player.canUse({ name: "sha", nature: "fire", isCard: true }, target, false)) {
-                // 若黑桃牌大概率会转成火【杀】,则把这部分期望伤害提前算进收益。
-                score += Math.max(get.effect(target, { name: "sha", nature: "fire", isCard: true }, player, player), 0) * 0.35;
+            if (target === player || get.attitude(player, target) >= 0 || target.countGainableCards(player, 'he') <= 0) return -Infinity;
+            const visible = target.getCards('e').concat(knownHandCards(player, target)).filter(card => lib.filter.canBeGained(card, player, target));
+            let best = -Infinity;
+            for (const card of visible) best = Math.max(best, lib.skill.yapogan.cardScore(player, target, card));
+            if (knownHandCards(player, target).length < target.countCards('h')) {
+                const fire = { name: 'sha', nature: 'fire', isCard: true };
+                const fireValue = player.canUse(fire, target, false) ? get.effect(target, fire, player, player) * 0.7 : 0;
+                best = Math.max(best, 1.2 + 0.75 * 1.2 + 0.25 * fireValue);
             }
-            if (target.countCards("he") == 1) score += 0.3;
-            return score;
+            return best;
         },
         getDrawCost(player, selectedCount) {
             // “少摸一张”的代价会随着体力、手牌压力和已选目标数上升而变大。
@@ -2719,7 +2647,13 @@ const fallendemon = {
             for (var i = 0; i < targets.length; i++) {
                 var target = targets[i];
                 player.line(target);
-                var gainResult = await player.gainPlayerCard(target, "he", true);
+                var gainResult = await player.gainPlayerCard(target, "he", true).set('yapoganTarget', target).set('ai', function (button) {
+                    const viewer = _status.event.player;
+                    const owner = _status.event.yapoganTarget;
+                    const visible = owner.getCards('e').concat(knownHandCards(viewer, owner));
+                    if (!visible.includes(button.link)) return 1.2;
+                    return lib.skill.yapogan.cardScore(viewer, owner, button.link);
+                });
                 if (!gainResult.result || !gainResult.result.bool || !gainResult.result.cards || !gainResult.result.cards.length) continue;
                 var card = gainResult.result.cards[0];
                 if (get.suit(card, player) == "spade") {
@@ -2938,7 +2872,7 @@ const fallendemon = {
                     selectCard: 2,
                     position: "hes",
                     check: function (card) {
-                        return 8 - get.value(card);
+                        return 6 - get.value(card);
                     },
                     viewAs: { name: links[0][2], nature: links[0][3] },
                     popname: true,
@@ -3042,7 +2976,7 @@ const fallendemon = {
                     selectCard: 2,
                     position: "hes",
                     check: function (card) {
-                        return 8 - get.value(card);
+                        return 6 - get.value(card);
                     },
                     viewAs: { name: links[0][2], nature: links[0][3] },
                     popname: true,
@@ -3068,13 +3002,8 @@ const fallendemon = {
             save: true,
             skillTagFilter: function (player, tag) {
                 if (player.countCards("hes") < 2) return false;
-                var event = _status.event;
-                if (!event || typeof event.filterCard != "function") return false;
-                var list = lib.skill.yamato_R_dikai2.getList(player, event);
-                if (tag == "respondSha") return list.some(function (card) { return card[2] == "sha"; });
-                if (tag == "respondShan") return list.some(function (card) { return card[2] == "shan"; });
-                if (tag == "save") return list.some(function (card) { return card[2] == "tao"; });
-                return false;
+                if (tag == "save") return !player.getStat("skill").yamato_R_dikai2_tao;
+                return true;
             },
             order: 3.1,
             result: { player: 1 },
