@@ -2675,6 +2675,9 @@ const standard = {
         // getUseValue 按合法目标和次数限制估价；无目标牌只计算使用者收益。
         cardValue(player, name) {
             const card = { name, isCard: true };
+            // 桃（含自动转为桃的快修）只能补回本次支付的体力，没有净回血。
+            // 手动选择仍合法；AI不把这次独立回血的通用倍率当成技能收益。
+            if (name === 'tao' || get.info(card)?.autoViewAs === 'tao') return 0;
             const value = get.info(card)?.notarget
                 ? get.effect(undefined, card, player, player)
                 : player.getUseValue(card, true, true);
@@ -2684,11 +2687,12 @@ const standard = {
             // 代价先于虚拟牌结算；最后一点体力无法安全支付，不能把未确认的救援算作收益。
             // 这不是旧版 hp<3 门槛：两点体力及以上仍完全按真实净收益决策。
             if (player.hp <= 1) return Infinity;
-            // 体力流失用现成的 losehp 伪牌接口估价（card/standard.js 定义 ai.result.target=-1.5），
-            // 与伤害分开、不受护甲/伤害免疫折减；直接用真实 effect 值，不做下限夹紧，
-            // 避免满血固定成本与伤后 recoverCost 之间的跳变。
+            // losehp 保留低血量风险与技能修正，但抵消 get.effect 对手牌数的通用倍率。
+            // 手牌多/装甲厚不能降低主动失去体力的成本；失血并不需要突破防御牌。
             const lossEffect = get.effect(player, { name: 'losehp', isCard: true }, player, player);
-            return Number.isFinite(lossEffect) ? -lossEffect : 0;
+            const hand = player.countCards('h');
+            const handFactor = hand === 0 ? 1.5 : hand === 1 ? 1.3 : hand === 2 ? 1.1 : hand > 3 ? 0.5 : 1;
+            return Number.isFinite(lossEffect) ? -lossEffect / handFactor : Infinity;
         },
         // 入口、按钮与总AI共用父 chooseToUse 的合法性口径：lib.filter.filterCard 内含
         // cardEnabled+cardUsable+目标存在性，与 cardValue 的 getUseValue(card,true,true)
@@ -2749,7 +2753,7 @@ const standard = {
                 const name = button?.link?.[2];
                 const info = lib.skill.jujianmengxiang;
                 if (!name || !info.availableNames(_status.event, player).includes(name)) return -1;
-                return info.cardValue(player, name) - info.hpValue(player);
+                return info.cardValue(player, name) - info.hpValue(player) - info.activateThreshold;
             },
             backup(links, player) {
                 return {

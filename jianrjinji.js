@@ -628,7 +628,7 @@ var jianrjinji = {
         chuansuohongzha_send: "穿梭轰炸", "chuansuohongzha_send_info": "每回合限一次,你使用的伤害类牌结算结束后,你可以将其交给一名未受伤角色。",
         hangkongyazhi_fengyin: "航空压制_封印",
         yuanyangpoxi: "远洋破袭", "yuanyangpoxi_info": "当你使用锦囊牌对攻击范围内的角色造成伤害时,你可以令此伤害+1,然后本回合不能使用【杀】。",
-        juejingfengsheng: "绝境逢生", juejingfengsheng_info: "每轮开始时，你可以弃置任意张未记录点数的牌并记录其点数，然后你增加X点体力上限并回复X点体力（X为此次弃置的牌数）",
+        juejingfengsheng: "绝境逢生", juejingfengsheng_info: "每轮开始时，你可以弃置任意张牌面点数尚未被你记录的牌并记录其点数，然后你增加X点体力上限并回复X点体力（X为此次弃置的牌数）",
         saqijian: "萨奇剪", "saqijian_info": "你获得【防空】。你可以将1张黑色牌当无懈可击使用。当你使用【开幕航空】或【防空】后,你获得1张【影】（黑桃A）。",
         jupaohuoli: "巨炮火力", "jupaohuoli_info": "你使用杀造成伤害时,若你手牌数大于目标手牌数,此伤害+1。",
         guanjianyiji: "关键一击", "guanjianyiji_info": "每回合对每名角色限一次,你使用牌指定目标后,你可以扣置目标的1张牌于武将牌上,其准备阶段开始时获得之。若目标为战列舰,不计入发动次数限制。",

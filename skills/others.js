@@ -4207,7 +4207,8 @@ const others = {
                 var card = result.cards[0];
                 player.line(target, 'green');
                 target.addTempSkill('new_zhixi', 'phaseUseAfter');
-                target.markSkillCharacter('jiashuzhidao', player, '魅步', '锁定技，出牌阶段，你至多可使用X张牌，你使用了锦囊牌后不能再使用牌（X为你的体力值）。');
+                // 标记跟随临时止息技能，到期移除 new_zhixi 时一并清理。
+                target.markSkillCharacter('new_zhixi', player, '止息', '锁定技，出牌阶段，你至多可使用X张牌，你使用了锦囊牌后不能再使用牌（X为你的体力值）。');
             }
         },
         ai: {

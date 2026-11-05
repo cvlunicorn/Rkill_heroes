@@ -1,5 +1,5 @@
 import { lib, game, ui, get, ai, _status } from '../../../noname.js';
-import { knownHandCards, isAttack } from './unfulfilledambition.js';
+import { knownHandCards, isAttack } from './sharedAI.js';
 const tebiechuanwu = {
 
     //光荣舰队SP

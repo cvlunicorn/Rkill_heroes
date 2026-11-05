@@ -1,5 +1,5 @@
 import { lib, game, get, ui, _status } from "../../../noname.js";
-import { knownHandCards } from './unfulfilledambition.js';
+import { knownHandCards } from './sharedAI.js';
 const fallendemon = {
     /* pachina_R_xinao: {
                nobracket: true,
