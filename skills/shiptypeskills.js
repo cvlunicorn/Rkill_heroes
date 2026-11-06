@@ -1836,16 +1836,21 @@ const shiptypeskills = {
         },
     },
     "fangkong2": {
+        fullLevel(player) {
+            return player.hasSkill('duikongfangyu') || (player.hasSkill('fangkongdanmu9_skill') && player.hasSkill('fangkong2', null, false));
+        },
+        level(player) { return lib.skill.fangkong2.fullLevel(player) ? 3 : Math.min(3, player.countMark('jinengup') + 1); },
+        cost(player) { return lib.skill.fangkong2.fullLevel(player) ? 1 : lib.skill.fangkong2.level(player); },
         name: "防空", //audio: "ext:舰R牌将/audio/skill:1", audioname: ["yixian_R", "reganning", "sunce", "re_sunben", "re_sunce", "ol_sunjian"],
         unique: true, nodelay: true, lastDo: true,
         group: ['fangkong2_roundreset'],
         trigger: { global: "useCardToPlayered", },
         filter: function (event, player) {
             if (event.getParent().triggeredTargets3.length > 1) return false;//万箭要作用七个目标,而你不想跟着遍历七次技能。
-            if (player.countMark('fangkong2_used_round') >= Math.min(3, player.countMark('jinengup') + 1)) return false;
+            if (player.countMark('fangkong2_used_round') >= lib.skill.fangkong2.level(player)) return false;
             if (get.type(event.card) != 'trick') return false;
-            var level = Math.min(3, player.countMark('jinengup') + 1);
-            if (player.countCards('he') < level || event.targets.length < level) return false;
+            var level = lib.skill.fangkong2.level(player);
+            if (player.countCards('he', c => lib.filter.cardDiscardable(c, player)) < lib.skill.fangkong2.cost(player) || event.targets.length < Math.max(2, level)) return false;
             for (var i = 0; i < event.targets.length; i++) {
                 if (!event.targets[i].hasSkill("fangkong2_aibiexuan")) return true;
             } return false;
@@ -1856,16 +1861,16 @@ const shiptypeskills = {
             'step 0'
             var next = player.chooseCardTarget({
                 prompt: get.prompt('防空保护对象'),
-                prompt2: ('弃置' + Math.min(3, player.countMark('jinengup') + 1) + '张牌,令此牌对等量目标无效。'),
+                prompt2: ('弃置' + lib.skill.fangkong2.cost(player) + '张牌,令此牌对' + lib.skill.fangkong2.level(player) + '名目标无效。'),
                 position: 'he',
                 selectCard: function () {
                     var player = get.player();
-                    var limit = Math.min(3, player.countMark('jinengup') + 1);
+                    var limit = lib.skill.fangkong2.cost(player);
                     return [limit, limit];
                 },
                 selectTarget: function () {
                     var player = get.player();
-                    var limit = Math.min(3, player.countMark('jinengup') + 1);
+                    var limit = lib.skill.fangkong2.level(player);
                     return [limit, limit];
                 },
                 filterCard: function (card, player) {
@@ -1885,13 +1890,13 @@ const shiptypeskills = {
                         if (t.hasSkill('fangkong2_aibiexuan')) { markedCount++; continue; }
                         protectedCount++;
                     }
-                    var level = Math.min(3, player.countMark('jinengup') + 1);
+                    var level = lib.skill.fangkong2.level(player);
                     var fp = player.countCards('he') + '|' + protectedCount + '|' + markedCount + '|' + level;
                     var plan = event._fangkong2PlanCache;
                     //静态指纹一致则复用(选牌推进不影响静态集合,费用按ui.selected.cards实时另算)
                     if (plan && plan.fp === fp) return plan;
                     //重建计划:可保护集合+各目标不拦截的负效应
-                    var needCards = Math.min(3, player.countMark('jinengup') + 1);
+                    var needCards = lib.skill.fangkong2.cost(player);
                     var range = Infinity;
                     var protectable = [];//[{t, gain}] 仅含收益>0者
                     var totalGain = 0;
