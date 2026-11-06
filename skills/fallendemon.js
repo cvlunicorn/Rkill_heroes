@@ -1200,25 +1200,33 @@ const fallendemon = {
     tirpitz_R_jinshu: {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
-        trigger: { player: "phaseDrawBegin" },
+        dutySkill: true,
+        trigger: { global: "roundStart" },
         filter(event, player) {
             return player.isIn() && !player.storage.tirpitz_R_jinshu_success && player.countCards("h") > 0;
         },
         direct: true,
-        check(event, player) {
-            var stored = player.getExpansions("tirpitz_R_jinshu");
-            if (stored.length >= 13) return false;
-            return player.countCards("h") > 0;
+        group: ["tirpitz_R_jinshu_success", "tirpitz_R_jinshu_fail"],
+        marktext: "书",
+        intro: {
+            content: "expansion",
+            markcount: "expansion",
+            mark(dialog, storage, player) {
+                var cards = player.getExpansions("tirpitz_R_jinshu").slice().sort(function (a, b) {
+                    return get.number(a, false) - get.number(b, false);
+                });
+                if (cards.length) dialog.addAuto(cards);
+                else return "没有禁书";
+            },
         },
         content() {
-            player.logSkill("tirpitz_R_jinshu");
             "step 0"
-            player.chooseCard(get.prompt2("tirpitz_R_jinshu"), "h").set("ai", function (card) {
+            player.chooseToDiscard("h", get.prompt2("tirpitz_R_jinshu")).set("ai", function (card) {
                 return 6 - get.value(card);
             });
             "step 1"
             if (result.bool) {
-                player.discard(result.cards);
+                player.logSkill("tirpitz_R_jinshu");
                 player.storage.tirpitz_R_jinshu_suit = get.suit(result.cards[0], false);
                 player.addTempSkill("tirpitz_R_jinshu_watch", { global: "roundStart" });
             }
@@ -1227,47 +1235,84 @@ const fallendemon = {
             watch: {
                 charlotte: true,
                 mark: true,
-                marktext: "禁书",
+                marktext: "禁",
+                onremove(player) { delete player.storage.tirpitz_R_jinshu_suit; },
                 intro: {
                     content(storage, player) {
                         var suit = player.storage.tirpitz_R_jinshu_suit;
-                        var cards = player.getExpansions("tirpitz_R_jinshu");
-                        return "本轮记录花色：" + (suit ? get.translation(suit) : "无") + "；禁书牌：" + cards.length;
+                        return "本轮记录花色：" + (suit ? get.translation(suit) : "无") + "；禁书牌：" + player.getExpansions("tirpitz_R_jinshu").length;
                     },
                 },
-                trigger: { global: "cardsDiscardAfter" },
-                filter(event, player) {
+                trigger: { global: ["loseAfter", "cardsDiscardAfter", "loseAsyncAfter"] },
+                getCards(event, player) {
+                    if (event.name.indexOf("lose") === 0 && (event.getlx === false || event.position !== ui.discardPile)) return [];
                     var suit = player.storage.tirpitz_R_jinshu_suit;
-                    if (!suit || !event.cards || player.storage.tirpitz_R_jinshu_success) return false;
-                    return event.cards.some(function (card) {
-                        return !card.hasGaintag("tirpitz_R_jinshu") && get.suit(card, false) == suit && get.position(card, true) == "d";
-                    }) && player.countCards("h") > 0;
+                    if (!suit || player.storage.tirpitz_R_jinshu_success) return [];
+                    return (event.cards || []).filter(function (card) {
+                        if (get.position(card, true) !== "d" || get.suit(card, false) !== suit) return false;
+                        // lose removes gaintags before loseAfter; inspect the loss snapshot.
+                        if (card.hasGaintag("tirpitz_R_jinshu")) return false;
+                        if (event.gaintag_map && (event.gaintag_map[card.cardid] || []).includes("tirpitz_R_jinshu")) return false;
+                        if (event.getl && game.players.concat(game.dead).some(function (current) {
+                            var loss = event.getl(current);
+                            return loss && loss.gaintag_map && (loss.gaintag_map[card.cardid] || []).includes("tirpitz_R_jinshu");
+                        })) return false;
+                        return true;
+                    });
+                },
+                filter(event, player) {
+                    return lib.skill.tirpitz_R_jinshu_watch.getCards(event, player).length > 0;
                 },
                 direct: true,
                 content() {
                     "step 0"
-                    event.discarded = trigger.cards.find(function (card) {
-                        return !card.hasGaintag("tirpitz_R_jinshu") && get.suit(card, false) == player.storage.tirpitz_R_jinshu_suit;
-                    });
-                    if (!event.discarded) { event.finish(); return; }
+                    event.remaining = lib.skill.tirpitz_R_jinshu_watch.getCards(trigger, player).length;
+                    "step 1"
+                    if (!event.remaining || !player.isIn() || player.storage.tirpitz_R_jinshu_success || !player.hasSkill("tirpitz_R_jinshu_watch")) {
+                        event.finish();
+                        return;
+                    }
+                    event.remaining--;
+                    player.chooseBool(get.prompt("tirpitz_R_jinshu"), "摸一张牌，然后将一张手牌置为禁书，并弃置同点数的旧禁书").set("ai", function () { return true; });
+                    "step 2"
+                    if (!result.bool) { event.goto(1); return; }
                     player.logSkill("tirpitz_R_jinshu");
                     player.draw();
-                    "step 1"
-                    if (!player.countCards("h")) { event.finish(); return; }
-                    event.number = get.number(event.discarded, false);
-                    event.old = player.getExpansions("tirpitz_R_jinshu").find(function (card) {
-                        return get.number(card, false) == event.number;
-                    });
+                    "step 3"
+                    if (!player.countCards("h")) { event.goto(1); return; }
                     player.chooseCard("h", "将一张手牌盖在武将牌上", true).set("ai", function (card) {
-                        return 5 - get.value(card);
+                        var duplicate = _status.event.player.getExpansions("tirpitz_R_jinshu").some(function (stored) {
+                            return get.number(stored, false) === get.number(card, false);
+                        });
+                        return (duplicate ? 0 : 10) - get.value(card);
                     });
-                    "step 2"
+                    "step 4"
                     if (result.bool) {
+                        var number = get.number(result.cards[0], false);
+                        event.old = player.getExpansions("tirpitz_R_jinshu").filter(function (card) {
+                            return get.number(card, false) === number;
+                        });
                         player.addToExpansion(result.cards, "giveAuto").gaintag.add("tirpitz_R_jinshu");
-                        if (event.old && get.position(event.old, true) == "x") player.loseToDiscardpile(event.old);
                     }
+                    "step 5"
+                    if (event.old && event.old.length) player.loseToDiscardpile(event.old);
+                    event.goto(1);
+                },
             },
-        },
+            fail: {
+                charlotte: true,
+                trigger: { player: "dying" },
+                forced: true,
+                filter(event, player) { return !player.storage.tirpitz_R_jinshu_success; },
+                content() {
+                    // Stop collection before discarding books, including the empty-book case.
+                    player.removeSkill("tirpitz_R_jinshu_watch");
+                    delete player.storage.tirpitz_R_jinshu_suit;
+                    player.storage.tirpitz_R_chuanyue_used = [];
+                    var cards = player.getExpansions("tirpitz_R_jinshu");
+                    if (cards.length) player.loseToDiscardpile(cards);
+                },
+            },
         },
         ai: { threaten: 2.1 },
     },
@@ -1275,58 +1320,110 @@ const fallendemon = {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
         enable: ["chooseToUse", "chooseToRespond"],
+        group: ["tirpitz_R_chuanyue_reset", "tirpitz_R_chuanyue_equip"],
         filter(event, player) {
-            if (!player.storage.tirpitz_R_jinshu_success || !player.countCards("h")) return false;
-            var used = player.storage.tirpitz_R_chuanyue_used || [];
-            return player.countCards("h", function (card) {
-                return !used.includes(get.number(card, false)) && player.getExpansions("tirpitz_R_jinshu").some(function (stored) {
-                    return get.number(stored, false) == get.number(card, false);
-                });
-            }) > 0;
+            return player.hasCard(function (card) {
+                return lib.skill.tirpitz_R_chuanyue.filterCard(card, player, event);
+            }, "h");
         },
-        filterCard(card, player) {
+        filterCard(card, player, event) {
             var used = player.storage.tirpitz_R_chuanyue_used || [];
-            return player.storage.tirpitz_R_jinshu_success && player.countCards("h") > 0 && !used.includes(get.number(card, false)) && player.getExpansions("tirpitz_R_jinshu").some(function (stored) {
-                return get.number(stored, false) == get.number(card, false);
-            });
+            if (!player.storage.tirpitz_R_jinshu_success || used.includes(get.number(card, false))) return false;
+            var viewAs = lib.skill.tirpitz_R_chuanyue.viewAs([card], player);
+            if (!viewAs || game.checkMod(card, player, "unchanged", "cardEnabled2", player) === false) return false;
+            event = event || _status.event;
+            if (!event || !["chooseToUse", "chooseToRespond"].includes(event.name)) return true;
+            // Once the skill is selected, event.filterCard filters materials; use the original card filter.
+            var filter = event._backup ? event._backup.filterCard : event.filterCard;
+            var virtual = get.autoViewAs(viewAs, [card]);
+            if (filter && !filter(virtual, player, event)) return false;
+            if (event.name === "chooseToRespond") return lib.filter.cardRespondable(virtual, player, event);
+            var info = get.info(virtual);
+            if (info.notarget) return true;
+            var select = info.selectTarget;
+            if (select === undefined) select = info.filterTarget === undefined ? 0 : 1;
+            var range = typeof select === "function" ? select(virtual, player) : get.select(select);
+            range = range.slice();
+            game.checkMod(virtual, player, range, "selectTarget", player);
+            if (range[1] !== -1 && range[1] < range[0]) return false;
+            if (range[0] === 0) return true;
+            var filterTarget = (event._backup ? event._backup.filterTarget : event.filterTarget) || lib.filter.filterTarget;
+            return game.countPlayer(function (target) {
+                return lib.filter.filterTarget(virtual, player, target) && filterTarget(virtual, player, target);
+            }) >= Math.max(1, range[0]);
         },
         precontent() {
-            if (!event.cards || !event.cards.length) {
-                event.finish();
-                return;
-            }
-            var number = get.number(event.cards[0], false);
-            if (!player.storage.tirpitz_R_chuanyue_used) player.storage.tirpitz_R_chuanyue_used = [];
-            player.storage.tirpitz_R_chuanyue_used.push(number);
+            var cards = event.result.cards;
+            if (!cards || !cards.length) return;
+            event.result.card = get.autoViewAs(lib.skill.tirpitz_R_chuanyue.viewAs(cards, player), cards);
+            player.markAuto("tirpitz_R_chuanyue_used", [get.number(cards[0], false)]);
         },
-        viewAs(cards) {
+        viewAs(cards, player) {
             if (!cards.length) return null;
             var number = get.number(cards[0], false);
-            var stored = get.player().getExpansions("tirpitz_R_jinshu").find(function (card) {
-                return get.number(card, false) == number;
+            var stored = player.getExpansions("tirpitz_R_jinshu").find(function (card) {
+                return get.number(card, false) === number;
             });
             if (!stored) return null;
-            return { name: get.name(stored, false), nature: get.nature(stored, false), isCard: true };
+            return { name: get.name(stored, false), nature: get.nature(stored, false) };
         },
         position: "h",
         selectCard: 1,
-        filterTarget: function (card, player, target) {
-            return lib.filter.filterTarget.apply(this, arguments);
-        },
-        mod: {
-            cardUsable(card, player, num) {
-                if (get.name(card) == "tirpitz_R_chuanyue") return num;
-                return num;
-            },
-        },
+        check(card) { return 6 - get.value(card); },
         subSkill: {
+            equip: {
+                charlotte: true,
+                trigger: { global: "equipBegin" },
+                forced: true,
+                silent: true,
+                firstDo: true,
+                filter(event, player) {
+                    var use = event.getParent("useCard");
+                    return use.player === player && use.skill === "tirpitz_R_chuanyue" && use.cards.includes(event.card) && get.type(use.card) === "equip" && event.card.name !== use.card.name;
+                },
+                content() {
+                    // This engine equips the physical material, so retain the equipment identity until it leaves the zone.
+                    var name = trigger.getParent("useCard").card.name;
+                    game.broadcastAll(function (card, name) {
+                        card.tirpitz_R_chuanyue_original = [card.suit, card.number, card.name, card.nature];
+                        card.init([card.suit, card.number, name]);
+                    }, trigger.card, name);
+                    game.addGlobalSkill("tirpitz_R_chuanyue_restore");
+                },
+            },
+            restore: {
+                charlotte: true,
+                trigger: { global: ["loseAfter", "gainAfter", "cardsDiscardAfter", "equipAfter", "loseAsyncAfter"] },
+                forced: true,
+                silent: true,
+                firstDo: true,
+                forceDie: true,
+                getCards(event) {
+                    // Equipment transfers pass through the special area; restore only after the transfer finishes.
+                    if (event.name === "lose" && event.getParent("swapEquip").name === "swapEquip") return [];
+                    var moving = event.name === "lose" ? event.getParent("equip").card : null;
+                    return (event.cards || (event.card ? [event.card] : [])).filter(function (card) {
+                        return card !== moving && card.tirpitz_R_chuanyue_original && get.position(card, true) !== "e";
+                    });
+                },
+                filter(event) { return lib.skill.tirpitz_R_chuanyue_restore.getCards(event).length > 0; },
+                content() {
+                    game.broadcastAll(function (cards) {
+                        cards.forEach(function (card) {
+                            var original = card.tirpitz_R_chuanyue_original;
+                            delete card.tirpitz_R_chuanyue_original;
+                            card.init(original);
+                        });
+                    }, lib.skill.tirpitz_R_chuanyue_restore.getCards(trigger));
+                },
+            },
             reset: {
                 charlotte: true,
                 trigger: { global: "roundStart" },
                 forced: true,
-                content() {
-                    player.storage.tirpitz_R_chuanyue_used = [];
-                },
+                silent: true,
+                firstDo: true,
+                content() { player.storage.tirpitz_R_chuanyue_used = []; },
             },
         },
         ai: { order: 8, respondSha: true, respondShan: true, respondTao: true },
@@ -1335,66 +1432,84 @@ const fallendemon = {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
         locked: true,
-        group: ["tirpitz_R_jinshu_success"],
+        trigger: { player: "phaseDrawBegin2" },
+        forced: true,
+        content() {
+            var suits = [];
+            player.getExpansions("tirpitz_R_jinshu").forEach(function (card) {
+                var suit = get.suit(card, false);
+                if (lib.suit.includes(suit)) suits.add(suit);
+            });
+            trigger.num = Math.max(1, suits.length);
+        },
+        group: "tirpitz_R_ziwochuangzuo_show",
+        matches(card, player) {
+            return player.getExpansions("tirpitz_R_jinshu").some(function (stored) {
+                return get.number(stored, false) === get.number(card, false);
+            });
+        },
         mod: {
-            drawNum(player, num) {
-                var cards = player.getExpansions("tirpitz_R_jinshu");
-                if (!cards.length) return num;
-                var suits = [];
-                cards.forEach(function (card) {
-                    var suit = get.suit(card, false);
-                    if (suit && !suits.includes(suit)) suits.push(suit);
-                });
-                return suits.length || num;
-            },
             cardUsable(card, player, num) {
-                if (get.name(card) == "sha") {
-                    var count = player.getExpansions("tirpitz_R_jinshu").filter(function (c) { return get.name(c, false) == "sha"; }).length;
-                    return count || num;
+                if (get.name(card) === "sha") {
+                    return player.getExpansions("tirpitz_R_jinshu").filter(function (c) { return get.name(get.autoViewAs(c)) === "sha"; }).length;
                 }
-                return num;
             },
             selectTarget(card, player, range) {
-                if (get.name(card) == "sha") {
-                    var count = player.getExpansions("tirpitz_R_jinshu").filter(function (c) { return get.type(c, false) == "equip"; }).length;
-                    if (count) range[1] = count;
+                if (get.name(card) === "sha") {
+                    range[1] = player.getExpansions("tirpitz_R_jinshu").filter(function (c) { return get.type(c, false) === "equip"; }).length;
                 }
             },
             globalFrom(from, to, distance) {
-                return distance - from.getExpansions("tirpitz_R_jinshu").filter(function (c) { return get.type(c, false) == "trick"; }).length;
+                return distance - from.getExpansions("tirpitz_R_jinshu").filter(function (c) { return get.type2(c, false) === "trick"; }).length;
             },
-            maxHandcard(player, num) {
-                var ranks = [];
-                player.getExpansions("tirpitz_R_jinshu").forEach(function (card) {
-                    var number = get.number(card, false);
-                    if (number != null && !ranks.includes(number)) ranks.push(number);
-                });
-                return num + player.countCards("h", function (card) { return ranks.includes(get.number(card, false)); });
+            ignoredHandcard(card, player) {
+                if (lib.skill.tirpitz_R_ziwochuangzuo.matches(card, player)) return true;
+            },
+            cardDiscardable(card, player, name) {
+                if (name === "phaseDiscard" && lib.skill.tirpitz_R_ziwochuangzuo.matches(card, player)) return false;
             },
         },
-        trigger: { player: "dying" },
-        filter(event, player) {
-            return !player.storage.tirpitz_R_jinshu_success && player.getExpansions("tirpitz_R_jinshu").length > 0;
-        },
-        forced: true,
-        content() {
-            player.loseToDiscardpile(player.getExpansions("tirpitz_R_jinshu"));
-            player.storage.tirpitz_R_jinshu_suit = null;
-            player.storage.tirpitz_R_chuanyue_used = [];
+        subSkill: {
+            show: {
+                charlotte: true,
+                trigger: { global: ["gainAfter", "loseAfter", "loseAsyncAfter", "addToExpansionAfter", "equipAfter", "addJudgeAfter"], player: "enterGame" },
+                forced: true,
+                silent: true,
+                onremove(player) { player.removeGaintag("visible_tirpitz_R_ziwochuangzuo"); },
+                filter(event, player) {
+                    return player.getCards("h").some(function (card) {
+                        return lib.skill.tirpitz_R_ziwochuangzuo.matches(card, player) !== card.hasGaintag("visible_tirpitz_R_ziwochuangzuo");
+                    });
+                },
+                content() {
+                    var hs = player.getCards("h");
+                    var shown = hs.filter(function (card) {
+                        return lib.skill.tirpitz_R_ziwochuangzuo.matches(card, player) && !card.hasGaintag("visible_tirpitz_R_ziwochuangzuo");
+                    });
+                    var hidden = hs.filter(function (card) {
+                        return !lib.skill.tirpitz_R_ziwochuangzuo.matches(card, player) && card.hasGaintag("visible_tirpitz_R_ziwochuangzuo");
+                    });
+                    if (shown.length) player.addShownCards(shown, "visible_tirpitz_R_ziwochuangzuo");
+                    if (hidden.length) player.hideShownCards(hidden, "visible_tirpitz_R_ziwochuangzuo");
+                },
+            },
         },
     },
     tirpitz_R_jinshu_success: {
         charlotte: true,
         trigger: { player: "addToExpansionAfter" },
         filter(event, player) {
-            var cards = player.getExpansions("tirpitz_R_jinshu");
             var numbers = [];
-            cards.forEach(function (card) { var n = get.number(card, false); if (n != null && !numbers.includes(n)) numbers.push(n); });
-            return !player.storage.tirpitz_R_jinshu_success && numbers.length >= 13;
+            player.getExpansions("tirpitz_R_jinshu").forEach(function (card) {
+                var n = get.number(card, false);
+                if (n >= 1 && n <= 13) numbers.add(n);
+            });
+            return !player.storage.tirpitz_R_jinshu_success && numbers.length === 13;
         },
         forced: true,
         content() {
             player.storage.tirpitz_R_jinshu_success = true;
+            player.removeSkill("tirpitz_R_jinshu_watch");
             player.addSkill("tirpitz_R_chuanyue");
             player.markSkill("tirpitz_R_chuanyue");
         },
