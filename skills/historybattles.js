@@ -26,7 +26,7 @@ const historybattles = {
         content: function () {
             "step 0"
             player.give(cards, targets[0]);
-            target.addTempSkill('u81_langben_target', "phaseBegin");
+            target.addTempSkill('u81_langben_target', { player: 'phaseBegin' });
         },
         ai: {
             result: {
@@ -160,7 +160,7 @@ const historybattles = {
         },
         filter: function (event, player) {
             return game.hasPlayer(function (current) {
-                return current.hasSkill('u47_xinbiao_hp') && lib.skill.u47_huxi.getTargetValue(player, current) > 0;
+                return current.hasSkill('u47_xinbiao_hp');
             });
         },
         content: function () {
@@ -232,14 +232,13 @@ const historybattles = {
     },
     u81_zonglie: {
         audio: "ext:舰R牌将/audio/skill:true",
-        usable: 1,
         nobracket: true,
         frequent: true,
         trigger: {
             source: "damageBegin",
         },
         filter(event, player) {
-            return !event.player.hasSkill("u81_zonglie_shanghai") && player != event.player && event.player.countCards("h") > 0 && event.player.countCards("h") != player.countCards("h");
+            return !event.player.getStorage("u81_zonglie_shanghai").includes(player) && player != event.player && event.player.countCards("h") > 0 && event.player.countCards("h") != player.countCards("h");
         },
         content: function* (event, map) {
             "step 0"
@@ -256,9 +255,9 @@ const historybattles = {
                 trigger.cancel();
                 if (!trigger.player.hasSkill("u81_zonglie_shanghai")) {
                     //game.log("添加技能");
-                    trigger.player.addTempSkill("u81_zonglie_shanghai");
+                    trigger.player.addTempSkill("u81_zonglie_shanghai", { global: "phaseAfter" });
                 }
-                trigger.player.addMark('u81_zonglie_shanghai', 1, false);
+                trigger.player.markAuto('u81_zonglie_shanghai', [player]);
             } else {
                 game.log("不给牌结束");
                 event.finish();
@@ -276,14 +275,14 @@ const historybattles = {
         locked: false,
         filter: function (event, player) {
             return game.hasPlayer((current) => {
-                return current != player && current.hasSkill("u81_zonglie_shanghai");
+                return current != player && current.getStorage("u81_zonglie_shanghai").includes(player);
             });
         },
         groupSkill: true,
         content: function () {
             trigger.directHit.addArray(
                 game.filterPlayer((current) => {
-                    return current != player && current.hasSkill("u81_zonglie_shanghai");
+                    return current != player && current.getStorage("u81_zonglie_shanghai").includes(player);
                 })
             );
         },
@@ -297,6 +296,7 @@ const historybattles = {
     },
     u81_zonglie_shanghai: {
         nobracket: true,
+        onremove: true,
         mark: true,
         marktext: "纵猎",
         intro: {
@@ -1192,8 +1192,6 @@ const historybattles = {
         position: "h",
         selectCard: [1, 2],
         filterCard: function (card, player) {
-            if (player.hp <= 1) return !['shan', 'tao', 'jiu', 'wuxie', 'huibi9'].includes(card.name);
-            if (player.hp <= 2) return !['shan', 'tao'].includes(card.name);
             return true;
         },
         filterTarget: true,
@@ -1538,35 +1536,21 @@ const historybattles = {
         prompt: "你可以将任意角色一张牌置于自己武将牌上称为Z", //group: ["z22_tuxixiawan_discard"],
         subSkill: {
             discard: {
-                trigger: {
-                    global: "damageSource",
+                trigger: { global: "damageSource" },
+                filter(event, player) {
+                    return event.source !== player && !!_status.currentPhase?.isIn() && player.getExpansions('Z').length > 0;
                 },
-                filter: function (event, player) {
-                    return player.getExpansions('Z').length;
-                },
-                check: function (event, player) {
-                    return get.attitude(player, event.source) < 0;
-                },
-                content: function () {
-                    'step 0'
-                    var cards = player.getExpansions('Z'), count = cards.length;
-                    if (count > 0) {
-                        player.chooseCardButton('你可以移去一张Z令' + get.translation(event.source) + '进行一次判定,本回合无法使用或打出与判定牌相同颜色的牌', true, cards).set('ai', function (button) {
-                            return 1;
-                        });
+                check(event, player) { return get.attitude(player, _status.currentPhase) < 0; },
+                async content(event, trigger, player) {
+                    const current = _status.currentPhase;
+                    const result = await player.chooseCardButton('移去一张Z，判定后令当前回合角色本回合不能使用或打出同色牌', true, player.getExpansions('Z')).set('ai', () => 1).forResult();
+                    if (!result.bool || !result.links?.length) return;
+                    await player.loseToDiscardpile(result.links);
+                    const judgment = await player.judge(() => 0).forResult();
+                    if (current?.isIn() && ['red', 'black'].includes(judgment.color)) {
+                        current.addTempSkill('cardsDisabled_color', { global: 'phaseAfter' });
+                        current.markAuto('cardsDisabled_color', [judgment.color]);
                     }
-                    else event.finish();
-                    'step 1'
-                    event.cards = result.links;
-                    player.loseToDiscardpile(event.cards);
-                    'step 2'
-                    player.judge(function (card) {
-                        if (!trigger.source.hasSkill('cardsDisabled_color')) {
-                            trigger.source.addTempSkill('cardsDisabled_color', { player: 'phaseAfter' });
-                        }
-                        trigger.source.markAuto('cardsDisabled_color', [get.color(card)]);
-                    });
-                    event.finish();
                 },
             },
         },
@@ -1574,38 +1558,14 @@ const historybattles = {
     cardsDisabled_color: {
         nobracket: true,
         charlotte: true,
-        direct: true,
-        lastDo: true,
-        trigger: {
-            player: ['phaseEnd', 'dieAfter'],
-        },
-        intro: {
-            content: "不可使用的颜色：$",
-            onunmark: true,
-        },
+        onremove: true,
+        intro: { content: "不可使用或打出的颜色：$" },
         mod: {
-            cardEnabled: function (card, player) {
-                var color = get.color(card);
-                if (player.storage.cardsDisabled_color.includes(color)) return false;
-            },
-            cardUsable: function (card, player) {
-                var color = get.color(card);
-                if (player.storage.cardsDisabled_color.includes(color)) return false;
-            },
-            cardRespondable: function (card, player) {
-                var color = get.color(card);
-                if (player.storage.cardsDisabled_color.includes(color)) return false;
-            },
-            cardSavable: function (card, player) {
-                var color = get.color(card);
-                if (player.storage.cardsDisabled_color.includes(color)) return false;
-            },
+            cardEnabled(card, player) { if (player.getStorage('cardsDisabled_color').includes(get.color(card))) return false; },
+            cardUsable(card, player) { if (player.getStorage('cardsDisabled_color').includes(get.color(card))) return false; },
+            cardRespondable(card, player) { if (player.getStorage('cardsDisabled_color').includes(get.color(card))) return false; },
+            cardSavable(card, player) { if (player.getStorage('cardsDisabled_color').includes(get.color(card))) return false; },
         },
-        content: function () {
-            player.unmarkSkill('cardsDisabled_color');
-            player.removeSkill('cardsDisabled_color');
-        },
-        "_priority": 0,
     },
     matapanjiaozhijian: {
         audio: "ext:舰R牌将/audio/skill:true",
@@ -1735,8 +1695,8 @@ const historybattles = {
         filter(event, player) {
             if (!(event.source && event.source.isIn())) return false;
             var target = (player == event.player) ? event.source : event.player;
-            //game.log(event.player != event.source && target.countCards("h") && target.isAlive());
-            return event.player != event.source && target.countCards("h") && target.isAlive() && event.notLink();
+            //game.log(event.player != event.source && target.countCards("he") && target.isAlive());
+            return event.player != event.source && target.countCards("he") && target.isAlive() && event.notLink();
         },
         content: function () {
             'step 0'
@@ -1973,22 +1933,23 @@ const historybattles = {
         audio: "ext:舰R牌将/audio/skill:true",
         unique: true,
         zhuSkill: true,
-        usable: 1,
         trigger: {
             player: "damageBegin3",
         },
-        forced: true,
+        direct: true,
         filter(event, player) {
-            if (player.countCards("he") == 0) return false;
+            if (player.hasSkill("yongbuchenmo_used") || !player.countDiscardableCards(player, "he")) return false;
             return player.hujia > 0 && event.num >= 1;
         },
         content() {
             'step 0'
-            player.chooseToDiscard(1).set("ai", function (card) {
+            player.chooseToDiscard("he", 1).set("ai", function (card) {
                 return 9 - get.value(card);
             });
             'step 1'
             if (result.bool == true) {
+                player.logSkill("yongbuchenmo");
+                player.addTempSkill("yongbuchenmo_used", { global: "phaseAfter" });
                 if (trigger.num >= 1) {
                     trigger.num--;
                 }
@@ -2002,6 +1963,11 @@ const historybattles = {
                         return 0.1;
                     }
                 },
+            },
+        },
+        subSkill: {
+            used: {
+                charlotte: true,
             },
         },
         "_priority": 0,
@@ -2332,7 +2298,7 @@ const historybattles = {
                     var num = event.player.getSeatNum();
                     //game.log(num);
                     for (var i = 0; i < player.getExpansions('hongseqiangwei').length; i++) {
-                        if (get.number(cards[i]) % game.countPlayer() == num) {
+                        if ((get.number(cards[i]) - 1) % game.countPlayer() + 1 == num) {
                             return event.player.isAlive();
                         }
                     }
@@ -2347,7 +2313,7 @@ const historybattles = {
                     var Fcards = player.getExpansions('hongseqiangwei');
                     for (var i = 0; i < Fcards.length; i++) {
                         //game.log("蔷薇的点数" + get.number(Fcards[i]));
-                        if (get.number(Fcards[i]) % game.countPlayer() == num) {
+                        if ((get.number(Fcards[i]) - 1) % game.countPlayer() + 1 == num) {
                             list.push(Fcards[i]);
                         }
                     }
@@ -2592,7 +2558,7 @@ const historybattles = {
             if (!result.bool) return;
             player.logSkill("yuanyangpoxi");
             trigger.num++;
-            player.addTempSkill("yuanyangpoxi_ban_sha", { player: "phaseAfter" });
+            player.addTempSkill("yuanyangpoxi_ban_sha", { global: "phaseAfter" });
         },
         ai: {
             damageBonus: true,
@@ -2931,6 +2897,7 @@ const historybattles = {
         audio: "ext:舰R牌将/audio/skill:true",
         forced: true,
         direct: true,
+        usable: 1,
         trigger: {
             global: "judge",
         },
@@ -3109,6 +3076,8 @@ const historybattles = {
 
             }
             "step 2";
+            player.recover(1);
+            "step 3";
             player.drawTo(Math.min(5, player.maxHp));
             //player.addTempSkill("xingyunyunyuqu_bazhen",{player:"phaseBegin"});
         },
@@ -3238,7 +3207,9 @@ const historybattles = {
         },
         frequent: true,
         filter(event, player) {
-            return event.player != player;
+            if (event.player == player) return false;
+            if (!event.card) return false;
+            return event.card.name == "sha" || event.card.name == "sheji9";
         },
         content() {
             trigger.player.addTempSkill("beijixingweishe_effect", { player: "phaseEnd" });

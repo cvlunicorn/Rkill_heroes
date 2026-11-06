@@ -23,13 +23,9 @@ const standard = {
     manchangzhanyi_mianyi: {
         audio: "ext:舰R牌将/audio/skill:true",
         nobracket: true,
-        round: 1, trigger:
-        {
-            player: "damageBefore",
-            source: "damageSource",
-
-        },
-        filter: function (event, player) { return event.card && event.card.name != 'sha' && event.card.name != 'sheji9' },
+        round: 1,
+        trigger: { player: "damageBefore" },
+        filter: function (event, player) { return event.card && get.type2(event.card) == 'trick'; },
         forced: true,
         content: function () {
 
@@ -148,17 +144,23 @@ const standard = {
             "step 0";
             player.give(cards, targets[0]);
             "step 1";
-            if (!player.hasSkill("shuileizhandui_skill_1")) {
-                var card = get.cardPile(function (card) {
-                    return card.name == 'sheji9' && card.nature == 'thunder';
-                });
-                if (card) {
-                    game.log("在牌堆中查找到了雷属性射击");
-                    player.gain(card, 'gain2');
-                }
-                player.addTempSkill("shuileizhandui_skill_1", { player: 'phaseJieshuBegin' });
+            if (player.hasSkill("shuileizhandui_skill_1")) {
+                event.finish();
+                return;
             }
-            //game.log("step end");
+            player.addTempSkill("shuileizhandui_skill_1", { global: 'phaseAfter' });
+            event.thunderSha = get.cardPile(function (card) {
+                return get.name(get.autoViewAs(card)) == 'sha' && game.hasNature(card, 'thunder');
+            });
+            if (!event.thunderSha) {
+                event.finish();
+                return;
+            }
+            player.chooseBool("水雷战队：是否获得" + get.translation(event.thunderSha) + "？").set('ai', () => true);
+            "step 2";
+            if (result.bool && ['c', 'd'].includes(get.position(event.thunderSha, true))) {
+                player.gain(event.thunderSha, 'gain2');
+            }
         },
         ai: {
             expose: 0.1,
@@ -273,28 +275,14 @@ const standard = {
     dumuchenglin: {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
-        trigger: {
-            player: "phaseZhunbeiBegin",
-        },
-        forced: true,
-        popup: false,
-        content: function () {
-            var num = game.countPlayer(function (current) {
-                return current.hasSkill('hangmucv');
-            });
-            if (num <= 1) {
-                game.log("获得多刀加伤");
-                player.addSkill("dumuchenglin_2");
-            }
-        },
-
+        group: ["dumuchenglin_2", "dajiaoduguibi"],
     },
     dumuchenglin_2: {
         nobracket: true,
         //audio: "ext:舰R牌将/audio/skill:true",
         mod: {
             cardUsable: function (card, player, num) {
-                if (card.name == 'sha') return num + 1;
+                if (card.name == 'sha' && !game.hasPlayer(current => current != player && current.hasSkill('hangmucv'))) return num + 1;
             },
         },
         /*
@@ -327,12 +315,12 @@ const standard = {
     },
 
     bigE: {
-        prompt: "你令使用的第一张杀不可响应",
+        prompt: "你令使用的第一张杀需要两张闪响应",
         audio: "ext:舰R牌将/audio/skill:true",
         forced: true,
         filter: function (event, player) {
             return (event.card.name == 'sha' || event.card.name == 'sheji9') && !event.getParent().directHit.includes(event.target) && player.getHistory('useCard', function (event) {
-                return (event.card.name == 'sha' || event.card.name == 'sheji9') && event.cards && event.cards.length;
+                return event.card.name == 'sha' || event.card.name == 'sheji9';
             }).length == 1;
         },
         trigger: { player: 'useCardToPlayered' },
@@ -417,13 +405,11 @@ const standard = {
         },*/
         content: function () {
             "step 0"
-            //player.addMark('xiangrui', 1);
-            var i = player.countMark('xiangrui');
-            player.removeMark('xiangrui', i);
-            //game.log("i" + i);
+            event.unlimited = player.countMark('xiangrui') > 0;
+            player.removeMark('xiangrui', player.countMark('xiangrui'));
             player.chooseTarget(get.prompt2('yumian'), true, function (card, player, target) {
-                return get.distance(player, target) <= 1;
-            }).set('ai', function (target) {
+                return _status.event.unlimited || get.distance(player, target) <= 1;
+            }).set('unlimited', event.unlimited).set('ai', function (target) {
                 var player = get.player();
                 return get.effect(target, { name: 'losehp' }, player, target);
             });
@@ -467,7 +453,7 @@ const standard = {
         },
         content() {
             "step 0"
-            event.cards = get.cards(trigger.targets.length);
+            event.cards = get.cards(Math.min(4, trigger.targets.length));
             game.cardsGotoOrdering(event.cards);
             event.videoId = lib.status.videoId++;
             game.broadcastAll(function (player, id, cards) {
@@ -605,8 +591,7 @@ const standard = {
             //game.log(event.targets);
             'step 1'
             event.target1 = event.targets.shift();
-            if (event.target1.countCards('he') < 1) event._result = { index: 2 };
-            else event.target1.chooseControlList(
+            event.target1.chooseControlList(
                 ['令' + get.translation(player) + '弃置你区域内的两张牌',
                     '本回合不能使用或打出手牌', '翻面'],
                 true).set('ai', function (event, player) {
@@ -619,9 +604,10 @@ const standard = {
                     ];
                     //根据条件修改权重
                     if (get.attitude(player, target) > 0) options[1].weight += 1;
-                    if (!event.target1.hasEmptySlot(2)) options[0].weight -= 2;
-                    else if (event.target1.countCards("h") > 3) options[0].weight += 1;
-                    if (event.target1.hp <= 2) options[1].weight -= 1;
+                    if (!player.hasEmptySlot(2)) options[0].weight -= 2;
+                    else if (player.countCards("h") > 3) options[0].weight += 1;
+                    if (player.hp <= 2) options[1].weight -= 1;
+                    if (!player.countCards('hej')) return 1;
 
                     //加权随机
                     var totalWeight = options.reduce((acc, option) => acc + option.weight, 0);
@@ -654,7 +640,7 @@ const standard = {
 
             } else if (result.index == 1) {
                 game.log(get.translation(event.target1) + "不能使用手牌");
-                event.target1.addTempSkill('qixi_cv_block', { global: "phaseEnd" });
+                event.target1.addTempSkill('qixi_cv_block', { global: "phaseAfter" });
 
             } else {
                 game.log(get.translation(event.target1) + "翻面");
@@ -979,11 +965,15 @@ const standard = {
     },
     sawohaizhan_2: {
         nobracket: true,
-        enable: "phaseUse",
-        usable: 1,
+        enable: 'chooseToUse',
+        position: 'hes',
         viewAsFilter: function (player) {
-            return player.countCards('hes', { color: 'red' }) > 0;
+            return !player.hasSkill('sawohaizhan_2_used') && player.countCards('hes', { color: 'red' }) > 0;
         },
+        precontent: function () {
+            player.addTempSkill('sawohaizhan_2_used', { global: 'phaseAfter' });
+        },
+        subSkill: { used: { charlotte: true } },
         viewAs: {
             name: "dongzhuxianji",
         },
@@ -1033,8 +1023,7 @@ const standard = {
         content: function () {
             'step 0'
             player.chooseTarget(get.prompt2('qingyeqingyeqing'), function (card, player, target) {
-                var evt = _status.event.getTrigger();
-                return target != player && !evt.targets.includes(target) && lib.filter.targetEnabled(evt.card, evt.player, target);
+                return target != player;
             }).set('ai', function (target) {
                 var player = get.player();
                 return get.attitude(target, player);
@@ -1080,7 +1069,7 @@ const standard = {
             var check = player.countCards('h') > 2 || player.countCards('j') > 0;
             player.chooseTarget(get.prompt("mingyundewufenzhong"), "跳过判定阶段和摸牌阶段,视为对一名其他角色使用一张【杀】", function (card, player, target) {
                 if (player == target) return false;
-                return player.canUse({ name: 'sha' }, target, false);
+                return player.canUse({ name: 'sha' }, target);
             }).set('check', check).set('ai', function (target) {
                 if (!_status.event.check) return 0;
                 return get.effect(target, { name: 'sha' }, _status.event.player);
@@ -1131,7 +1120,7 @@ const standard = {
                 position: 'he',
                 filterTarget: function (card, player, target) {
                     if (player == target) return false;
-                    return player.canUse({ name: 'sha' }, target, false);
+                    return player.canUse({ name: 'sha' }, target);
                 },
                 ai1: function (card) {
                     if (_status.event.check) return 0;
@@ -1176,7 +1165,7 @@ const standard = {
             var check = player.needsToDiscard() || player.isTurnedOver() || (player.hasSkill('shebian') && player.canMoveCard(true, true));
             player.chooseTarget(get.prompt('mingyundewufenzhong'), "跳过弃牌阶段并将武将牌翻面,视为对一名其他角色使用一张【杀】", function (card, player, target) {
                 if (player == target) return false;
-                return player.canUse({ name: 'sha' }, target, false);
+                return player.canUse({ name: 'sha' }, target);
             }).set('check', check).set('ai', function (target) {
                 if (!_status.event.check) return 0;
                 return get.effect(target, { name: 'sha' }, _status.event.player, _status.event.player);
@@ -1374,7 +1363,7 @@ const standard = {
 
             //game.log('zhanxianfangyu', trigger.target);
 
-            player.chooseToDiscard(1);
+            player.chooseToDiscard('he', 1);
             'step 1'
             if (result.bool) {
                 //game.log('zhanxianfangyu', trigger.target);
@@ -1444,7 +1433,7 @@ const standard = {
         selectTarget: [1, Infinity],
         discard: false,
         lose: false,
-        position: "h",
+        position: "he",
         filterOk: function () {
             return ui.selected.cards.length == ui.selected.targets.length;
         },
@@ -1570,610 +1559,46 @@ const standard = {
     Z_qianghua: {
         nobracket: true,
         name: "Z强化",
-        prompt: "出牌阶段,你可以移去任意张Z,每张Z获得2点强化点数,可强化多项或摸牌(每2点摸2张)。<br>强化规则与'强化装备'技能相同。<br>未使用的点数可存储为经验供下次使用。",
+        prompt: "出牌阶段，你可以移去一张Z，强化一项。",
         enable: "phaseUse",
         filter: function (event, player) {
-            // 检查是否有Z卡牌
-            if (!player.getExpansions('Z').length) return false;
-
-            return true;
+            return player.getExpansions('Z').length > 0 && lib.skill.Z_qianghua.getUpgrades(player).length > 0;
+        },
+        getUpgrades: function (player) {
+            var cap = Math.min(2, player.countMark('_jianzaochuan') + 1);
+            return ['mopaiup', 'jinengup', 'wuqiup', 'useshaup', 'jidongup', 'shoupaiup'].filter(mark =>
+                player.countMark(mark) < cap && (mark != 'jinengup' || !player.hasSkill('shixiangquanneng')));
         },
         mod: {
             attackFrom: function (from, to, distance) {
-                if (lib.config.extension_舰R牌将__qianghuazhuang === true) return distance;
+                if (lib.config.extension_舰R牌将__qianghuazhuang !== false) return distance;
                 return distance - from.countMark('wuqiup');
             },
             attackTo: function (from, to, distance) {
-                if (lib.config.extension_舰R牌将__qianghuazhuang === true) return distance;
+                if (lib.config.extension_舰R牌将__qianghuazhuang !== false) return distance;
                 return distance + to.countMark('jidongup');
             },
             cardUsable: function (card, player, num) {
-                if (lib.config.extension_舰R牌将__qianghuazhuang === true) return num;
+                if (lib.config.extension_舰R牌将__qianghuazhuang !== false) return num;
                 if (card.name == 'sha') return num + player.countMark('useshaup');
             },
             maxHandcard: function (player, num) {
-                if (lib.config.extension_舰R牌将__qianghuazhuang === true) return num;
+                if (lib.config.extension_舰R牌将__qianghuazhuang !== false) return num;
                 return num + player.countMark('shoupaiup');
             }
         },
-        content: function () {
-            'step 0'
-            // 获取当前玩家
-            var player = get.player();
-            // 获取所有Z卡牌
-            var zCards = player.getExpansions('Z');
-            if (zCards.length === 0) {
-                event.finish();
-                return;
-            }
-
-            // 让玩家选择要移去的Z卡牌（可选多张）
-            var maxZ = Math.min(zCards.length, 4); // 最多选4张
-            player.chooseCardButton('请选择要移去的Z卡牌（可选多张）', [1, maxZ], zCards)
-                .set('ai', function (button) {
-                    var player = _status.event.player;
-                    var currentExp = player.countMark('Expup') || 0;
-                    var zCount = player.getExpansions('Z').length;
-
-                    // 如果已有经验，优先少选
-                    if (currentExp >= 2) return 0.5;
-
-                    // 根据Z数量决定选择策略
-                    if (zCount >= 3) return 1; // Z多时可以多选
-                    return 0.8; // Z少时谨慎
-                });
-
-            'step 1'
-            // 移去选择的Z卡牌
-            if (!result || !result.bool || !result.links || result.links.length === 0) {
-                event.finish();
-                return;
-            }
-
-            event.zCards = result.links;
-            player.loseToDiscardpile(event.zCards);
-
-            // 计算获得的点数：移去的Z数量 * 2 + 已存储的经验
-            var currentExp = player.countMark('Expup') || 0;
-            var gainedPoints = event.zCards.length * 2;
-            var totalPoints = currentExp + gainedPoints;
-
-            // 先将新获得的点数加到经验标记上
-            if (gainedPoints > 0) {
-                player.addMark('Expup', gainedPoints);
-            }
-
-            event.gainedPoints = gainedPoints;
-            event.totalPoints = totalPoints;
-
-            game.log(player, '移去了', event.zCards.length, '张Z，获得', gainedPoints, '点，总计', totalPoints, '点');
-
-            // 检查是否可以强化
-            var buildLevel = player.countMark('_jianzaochuan') + 1;
-            var upgradeConfig = [
-                {
-                    mark: 'mopaiup',
-                    name: '后勤保障',
-                    desc: '用一摸一标记上限提升,手牌少于手牌上限一半时,失去手牌会摸一张牌。',
-                    cost: function (lv) { return lv + 2; }
-                },
-                {
-                    mark: 'jinengup',
-                    name: '技能升级',
-                    desc: '强化舰种技能效果（重巡-降低必中攻击限制(杀/黑牌/任意牌)、轻巡-增加无效群体锦囊牌范围(1/2/3)、航母-降低万箭齐发限制(黑桃与梅花/黑桃与梅花与红桃/任意牌);<br>战列舰-增加防护范围(普通杀造成的伤害/普通杀造成的伤害和火属性伤害/普通杀造成的伤害和属性伤害),导驱-增加射程(2/3/4)降低导弹条件（武器/装备/任意牌）、潜艇-降低雷杀条件(红桃/红桃或黑桃/红桃或黑桃或方块);<br>驱逐-增加回避概率(0.25/0.33/0.50)、军辅-增加存牌上限(1/2/3)、要塞-增加血量上限（0/1/2））。',
-                    cost: function (lv) { return lv + 2; },
-                    ban: player.hasSkill("shixiangquanneng")
-                },
-                {
-                    mark: 'wuqiup',
-                    name: '射程升级',
-                    desc: '增加出杀攻击距离。',
-                    cost: function (lv) { return lv + 2; }
-                },
-                {
-                    mark: 'useshaup',
-                    name: '速射炮管',
-                    desc: '增加出杀次数上限。',
-                    cost: function (lv) { return lv + 2; }
-                },
-                {
-                    mark: 'jidongup',
-                    name: '改良推进器',
-                    desc: '增加防御距离（被杀距离）。',
-                    cost: function (lv) { return lv + 2; }
-                },
-                {
-                    mark: 'shoupaiup',
-                    name: '物流运输',
-                    desc: '增加手牌上限。',
-                    cost: function (lv) { return lv + 2; }
-                }
-            ];
-
-            // 生成可选列表
-            var choiceList = [];
-            event.upgradeConfigMap = {};
-
-            for (var i = 0; i < upgradeConfig.length; i++) {
-                var item = upgradeConfig[i];
-                if (item.ban) continue;
-
-                var currentLv = player.countMark(item.mark);
-                var cost = item.cost(currentLv);
-
-                event.upgradeConfigMap[item.mark] = item;
-
-                // 检查是否可升级
-                if (currentLv < 2 && currentLv < buildLevel && totalPoints >= cost) {
-                    choiceList.push([
-                        item.mark,
-                        item.name + ' (消耗' + cost + '点)<br>当前:' + currentLv + '→' + (currentLv + 1) + '级<br>' + item.desc
-                    ]);
-                }
-            }
-
-            // 添加摸牌选项（每2点摸2张）
-            var maxDrawTimes = Math.floor(totalPoints / 2);
-            if (maxDrawTimes > 0) {
-                choiceList.push(['draw_cards', '<b>摸牌</b> (消耗2点)<br>每选择一次消耗2点摸2张牌，可多次选择。']);
-            }
-
-            // 添加存储选项
-            choiceList.push(['store_only', '<b>仅存储经验</b><br>不进行任何升级或摸牌，将所有' + totalPoints + '点存储为经验。']);
-
-            event.choiceList = choiceList;
-
-            if (choiceList.length <= 1) { // 只有存储选项
-                game.log(player, '没有可用选项，存储了', totalPoints, '点经验');
-                return;
-            }
-
-            'step 2'
-            // 计算最多可选数量
-            var maxSelectable = Math.floor(event.totalPoints / 2);
-            maxSelectable = Math.max(1, maxSelectable);
-
-            // 使用与通用强化一致的界面
-            player.chooseButton([
-                '移去' + event.zCards.length + '张Z获得' + event.gainedPoints + '点，加上已存储' + (event.totalPoints - event.gainedPoints) + '点，共' + event.totalPoints + '点。<br>选择要强化的项目或摸牌（每2点摸2张），未使用的点数将保留。<br>强化上限默认为1，发动建造技能后提高。一级强化需要2点，二级强化需要3点。',
-                [event.choiceList, 'textbutton'],
-            ]).set('filterButton', function (button) {
-                // --- 客户端安全代码区域 ---
-                var player = _status.event.player;
-                // 直接读取已同步的标记，获取真实总点数
-                var totalPoints = player.countMark('Expup');
-                var selectedButtons = ui.selected.buttons || [];
-                var totalCost = 0;
-                var drawCount = 0;
-
-                // 简易版 Cost 计算函数
-                var getCost = function (mk) {
-                    if (mk === 'draw_cards') return 2;
-                    if (mk === 'store_only') return 0;
-                    var lv = player.countMark(mk);
-                    return lv + 2;
-                };
-
-                // 计算已选消耗和摸牌次数
-                for (var i = 0; i < selectedButtons.length; i++) {
-                    var mark = selectedButtons[i].link || selectedButtons[i];
-                    if (mark === 'store_only') continue;
-                    if (mark === 'draw_cards') drawCount++;
-                    totalCost += getCost(mark);
-                }
-
-                var currentLink = button.link;
-
-                // 互斥逻辑：存储选项与其他选项互斥
-                if (currentLink === 'store_only') {
-                    for (var i = 0; i < selectedButtons.length; i++) {
-                        if ((selectedButtons[i].link || selectedButtons[i]) !== 'store_only') return false;
-                    }
-                    return true;
-                }
-                for (var i = 0; i < selectedButtons.length; i++) {
-                    if ((selectedButtons[i].link || selectedButtons[i]) === 'store_only') return false;
-                }
-
-                // 允许取消勾选
-                for (var i = 0; i < selectedButtons.length; i++) {
-                    if ((selectedButtons[i].link || selectedButtons[i]) === currentLink) return true;
-                }
-
-                // 摸牌选项可以多次选择
-                if (currentLink === 'draw_cards') {
-                    if (totalCost + 2 <= totalPoints) return true;
-                    return false;
-                }
-
-                // 检查余额（升级选项）
-                if (totalCost + getCost(currentLink) <= totalPoints) {
-                    return true;
-                }
-                return false;
-            }).set('ai', function (button) {
-                var choice = button.link;
-                var player = _status.event.player;
-
-                // 存储选项默认最低优先级
-                if (choice === 'store_only') return 0.1;
-
-                // 摸牌选项：根据手牌情况动态评分
-                if (choice === 'draw_cards') {
-                    var handCards = player.countCards('h');
-                    var handcardLimit = player.getHandcardLimit();
-
-                    // 手牌紧缺时摸牌价值高
-                    if (handCards <= 2) return 2.5;
-                    if (handCards <= handcardLimit / 2) return 1.5;
-                    if (handCards >= handcardLimit) return 0.2; // 手牌溢出时不摸
-                    return 0.8;
-                }
-
-                // === 第一步：评估当前风险分（生存威胁） ===
-                var riskScore = 0;
-                var hp = player.hp;
-                var maxHp = player.maxHp;
-                var handCards = player.countCards('h');
-                var shanCount = player.countCards('h', 'shan');
-
-                // 血量风险
-                if (hp <= 1) riskScore += 0.6;
-                else if (hp <= 2) riskScore += 0.3;
-                else if (hp <= maxHp / 2) riskScore += 0.15;
-
-                // 敌方集火压力
-                var enemiesInRange = game.countPlayer(function (current) {
-                    return current != player && get.attitude(player, current) < 0 && current.inRange(player);
-                });
-                riskScore += Math.min(0.3, enemiesInRange * 0.1);
-
-                // 缺少防御牌
-                if (shanCount === 0 && hp <= 2) riskScore += 0.2;
-
-                // === 第二步：评估各选项的基础收益 ===
-                var baseScore = 0;
-                var currentLv = player.countMark(choice);
-
-                switch (choice) {
-                    case 'mopaiup':
-                        // 后勤保障：手牌紧缺时价值高
-                        baseScore = 3.5;
-                        if (handCards <= player.getHandcardLimit() / 2) baseScore += 1.5;
-                        if (handCards <= 2) baseScore += 1.0;
-                        break;
-
-                    case 'jinengup':
-                        // 技能升级：按实际新增可用牌和当前局势动态加分
-                        baseScore = 2.0;
-                        var nextLv = currentLv + 1;
-                        var addNewCardScore = function (newCards, weight) {
-                            if (newCards > 0) baseScore += Math.min(3.5, newCards * weight);
-                        };
-                        var getEnemyEffectInfo = function (card, nature, ignoreRange) {
-                            var info = { total: 0, best: 0, weak: 0 };
-                            for (var i = 0; i < game.players.length; i++) {
-                                var target = game.players[i];
-                                if (target == player || get.attitude(player, target) >= 0) continue;
-                                if (!ignoreRange && player.canUse && !player.canUse(card, target, false)) continue;
-                                var effect = nature ? get.damageEffect(target, player, player, nature) : get.effect(target, card, player, player);
-                                if (effect > 0) {
-                                    info.total += effect;
-                                    info.best = Math.max(info.best, effect);
-                                    if (target.hp <= 1 || target.countCards('h') == 0) info.weak++;
-                                }
-                            }
-                            return info;
-                        };
-                        var addEffectScore = function (info, cap) {
-                            if (info.total > 0) baseScore += Math.min(cap, info.best + info.total * 0.25 + info.weak * 0.5);
-                        };
-
-                        if (player.hasSkill('kaimuhangkong')) {
-                            var hangkongCard = function (card, lv) {
-                                if (lv <= 0) return get.color(card) == 'black';
-                                if (lv == 1) return get.color(card) == 'black' || get.suit(card) == 'heart';
-                                return true;
-                            };
-                            var beforeUpgrade = player.countCards('h', function (card) {
-                                return hangkongCard(card, currentLv);
-                            });
-                            var afterUpgrade = player.countCards('h', function (card) {
-                                return hangkongCard(card, nextLv);
-                            });
-                            var newCards = afterUpgrade - beforeUpgrade;
-                            addNewCardScore(newCards, 1.2);
-                            if (afterUpgrade > 0) {
-                                addEffectScore(getEnemyEffectInfo({ name: 'wanjian' }, null, false), 3);
-                            }
-                        }
-
-                        if (player.hasSkill('fanjiandaodan')) {
-                            var daodanCard = function (card, lv) {
-                                if (lv <= 0) return get.subtype(card) == 'equip1';
-                                if (lv == 1) return get.type(card) == 'equip';
-                                return get.type(card) != 'basic';
-                            };
-                            var beforeUpgrade = player.countCards('he', function (card) {
-                                return daodanCard(card, currentLv);
-                            });
-                            var afterUpgrade = player.countCards('he', function (card) {
-                                return daodanCard(card, nextLv);
-                            });
-                            var newCards = afterUpgrade - beforeUpgrade;
-                            addNewCardScore(newCards, 1.5);
-                            if (afterUpgrade > 0) {
-                                var missileInfo = { total: 0, best: 0, weak: 0 };
-                                for (var i = 0; i < game.players.length; i++) {
-                                    var target = game.players[i];
-                                    if (target == player || get.attitude(player, target) >= 0) continue;
-                                    var effect = lib.card["yuanchengdaodan9"] ? get.effect(target, { name: "yuanchengdaodan9", isCard: true }, player, player) : get.damageEffect(target, player, player);
-                                    if (effect > 0) {
-                                        missileInfo.total += effect;
-                                        missileInfo.best = Math.max(missileInfo.best, effect);
-                                        if (target.hp <= 1 || target.countCards('h') == 0) missileInfo.weak++;
-                                    }
-                                }
-                                addEffectScore(missileInfo, 3);
-                                var currentRange = player.getAttackRange ? player.getAttackRange() : 0;
-                                var newRange = currentRange + 2;
-                                var newTargets = game.countPlayer(function (current) {
-                                    if (current == player || get.attitude(player, current) >= 0) return false;
-                                    var distance = get.distance(player, current);
-                                    return distance > currentRange && distance <= newRange;
-                                });
-                                if (newTargets > 0) baseScore += Math.min(2.4, newTargets * 1.2);
-                            }
-                        }
-
-                        if (player.hasSkill('kaimuleiji')) {
-                            var leijiCard = function (card, lv) {
-                                var suit = get.suit(card);
-                                if (lv <= 0) return suit == 'heart' || suit == 'spade';
-                                if (lv == 1) return suit == 'heart' || suit == 'spade' || suit == 'diamond';
-                                return true;
-                            };
-                            var beforeUpgrade = player.countCards('h', function (card) {
-                                return leijiCard(card, currentLv);
-                            });
-                            var afterUpgrade = player.countCards('h', function (card) {
-                                return leijiCard(card, nextLv);
-                            });
-                            var newCards = afterUpgrade - beforeUpgrade;
-                            addNewCardScore(newCards, 1.2);
-                            if (afterUpgrade > 0 && player.getHistory("sourceDamage").length == 0) {
-                                addEffectScore(getEnemyEffectInfo({ name: 'sha', nature: 'thunder', isCard: true }, 'thunder', true), 3);
-                            }
-                        }
-
-                        if (player.hasSkill('fangkongdaodan')) {
-                            var storedMissiles = player.getExpansions('daodan').length + player.getCards('s', function (card) { return card.hasGaintag('daodan') }).length;
-                            var currentSlots = Math.max(0, 1 + currentLv - storedMissiles);
-                            var nextSlots = Math.max(0, 1 + nextLv - storedMissiles);
-                            var newSlots = Math.min(handCards, nextSlots) - Math.min(handCards, currentSlots);
-                            if (newSlots > 0) {
-                                var trickPressure = game.countPlayer(function (current) {
-                                    return current != player && get.attitude(player, current) < 0 && current.countCards('h', function (card) {
-                                        return get.type(card) == 'trick';
-                                    }) > 0;
-                                });
-                                baseScore += Math.min(3, newSlots * 1.2 + trickPressure * 0.4);
-                            }
-                        }
-
-                        if (player.hasSkill('junfu')) {
-                            var storedSupport = player.getExpansions('junfu').length + player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length;
-                            var currentSupportSlots = Math.max(0, 1 + currentLv - storedSupport);
-                            var nextSupportSlots = Math.max(0, 1 + nextLv - storedSupport);
-                            var newSupportSlots = Math.min(handCards, nextSupportSlots) - Math.min(handCards, currentSupportSlots);
-                            if (newSupportSlots > 0) {
-                                var supportNeed = game.countPlayer(function (current) {
-                                    return current != player && get.attitude(player, current) > 0 && (current.hp <= 2 || current.countCards('h') <= current.hp);
-                                });
-                                baseScore += Math.min(3, newSupportSlots * 1.2 + supportNeed * 0.4);
-                            }
-                        }
-
-                        if (player.hasSkill('fangkong2')) {
-                            var beforeRange = player.hasSkill('duikongfangyu') ? 5 : 1 + 2 * currentLv;
-                            var afterRange = player.hasSkill('duikongfangyu') ? 5 : 1 + 2 * nextLv;
-                            var newProtected = game.countPlayer(function (current) {
-                                return current != player && get.attitude(player, current) > 0 && get.distance(player, current) > beforeRange && get.distance(player, current) <= afterRange;
-                            });
-                            if (newProtected > 0 && player.countCards('he') > 0) {
-                                baseScore += Math.min(2.5, newProtected * 0.8 + riskScore);
-                            }
-                        }
-
-                        if (player.hasSkill('zhuangjiafh')) {
-                            var armorPressure = game.countPlayer(function (current) {
-                                return current != player && get.attitude(player, current) < 0 && current.countCards('h', function (card) {
-                                    if (currentLv <= 0) return get.nature(card) == 'fire';
-                                    if (currentLv == 1) return get.nature(card) && get.nature(card) != 'fire';
-                                    return false;
-                                }) > 0;
-                            });
-                            if (armorPressure > 0) baseScore += Math.min(2, armorPressure * 0.6 + riskScore);
-                        }
-
-                        if (player.hasSkill('quzhudd')) {
-                            var dodgePressure = enemiesInRange + (shanCount == 0 && hp <= 2 ? 1 : 0);
-                            if (dodgePressure > 0) baseScore += Math.min(2, dodgePressure * 0.4 + riskScore);
-                        }
-
-                        if (player.hasSkill('yaosai')) {
-                            var yaosaiUsed = player.storage.yaosai || 0;
-                            if (yaosaiUsed >= currentLv && yaosaiUsed < nextLv) {
-                                var recoverScore = 2;
-                                if (hp <= 1) recoverScore += 2;
-                                else if (hp <= 2) recoverScore += 1;
-                                if (hp < maxHp) recoverScore += 1;
-                                baseScore += Math.min(4, recoverScore);
-                            } else if (yaosaiUsed < nextLv && hp < maxHp) {
-                                baseScore += 1.5;
-                            }
-                        }
-                        break;
-
-                    case 'wuqiup':
-                        // 射程升级：打不到人时价值高
-                        baseScore = 2.5;
-                        var unreachableEnemies = game.countPlayer(function (current) {
-                            return current != player && get.attitude(player, current) < 0 && !player.inRange(current);
-                        });
-                        if (unreachableEnemies > 0) baseScore += unreachableEnemies * 0.8;
-                        break;
-
-                    case 'useshaup':
-                        // 速射炮管：有多张杀时价值高
-                        baseScore = 2.0;
-                        var shaCount = player.countCards('h', 'sha');
-                        if (shaCount > 1) baseScore += shaCount * 0.5;
-
-                        // 输出型武将优先级更高
-                        if (player.hasSkill('kaimuhangkong') || player.hasSkill('zhongxunca') ||
-                            player.hasSkill('fanjiandaodan') || player.hasSkill('kaimuleiji')) {
-                            baseScore += 1.0;
-                        }
-                        break;
-
-                    case 'jidongup':
-                        // 改良推进器：被贴脸时价值高
-                        baseScore = 2.0;
-                        if (enemiesInRange > 0) baseScore += enemiesInRange * 0.6;
-
-                        // 脆皮输出更需要防御距离
-                        if ((player.hasSkill('kaimuhangkong') || player.hasSkill('zhongxunca') ||
-                            player.hasSkill('fanjiandaodan') || player.hasSkill('kaimuleiji')) && hp <= 2) {
-                            baseScore += 1.5;
-                        }
-                        break;
-
-                    case 'shoupaiup':
-                        // 物流运输：手牌溢出时价值高
-                        baseScore = 1.5;
-                        var handcardLimit = player.getHandcardLimit();
-                        if (handCards >= handcardLimit) baseScore += 2.0; // 溢出，急需
-                        else if (handCards >= handcardLimit - 1) baseScore += 1.0;
-                        break;
-                }
-
-                // === 第三步：根据风险分调整优先级 ===
-                var finalScore = baseScore;
-
-                if (riskScore > 0.5) {
-                    // 高风险：优先防御选项
-                    if (['jidongup', 'shoupaiup'].includes(choice)) {
-                        finalScore += 2.0;
-                    }
-                    // 要塞技能在残血时优先级拉满
-                    if (choice === 'jinengup' && player.hasSkill('yaosai') && hp <= 2) {
-                        finalScore += 3.0;
-                    }
-                    // 降低纯输出选项优先级
-                    if (['wuqiup', 'useshaup'].includes(choice)) {
-                        finalScore -= 1.5;
-                    }
-                } else {
-                    // 低风险：突出特长
-                    // 质变技能优先级拉满
-                    if (choice === 'jinengup' && currentLv === 0) {
-                        finalScore += 2.0;
-                    }
-                    // 输出选项适当提升
-                    if (['wuqiup', 'useshaup'].includes(choice)) {
-                        finalScore += 0.5;
-                    }
-                }
-
-                // === 第四步：团队需求调整 ===
-                var teamHasDamage = game.hasPlayer(function (current) {
-                    return current != player && get.attitude(player, current) > 0 &&
-                        (current.hasSkill('kaimuhangkong') || current.hasSkill('zhongxunca') ||
-                            current.hasSkill('fanjiandaodan') || current.hasSkill('kaimuleiji'));
-                });
-
-                // 防御型武将，但团队缺输出
-                if ((player.hasSkill('zhanliebb') || player.hasSkill('yaosai')) && !teamHasDamage) {
-                    if (['wuqiup', 'useshaup'].includes(choice)) {
-                        finalScore += 1.5; // 弥补短板
-                    }
-                }
-
-                // === 第五步：避免重复升级已满级的选项 ===
-                var buildLevel = player.countMark('_jianzaochuan') + 1;
-                if (currentLv >= buildLevel || currentLv >= 2) {
-                    return 0; // 已满级，不可选
-                }
-
-                return finalScore;
-            }).set('selectButton', [0, maxSelectable]);
-
-            'step 3'
-            var selected = [];
-            if (result && result.bool && result.links) {
-                selected = result.links;
-            } else {
-                // 取消选择，保留所有点数
-                game.log(player, '取消了选择，保留', event.totalPoints, '点经验');
-                return;
-            }
-
-            // 处理选择的选项
-            var usedPoints = 0;
-            var drawCount = 0;
-            var upgradedItems = [];
-
-            // 统计摸牌次数和升级项目
-            for (var i = 0; i < selected.length; i++) {
-                var mark = selected[i];
-
-                if (mark === 'store_only') {
-                    // 仅存储，不消耗点数
-                    game.log(player, '选择了仅存储经验，保留', event.totalPoints, '点');
-                    return;
-                } else if (mark === 'draw_cards') {
-                    drawCount++;
-                } else {
-                    // 升级项目
-                    var item = event.upgradeConfigMap[mark];
-                    if (item) {
-                        var currentLv = player.countMark(mark);
-                        var cost = item.cost(currentLv);
-                        upgradedItems.push({
-                            mark: mark,
-                            name: item.name,
-                            cost: cost
-                        });
-                    }
-                }
-            }
-
-            // 执行摸牌
-            if (drawCount > 0) {
-                var drawAmount = drawCount * 2;
-                var drawCost = drawCount * 2;
-                player.draw(drawAmount);
-                usedPoints += drawCost;
-                game.log(player, '消耗', drawCost, '点摸了', drawAmount, '张牌');
-            }
-
-            // 执行升级
-            for (var i = 0; i < upgradedItems.length; i++) {
-                var item = upgradedItems[i];
-                player.addMark(item.mark, 1);
-                usedPoints += item.cost;
-                game.log(player, '消耗', item.cost, '点强化了', item.name);
-            }
-
-            // 扣除使用的点数
-            if (usedPoints > 0) {
-                player.removeMark('Expup', usedPoints);
-                var remainingPoints = player.countMark('Expup');
-                if (remainingPoints > 0) {
-                    game.log(player, '剩余', remainingPoints, '点经验');
-                }
-            }
+        async content(event, trigger, player) {
+            var choices = lib.skill.Z_qianghua.getUpgrades(player);
+            if (!choices.length || !player.getExpansions('Z').length) return;
+            var chosen = await player.chooseCardButton('移去一张Z，强化一项', player.getExpansions('Z'), 1)
+                .set('ai', button => 1).forResult();
+            if (!chosen.bool) return;
+            var labels = {mopaiup: '后勤保障', jinengup: '技能升级', wuqiup: '射程升级', useshaup: '速射炮管', jidongup: '改良推进器', shoupaiup: '物流运输'};
+            var result = await player.chooseButton(['强化一项', [choices.map(mark => [mark, labels[mark] + '：' + player.countMark(mark) + '→' + (player.countMark(mark) + 1)]), 'textbutton']], true)
+                .set('selectButton', 1).set('ai', button => button.link == 'jinengup' ? 3 : 1).forResult();
+            if (!result.bool || !choices.includes(result.links[0])) return;
+            await player.loseToDiscardpile(chosen.links);
+            player.addMark(result.links[0], 1);
         },
         ai: {
             save: true,
@@ -2333,7 +1758,7 @@ const standard = {
             if (event.targets && event.targets.length != 1) return false;
             if (event.target != player) return player.countCards('he') > 0;
             return game.hasPlayer(function (current) {
-                return current != player && current.countCards('he') > 0 && get.attitude(player, current) > 0;
+                return current != player && current.countCards('he') > 0;
             });
         },
         check: function (event, player) {
@@ -2507,18 +1932,19 @@ const standard = {
         content: function () {
             'step 0'
             //player.gain(trigger.result.card, 'gain2');
-            player.chooseTarget(get.prompt2('选择一名角色本回合的手牌上限和使用【杀】的次数上限+1')).ai = function (target) {
+            player.chooseTarget(get.prompt2('选择一名角色，其手牌上限和使用【杀】的次数上限+1，直到你的下回合开始')).ai = function (target) {
                 return get.attitude(player, target) > 0;
             }
             'step 1'
             if (result.bool) {
                 game.log(get.translation(result.targets[0]) + "矢志不渝");
-                if (!result.targets[0].hasSkill('shizhibuyu1_eff')) {
-                    result.targets[0].addTempSkill('shizhibuyu1_eff', { player: 'phaseEnd' });
-                    result.targets[0].storage.shizhibuyu1_eff = 1;
-                }
-                else result.targets[0].storage.shizhibuyu1_eff++;
-                result.targets[0].updateMarks();
+                var beneficiary = result.targets[0];
+                beneficiary.addSkill('shizhibuyu1_eff');
+                if (!beneficiary.storage.shizhibuyu1_eff_sources) beneficiary.storage.shizhibuyu1_eff_sources = {};
+                var sources = beneficiary.storage.shizhibuyu1_eff_sources;
+                sources[player.playerid] = (sources[player.playerid] || 0) + 1;
+                beneficiary.storage.shizhibuyu1_eff = (beneficiary.storage.shizhibuyu1_eff || 0) + 1;
+                beneficiary.updateMarks();
                 //target.addTempSkill('mingjian2',{player:'phaseAfter'});
                 //target.storage.mingjian2++;
                 //target.updateMarks('mingjian2');
@@ -2527,6 +1953,22 @@ const standard = {
         subSkill: {
             eff: {
                 sub: true,
+                trigger: { global: 'phaseBefore' },
+                forced: true, silent: true, firstDo: true, priority: 100,
+                filter: function (event, player) {
+                    return !!player.storage.shizhibuyu1_eff_sources?.[event.player.playerid];
+                },
+                content: function () {
+                    var sources = player.storage.shizhibuyu1_eff_sources;
+                    player.storage.shizhibuyu1_eff -= sources[trigger.player.playerid];
+                    delete sources[trigger.player.playerid];
+                    if (!player.storage.shizhibuyu1_eff) player.removeSkill('shizhibuyu1_eff');
+                    else player.updateMarks();
+                },
+                onremove: function (player) {
+                    delete player.storage.shizhibuyu1_eff;
+                    delete player.storage.shizhibuyu1_eff_sources;
+                },
                 mod: {
                     cardUsable: function (card, player, num) {
                         if (card.name == 'sha' || card.name == 'sheji9') return num + player.storage.shizhibuyu1_eff;
@@ -2546,40 +1988,53 @@ const standard = {
     qianxingtuxi: {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
-        mod: {
-            attackFrom: function (from, to, distance) {
-                return 1
-            },
-        },
-        trigger: {
-            source: "damageSource",
-        },
+        mod: { targetInRange: function () { return true; } },
+        trigger: { source: "damageSource" },
         forced: true,
-        filter: function (event, player) {
-            if (player.isPhaseUsing()) { return false; }
-            return true;
-        },
+        filter: function (event, player) { return !player.isPhaseUsing(); },
         content: function () {
-            "step 0"
-            player.addTempSkill("dajiaoduguibi", "roundstart");
-            trigger.player.addTempSkill("qianxingtuxi_debuff", { player: "phaseEnd" });
+            player.addTempSkill("dajiaoduguibi", "roundStart");
+            trigger.player.addSkill("qianxingtuxi_debuff");
+            trigger.player.storage.qianxingtuxi_debuff.pending = true;
         },
-        "_priority": 0,
     },
     qianxingtuxi_debuff: {
-        usable: 1,
-        trigger: {
-            source: "damageBegin1",
+        charlotte: true,
+        init: function (player) {
+            player.storage.qianxingtuxi_debuff = { pending: false, active: false, used: false };
         },
+        onremove: true,
+        trigger: { source: "damageBegin1" },
         forced: true,
-        content: function () {
-            player.judge(function (card) {
-                if (get.suit(card) == 'spade') {
-                    trigger.num--;
-                    return 1;
-                }
-                return 0;
-            });
+        filter: function (event, player) {
+            var state = player.storage.qianxingtuxi_debuff;
+            return state && state.active && !state.used;
+        },
+        async content(event, trigger, player) {
+            player.storage.qianxingtuxi_debuff.used = true;
+            var result = await player.judge(card => get.suit(card) == 'spade' ? -1 : 1).forResult();
+            if (result.suit == 'spade') trigger.num--;
+        },
+        group: ['qianxingtuxi_debuff_start', 'qianxingtuxi_debuff_end'],
+        subSkill: {
+            start: {
+                trigger: { player: 'phaseBefore' }, firstDo: true, priority: 100,
+                forced: true, silent: true, charlotte: true,
+                content: function () {
+                    var state = player.storage.qianxingtuxi_debuff;
+                    state.active = state.pending;
+                    state.pending = false;
+                    state.used = false;
+                },
+            },
+            end: {
+                trigger: { player: 'phaseAfter' }, forced: true, silent: true, charlotte: true,
+                content: function () {
+                    var state = player.storage.qianxingtuxi_debuff;
+                    state.active = false;
+                    if (!state.pending) player.removeSkill('qianxingtuxi_debuff');
+                },
+            },
         },
     },
     "31jiezhongdui": {
@@ -2594,7 +2049,7 @@ const standard = {
             return get.attitude(player, event.target) > 0;
         },
         filter: function (event, player) {
-            return (event.card.name == 'sha' || event.card.name == 'sheji9') && !player.countMark('31jiezhongdui') && _status.currentPhase.hp <= event.target.hp;
+            return (event.card.name == 'sha' || event.card.name == 'sheji9') && !player.countMark('31jiezhongdui') && event.player.hp <= event.target.hp;
         },
         content: function () {
             'step 0'
@@ -2854,29 +2309,18 @@ const standard = {
     jiujingzhanzhen: {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
-        count: function () {
+        count: function (player) {
             var num = 0;
-            game.countPlayer2(function (current) {
-                current.getHistory('lose', function (evt) {
-                    if (evt.position == ui.discardPile) {
-                        for (var i = 0; i < evt.cards.length; i++) {
-                            if (get.color(evt.cards[i]) == 'red') num++;
-                        }
-                    }
-                })
-            });
-            /*game.getGlobalHistory('cardMove', function (evt) {
-                if (evt.name == 'cardsDiscard') {
-                    for (var i = 0; i < evt.cards.length; i++) {
-                        if (get.color(evt.cards[i]) == 'red') num++;
-                    }
+            player.getHistory('lose', function (evt) {
+                if (evt.type == 'discard' && evt.position == ui.discardPile) {
+                    num += evt.cards.filter(card => get.color(card, player) == 'red').length;
                 }
-            })*/
+            });
             return num;
         },
         frequent: true,
         filter: function (event, player) {
-            return lib.skill.jiujingzhanzhen.count() > 0;
+            return lib.skill.jiujingzhanzhen.count(player) > 0;
             /*return player.hasHistory('lose', function (evt) {
                 return evt.hs && evt.hs.length > 0;
             });*/
@@ -2887,7 +2331,7 @@ const standard = {
 
         content: function () {
             'step 0'
-            player.chooseTarget([1, lib.skill.jiujingzhanzhen.count()], get.prompt2('jiujingzhanzhen')).ai = function (target) {
+            player.chooseTarget([1, lib.skill.jiujingzhanzhen.count(player)], get.prompt2('jiujingzhanzhen')).ai = function (target) {
                 return get.attitude(_status.event.player, target);
             };
             'step 1'
@@ -3182,10 +2626,8 @@ const standard = {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
         enable: "phaseUse",
-        init: function (player) {
-            player.storage.duomianshou = [];
-
-        },
+        filter: function (event, player) { return player.countMark('duomianshou_count') < 3; },
+        init: function (player) { player.storage.duomianshou = []; },
         getConversionCandidates: function (card, player) {
             var list = [];
             var seen = [];
@@ -3196,7 +2638,7 @@ const standard = {
                 var type = get.type(pileCard);
                 var converted = { name: name, nature: get.nature(pileCard), isCard: true };
                 if ((type != 'trick' && type != 'basic') || !lib.filter.cardEnabled(converted, player)) continue;
-                if (!player.hasUseTarget(converted, false, false)) continue;
+                if (!player.hasUseTarget(converted, true, false)) continue;
                 seen.push(name);
                 list.push(pileCard);
             }
@@ -3230,8 +2672,6 @@ const standard = {
                     numbers.add(get.number(player.storage.duomianshou[i]));
                 }
             }
-            var list = lib.skill.duomianshou.getConversionCandidates(card, player);
-            if (list.length == 0) { return false; }
             if (!numbers.includes(get.number(card))) {
                 return true;
             }
@@ -3242,7 +2682,7 @@ const standard = {
         intro: {
             name: "多面手",
             content: function (storage, player) {
-                var str = "已发动次数：" + get.translation(player.getStat('skill').duomianshou);
+                var str = "已发动次数：" + player.countMark('duomianshou_count');
                 return str;
             },
         },
@@ -3250,82 +2690,35 @@ const standard = {
         discard: false,
         lose: false,
         log: false,
-        usable: 3,
         check: function (card) {
             var player = get.player();
             return lib.skill.duomianshou.getConversionScore(card, player);
         },
-        content: function () {
-            'step 0'
-            var card = cards[0];
-            //var cardtype=get.type(card);
-            //game.log("卡牌价值" + get.value(card));
-            // game.log("卡牌类型" + get.type(card));
+        async content(event, trigger, player) {
+            var card = event.cards[0];
             var list = lib.skill.duomianshou.getConversionCandidates(card, player);
-            if (list.length == 0) {
-                game.log('牌堆中没有符合要求的牌');
-                player.getStat('skill').duomianshou -= 1;
+            player.addTempSkill('duomianshou_count', { global: 'phaseAfter' });
+            player.addMark('duomianshou_count', 1, false);
+            await player.discard(card);
+            var result = list.length ? await player.chooseCardButton('多面手', list, 1)
+                .set('selectButton', 1).set('ai', button => get.player().getUseValue(button.link, false, false)).forResult() : {bool: false};
+            if (!result.bool) {
                 player.storage.duomianshou.push(card);
-                event.finish();
+                player.removeMark('duomianshou_count', 1, false);
+                player.getStat('skill').duomianshou = Math.max(0, (player.getStat('skill').duomianshou || 0) - 1);
+                return;
             }
-            player.chooseButton([
-                '多面手',
-                [list, 'vcard'],
-            ]).set('filterButton', button => {
-                var event = _status.event;
-                if (ui.selected.buttons) {
-                    return true;
-                }
-            }).set('ai', function (button) {
-                var player = get.player();
-                return player.getUseValue(button.link, false, false);
-
-            }).set('selectButton', 1);
-
-            //var dialog = ui.create.dialog('多面手', [list, 'vcard']);
-            //game.log("多面手列表已生成");
-
-
-            /*player.chooseButton(dialog).ai = function (button) {
-                var MostValue = 0;
-                var MostValuableCard = card;
- 
-                for (var j of list) {
-                    game.log("目标卡牌价值" + get.value(j));
-                    game.log("最大卡牌价值" + MostValue);
- 
-                    if (get.value(j) > MostValue) {
-                        MostValuableCard = j;
-                        MostValue = get.value(j);
-                        game.log("最有价值的卡牌变更为" + get.name(MostValuableCard));
-                    }
- 
-                }
-                //game.log("button.link[0]"+JSON.stringify(button.link));
-                //game.log("MostValuableCard"+JSON.stringify(MostValuableCard));
-                return (button.link == MostValuableCard) ? 1 : -1;
-            
-            }*/
-            'step 1'
-            if (result && result.bool && result.links[0]) {
-                player.discard(cards[0]);
-                //player.addTempSkill("duomianshou_1", "useCardToTargeted");
-                player.chooseUseTarget(true, get.name(result.links[0]), false);
-                player.logSkill("duomianshou");
-
-            } else {
-                player.getStat('skill').duomianshou -= 1;
-                player.storage.duomianshou.push(cards[0]);
-            }
+            var chosen = result.links[0];
+            await player.chooseUseTarget({name: get.name(chosen), nature: get.nature(chosen), isCard: true}, true, false);
+            player.logSkill('duomianshou');
         },
-        group: ["duomianshou_reset"],
+        group: ['duomianshou_reset'],
         subSkill: {
+            count: { charlotte: true, onremove: true },
             reset: {
-                charlotte: true,
-                trigger: { player: "phaseBegin" },
-                content() {
-                    player.storage.duomianshou = [];
-                },
+                charlotte: true, forced: true, silent: true,
+                trigger: { global: 'phaseAfter' },
+                content: function () { player.storage.duomianshou = []; },
             },
         },
         ai: {
@@ -3396,7 +2789,7 @@ const standard = {
         content: function () {
             "step 0"
 
-            player.chooseToDiscard(1);
+            player.chooseToDiscard('he', 1);
             "step 1"
             if (result.bool) {
                 game.log("此杀伤害基数" + trigger.getParent().baseDamage);
@@ -3415,23 +2808,22 @@ const standard = {
     changge: {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
-        forced: true,
-        trigger: {
-            player: "useCardToPlayered",
-        },
+        forced: true, firstDo: true, priority: 100,
+        trigger: { player: 'useCardToPlayered', source: 'damageBegin3' },
         filter: function (event, player) {
-            return event.card.name == "sha";
+            if (!event.card || get.name(event.card) != 'sha') return false;
+            if (player.hp <= 2) return true;
+            if (event.name == 'damage') return event.num >= 2;
+            var use = event.getParent();
+            var extra = use.customArgs?.[event.target.playerid]?.extraDamage || 0;
+            return (use.baseDamage || 1) + (use.extraDamage || 0) + extra >= 2;
         },
-
         content: function () {
-            if (trigger.getParent().baseDamage > 1 || player.hp <= 2) {
-                //game.log("此杀伤害基数" + trigger.getParent().baseDamage);
-                trigger.target.addTempSkill("qinggang2");
-                trigger.target.storage.qinggang2.add(trigger.card);
-                trigger.target.markSkill("qinggang2");
-            }
+            var target = trigger.name == 'damage' ? trigger.player : trigger.target;
+            target.addTempSkill('qinggang2');
+            target.storage.qinggang2.add(trigger.card);
+            target.markSkill('qinggang2');
         },
-
     },
     xiongjiaqibin: {
         nobracket: true,
@@ -3596,7 +2988,7 @@ const standard = {
                 },
                 filter: function (event, player) {
                     //game.log(event.target.hujia);
-                    return player == _status.currentPhase && player.countMark('jueshengzhibing_count') < 2 && event.target.hujia > 0 &&
+                    return player.countMark('jueshengzhibing_count') < 2 && event.target.hujia > 0 && event.target.countDiscardableCards(player, 'he') > 0 &&
                         (event.card.name == 'sha' || event.card.name == 'sheji9');
                 },
                 check: function (event, player) {
@@ -3604,7 +2996,7 @@ const standard = {
                 },
                 content: function () {
                     player.discardPlayerCard('he', trigger.target, 1, true);
-                    player.addTempSkill('jueshengzhibing_count');
+                    player.addTempSkill('jueshengzhibing_count', { global: 'phaseAfter' });
                     player.addMark('jueshengzhibing_count', 1, false);
 
                     /* if (player.countMark('jueshengzhibing_count') >= 2) {
@@ -3624,11 +3016,11 @@ const standard = {
                     player: "useCard",
                 },
                 filter: function (event, player) {
-                    return player == _status.currentPhase && player.countMark('jueshengzhibing_count') < 2 && event.card.isCard && get.type(event.card) == 'trick';
+                    return player.countMark('jueshengzhibing_count') < 2 && get.type2(event.card) == 'trick';
                 },
                 content: function () {
                     player.draw();
-                    player.addTempSkill('jueshengzhibing_count');
+                    player.addTempSkill('jueshengzhibing_count', { global: 'phaseAfter' });
                     player.addMark('jueshengzhibing_count', 1, false);
 
                     /* if (player.countMark('jueshengzhibing_count') >= 2) {
@@ -3751,7 +3143,8 @@ const standard = {
                     event.targets[k].draw();
                 } else {
                     game.log(event.targets[k], "获得技能");
-                    event.targets[k].addTempSkill("mashu", { player: "phaseJieshuBegin" });
+                    event.targets[k].addSkill('xinqidian_distance');
+                    event.targets[k].storage.xinqidian_distance = false;
                 }
             }
         },
@@ -3769,13 +3162,23 @@ const standard = {
             },
         },
     },
+    xinqidian_distance: {
+        charlotte: true, onremove: true,
+        mod: { globalFrom: function (from, to, distance) { return distance - 1; } },
+        trigger: { player: ['phaseBefore', 'phaseAfter'] },
+        forced: true, silent: true,
+        content: function () {
+            if (event.triggername == 'phaseBefore') player.storage.xinqidian_distance = true;
+            else if (player.storage.xinqidian_distance) player.removeSkill('xinqidian_distance');
+        },
+    },
     jilizhixin: {
         nobracket: true,
         trigger: {
             player: "phaseUseBefore",
         },
         filter: function (event, player) {
-            return player.countCards('h') > 0 && !player.hasSkill('jilizhixin3');
+            return player.countCards('he') > 0 && !player.hasSkill('jilizhixin3');
         },
         frequent: true,
         //preHidden: true,
@@ -3795,7 +3198,7 @@ const standard = {
             }).set('fang', fang).setHiddenSkill(event.name);
             "step 1"
             if (result.bool) {
-                player.chooseToDiscard('是否弃置一张牌并令一名其他角色进行一个额外回合？').set('logSkill', 'jilizhixin').ai = function (card) {
+                player.chooseToDiscard('he', '是否弃置一张牌并令一名角色进行一个额外回合？').set('logSkill', 'jilizhixin').ai = function (card) {
                     return 20 - get.value(card);
                 };
             } else event.finish();
@@ -3839,7 +3242,7 @@ const standard = {
 
             "step 2"
 
-            player.chooseTarget(true, '请选择进行额外回合的目标角色', lib.filter.notMe).ai = function (target) {
+            player.chooseTarget(true, '请选择进行额外回合的目标角色').ai = function (target) {
                 if (target.hasJudge('lebu') || get.attitude(player, target) <= 0) return -1;
                 if (target.isTurnedOver()) return 0.18;
                 return get.threaten(target) / Math.sqrt(target.hp + 1) / Math.sqrt(target.countCards('h') + 1);

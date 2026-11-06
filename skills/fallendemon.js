@@ -331,7 +331,7 @@ const fallendemon = {
         usable: 1,
         filter: function (event, player) {
             if (!player.getStorage('loki_R_xiance2') || player.getStorage('loki_R_xiance2').length == 0 || !player.getStorage('loki_R_xiance2')[0].isAlive()) { return false; }
-            if (player.countCards("h") >= 2) {
+            if (player.countCards("h") >= 1) {
                 for (var i of lib.inpile) {
                     var type = get.type(i);
                     if ((type == "basic" || type == "trick") && event.filterCard(get.autoViewAs({ name: i }, "unsure"), player, event)) return true;
@@ -400,7 +400,7 @@ const fallendemon = {
         ai: {
             fireAttack: true,
             skillTagFilter: function (player) {
-                if (player.countCards("h") < 2) return false;
+                if (player.countCards("h") < 1) return false;
             },
             order: 1,
             result: {
@@ -886,7 +886,7 @@ const fallendemon = {
         content: function () {
             "step 0";
             trigger.cancel();
-            player.draw(1);
+            if (!player.countCards('h')) { event.finish(); return; }
             player.chooseCard('h', 1, '将一张手牌置于其的武将牌上,称为【军辅】', true).set('ai', function (card) {
                 return 9 - get.value(card);
             });
@@ -2096,29 +2096,20 @@ const fallendemon = {
         },
         direct: true,
         log: false,
-        content: function () {
-            'step 0'
-            player.chooseTarget(get.prompt('cassone_R_weizhuangqixi'), '你可以与一名角色拼点：若你赢,你与其之间距离视作1,且每回合你对其使用的第一张牌不可响应,直到其回合结束；若其赢,你失去一点体力,那之后,直到其回合结束,你受到其造成的伤害后,恢复1点体力', (card, player, target) => {
-                return player.canCompare(target);
-            }).set('ai', target => {
-                var player = _status.event.player;
-                return -get.attitude(player, target);
-            });
-            "step 1"
+        async content(event, trigger, player) {
+            const selection = await player.chooseTarget(get.prompt('cassone_R_weizhuangqixi'), '与一名角色拼点，效果持续至其回合结束', (card, player, target) => player.canCompare(target)).set('ai', target => -get.attitude(player, target)).forResult();
+            if (!selection.bool || !selection.targets?.length) return;
+            const target = selection.targets[0];
+            const result = await player.chooseToCompare(target).forResult();
             if (result.bool) {
-                player.chooseToCompare(result.targets[0]);
-            }
-            "step 1"
-            if (result.bool) {
-                player.addTempSkill("cassone_R_weizhuangqixi_win");
-                player.addTempSkill("cassone_R_weizhuangqixi_remove");
-                player.markAuto("cassone_R_weizhuangqixi_win", target);
-            } else {
-                player.loseHp(1);
-                player.addTempSkill("cassone_R_weizhuangqixi_lose");
-                player.addTempSkill("cassone_R_weizhuangqixi_remove");
-                player.markAuto("cassone_R_weizhuangqixi_lose", target);
-            }
+                player.addSkill('cassone_R_weizhuangqixi_win');
+                player.markAuto('cassone_R_weizhuangqixi_win', [target]);
+            } else if (result.num1 < result.num2) {
+                await player.loseHp(1);
+                player.addSkill('cassone_R_weizhuangqixi_lose');
+                player.markAuto('cassone_R_weizhuangqixi_lose', [target]);
+            } else return;
+            player.addSkill('cassone_R_weizhuangqixi_remove');
         },
         ai: {
             threaten: 1.1,
@@ -2144,71 +2135,46 @@ const fallendemon = {
         subSkill: {
             win: {
                 charlotte: true,
-                init: function (player, skill) {
-                    if (!player.storage[skill]) player.storage[skill] = [];
-                },
                 mark: true,
                 onremove: true,
-                usable: 1,
-                intro: {
-                    content: "到$的距离视为1",
-                },
-                direct: true,
+                intro: { content: '与$距离视为1；每回合对其使用的第一张牌不可响应' },
                 mod: {
-                    globalFrom: function (from, to) {
-                        if (from.getStorage('cassone_R_weizhuangqixi_win').includes(to)) {
-                            return -Infinity;
-                        }
-                    },
-                },
-                filter: function (event, player) {
-                    return !event.getParent().directHit.includes(event.target) && player.getHistory('useCard', function (event) {
-                        return event.cards && event.cards.length;
-                    }).indexOf(event) == 0;
+                    globalFrom(from, to) { if (from.getStorage('cassone_R_weizhuangqixi_win').includes(to)) return -Infinity; },
+                    globalTo(from, to) { if (to.getStorage('cassone_R_weizhuangqixi_win').includes(from)) return -Infinity; },
                 },
                 trigger: { player: 'useCardToPlayered' },
+                forced: true,
                 filter(event, player) {
-                    return player.getStorage('cassone_R_weizhuangqixi_win').includes(event.target);
+                    if (!player.getStorage('cassone_R_weizhuangqixi_win').includes(event.target)) return false;
+                    return player.getHistory('useCard', use => use.targets?.includes(event.target))[0] === event.getParent();
                 },
-                logTarget: 'target',
-                content() {
-                    trigger.directHit.add(trigger.target);
-                },
-                ai: {
-                    directHit_ai: true,
-                },
+                content() { trigger.getParent().directHit.add(trigger.target); },
             },
             lose: {
                 charlotte: true,
-                init: function (player, skill) {
-                    if (!player.storage[skill]) player.storage[skill] = [];
-                },
                 mark: true,
                 onremove: true,
-                intro: {
-                    content: "受到来自$的伤害后回复1点体力",
-                },
-                direct: true,
+                intro: { content: '受到来自$的伤害后回复1点体力' },
                 trigger: { player: 'damageEnd' },
-                filter: function (event, player) {
-                    return event.source && player.getStorage('cassone_R_weizhuangqixi_lose').includes(event.source);
-                },
-                content: function () {
-                    if (player.hp < player.maxHp) player.recover(1);
-                },
-                ai: {
-                    maixie: true,
-                },
+                forced: true,
+                filter(event, player) { return event.source && player.getStorage('cassone_R_weizhuangqixi_lose').includes(event.source); },
+                content() { player.recover(1); },
             },
             remove: {
                 charlotte: true,
-                trigger: { global: "phaseEnd" },
-                filter: function (event, player) {
-                    return (player.getStorage('cassone_R_weizhuangqixi_win').includes(event.player) && player.hasSkill("cassone_R_weizhuangqixi_win")) || (player.getStorage('cassone_R_weizhuangqixi_lose').includes(event.player) && player.hasSkill("cassone_R_weizhuangqixi_lose"));
+                forced: true,
+                silent: true,
+                trigger: { global: ['phaseAfter', 'dieAfter'] },
+                filter(event, player) {
+                    return ['win', 'lose'].some(branch => player.getStorage('cassone_R_weizhuangqixi_' + branch).includes(event.player));
                 },
-                content: function () {
-                    if (player.hasSkill("cassone_R_weizhuangqixi_win")) { player.storage.cassone_R_weizhuangqixi_win = []; player.removeSkill("cassone_R_weizhuangqixi_win"); }
-                    if (player.hasSkill("cassone_R_weizhuangqixi_lose")) { player.storage.cassone_R_weizhuangqixi_lose = []; player.removeSkill("cassone_R_weizhuangqixi_lose"); }
+                content() {
+                    for (const branch of ['win', 'lose']) {
+                        const key = 'cassone_R_weizhuangqixi_' + branch;
+                        player.unmarkAuto(key, [trigger.player]);
+                        if (!player.getStorage(key).length) player.removeSkill(key);
+                    }
+                    if (!player.hasSkill('cassone_R_weizhuangqixi_win') && !player.hasSkill('cassone_R_weizhuangqixi_lose')) player.removeSkill('cassone_R_weizhuangqixi_remove');
                 },
             },
         },
@@ -2535,7 +2501,7 @@ const fallendemon = {
                 frequent: true,
                 filter: function (event, player) {
                     var source = player.storage.Xfliegerkorps_R_piaobodeying_markplayer;
-                    return Array.isArray(source) && source.includes(player) && player.hasSkill("kaimuhangkong") && !event.numFixed;
+                    return Array.isArray(source) && source.some(current => current !== player) && player.countMark("Xfliegerkorps_R_piaobodeying_mark") > 0 && player.hasSkill("kaimuhangkong") && !event.numFixed;
                 },
                 content: function () {
                     trigger.num++;

@@ -233,34 +233,26 @@ const shuileizhandui = {
             var showCardsDelay = Math.max(2.5, 1.0 + cards.length * 0.5);
             await player.showCards(cards, "鱼雷战突进").set("delay_time", showCardsDelay);
 
-            var basicTargetResult = { result: { bool: false } };
-            // 只有存在至少一张可合法使用的基本牌时，才需要先确定突击目标。
-            var hasBasicTarget = game.hasPlayer(function (current) {
-                return cards.some(function (currentCard) {
-                    return get.type(currentCard, "trick") == "basic" && player.canUse(currentCard, current, false);
-                });
-            });
             var basecards = cards.filter(function (currentCard) {
                 return get.type(currentCard, "trick") == "basic" && !get.info(currentCard).notarget;
             });
-            if (hasBasicTarget) {
-                basicTargetResult = await player.chooseTarget(
-                    true,
-                    get.prompt("yuleizhantujin"),
-                    "选择一名角色，依次对其使用" + get.translation(basecards),
-                    function (card, player, target) {
-                        return _status.event.cards.some(function (currentCard) {
-                            return get.type(currentCard, "trick") == "basic" && player.canUse(currentCard, target, false);
-                        });
-                    }
-                ).set("cards", cards).set("ai", function (target) {
-                    var player = _status.event.player;
-                    return _status.event.cards.reduce(function (sum, currentCard) {
-                        if (get.type(currentCard, "trick") != "basic" || !player.canUse(currentCard, target, false)) return sum;
+            var basicTargetResult = await player.chooseTarget(
+                true,
+                get.prompt("yuleizhantujin"),
+                "选择一名角色：你对其使用可用基本牌，然后其对你使用可用普通锦囊牌",
+                function (card, player, target) { return target.isIn(); }
+            ).set("cards", cards).set("ai", function (target) {
+                var player = _status.event.player;
+                return _status.event.cards.reduce(function (sum, currentCard) {
+                    if (get.type(currentCard, "trick") == "basic" && player.canUse(currentCard, target)) {
                         return sum + get.effect(target, currentCard, player, player);
-                    }, 0);
-                });
-            }
+                    }
+                    if (get.type(currentCard) == "trick" && target.canUse(currentCard, player)) {
+                        return sum + get.effect(player, currentCard, target, player);
+                    }
+                    return sum;
+                }, 0);
+            });
 
             var basicTarget = null;
             if (basicTargetResult.result && basicTargetResult.result.bool) {
@@ -277,7 +269,7 @@ const shuileizhandui = {
                     if (get.info(basicCard).notarget) {
                         continue;
                     } else {
-                        if (!player.canUse(basicCard, basicTarget, false)) continue;
+                        if (!player.canUse(basicCard, basicTarget)) continue;
                         await player.useCard(basicCard, basicTarget, false);
                     }
                     cards.remove(basicCard);
@@ -287,11 +279,11 @@ const shuileizhandui = {
                 var trickCards = cards.slice(0);
                 for (var j = 0; j < trickCards.length; j++) {
                     var trickCard = trickCards[j];
-                    if (!cards.includes(trickCard) || get.type(trickCard, "trick") != "trick" || !player.isIn()) continue;
+                    if (!cards.includes(trickCard) || get.type(trickCard) != "trick" || !player.isIn() || !basicTarget.isIn()) continue;
                     if (get.info(trickCard).notarget) {
                         continue;
                     } else {
-                        if (!basicTarget.canUse(trickCard, player, false)) continue;
+                        if (!basicTarget.canUse(trickCard, player, null, true)) continue;
                         await basicTarget.useCard(trickCard, player);
                     }
                     cards.remove(trickCard);
@@ -316,7 +308,7 @@ const shuileizhandui = {
     },
     zhanduiqijian: {
         // 战队旗舰：
-        // 其他角色出牌阶段开始时，可以先看牌堆顶三张，
+        // 一名角色出牌阶段开始时，可以先看牌堆顶三张，
         // 再按需要把其中 0~2 张"调拨"给该角色，剩余牌按原顺序放回牌堆顶。
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
@@ -325,7 +317,7 @@ const shuileizhandui = {
             global: "phaseUseBegin",
         },
         filter: function (event, player) {
-            return event.player != player && event.player.isIn();
+            return event.player.isIn();
         },
         prompt: function (event, player) {
             return get.prompt("zhanduiqijian", event.player, player);
@@ -460,20 +452,33 @@ const shuileizhandui = {
         trigger: { global: "dying" },
         round: 1,
         direct: true,
+        canSave(player, target, material) {
+            if (!target || !target.isIn() || target.hp > 0 || !player.getCards("h").includes(material)) return false;
+            if (game.checkMod(material, player, "unchanged", "cardEnabled2", player) === false) return false;
+            const card = get.autoViewAs({ name: "tao", isCard: true }, [material]);
+            return lib.filter.cardEnabled(card, player, "forceEnable") && lib.filter.cardSavable(card, player, target) &&
+                game.checkMod(card, player, target, "unchanged", "playerEnabled", player) !== false &&
+                game.checkMod(card, player, target, "unchanged", "targetEnabled", target) !== false;
+        },
         filter(event, player) {
-            return event.player && event.player.isIn() && event.player.hp <= 0 && player.countCards("h") > 0 &&
-                lib.filter.cardEnabled({ name: "tao", isCard: true }, player, event);
+            return player.getCards("h").some(card => lib.skill.jiunan.canSave(player, event.player, card));
         },
         async content(event, trigger, player) {
             const target = trigger.player;
-            const previousHp = target.hp;
             const result = await player.chooseCard("h", "救难：是否将一张手牌当【快修】对" + get.translation(target) + "使用？")
+                .set("jiunanTarget", target)
+                .set("filterCard", function (card, player) {
+                    return lib.skill.jiunan.canSave(player, _status.event.jiunanTarget, card);
+                })
                 .set("ai", function (card) {
+                    const player = _status.event.player, target = _status.event.jiunanTarget;
                     const effect = get.effect(target, { name: "tao", isCard: true }, player, player);
                     if (effect <= 0) return 0;
                     return effect * 10 - get.value(card, player);
-                });
-            if (!result.bool || !result.cards || !result.cards.length || !target.isIn()) return;
+                }).forResult();
+            if (!result.bool || !result.cards?.length || !lib.skill.jiunan.canSave(player, target, result.cards[0])) return;
+            const previousHp = target.hp;
+            player.logSkill("jiunan", target);
             await player.useCard({ name: "tao", isCard: true }, result.cards, target, true);
             if (target !== player && target.hp > previousHp) await player.draw();
         },
@@ -566,7 +571,7 @@ const shuileizhandui = {
         log: false,
         filter: function (event, player) {
             // 先确认当前确实存在可合法指定的目标，避免空触发。
-            return player.hasUseTarget({ name: "sha", nature: "thunder", isCard: true }, false);
+            return player.hasUseTarget({ name: "sha", nature: "thunder", isCard: true }, null, true);
         },
         prompt2: "选择一名角色，视为对其使用一张【雷杀】。",
         content: function () {
@@ -576,7 +581,7 @@ const shuileizhandui = {
                 get.prompt("shuileihun"),
                 "选择一名角色，视为对其使用一张【雷杀】",
                 function (card, player, target) {
-                    return player.canUse({ name: "sha", nature: "thunder", isCard: true }, target, false);
+                    return player.canUse({ name: "sha", nature: "thunder", isCard: true }, target, null, true);
                 }
             ).set("ai", function (target) {
                 var player = _status.event.player;
@@ -586,7 +591,7 @@ const shuileizhandui = {
             if (result.bool && result.targets && result.targets.length) {
                 player.logSkill("shuileihun", result.targets);
                 // 直接生成虚拟【雷杀】，不需要额外消耗实体手牌。
-                player.useCard({ name: "sha", nature: "thunder", isCard: true }, result.targets[0], false);
+                player.useCard({ name: "sha", nature: "thunder", isCard: true }, result.targets[0]);
             }
         },
     },
@@ -702,7 +707,7 @@ const shuileizhandui = {
             turn: {
                 // 自己回合内偏向先手调度，基本牌会继续牵出后续锦囊资源。
                 trigger: {
-                    player: "useCard",
+                    player: "useCardAfter",
                 },
                 forced: true,
                 filter: function (event, player) {
@@ -720,7 +725,7 @@ const shuileizhandui = {
             outturn: {
                 // 回合外更像防空/反潜支援，打出锦囊后再补一张基础应急牌。
                 trigger: {
-                    player: "useCard",
+                    player: "useCardAfter",
                 },
                 forced: true,
                 filter: function (event, player) {
@@ -826,9 +831,17 @@ const shuileizhandui = {
                     player.logSkill("xiang_busizhishouhu", target);
                     // assignGuardTarget inlined (clearGuardTarget already done above)
                     player.storage.xiang_busizhishouhu = target;
+                    player.markSkill("xiang_busizhishouhu");
                     await target.addSkills("xiang_shouhu");
+                    target.addSkill("xiang_busizhishouhu_mark");
                 },
                 sub: true,
+            },
+            mark: {
+                charlotte: true,
+                mark: true,
+                marktext: "守",
+                intro: { content: "拥有守护标记：死亡后由不死鸟的守护重新指定守护对象。" },
             },
         },
     },

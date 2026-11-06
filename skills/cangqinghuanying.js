@@ -436,14 +436,11 @@ const cangqinghuanying = {
                 }
             }  */
             "step 1"
+            var current = event;
             player.getHistory('sourceDamage', function (evt) {
-                var player = get.player();
-                //game.log("不朽战士" + evt.getParent("buxiuzhanshi").name + get.translation(evt.player) + get.translation(player));
-                if (evt.getParent("buxiuzhanshi").name == "buxiuzhanshi") {
-                    player.addMark("buxiuzhanshi", 1);
-                    return 1;
+                if (evt.getParent("buxiuzhanshi") === current && evt.player !== player) {
+                    player.addMark("buxiuzhanshi", evt.num);
                 }
-                return 0;
             });
         },
         ai: {

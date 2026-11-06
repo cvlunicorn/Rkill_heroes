@@ -8,35 +8,13 @@ const shiptypeskills = {
         firstDo: true,
         usable: 1,
         filter: function (event, player) {
-            return !event.hujia && player.hujia == 0;
+            if (event.hujia) return false;
+            const level = player.countMark('jinengup');
+            const sha = event.card && ['sha', 'sheji9'].includes(get.name(event.card));
+            if (level <= 0) return sha && !game.hasNature(event);
+            return sha || (level === 1 ? game.hasNature(event, 'fire') : game.hasNature(event));
         },
-        content: function () {
-            //  game.log(event.triggername,!trigger.hujia);//灵血&&!player.countCards('h',{color:'red'})
-            if (player.countMark('jinengup') <= 0) {
-                if (event.triggername == 'damageEnd' && trigger.card && (trigger.card.name == 'sha' || trigger.card.name == 'sheji9') && trigger.source && !trigger.nature) {
-                    player.changeHujia(1);
-                    game.log(get.translation(player), '发动了技能【装甲防护】,增加了 1 点护甲值！');
-                }
-            } else if (player.countMark('jinengup') == 1) {
-                if (event.triggername == 'damageEnd' && (trigger.card && (trigger.card.name == 'sha' || trigger.card.name == 'sheji9') || (trigger.nature && trigger.nature == "fire"))) {
-                    player.changeHujia(1);
-                    game.log(get.translation(player), '发动了技能【装甲防护】,增加了 1 点护甲值！');
-                }
-            } else if (player.countMark('jinengup') >= 2) {
-                if (event.triggername == 'damageEnd' && (trigger.card && (trigger.card.name == 'sha' || trigger.card.name == 'sheji9') || trigger.nature)) {
-                    player.changeHujia(1);
-                    game.log(get.translation(player), '发动了技能【装甲防护】,增加了 1 点护甲值！');
-                }
-            }
-            /*if(player.countCards('h',{color:'red'})){
-            var next=player.chooseToDiscard('hejs',{color:'red'},[1,2],get.prompt('叠甲'),('你拥有护甲时,会减少等同于护甲值的手牌上限。<br>当你结算完回复/受伤时,你可以弃置至多2张红色牌,获得X点护甲。（X为弃牌数）<br>若你没有用护甲承受过此次伤害,会额外获得1点护甲。<br>你的出牌阶段开始时,会清除你的护甲,然后摸等量的牌（牺牲防御的制衡）'));
-            next.ai=function(card){var player=_status.event.player;
-             if(player.countCards({name:'tao'})&&player.hasSkill('lingxue'))return -1;
-             if(event.triggername=='damageBefore'&&event.nature=="thunder")return-1;
-             return 4-get.value(card);
-            };*///移除了可以弃置红色牌获得等量护甲值的技能效果2023.8.7
-            //if(result.bool&&result.cards){var num=result.cards.length;player.changeHujia(num);}
-        },
+        content: function () { player.changeHujia(1); },
         /*group:["zhuangjiafh_hujialose"],
         subSkill:{hujialose:{
                  trigger:{
@@ -408,21 +386,28 @@ const shiptypeskills = {
     },
     xianjinld: {
         enable: "phaseUse",
-        usable: 2,
         init: function (player) {
             if (!player.hasMark('xianjinld_defend') && !player.hasMark('xianjinld_attack')) player.addMark('xianjinld_defend');
         },
         content: function () {
             'step 0'
-            player.chooseControl('<span class=yellowtext>友军摸牌防御' + '</span>', '<span class=yellowtext>友军远射攻击' + '</span>', 'cancel2').set('prompt', get.prompt('huokongld')).set('prompt2', '<br>防御：你让实际距离此角色为' + (1 + player.countMark('songpaiup')) + '的队友：<br>防御距离+1,但用杀攻击的距离-1,令自己的摸牌阶段摸牌数-1。<br>攻击：让距离自己' + (1 + player.countMark('jinengup')) + '的队友及自己的攻击距离+1,但防御杀的距离-1,队友的摸牌阶段摸牌数+1。<br>强化技能可以增加这两个技能的作用距离').set('ai', function (event, player) {
-                var player = get.player(), chusha = lib.filter.cardEnabled({ name: 'sha' }, player), renshu = game.countPlayer(function (current) { return get.attitude(player, current) > 0 && get.distance(player, current, 'pure') <= 1 + current.countMark('jinengup'); });
-                if (renshu < 2 || chusha) return 1; if (renshu >= 2 && !chusha) return 0;
+            player.chooseControl('<span class=yellowtext>友军摸牌防御' + '</span>', '<span class=yellowtext>友军远射攻击' + '</span>', 'cancel2').set('prompt', get.prompt('huokongld')).set('prompt2', '<br>防御：你让实际距离此角色为' + (1 + player.countMark('jinengup')) + '的队友：<br>防御距离+1,但用杀攻击的距离-1,令自己的摸牌阶段摸牌数-1。<br>攻击：让距离自己' + (1 + player.countMark('jinengup')) + '的队友及自己的攻击距离+1,但防御杀的距离-1,队友的摸牌阶段摸牌数+1。<br>强化技能可以增加这两个技能的作用距离').set('ai', function (event, player) {
+                return lib.skill.xianjinld.preferredMode(player) === 'attack' ? 1 : 0;
             });
             'step 1'
             if (result.control != 'cancel2') { var i = result.index; game.log(i, 'xianjinld'); if (i == 0 && !player.hasMark('xianjinld_defend')) { player.addMark('xianjinld_defend'); player.removeMark('xianjinld_attack') }; if (i == 1 && !player.hasMark('xianjinld_attack')) { player.addMark('xianjinld_attack'); player.removeMark('xianjinld_defend') }; };
         },
+        preferredMode(player) {
+            const canAttack = lib.filter.cardEnabled({ name: 'sha' }, player);
+            const allies = game.countPlayer(current => get.attitude(player, current) > 0 && get.distance(player, current, 'pure') <= 1 + current.countMark('jinengup'));
+            return allies < 2 || canAttack ? 'attack' : 'defend';
+        },
         ai: {
-            order: function (player) { if (lib.filter.cardEnabled({ name: 'sha' }, player)) { return 8; } return 3; },
+            order(item, player) {
+                if (player.hasMark('xianjinld_' + lib.skill.xianjinld.preferredMode(player))) return 0;
+                return lib.filter.cardEnabled({ name: 'sha' }, player) ? 8 : 3;
+            },
+            result: { player(player) { return player.hasMark('xianjinld_' + lib.skill.xianjinld.preferredMode(player)) ? 0 : 1; } },
         },
         onremove: function (player) { player.removeGaintag('xianjinld'); },
         mark: true,
@@ -431,13 +416,13 @@ const shiptypeskills = {
         },
         intro: {
             mark: function (dialog, content, player) {
-                var tishi = ''; if (player.hasMark('xianjinld_defend')) { var tishi = '实际距离此角色为' + (1 + player.countMark('songpaiup')) + '的队友：防御距离+1,但用杀攻击的距离-1,令自己的摸牌阶段摸牌数-1' }; if (player.hasMark('xianjinld_attack')) { var tishi = '实际距离此角色为' + (1 + player.countMark('songpaiup')) + '的队友及自己：攻击距离+1,但防御杀的距离-1,队友的摸牌阶段摸牌数+1。' };
+                var tishi = ''; if (player.hasMark('xianjinld_defend')) { var tishi = '实际距离此角色为' + (1 + player.countMark('jinengup')) + '的队友：防御距离+1,但用杀攻击的距离-1,令自己的摸牌阶段摸牌数-1' }; if (player.hasMark('xianjinld_attack')) { var tishi = '实际距离此角色为' + (1 + player.countMark('jinengup')) + '的队友及自己：攻击距离+1,但防御杀的距离-1,队友的摸牌阶段摸牌数+1。' };
                 if (get.attitude(game.me, player) <= 0 || player.hasMark('xianjinld_defend')) { return get.translation(player) + '观看牌堆中...' + '<br>增益' + tishi; };
                 if (get.itemtype(_status.pileTop) != 'card') return '牌堆顶无牌'; var cardPile = Array.from(ui.cardPile.childNodes); var cardPile = cardPile.slice(0, Math.min(3, cardPile.length)); dialog.addAuto(cardPile, tishi);
             },
         },
-        global: ["xianjinld_attack", "xianjinld_defend"],
-        group: ["xianjinld_defend1"],
+        global: ["xianjinld_attack", "xianjinld_difend"],
+        group: ["xianjinld_difend1"],
         subSkill: {
             attack: {
                 mod: {
@@ -473,7 +458,7 @@ const shiptypeskills = {
                 trigger: {
                     global: "phaseDrawBegin",
                 },
-                frequent: function (event, player) { if (get.attitude(player, event.player) > 0) return true; return false },
+                forced: true,
                 check: function (event, player) { if (get.attitude(player, event.player) < 0) return false; return true },
                 logTarget: "player",
                 filter: function (event, player) {//spshicai与云将技能在下面,除了帮助队友外还可以看牌顶。
@@ -664,7 +649,7 @@ const shiptypeskills = {
         },
         filterCard: function (card) {
             var player = get.player();
-            return card.name == 'sheji9' || card.name == 'zziqi9' || card.name == 'sha' || card.name == 'jiu' || get.type(card) == 'equip';
+            return ['sha', 'sheji9'].includes(get.name(card)) || get.type(card) == 'equip';
         },
         filterTarget: function (card, player, target) {
             if ((get.attitude(player, target) >= 0 || player.identity == 'nei')) return target != player && get.distance(player, target, 'pure') <= 1 + player.countMark('shoupaiup');
@@ -674,13 +659,16 @@ const shiptypeskills = {
         prompt: function () { return "给队友一张杀或装备牌,每回合限2次。<br>之后目标可以选择使用此牌,如果因使用此牌而造成伤害,你摸一张牌。" },
         prepare: "give",
         discard: false,
-        content: function () {
-            'step 0'
-            targets[0].gain(cards, player);
-            for (var i = 0; i < cards.length; i += (1)) { var usecard = cards[i]; if (usecard.name != 'sha' || !targets[0].hasSkill('_diewulimitai_shale')) { targets[0].chooseUseTarget(usecard); } };
-            if (!target.hasSkill('_diewulimitai_shale')) { target.addSkill('_diewulimitai_shale'); }
-
-
+        async content(event, trigger, player) {
+            const target = event.targets[0];
+            await target.gain(event.cards, player, 'giveAuto');
+            for (const card of event.cards) {
+                if (get.name(card) === 'sha' && target.hasSkill('_diewulimitai_shale')) continue;
+                const use = target.chooseUseTarget(card);
+                await use;
+                if (target.hasHistory('sourceDamage', evt => evt.getParent(parent => parent === use, true))) await player.draw();
+            }
+            if (!target.hasSkill('_diewulimitai_shale')) target.addSkill('_diewulimitai_shale');
         },
         subSkill: {
             shale: {
@@ -828,6 +816,7 @@ const shiptypeskills = {
         },
     }, */
     kaifa: {
+        group: 'xinfu_jingxie2',
         position: "hejs",
         audio: "xinfu_jingxie",
         enable: "phaseUse",
@@ -883,7 +872,7 @@ const shiptypeskills = {
     },
     huijiahuihe: {
         trigger: { player: "phaseEnd", },
-        round: 1, name: "回合", lastDo: true,
+        name: "回合", lastDo: true,
         filter: function (event, player) {//暂时不用
             return player.hujia > 0;
         },
@@ -895,7 +884,7 @@ const shiptypeskills = {
             player.changeHujia(-player.hujia);
             player.insertPhase();
         },
-        group: ["huijiahuihe_hp", "huijiahuihe_draw", "huijiahuihe_roundcount"],
+        group: ["huijiahuihe_hp", "huijiahuihe_draw"],
         subSkill: {
             hp: {
                 trigger: {
@@ -958,7 +947,7 @@ const shiptypeskills = {
             if (name) return { name: name };
             return null;
         },
-        filterCard: function (card, player, event) { return true },
+        filterCard: function (card, player, event) { return !['trick', 'delay'].includes(get.type(card)); },
         selectCard: function (card) { return 1 },
         discard: false,
         check: function (card) {
@@ -1197,28 +1186,16 @@ const shiptypeskills = {
             //var a = (event.name == 'phase');
             return player.getCards('s', function (card) { return card.hasGaintag('junfu') }).length > 0 && event.player.isAlive() && event.player != player;//&& a == true
         },
-        content: function () {
-            'step 0'
-            var goon = (get.attitude(player, trigger.player) > 0);
-            player.chooseCardButton(get.prompt('junfu', trigger.player), player.getCards('s', function (card) { return card.hasGaintag('junfu') }), [1, 3]).set('ai', function () {
-                if (_status.event.goon) return 1;
-                return -1;
-            }).set('goon', goon);
-            'step 1'
-            if (result.bool) {
-                player.logSkill('junfu', trigger.player);
-                //player.loseToDiscardpile(result.links);player.discoverCard(get.inpile('trick'));target.loseToSpecial(event.cards2,'asara_yingwei',player).visible=true;player.draw(1);player.draw(1);player.loseToSpecial(,'junfu',player).visible=true;
-                trigger.player.gain(result.links, player);
-                //独角兽的技能修葺
-                if (player.hasSkill("xiuqi") && (!trigger.player.hasSkill("xiuqi2"))) {
-                    game.log(get.translation(trigger.player) + "获得了【修葺】带来的提升！");
-                    trigger.player.addTempSkill('xiuqi2', { player: 'phaseAfter' });
-                }
-
-                //
-                player.draw(1);
-            } else event.finish();
-
+        async content(event, trigger, player) {
+            const result = await player.chooseCardButton(get.prompt('junfu', trigger.player), player.getCards('s', card => card.hasGaintag('junfu')), [1, 3]).set('ai', () => get.attitude(player, trigger.player) > 0 ? 1 : -1).forResult();
+            if (!result.bool) return;
+            player.logSkill('junfu', trigger.player);
+            await trigger.player.gain(result.links, player);
+            if (player.hasSkill('xiuqi') && !trigger.player.hasSkill('xiuqi2')) {
+                const grant = await player.chooseBool('修葺：是否令' + get.translation(trigger.player) + '本回合首次造成伤害时可以回复1点体力？').set('ai', () => get.attitude(player, trigger.player) > 0).forResult();
+                if (grant.bool) trigger.player.addTempSkill('xiuqi2', { player: 'phaseAfter' });
+            }
+            await player.draw(1);
         },
         group: ["junfu_choose", "junfu_mark"],
         onremove: function (player, skill) {
@@ -1316,7 +1293,7 @@ const shiptypeskills = {
     fangkongdaodan: {
         nobracket: true,
         trigger: {
-            player: "phaseZhunbeiBegin",
+            player: "phaseUseBegin",
             global: "gameStart",
         },
         frequent: true,
@@ -1627,7 +1604,7 @@ const shiptypeskills = {
         firstDo: true,
         trigger: { player: ["shaMiss", "eventNeutralized"], }, audio: "ext:舰R牌将/audio/skill:true",
         filter: function (event, player) {
-            if (event.type != 'card' || event.card.name != 'sha') return false;
+            if (event.type != 'card' || event.card.name != 'sha' || event.responded?.result !== 'shaned') return false;
 
             return player.countCards('he', function (card) { return card != player.getEquip('guanshi'); }) >= 1 && event.target.isAlive();
         },
@@ -1696,7 +1673,7 @@ const shiptypeskills = {
         audio: "ext:舰R牌将/audio/skill:2",
         trigger: { player: "damageEnd", },
         filter: function (event, player) {
-            return (event.source != undefined && event.source != player && event.player.hp <= event.player.maxHp / 2);
+            return (event.source != undefined && event.source != player && event.player.hp <= 2);
         },
         check: function (event, player) {
             return (get.attitude(player, event.source) <= 0);
@@ -1736,6 +1713,11 @@ const shiptypeskills = {
                 });
             };
             "step 4"
+            if (result.bool) {
+                if (event.num > 0) event.goto(1);
+                else event.finish();
+                return;
+            }
             if (result.bool == false) {
                 event.tishi = '作为伤害来源：2.选择交给' + get.translation(player) + '一张手牌;<br>3.不执行,则自己失去一点体力(无视护甲)。<br>'; if (event.qipai > 1) { event.tishi += ('对手先弃置了两张牌,你进行选择2前,若手牌大于1,会额外失去一张牌。<br>'); if (trigger.source.countCards('h') >= 2) { trigger.source.discard(trigger.source.getCards('h').randomGet()); }; };
                 if (trigger.source.countCards('h', { name: 'tao' }) >= 0) { event.tishi += ('有桃,不怕扣血；') }; if (trigger.source.countCards('h', { name: 'jiu' }) >= 0) { event.tishi += ('有酒,没血不慌；') }; if (trigger.source.countCards('h', { name: 'shandian' }) + trigger.source.countCards('h', { name: 'taoyuan' }) >= 0) { event.tishi += ('有些稀有卡牌能变废为宝,转给对手') };
@@ -1801,9 +1783,9 @@ const shiptypeskills = {
         content: function () {
             "step 0"
             event.num1 = player.countMark('jinengup') + 1; event.num2 = 0;
-            var a = game.countPlayer(function (current) { return get.attitude(player, current) > 0 });
+            var a = game.countPlayer();
             player.chooseTarget(get.prompt('zhiyan'), [1, Math.min(event.num1, a)], '令目标角色摸一张牌并展示之。<br>若为装备牌,则其选择是否装备。<br>(每强化一次技能,便+1技能的可以选择的目标数)', function (card, player, target) {
-                return get.distance(player, target, 'pure') <= 1 + player.countMark('jinengup');
+                return true;
             }).set('ai', function (target) {
                 return get.attitude(_status.event.player, target);
             });
@@ -2083,9 +2065,9 @@ const shiptypeskills = {
                 });
             "step 1"
             if (result.bool) {
-                var target = result.targets[0];
+                event.target = result.targets[0];
                 for (var i = 0; i < 3; i++) {
-                    player.useCard({ name: "sha", nature: "thunder", isCard: true }, target);
+                    player.useCard({ name: "sha", nature: "thunder", isCard: true }, event.target);
                 }
             } else event.finish();
             "step 2"
@@ -2124,8 +2106,10 @@ const shiptypeskills = {
                 },
                 silent: true,
                 charlotte: true,
+                onremove: true,
                 filter: function (event, player) {
-                    return event.getParent("zhongleizhuangjiantuxi").player == player;
+                    const parent = event.getParent("zhongleizhuangjiantuxi");
+                    return parent.player === player && parent.target === event.player;
                 },
                 content: function () {
                     player.markAuto("zhongleizhuangjiantuxi_count", [trigger.player]);

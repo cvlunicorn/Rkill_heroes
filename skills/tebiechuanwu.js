@@ -9,42 +9,28 @@ const tebiechuanwu = {
         trigger: { global: "phaseEnd" },
         forced: false,
         frequent: true,
-        filter: function (event, player) {
-            if (!player.isTurnedOver()) return false;
-            var evt = _status.event.getParent("phase");
-            if (!evt || !evt.player) return false;
-
-            // 汇总本回合所有角色进入弃牌堆的牌，不再要求目标本回合未造成伤害。
+        getCards: function (player) {
             var list = [];
-            var allPlayers = (game.players || []).concat(game.dead || []);
-            allPlayers.forEach(function (current) {
-                current.getHistory("lose", function (loseEvt) {
-                    if (loseEvt.type == "discard" && loseEvt.cards) {
-                        list.addArray(loseEvt.cards.filter(function (card) {
-                            return get.position(card) == "d";
-                        }));
-                    }
-                });
+            game.getGlobalHistory("cardMove", function (evt) {
+                if (evt.name !== "cardsDiscard" && !(evt.name === "lose" && evt.position === ui.discardPile)) return;
+                list.addArray((evt.cards || []).filter(function (card) {
+                    return get.position(card, true) === "d" && player.hasUseTarget(card, null, true);
+                }));
             });
-            return list.length > 0;
+            return list;
+        },
+        filter: function (event, player) {
+            return player.isTurnedOver() && lib.skill.guangrongjianduisp.getCards(player).length > 0;
         },
         content: function () {
             "step 0"
             var evt = _status.event.getParent("phase");
             if (evt && evt.player) {
-                var list = [];
-                var allPlayers = (game.players || []).concat(game.dead || []);
-                allPlayers.forEach(function (current) {
-                    current.getHistory("lose", function (loseEvt) {
-                        if (loseEvt.type == "discard" && loseEvt.cards) {
-                            list.addArray(loseEvt.cards.filter(function (card) {
-                                return get.position(card) == "d";
-                            }));
-                        }
-                    });
-                });
+                var list = lib.skill.guangrongjianduisp.getCards(player);
                 if (list.length > 0) {
-                    player.chooseButton(["光荣舰队：是否使用一张牌？", list]).set("ai", function (button) {
+                    player.chooseButton(["光荣舰队：是否使用一张牌？", list]).set("filterButton", function (button, player) {
+                        return get.position(button.link, true) === "d" && player.hasUseTarget(button.link, null, true);
+                    }).set("ai", function (button) {
                         var player = _status.event.player;
                         var card = button.link;
 
@@ -78,7 +64,7 @@ const tebiechuanwu = {
                 event.finish();
             }
             "step 1"
-            if (result.bool && result.links && result.links[0]) {
+            if (result.bool && result.links && result.links[0] && get.position(result.links[0], true) === "d" && player.hasUseTarget(result.links[0], null, true)) {
                 player.chooseUseTarget(result.links[0], true);
             }
         },
@@ -383,11 +369,14 @@ const tebiechuanwu = {
             }
             if (num >= 4) {
                 var evt = trigger.getParent();
-                if (evt.baseDamage) evt.baseDamage++;
+                if (!evt.nanshagonchen_damage) {
+                    evt.nanshagonchen_damage = true;
+                    evt.baseDamage = (evt.baseDamage || 1) + 1;
+                }
             }
             if (num >= 1) {
-                if (trigger.target.countCards("he") >= 0) {
-                    var next = player.choosePlayerCard(trigger.target, 'he', [1, Math.min(player.hp, trigger.target.countCards('he'))], get.prompt('nanshagonchen', trigger.target));
+                if (trigger.target.countCards("he") > 0 && player.hp > 0) {
+                    var next = player.choosePlayerCard(trigger.target, 'he', Math.min(player.hp, trigger.target.countCards('he')), true, get.prompt('nanshagonchen', trigger.target));
                     next.set('ai', function (button) {
                         if (!_status.event.goon) return 0;
                         var val = get.value(button.link);
@@ -525,35 +514,30 @@ const tebiechuanwu = {
                 },
             },
             damage: {
-                trigger: { source: "damageSource" },
+                trigger: { global: "damageSource" },
                 direct: true,
                 filter: function (event, player) {
-                    return event.source.hasSkill("sidajinganglian_effect") && event.source.storage.sidajinganglian_effect < 2;
+                    return event.source?.hasSkill("sidajinganglian_effect") && !event.source.storage.sidajinganglian_effect;
                 },
-                content: function () {
-                    "step 0"
-                    if (trigger.source.storage.sidajinganglian_effect && trigger.source.storage.sidajinganglian_effect == 1) {
-                        game.asyncDraw([player, trigger.source]);
-                        trigger.source.storage.sidajinganglian_effect = 2;
-                        event.finish();
-                        return;
-                    }
-                    player.chooseToDiscard("he", "四大金刚：是否弃置一张牌，令" + get.translation(player) + "额外使用一张【杀】？").set("ai", function (card) {
-                        return 7 - get.value(card);
+                async content(event, trigger, player) {
+                    const source = trigger.source;
+                    source.storage.sidajinganglian_effect = 1;
+                    const paid = await player.chooseToDiscard("he", "四大金刚：是否弃置一张牌，令" + get.translation(source) + "额外使用一张【杀】？")
+                        .set("ai", card => 7 - get.value(card)).forResult();
+                    if (!paid.bool || !source.isIn()) return;
+                    player.logSkill("sidajinganglian", source);
+                    const use = source.chooseToUse({
+                        prompt: "四大金刚：你可以额外使用一张杀",
+                        filterCard: function (card, player) { return get.name(card) === "sha" && lib.filter.cardEnabled(card, player); },
+                        filterTarget: function (card, player, target) { return player.canUse(card, target, true, false); },
+                        addCount: false,
+                        ai2: function () { return get.effect_use.apply(this, arguments) + 0.01; },
                     });
-                    "step 1"
-                    if (result.bool) {
-                        trigger.source.storage.sidajinganglian_effect = 1;
-                        trigger.source.chooseToUse('四大金刚：你可以使用一张杀', function (card) {
-                            if (get.name(card) != 'sha' && get.name(card) != 'sheji9') return false;
-                            return lib.filter.cardEnabled.apply(this, arguments)
-                        }, function (card, player, target) {
-                            return lib.filter.filterTarget.apply(this, arguments);
-                        }).set('ai2', function () {
-                            return get.effect_use.apply(this, arguments) + 0.01;
-                        });
+                    await use;
+                    if (source.hasHistory("sourceDamage", evt => evt.card?.name === "sha" && evt.getParent(parent => parent === use, true))) {
+                        const recipients = game.filterPlayer(current => current === player || current.hasSkill("sidajinganglian_effect"));
+                        await game.asyncDraw(recipients);
                     }
-
                 },
             },
 
@@ -566,26 +550,14 @@ const tebiechuanwu = {
         global: "haiyingxunyi_qinggang_skill",
         trigger: { global: "useCardAfter" },
         direct: true,
-        filter: function (event, player, name) {
-            if (event.player == player) {
-                if (_status.currentPhase != player) return false;
-                var evt = player.getLastUsed(1);
-                if (!evt) return false;
-                var color1 = get.color(evt.card);
-                var color2 = get.color(event.card);
-                return color1 && color2 && color1 != 'none' && color2 != 'none' && color1 != color2;
-            }
-            if (event.player != player) {
-                if (event.player.group == "PLAN" || event.player.group == "ROCN") {
-                    if (_status.currentPhase != event.player) return false;
-                    var evt = event.player.getLastUsed(1);
-                    if (!evt) return false;
-                    var color1 = get.color(evt.card);
-                    var color2 = get.color(event.card);
-                    return color1 && color2 && color1 != 'none' && color2 != 'none' && color1 != color2;
-                }
-            }
-            return false;
+        filter: function (event, player) {
+            if (event.player !== player && !["PLAN", "ROCN"].includes(event.player.group)) return false;
+            const phase = event.getParent(evt => ["phaseZhunbei", "phaseJudge", "phaseDraw", "phaseUse", "phaseDiscard", "phaseJieshu"].includes(evt.name), true);
+            if (!phase) return false;
+            const previous = event.player.getHistory("useCard", evt => evt !== event && evt.getParent(current => current === phase, true)).at(-1);
+            if (!previous) return false;
+            const a = get.color(previous.card), b = get.color(event.card);
+            return a && b && a !== "none" && b !== "none" && a !== b;
         },
         content: function () {
             "step 0"
@@ -620,7 +592,7 @@ const tebiechuanwu = {
             player: "useCardToPlayered",
         },
         filter: function (event) {
-            return event.player.hasSkill("daoqu");
+            return event.card?.name === "sha" && event.player.hasSkill("daoqu");
         },
         forced: true,
         logTarget: "target",
@@ -669,7 +641,7 @@ const tebiechuanwu = {
             player: "useCardToPlayered",
         },
         filter: function (event) {
-            return event.player.hasSkill("qiantingss");
+            return event.card?.name === "sha" && event.player.hasSkill("qiantingss");
         },
         forced: true,
         logTarget: "target",
@@ -920,11 +892,11 @@ const tebiechuanwu = {
         nobracket: true,
         group: ["weiyanzhaohuan_use", "weiyanzhaohuan_respond"],
         subSkill: {
+            used: { charlotte: true },
             use: {
-                usable: 1,
                 enable: "chooseToUse",
                 filter: function (event, player) {
-                    if (event.filterCard({ name: "sha", isCard: true }, player, event)) return true;
+                    if (!player.hasSkill("weiyanzhaohuan_used") && !event.responded && event.filterCard({ name: "sha", isCard: true }, player, event)) return true;
                 },
                 check: function (event, player) {
                     return true;
@@ -932,6 +904,7 @@ const tebiechuanwu = {
                 },
                 content: function () {
                     "step 0";
+                    player.addTempSkill("weiyanzhaohuan_used", { global: "phaseAfter" });
                     player.judge("weiyanzhaohuan", function (card) {
                         return get.color(card) == "black" ? 1.5 : -0.5;
                     }).judge2 = function (result) {
@@ -953,12 +926,11 @@ const tebiechuanwu = {
                 },
             },
             respond: {
-                usable: 1,
                 trigger: {
                     player: ["chooseToRespondBegin"],
                 },
                 filter: function (event, player) {
-                    if (event.filterCard({ name: "sha", isCard: true }, player, event)) return true;
+                    if (!player.hasSkill("weiyanzhaohuan_used") && !event.responded && event.filterCard({ name: "sha", isCard: true }, player, event)) return true;
                 },
                 check: function (event, player) {
                     if (!event) return true;
@@ -983,6 +955,7 @@ const tebiechuanwu = {
                 },
                 content: function () {
                     "step 0";
+                    player.addTempSkill("weiyanzhaohuan_used", { global: "phaseAfter" });
                     trigger.jishiyu_R1 = true;
                     player.judge("weiyanzhaohuan", function (card) {
                         return get.color(card) == "black" ? 1.5 : -0.5;
@@ -1034,6 +1007,7 @@ const tebiechuanwu = {
         forced: false,
         filter: function (event, player) {
             if (event.card.name != "sha" && event.card.name != "sheji9") return false;
+            if (event.getParent().guangrongjianduinormal_damage) return false;
             var hs = player.getCards("h");
             for (var card of hs) {
                 if (get.type(card) == "basic") return false;
@@ -1043,7 +1017,8 @@ const tebiechuanwu = {
         content: function () {
             player.showHandcards();
             var evt = trigger.getParent();
-            if (evt.baseDamage) evt.baseDamage++;
+            evt.guangrongjianduinormal_damage = true;
+            evt.baseDamage = (evt.baseDamage || 1) + 1;
         },
         check: function (event, player) {
             return event.target && get.attitude(player, event.target) < 0;
@@ -1070,11 +1045,10 @@ const tebiechuanwu = {
             }
         },
         filter: function (event, player, name) {
-            // 已经触发过则不再触发
-            if (player.storage.lizhengshangyou_used) return false;
             if (name == "phaseDrawBegin2") {
                 return !event.numFixed;
             }
+            if (player.storage.lizhengshangyou_used) return false;
             return (event.name != 'phase' || game.phaseNumber == 0);
         },
         content: function () {
@@ -1149,7 +1123,7 @@ const tebiechuanwu = {
         direct: true,
         filter: function (event, player) {
             return event.card && event.card.name == "sha" && event.target && event.target != player &&
-                event.target.isIn() && event.target.countCards("h") > 0 && get.attitude(player, event.target) < 0;
+                event.target.isIn() && player.canCompare(event.target);
         },
         content: function () {
             "step 0"
