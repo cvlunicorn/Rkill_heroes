@@ -1,4 +1,5 @@
-// Adapt native online Guozhan without changing the engine or its chooseButtonOL event.
+// 文件用途：适配舰R国战联机选将，同步候选武将并处理主副将搭配和重连。
+// 在不修改引擎及其 chooseButtonOL 事件的情况下接入原版联机国战。
 export function installJianROnlineSelection({ lib, game, get, _status, characterIds, packName }) {
     if (lib.jianrOnlineSelection) return lib.jianrOnlineSelection;
     const ids = new Set(characterIds);

@@ -1,3 +1,4 @@
+// 文件用途：定义舰R国战武将包的角色、分类、技能与翻译，供国战模式注册。
 import { lib, game, ui, get, ai, _status } from '../../noname.js'
 import { globalskills } from "./skills/globalskills.js";
 import { shiptypeskills } from "./skills/shiptypeskills.js";
