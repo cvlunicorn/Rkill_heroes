@@ -1197,16 +1197,84 @@ const fallendemon = {
             },
         },
     },
-    tirpitz_R_jinshu: {
+    tirpitz_R_chuanyue: {
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
         dutySkill: true,
-        trigger: { global: "roundStart" },
+        trigger: { global: ["gameStart", "phaseBefore"], player: "enterGame" },
+        firstDo: true,
+        priority: 100,
+        forced: true,
+        silent: true,
         filter(event, player) {
-            return player.isIn() && !player.storage.tirpitz_R_jinshu_success && player.countCards("h") > 0;
+            if (Number.isInteger(player.storage.tirpitz_R_chuanyue_x)) return false;
+            return event.name !== "phase" || game.phaseNumber === 0;
+        },
+        group: ["tirpitz_R_chuanyue_success", "tirpitz_R_chuanyue_fail"],
+        mark: true,
+        marktext: "阅",
+        intro: {
+            content(storage, player) {
+                var x = player.storage.tirpitz_R_chuanyue_x;
+                return "使命目标 X：" + (x || "尚未选择") +
+                    (player.storage.tirpitz_R_jinshu_success ? "；使命成功，禁书已获得转化能力" : "；收集不同点数的禁书，失败后保留 X");
+            },
+        },
+        content() {
+            "step 0"
+            player.addSkill("tirpitz_R_jinshu");
+            player.chooseControl(Array.from({ length: 13 }, function (_, i) { return String(i + 1); }))
+                .set("prompt", "传阅：选择使命目标 X（1至13，失败后保留）")
+                .set("ai", function () { return 0; });
+            "step 1"
+            var x = Number(result.control);
+            if (!Number.isInteger(x) || x < 1 || x > 13) { event.goto(0); return; }
+            player.storage.tirpitz_R_chuanyue_x = x;
+            player.storage.tirpitz_R_jinshu_success = false;
+            player.syncStorage("tirpitz_R_chuanyue_x");
+            player.syncStorage("tirpitz_R_jinshu_success");
+            player.markSkill("tirpitz_R_chuanyue");
+            game.log(player, "为传阅选择了", x);
+        },
+        subSkill: {
+            fail: {
+                charlotte: true,
+                trigger: { player: "dying" },
+                forced: true,
+                filter(event, player) {
+                    return Number.isInteger(player.storage.tirpitz_R_chuanyue_x) && !player.storage.tirpitz_R_jinshu_success;
+                },
+                content() {
+                    player.removeSkill("tirpitz_R_jinshu_watch");
+                    delete player.storage.tirpitz_R_jinshu_suit;
+                    player.storage.tirpitz_R_jinshu_use_used = [];
+                    player.storage.tirpitz_R_jinshu_success = false;
+                    player.syncStorage("tirpitz_R_jinshu_success");
+                    player.markSkill("tirpitz_R_chuanyue");
+                    var cards = player.getExpansions("tirpitz_R_jinshu");
+                    if (cards.length) player.loseToDiscardpile(cards);
+                },
+            },
+        },
+    },
+    tirpitz_R_jinshu: {
+        nobracket: true,
+        audio: "ext:舰R牌将/audio/skill:true",
+        trigger: { global: "roundStart" },
+        init() {
+            lib.dynamicTranslate.tirpitz_R_jinshu = function (player) {
+                var text = lib.translate.tirpitz_R_jinshu_info;
+                if (player.storage.tirpitz_R_jinshu_success) text += lib.translate.tirpitz_R_jinshu_use_info;
+                return text;
+            };
+        },
+        filter(event, player) {
+            var x = player.storage.tirpitz_R_chuanyue_x;
+            return player.isIn() && Number.isInteger(x) && x >= 1 && x <= 13 &&
+                player.getExpansions("tirpitz_R_jinshu").length <= x && player.countCards("h") > 0;
         },
         direct: true,
-        group: ["tirpitz_R_jinshu_success", "tirpitz_R_jinshu_fail"],
+        group: ["tirpitz_R_jinshu_use", "tirpitz_R_jinshu_use_reset", "tirpitz_R_jinshu_use_equip"],
         marktext: "书",
         intro: {
             content: "expansion",
@@ -1247,7 +1315,7 @@ const fallendemon = {
                 getCards(event, player) {
                     if (event.name.indexOf("lose") === 0 && (event.getlx === false || event.position !== ui.discardPile)) return [];
                     var suit = player.storage.tirpitz_R_jinshu_suit;
-                    if (!suit || player.storage.tirpitz_R_jinshu_success) return [];
+                    if (!suit) return [];
                     return (event.cards || []).filter(function (card) {
                         if (get.position(card, true) !== "d" || get.suit(card, false) !== suit) return false;
                         // lose removes gaintags before loseAfter; inspect the loss snapshot.
@@ -1268,7 +1336,7 @@ const fallendemon = {
                     "step 0"
                     event.remaining = lib.skill.tirpitz_R_jinshu_watch.getCards(trigger, player).length;
                     "step 1"
-                    if (!event.remaining || !player.isIn() || player.storage.tirpitz_R_jinshu_success || !player.hasSkill("tirpitz_R_jinshu_watch")) {
+                    if (!event.remaining || !player.isIn() || !player.hasSkill("tirpitz_R_jinshu_watch")) {
                         event.finish();
                         return;
                     }
@@ -1299,44 +1367,55 @@ const fallendemon = {
                     event.goto(1);
                 },
             },
-            fail: {
-                charlotte: true,
-                trigger: { player: "dying" },
-                forced: true,
-                filter(event, player) { return !player.storage.tirpitz_R_jinshu_success; },
-                content() {
-                    // Stop collection before discarding books, including the empty-book case.
-                    player.removeSkill("tirpitz_R_jinshu_watch");
-                    delete player.storage.tirpitz_R_jinshu_suit;
-                    player.storage.tirpitz_R_chuanyue_used = [];
-                    var cards = player.getExpansions("tirpitz_R_jinshu");
-                    if (cards.length) player.loseToDiscardpile(cards);
-                },
-            },
         },
         ai: { threaten: 2.1 },
     },
-    tirpitz_R_chuanyue: {
+    tirpitz_R_jinshu_use: {
+        sourceSkill: "tirpitz_R_jinshu",
         nobracket: true,
         audio: "ext:舰R牌将/audio/skill:true",
         enable: ["chooseToUse", "chooseToRespond"],
-        group: ["tirpitz_R_chuanyue_reset", "tirpitz_R_chuanyue_equip"],
+        group: ["tirpitz_R_jinshu_use_reset", "tirpitz_R_jinshu_use_equip"],
+        prepareSelection(event) {
+            if (event._tirpitz_R_jinshu_use_backupGuard || typeof event.backup !== "function") return;
+            // Scope this guard to the current choice event, not the engine prototype.
+            // A re-selection must back up the original choice, never a material
+            // filter wrapping this skill. Restore BEFORE backup, so cancel and
+            // native filterOk remain safe even before any material is checked.
+            var backup = event.backup;
+            event.backup = function (skill) {
+                if (this.skill && (skill === "tirpitz_R_jinshu_use" || this.skill === "tirpitz_R_jinshu_use")) {
+                    this.restore();
+                }
+                return backup.apply(this, arguments);
+            };
+            event._tirpitz_R_jinshu_use_backupGuard = true;
+        },
         filter(event, player) {
+            lib.skill.tirpitz_R_jinshu_use.prepareSelection(event);
             return player.hasCard(function (card) {
-                return lib.skill.tirpitz_R_chuanyue.filterCard(card, player, event);
+                return lib.skill.tirpitz_R_jinshu_use.filterCard(card, player, event);
             }, "h");
         },
         filterCard(card, player, event) {
-            var used = player.storage.tirpitz_R_chuanyue_used || [];
+            var used = player.storage.tirpitz_R_jinshu_use_used || [];
             if (!player.storage.tirpitz_R_jinshu_success || used.includes(get.number(card, false))) return false;
-            var viewAs = lib.skill.tirpitz_R_chuanyue.viewAs([card], player);
+            var viewAs = lib.skill.tirpitz_R_jinshu_use.viewAs([card], player);
             if (!viewAs || game.checkMod(card, player, "unchanged", "cardEnabled2", player) === false) return false;
             event = event || _status.event;
             if (!event || !["chooseToUse", "chooseToRespond"].includes(event.name)) return true;
-            // Once the skill is selected, event.filterCard filters materials; use the original card filter.
-            var filter = event._backup ? event._backup.filterCard : event.filterCard;
+            lib.skill.tirpitz_R_jinshu_use.prepareSelection(event);
+            var context = event.skill ? event._backup : event;
+            if (!context || event._tirpitz_R_jinshu_use_checking) return false;
             var virtual = get.autoViewAs(viewAs, [card]);
-            if (filter && !filter(virtual, player, event)) return false;
+            // Fail closed if an already-corrupt event has no recoverable original
+            // filter. Never bypass its use/respond restrictions to stop recursion.
+            event._tirpitz_R_jinshu_use_checking = true;
+            try {
+                if (context.filterCard && !context.filterCard(virtual, player, event)) return false;
+            } finally {
+                delete event._tirpitz_R_jinshu_use_checking;
+            }
             if (event.name === "chooseToRespond") return lib.filter.cardRespondable(virtual, player, event);
             var info = get.info(virtual);
             if (info.notarget) return true;
@@ -1347,7 +1426,7 @@ const fallendemon = {
             game.checkMod(virtual, player, range, "selectTarget", player);
             if (range[1] !== -1 && range[1] < range[0]) return false;
             if (range[0] === 0) return true;
-            var filterTarget = (event._backup ? event._backup.filterTarget : event.filterTarget) || lib.filter.filterTarget;
+            var filterTarget = context.filterTarget || lib.filter.filterTarget;
             return game.countPlayer(function (target) {
                 return lib.filter.filterTarget(virtual, player, target) && filterTarget(virtual, player, target);
             }) >= Math.max(1, range[0]);
@@ -1355,8 +1434,8 @@ const fallendemon = {
         precontent() {
             var cards = event.result.cards;
             if (!cards || !cards.length) return;
-            event.result.card = get.autoViewAs(lib.skill.tirpitz_R_chuanyue.viewAs(cards, player), cards);
-            player.markAuto("tirpitz_R_chuanyue_used", [get.number(cards[0], false)]);
+            event.result.card = get.autoViewAs(lib.skill.tirpitz_R_jinshu_use.viewAs(cards, player), cards);
+            player.markAuto("tirpitz_R_jinshu_use_used", [get.number(cards[0], false)]);
         },
         viewAs(cards, player) {
             if (!cards.length) return null;
@@ -1379,16 +1458,16 @@ const fallendemon = {
                 firstDo: true,
                 filter(event, player) {
                     var use = event.getParent("useCard");
-                    return use.player === player && use.skill === "tirpitz_R_chuanyue" && use.cards.includes(event.card) && get.type(use.card) === "equip" && event.card.name !== use.card.name;
+                    return use.player === player && use.skill === "tirpitz_R_jinshu_use" && use.cards.includes(event.card) && get.type(use.card) === "equip" && event.card.name !== use.card.name;
                 },
                 content() {
                     // This engine equips the physical material, so retain the equipment identity until it leaves the zone.
                     var name = trigger.getParent("useCard").card.name;
                     game.broadcastAll(function (card, name) {
-                        card.tirpitz_R_chuanyue_original = [card.suit, card.number, card.name, card.nature];
+                        card.tirpitz_R_jinshu_use_original = [card.suit, card.number, card.name, card.nature];
                         card.init([card.suit, card.number, name]);
                     }, trigger.card, name);
-                    game.addGlobalSkill("tirpitz_R_chuanyue_restore");
+                    game.addGlobalSkill("tirpitz_R_jinshu_use_restore");
                 },
             },
             restore: {
@@ -1403,18 +1482,18 @@ const fallendemon = {
                     if (event.name === "lose" && event.getParent("swapEquip").name === "swapEquip") return [];
                     var moving = event.name === "lose" ? event.getParent("equip").card : null;
                     return (event.cards || (event.card ? [event.card] : [])).filter(function (card) {
-                        return card !== moving && card.tirpitz_R_chuanyue_original && get.position(card, true) !== "e";
+                        return card !== moving && card.tirpitz_R_jinshu_use_original && get.position(card, true) !== "e";
                     });
                 },
-                filter(event) { return lib.skill.tirpitz_R_chuanyue_restore.getCards(event).length > 0; },
+                filter(event) { return lib.skill.tirpitz_R_jinshu_use_restore.getCards(event).length > 0; },
                 content() {
                     game.broadcastAll(function (cards) {
                         cards.forEach(function (card) {
-                            var original = card.tirpitz_R_chuanyue_original;
-                            delete card.tirpitz_R_chuanyue_original;
+                            var original = card.tirpitz_R_jinshu_use_original;
+                            delete card.tirpitz_R_jinshu_use_original;
                             card.init(original);
                         });
-                    }, lib.skill.tirpitz_R_chuanyue_restore.getCards(trigger));
+                    }, lib.skill.tirpitz_R_jinshu_use_restore.getCards(trigger));
                 },
             },
             reset: {
@@ -1423,7 +1502,7 @@ const fallendemon = {
                 forced: true,
                 silent: true,
                 firstDo: true,
-                content() { player.storage.tirpitz_R_chuanyue_used = []; },
+                content() { player.storage.tirpitz_R_jinshu_use_used = []; },
             },
         },
         ai: { order: 8, respondSha: true, respondShan: true, respondTao: true },
@@ -1495,7 +1574,7 @@ const fallendemon = {
             },
         },
     },
-    tirpitz_R_jinshu_success: {
+    tirpitz_R_chuanyue_success: {
         charlotte: true,
         trigger: { player: "addToExpansionAfter" },
         filter(event, player) {
@@ -1504,14 +1583,17 @@ const fallendemon = {
                 var n = get.number(card, false);
                 if (n >= 1 && n <= 13) numbers.add(n);
             });
-            return !player.storage.tirpitz_R_jinshu_success && numbers.length === 13;
+            var x = player.storage.tirpitz_R_chuanyue_x;
+            return Number.isInteger(x) && x >= 1 && x <= 13 &&
+                !player.storage.tirpitz_R_jinshu_success && numbers.length >= x;
         },
         forced: true,
         content() {
             player.storage.tirpitz_R_jinshu_success = true;
-            player.removeSkill("tirpitz_R_jinshu_watch");
-            player.addSkill("tirpitz_R_chuanyue");
+            player.syncStorage("tirpitz_R_jinshu_success");
             player.markSkill("tirpitz_R_chuanyue");
+            player.markSkill("tirpitz_R_jinshu");
+            game.log(player, "完成了传阅使命，禁书获得转化能力");
         },
     },
 
