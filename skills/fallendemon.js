@@ -1422,7 +1422,7 @@ const fallendemon = {
             var select = info.selectTarget;
             if (select === undefined) select = info.filterTarget === undefined ? 0 : 1;
             var range = typeof select === "function" ? select(virtual, player) : get.select(select);
-            range = range.slice();
+            range = get.select(range).slice();
             game.checkMod(virtual, player, range, "selectTarget", player);
             if (range[1] !== -1 && range[1] < range[0]) return false;
             if (range[0] === 0) return true;
